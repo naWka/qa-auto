@@ -1,0 +1,982 @@
+id: c2-l3
+chapter: c2
+title: { en: "Reviewing AI-generated tests", ru: "Ревью тестов от ИИ" }
+goal:
+  en: "Review Petal's tests with a five-question checklist, spot hallucinations and request changes the agent can act on."
+  ru: "Проверять тесты Petal по чек-листу из пяти вопросов, находить галлюцинации и запрашивать правки, с которыми агент сможет работать."
+minutes: 10
+keyPoints:
+  - id: kp-review-checklist
+    title: { en: "Five review questions", ru: "Пять вопросов ревью" }
+  - id: kp-spot-hallucination
+    title: { en: "Spot invented methods, elements and texts", ru: "Находить выдуманные методы, элементы и тексты" }
+  - id: kp-request-changes
+    title: { en: "Request changes like a good bug report", ru: "Запрашивать правки, как в хорошем баг-репорте" }
+terms: [code-review, request-changes, diff, hallucination, assertion, locator, test-data, pull-request]
+steps:
+  - type: story
+    lines:
+      - who: leo
+        text:
+          en: "Petal opened a pull request: five new tests for login and cart. Can you review it before we merge?"
+          ru: "Petal открыл пулл-реквест: пять новых тестов на вход и корзину. Сделаешь ревью до мержа?"
+      - who: petal
+        text:
+          en: "All five are green! I'm quite proud of them."
+          ru: "Все пять зелёные! Я ими очень горжусь."
+      - who: maya
+        text:
+          en: "Green is where the review starts, not where it ends. Read each test against its test case — the way you read requirements."
+          ru: "Зелёный цвет — это начало ревью, а не конец. Читай каждый тест рядом с его тест-кейсом — так же, как ты читаешь требования."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед стартом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c2-l3-p1
+        kind: choice
+        keyPoint: kp-review-checklist
+        prompt:
+          en: "Petal's test is green and the code looks neat. Is that enough to approve it?"
+          ru: "Тест Petal зелёный, и код выглядит аккуратно. Этого достаточно, чтобы его одобрить?"
+        options:
+          - text: { en: "No — first check that it asserts the expected result from the test case", ru: "Нет — сначала проверить, что он проверяет ожидаемый результат из тест-кейса" }
+            correct: true
+            why:
+              en: "A neat, green test can still check the wrong thing — or nothing."
+              ru: "Аккуратный зелёный тест всё равно может проверять не то — или ничего."
+          - text: { en: "Yes — green means it works", ru: "Да — зелёный значит работает" }
+            why:
+              en: "Green means “nothing it checks is broken”. The question is what it checks."
+              ru: "Зелёный значит «ничего из проверяемого не сломано». Вопрос в том, что проверяется."
+          - text: { en: "Yes — AI-written code doesn't need review", ru: "Да — коду от ИИ ревью не нужно" }
+            why:
+              en: "It needs it at least as much as human code: the agent doesn't know the requirements."
+              ru: "Нужно не меньше, чем человеческому: агент не знает требований."
+        hints:
+          - en: "What can a green test still get wrong?"
+            ru: "В чём зелёный тест всё ещё может ошибаться?"
+          - en: "Think of a test with no `expect` at all."
+            ru: "Представь тест вообще без `expect`."
+        explain:
+          en: "Review starts where the run ends: does this test check what the test case says?"
+          ru: "Ревью начинается там, где заканчивается прогон: проверяет ли тест то, что сказано в тест-кейсе?"
+      - id: c2-l3-p2
+        kind: choice
+        keyPoint: kp-spot-hallucination
+        prompt:
+          en: "Which line did the agent most likely invent?"
+          ru: "Какую строку агент, скорее всего, выдумал?"
+        optionsCode: true
+        options:
+          - text: "await page.getByLabel('Email').fill('anna@bloomly.app');"
+            why:
+              en: "Real: the login form has a field labelled “Email”."
+              ru: "Настоящая: в форме входа есть поле с меткой «Email»."
+          - text: "await page.getByRole('button', { name: 'Checkout now' }).click();"
+            correct: true
+            why:
+              en: "Invented: the cart button is “Proceed to checkout”."
+              ru: "Выдуманная: кнопка в корзине называется «Proceed to checkout»."
+          - text: "await expect(page.getByTestId('cart-total')).toHaveText('€70.00');"
+            why:
+              en: "Real: `cart-total` exists, and €70.00 is right for 2 Rose Bouquets."
+              ru: "Настоящая: `cart-total` существует, а €70.00 верно для 2 Rose Bouquet."
+        hints:
+          - en: "Compare each name with Bloomly's real pages."
+            ru: "Сравни каждое название с настоящими страницами Bloomly."
+          - en: "Many shops say “Checkout now”. Does Bloomly?"
+            ru: "Во многих магазинах пишут «Checkout now». А в Bloomly?"
+        explain:
+          en: "Agents fill gaps with the most common words from other websites. Names must match *this* app exactly."
+          ru: "Агенты заполняют пробелы самыми частыми словами с других сайтов. Названия должны точно совпадать с *этим* приложением."
+
+  - type: theory
+    keyPoint: kp-review-checklist
+    title: { en: "Five questions for every AI test", ru: "Пять вопросов к каждому тесту от ИИ" }
+    body:
+      - en: "1. Does it check the **expected result from the test case** — not just anything? 2. Is there a **real [[assertion]]** that can fail? 3. Are the **[[locators|locator]] resilient** — roles, labels, test ids, not CSS classes?"
+        ru: "1. Проверяет ли тест **ожидаемый результат из тест-кейса**, а не что попало? 2. Есть ли **настоящая [[проверка|assertion]]**, которая может упасть? 3. **Устойчивые ли [[локаторы|locator]]** — роли, метки, test id, а не CSS-классы?"
+      - en: "4. **No hard waits** (`waitForTimeout`) and **no missing `await`**? 5. **Right data, independent**: the case's [[test data|test-data]], and no reliance on another test?"
+        ru: "4. **Нет жёстких ожиданий** (`waitForTimeout`) и **пропущенных `await`**? 5. **Правильные данные и независимость**: [[тестовые данные|test-data]] из кейса и никакой опоры на другой тест?"
+      - en: "That's a [[code review|code-review]]: reading a change before it joins the project. You did the same with test cases: does this check what the requirement says?"
+        ru: "Это и есть [[код-ревью|code-review]]: чтение изменения до того, как оно попадёт в проект. С тест-кейсами ты делал{а|} то же самое: проверяет ли это то, что сказано в требовании?"
+    figure: review-checklist
+    mentor:
+      en: "Start with question 1. A beautifully written test that checks the wrong thing is still wrong."
+      ru: "Начинай с первого вопроса. Красиво написанный тест, который проверяет не то, всё равно неправильный."
+
+  - type: theory
+    keyPoint: kp-spot-hallucination
+    title: { en: "Spot the invention", ru: "Найди выдумку" }
+    body:
+      - en: "Agents invent things that *sound* right: methods (`page.open`, `getByButton`, `toBeShown`), elements (a “Sign in” button), texts (“Welcome, Anna!”)."
+        ru: "Агенты выдумывают то, что *звучит* правильно: методы (`page.open`, `getByButton`, `toBeShown`), элементы (кнопку «Sign in»), тексты («Welcome, Anna!»)."
+      - en: "Your weapon is the source of truth. Methods → the Playwright docs. Elements → the page itself. Texts → the test case and the requirements."
+        ru: "Твоё оружие — источник истины. Методы → документация Playwright. Элементы → сама страница. Тексты → тест-кейс и требования."
+      - en: "If a name looks unfamiliar, don't assume you're the one who doesn't know. Check. Quite often it's the agent."
+        ru: "Если название незнакомо, не думай сразу, что это ты чего-то не знаешь. Проверь. Довольно часто ошибается агент."
+    mentor:
+      en: "In Bloomly the button is “Log in”, the field is “Email”, the greeting is “Welcome back, Anna!”. Anything else is a red flag."
+      ru: "В Bloomly кнопка — «Log in», поле — «Email», приветствие — «Welcome back, Anna!». Всё остальное — красный флаг."
+
+  - type: theory
+    keyPoint: kp-request-changes
+    title: { en: "Request changes like a bug report", ru: "Запрашивай правки, как в баг-репорте" }
+    body:
+      - en: "When something is wrong, you [[request changes|request-changes]] — in a GitHub [[pull request|pull-request]] it's an option next to “Approve”. Then you explain. Petal (or a developer) will fix exactly what you wrote."
+        ru: "Если что-то не так, ты [[запрашиваешь правки|request-changes]] — в [[пулл-реквесте|pull-request]] на GitHub это вариант рядом с «Approve». Потом объясняешь. Petal (или разработчик) исправит ровно то, что ты написал{а|}."
+      - en: "A good comment is a mini bug report: **where** (line), **what's wrong**, **what you expect**, **why**. For example: “Line 9: TC-102 expects the exact text ‘Invalid email or password.’ — please use `toHaveText(...)` instead of `toBeVisible()`.”"
+        ru: "Хороший комментарий — это мини-баг-репорт: **где** (строка), **что не так**, **чего ты ждёшь**, **почему**. Например: «Line 9: TC-102 expects the exact text ‘Invalid email or password.’ — please use `toHaveText(...)` instead of `toBeVisible()`.»"
+      - en: "Not helpful: “This is bad, fix it.” The agent will change *something* — probably not what you meant."
+        ru: "Бесполезно: «This is bad, fix it». Агент поменяет *что-нибудь* — скорее всего, не то, что ты имел{а|} в виду."
+    mentor:
+      en: "Write review comments in English, short and concrete. It's the same skill as a good bug title."
+      ru: "Пиши комментарии к ревью на английском, коротко и конкретно. Это тот же навык, что и хороший заголовок баг-репорта."
+
+  - type: example
+    keyPoint: kp-review-checklist
+    title: { en: "A review, worked through", ru: "Ревью, разобранное по шагам" }
+    intro:
+      en: "Petal's test for TC-102 (a wrong password shows “Invalid email or password.”). Maya's notes go through the five questions. Verdict: request changes."
+      ru: "Тест Petal для TC-102 (неверный пароль показывает «Invalid email or password.»). Заметки Майи идут по пяти вопросам. Вердикт: запросить правки."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('wrong password shows an error', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('wrong-pass');
+        await page.locator('.btn').click();
+        await page.waitForTimeout(3000);
+        await expect(page.getByRole('alert')).toBeVisible();
+      });
+    notes:
+      - lines: [5, 6]
+        text:
+          en: "Q5, data: the case's account and a wrong password. ✓"
+          ru: "Вопрос 5, данные: аккаунт из кейса и неверный пароль. ✓"
+      - lines: 7
+        text:
+          en: "Q3, locators: `.btn` is a CSS class — any redesign breaks it. Comment: use `getByRole('button', { name: 'Log in' })`."
+          ru: "Вопрос 3, локаторы: `.btn` — CSS-класс, любой редизайн его сломает. Комментарий: используй `getByRole('button', { name: 'Log in' })`."
+      - lines: 8
+        text:
+          en: "Q4, waits: a hard 3-second wait on every run, and still no guarantee. Comment: remove it, `expect` waits by itself."
+          ru: "Вопрос 4, ожидания: жёсткие 3 секунды на каждом прогоне, и всё равно без гарантии. Комментарий: убрать, `expect` ждёт сам."
+      - lines: 9
+        text:
+          en: "Q1 and Q2: there is an assertion, but it only checks that *some* alert is visible. TC-102 expects the exact text. Comment: `toHaveText('Invalid email or password.')`."
+          ru: "Вопросы 1 и 2: проверка есть, но она смотрит только, что видно *какое-то* сообщение об ошибке. TC-102 ожидает точный текст. Комментарий: `toHaveText('Invalid email or password.')`."
+
+  - type: task
+    task:
+      id: c2-l3-t1
+      kind: review
+      keyPoint: kp-review-checklist
+      context:
+        en: "Petal's test for TC-170. The cart is preset with 1 Rose Bouquet and 1 Sunny Tulips."
+        ru: "Тест Petal для TC-170. В корзине заранее лежат 1 Rose Bouquet и 1 Sunny Tulips."
+      prompt:
+        en: "Go through the five questions. Flag each problem line and pick the issue type."
+        ru: "Пройди по пяти вопросам. Отметь каждую проблемную строку и выбери тип проблемы."
+      testCase:
+        id: TC-170
+        title: Removing an item updates the cart
+        preconditions: ["Cart has 1 Rose Bouquet and 1 Sunny Tulips"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Click \"Remove\" in the Sunny Tulips row", expected: "Only Rose Bouquet stays in the cart; total is €39.90" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('removing an item updates the cart', async ({ page }) => {
+          await page.goto('/cart');
+          const row = page.getByRole('row').filter({ hasText: 'Sunny Tulips' });
+          row.getByRole('button', { name: 'Remove' }).click();
+          await expect(page.getByTestId('cart-row')).toHaveCount(1);
+          await expect(page.getByTestId('cart-total')).toHaveText('€63.90');
+        });
+      issues:
+        - line: 6
+          type: missing-await
+          note:
+            en: "No `await` before `click()`: the test runs on without waiting for the click to finish."
+            ru: "Нет `await` перед `click()`: тест идёт дальше, не дожидаясь клика."
+        - line: 7
+          type: weak-assertion
+          note:
+            en: "“1 row” doesn't say *which* row stayed. If the wrong item were removed, this still passes. Check that the remaining row is Rose Bouquet."
+            ru: "«1 строка» не говорит, *какая* строка осталась. Если удалится не тот товар, проверка всё равно пройдёт. Проверь, что осталась строка Rose Bouquet."
+        - line: 8
+          type: wrong-assertion
+          note:
+            en: "€63.90 is the total *before* removing (35 + 24 + 4.90). The case expects €39.90."
+            ru: "€63.90 — это итог *до* удаления (35 + 24 + 4.90). Кейс ожидает €39.90."
+      types: [missing-await, weak-assertion, wrong-assertion, fragile-locator, hard-wait, hallucination]
+      hints:
+        - en: "Q4 includes missing `await`. Read the start of every line with an action."
+          ru: "Вопрос 4 включает пропущенный `await`. Посмотри на начало каждой строки с действием."
+        - en: "Compare both assertions with the expected result: *which* item stays, and *what* total."
+          ru: "Сравни обе проверки с ожидаемым результатом: *какой* товар остаётся и *какой* итог."
+        - en: "Lines 6, 7 and 8."
+          ru: "Строки 6, 7 и 8."
+      praise:
+        en: "Three different problem types in one short test — and you caught the weak count check too."
+        ru: "Три разных типа проблем в одном коротком тесте — и ты поймал{а|} даже слабую проверку количества."
+      explain:
+        en: "Line 7 is the subtle one: a count is a real assertion, but it can't tell Rose from Tulips. Bloomly even has a bug where “Remove” always deletes the first row — this test would miss it."
+        ru: "Строка 7 — самая коварная: количество — настоящая проверка, но она не отличит розы от тюльпанов. А в Bloomly даже есть баг, когда «Remove» всегда удаляет первую строку, — этот тест его пропустит."
+
+  - type: task
+    task:
+      id: c2-l3-t2
+      kind: review
+      keyPoint: kp-spot-hallucination
+      context:
+        en: "Petal wrote this TC-150 test from memory, without opening the cart page."
+        ru: "Petal написал этот тест для TC-150 по памяти, не открывая страницу корзины."
+      prompt:
+        en: "Find every invented method, element or text."
+        ru: "Найди все выдуманные методы, элементы и тексты."
+      testCase:
+        id: TC-150
+        title: Expired promo code is rejected
+        preconditions: ["Cart has 1 Rose Bouquet"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Enter the promo code and click \"Apply\"", data: "SPRING20", expected: "Message \"This promo code has expired.\"" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('expired promo code is rejected', async ({ page }) => {
+          await page.goto('/cart');
+          await page.getByPlaceholder('Enter promo code').fill('SPRING20');
+          await page.getByRole('button', { name: 'Apply code' }).click();
+          await expect(page.getByTestId('promo-message')).toBeShown();
+          await expect(page.getByTestId('promo-message')).toHaveText('This promo code has expired.');
+        });
+      issues:
+        - line: 5
+          type: hallucination
+          note:
+            en: "There is no field with the placeholder “Enter promo code” (Bloomly's says “e.g. BLOOM10”). Use the label: `getByLabel('Promo code')`."
+            ru: "Поля с плейсхолдером «Enter promo code» нет (в Bloomly — «e.g. BLOOM10»). Используй метку: `getByLabel('Promo code')`."
+        - line: 6
+          type: hallucination
+          note:
+            en: "The button is called “Apply”, not “Apply code”."
+            ru: "Кнопка называется «Apply», а не «Apply code»."
+        - line: 7
+          type: hallucination
+          note:
+            en: "`toBeShown()` isn't a Playwright matcher. It's `toBeVisible()` — and line 8 already covers it."
+            ru: "`toBeShown()` — не матчер Playwright. Правильно `toBeVisible()`, и строка 8 это уже покрывает."
+      types: [hallucination, wrong-assertion, fragile-locator, hard-wait, no-assertion]
+      hints:
+        - en: "Check every name against the cart page and every method against Playwright."
+          ru: "Сверь каждое название со страницей корзины, а каждый метод — с Playwright."
+        - en: "Three lines contain something that doesn't exist."
+          ru: "В трёх строках есть что-то несуществующее."
+        - en: "Lines 5, 6 and 7. Line 8 is correct."
+          ru: "Строки 5, 6 и 7. Строка 8 правильная."
+      praise:
+        en: "Three inventions, three catches. You checked names against the app, not against your intuition."
+        ru: "Три выдумки — три находки. Ты сверял{а|} названия с приложением, а не с интуицией."
+      explain:
+        en: "Each invented piece is plausible: many sites have an “Apply code” button, jest-dom has similar matchers. That's why hallucinations survive a quick glance — and why you compare with the real page."
+        ru: "Каждая выдумка правдоподобна: на многих сайтах есть кнопка «Apply code», в jest-dom есть похожие матчеры. Поэтому галлюцинации переживают беглый взгляд — и поэтому ты сверяешь с настоящей страницей."
+
+  - type: task
+    task:
+      id: c2-l3-t3
+      kind: choice
+      keyPoint: kp-request-changes
+      context:
+        en: "You left three comments on the TC-102 test from the worked example. Petal pushed this change."
+        ru: "Ты оставил{а|} три комментария к тесту TC-102 из разобранного примера. Petal прислал такое изменение."
+      prompt:
+        en: "Approve, request changes or reject?"
+        ru: "Одобрить, запросить правки или отклонить?"
+      diff:
+        before: |
+          await page.locator('.btn').click();
+          await page.waitForTimeout(3000);
+          await expect(page.getByRole('alert')).toBeVisible();
+        after: |
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+      options:
+        - text: { en: "Approve: resilient locator, no hard wait, exact expected text from TC-102", ru: "Одобрить: устойчивый локатор, нет жёсткого ожидания, точный ожидаемый текст из TC-102" }
+          correct: true
+          why:
+            en: "All three comments are addressed, and nothing else changed."
+            ru: "Все три комментария учтены, и больше ничего не поменялось."
+        - text: { en: "Request changes: without the wait the test will be flaky", ru: "Запросить правки: без ожидания тест станет нестабильным" }
+          why:
+            en: "`toHaveText` retries until the text appears (up to the timeout). The wait was never needed."
+            ru: "`toHaveText` повторяет попытки, пока текст не появится (до таймаута). Ожидание и не было нужно."
+        - text: { en: "Reject: an agent shouldn't change tests", ru: "Отклонить: агент не должен менять тесты" }
+          why:
+            en: "Changing tests on review comments is exactly the agent's job."
+            ru: "Менять тесты по комментариям ревью — как раз работа агента."
+      hints:
+        - en: "Check each of your three comments: locator, wait, expected text."
+          ru: "Проверь каждый из трёх комментариев: локатор, ожидание, ожидаемый текст."
+        - en: "Does an `expect` assertion that retries by itself need a pause before it?"
+          ru: "Нужна ли пауза перед проверкой `expect`, которая сама повторяет попытки?"
+      praise:
+        en: "You approved for the right reasons — and didn't fall for “we need the wait”."
+        ru: "Ты одобрил{а|} по правильным причинам — и не попал{ась|ся} на «без ожидания нельзя»."
+      explain:
+        en: "Reviewing a [[diff]] is the second half of a code review: did the author fix what you asked, and only that? Here: yes, yes and yes."
+        ru: "Проверка [[диффа|diff]] — вторая половина код-ревью: исправил ли автор то, что ты просил{а|}, и только это? Здесь: да, да и да."
+
+  - type: task
+    task:
+      id: c2-l3-t4
+      kind: choice
+      keyPoint: kp-request-changes
+      prompt:
+        en: "Petal's test clicks `page.locator('.btn')`. Which review comment will get the right fix?"
+        ru: "Тест Petal кликает `page.locator('.btn')`. Какой комментарий к ревью приведёт к правильному исправлению?"
+      options:
+        - text: "This test is bad, fix it."
+          why:
+            en: "No location, no problem, no expectation. The agent will change something random."
+            ru: "Ни места, ни проблемы, ни ожидания. Агент поменяет что-нибудь наугад."
+        - text: "Locators are wrong."
+          why:
+            en: "Which ones? Wrong how? What should they be?"
+            ru: "Какие? Чем неправильные? Какими должны быть?"
+        - text: "Line 7: `.btn` is a CSS class and will break on redesign. Please use page.getByRole('button', { name: 'Log in' }), as in tests/login.spec.ts."
+          correct: true
+          why:
+            en: "Where, what's wrong, what you expect, and why — plus an example to follow."
+            ru: "Где, что не так, чего ты ждёшь и почему — плюс образец."
+        - text: "Make it more professional."
+          why:
+            en: "“Professional” means nothing to an agent. Name the change."
+            ru: "«Профессионально» ничего не значит для агента. Назови изменение."
+      hints:
+        - en: "Think of a good bug report: where, what, expected, why."
+          ru: "Вспомни хороший баг-репорт: где, что, ожидание, почему."
+        - en: "Which comment could Petal execute without asking a question?"
+          ru: "Какой комментарий Petal сможет выполнить, ничего не переспрашивая?"
+      praise:
+        en: "That comment is a mini bug report — Petal can't misread it."
+        ru: "Этот комментарий — мини-баг-репорт. Petal его не поймёт неправильно."
+      explain:
+        en: "Specific comments get specific fixes. This works the same with human developers — and it's the core of good review etiquette."
+        ru: "Конкретный комментарий — конкретное исправление. С разработчиками-людьми это работает так же — и это основа хорошего этикета ревью."
+
+  - type: task
+    task:
+      id: c2-l3-t5
+      kind: agent
+      keyPoint: kp-request-changes
+      context:
+        en: |
+          Petal's test for TC-102 is red. Here it is (tests/login-error.spec.ts):
+          ```js
+          import { test, expect } from '@playwright/test';
+
+          test('wrong password shows an error', async ({ page }) => {
+            await page.goto('/login');
+            await page.getByLabel('Email').fill('anna@bloomly.app');
+            await page.getByLabel('Password').fill('wrong-pass');
+            await page.locator('.btn').click();
+            await page.waitForTimeout(3000);
+            await expect(page.getByRole('alert')).toHaveText('Wrong password');
+          });
+          ```
+          Petal is simulated, as everywhere in the trainer.
+        ru: |
+          Тест Petal для TC-102 красный. Вот он (tests/login-error.spec.ts):
+          ```js
+          import { test, expect } from '@playwright/test';
+
+          test('wrong password shows an error', async ({ page }) => {
+            await page.goto('/login');
+            await page.getByLabel('Email').fill('anna@bloomly.app');
+            await page.getByLabel('Password').fill('wrong-pass');
+            await page.locator('.btn').click();
+            await page.waitForTimeout(3000);
+            await expect(page.getByRole('alert')).toHaveText('Wrong password');
+          });
+          ```
+          Petal, как и везде в тренажёре, симулирован.
+      prompt:
+        en: "Compose your review feedback to Petal from the blocks. Then run the updated test."
+        ru: "Собери свой отзыв по ревью для Petal из блоков. Потом запусти обновлённый тест."
+      testCase:
+        id: TC-102
+        title: Wrong password shows an error
+        steps:
+          - { action: "Open /login" }
+          - { action: "Enter email and a wrong password", data: "anna@bloomly.app / wrong-pass" }
+          - { action: "Click \"Log in\"", expected: "Alert \"Invalid email or password.\"" }
+      blocks:
+        - { id: task, locked: true, text: "Please update the TC-102 test in tests/login-error.spec.ts.", ru: "Пожалуйста, обнови тест TC-102 в tests/login-error.spec.ts." }
+        - { id: expected, text: 'Line 9: TC-102 expects the alert text "Invalid email or password." — assert exactly that.', ru: "Строка 9: TC-102 ожидает текст ошибки «Invalid email or password.» — проверяй ровно его." }
+        - { id: cleanup, text: "Lines 7–8: use getByRole('button', { name: 'Log in' }) instead of .btn, and remove waitForTimeout — expect() waits by itself.", ru: "Строки 7–8: используй getByRole('button', { name: 'Log in' }) вместо .btn и убери waitForTimeout — expect() ждёт сам." }
+        - { id: vague, text: "This test is bad. Fix it.", ru: "Этот тест плохой. Исправь." }
+      responses:
+        - when: [expected, cleanup]
+          best: true
+          message:
+            en: "Updated! Line 7 now uses the button role, the 3-second wait is gone, and line 8 asserts the exact text from TC-102. Green ✅"
+            ru: "Обновил! В строке 7 теперь роль кнопки, ожидание в 3 секунды убрано, а строка 8 проверяет точный текст из TC-102. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('wrong password shows an error', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('wrong-pass');
+              await page.getByRole('button', { name: 'Log in' }).click();
+              await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+            });
+        - when: [expected]
+          message:
+            en: "Fixed the expected text. Green ✅"
+            ru: "Исправил ожидаемый текст. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('wrong password shows an error', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('wrong-pass');
+              await page.locator('.btn').click();
+              await page.waitForTimeout(3000);
+              await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+            });
+        - when: [cleanup]
+          message:
+            en: "Replaced the locator and removed the pause. Still red ❌: the alert text doesn't match “Wrong password”. Should I change the expected text to whatever the page shows?"
+            ru: "Заменил локатор и убрал паузу. Всё ещё красный ❌: текст ошибки не совпадает с «Wrong password». Может, поменять ожидаемый текст на тот, что показывает страница?"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('wrong password shows an error', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('wrong-pass');
+              await page.getByRole('button', { name: 'Log in' }).click();
+              await expect(page.getByRole('alert')).toHaveText('Wrong password');
+            });
+        - when: []
+          message:
+            en: "I'm not sure what's wrong with it, so I made the wait longer — 5 seconds. Still red ❌. Maybe the server is slow?"
+            ru: "Не уверен, что с ним не так, поэтому увеличил ожидание до 5 секунд. Всё ещё красный ❌. Может, сервер медленный?"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('wrong password shows an error', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('wrong-pass');
+              await page.locator('.btn').click();
+              await page.waitForTimeout(5000);
+              await expect(page.getByRole('alert')).toHaveText('Wrong password');
+            });
+      missing:
+        expected:
+          en: "Without the line 9 comment Petal didn't know the expected text was wrong — the test stays red. Petal even offers to copy the text from the page: a risky habit (more in the next lesson)."
+          ru: "Без комментария к строке 9 Petal не узнал, что ожидаемый текст неверный, — тест остаётся красным. Petal даже предлагает списать текст со страницы: опасная привычка (подробнее в следующем уроке)."
+        cleanup:
+          en: "Without the comment on lines 7–8 Petal fixed only the text: `.btn` and the 3-second pause are still there."
+          ru: "Без комментария к строкам 7–8 Petal исправил только текст: `.btn` и пауза в 3 секунды остались."
+      checks:
+        expect: pass
+        static: [hasAssertion, noHardWait, noFragile]
+      hints:
+        - en: "The test is red for one reason, and fragile/slow for two more. Each needs its own concrete comment."
+          ru: "Тест красный по одной причине и хрупкий/медленный ещё по двум. Каждой нужен свой конкретный комментарий."
+        - en: "“This test is bad” gives Petal nothing to act on."
+          ru: "«Этот тест плохой» не даёт Petal ничего, с чем можно работать."
+        - en: "Take the line 9 comment and the lines 7–8 comment."
+          ru: "Возьми комментарий к строке 9 и комментарий к строкам 7–8."
+      praise:
+        en: "Two precise comments, one clean test. That's review feedback that saves a whole round of back-and-forth."
+        ru: "Два точных комментария — один чистый тест. Такой отзыв экономит целый круг переписки."
+      explain:
+        en: "Each comment named the line, the problem and the fix — so Petal fixed exactly that. The vague comment led to a random change (a longer wait). And notice Petal's offer to “change the expected text to whatever the page shows”: the expected text must come from TC-102, not from the screen."
+        ru: "Каждый комментарий называл строку, проблему и исправление — поэтому Petal исправил ровно это. Размытый комментарий привёл к случайному изменению (ожидание подлиннее). И обрати внимание на предложение Petal «поменять ожидаемый текст на тот, что показывает страница»: ожидаемый текст должен приходить из TC-102, а не с экрана."
+
+  - type: task
+    task:
+      id: c2-l3-t6
+      kind: predict
+      keyPoint: kp-spot-hallucination
+      context:
+        en: "Petal wrote this greeting test without looking at the account page."
+        ru: "Petal написал этот тест приветствия, не заглянув на страницу аккаунта."
+      prompt:
+        en: "Pass or fail?"
+        ru: "Пройдёт или упадёт?"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user sees a greeting', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('heading', { name: 'Welcome, Anna!' })).toBeVisible();
+        });
+      outcome: fail
+      reasons:
+        - text:
+            en: "Fail: the heading is “Welcome back, Anna!” — Petal invented a shorter text."
+            ru: "Упадёт: заголовок — «Welcome back, Anna!», а Petal выдумал текст покороче."
+          correct: true
+        - text:
+            en: "Pass: the name matches part of the heading, so it's close enough."
+            ru: "Пройдёт: имя совпадает с частью заголовка — этого достаточно."
+        - text:
+            en: "Fail: the password is wrong."
+            ru: "Упадёт: пароль неверный."
+      hints:
+        - en: "What exactly does Bloomly's account heading say?"
+          ru: "Что именно написано в заголовке аккаунта Bloomly?"
+        - en: "“Welcome, Anna!” is not a part of “Welcome back, Anna!” — there's a word in between."
+          ru: "«Welcome, Anna!» — не часть «Welcome back, Anna!»: между словами есть ещё одно."
+        - en: "It fails — the text was invented."
+          ru: "Упадёт — текст выдуман."
+      praise:
+        en: "Right — one missing word, and the whole test is red. Texts must come from the app or the case."
+        ru: "Верно — одно пропущенное слово, и весь тест красный. Тексты берутся из приложения или из кейса."
+      explain:
+        en: "`getByRole` matches a *part* of the name, but “Welcome, Anna!” is not a substring of “Welcome back, Anna!”. The good news: an invented text usually makes the test fail loudly. The bad news: an agent may then “fix” it the wrong way."
+        ru: "`getByRole` находит имя и по *части*, но «Welcome, Anna!» не является частью «Welcome back, Anna!». Хорошая новость: выдуманный текст обычно приводит к громкому падению. Плохая: агент потом может «починить» его неправильно."
+
+  - type: task
+    task:
+      id: c2-l3-t7
+      kind: review
+      keyPoint: kp-review-checklist
+      context:
+        en: "Petal split TC-142 into two tests in one file."
+        ru: "Petal разбил TC-142 на два теста в одном файле."
+      prompt:
+        en: "Review the file. Line 0 means a problem with the whole test."
+        ru: "Сделай ревью файла. Строка 0 — проблема всего теста."
+      testCase:
+        id: TC-142
+        title: Added product appears in the cart
+        steps:
+          - { action: "Open /shop" }
+          - { action: "Click \"Add to cart\" on the Sunny Tulips card" }
+          - { action: "Open /cart", expected: "The cart has a row \"Sunny Tulips\"" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('add a product to the cart', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Peony Dream' });
+          await card.getByRole('button', { name: 'Add to cart' }).click();
+        });
+
+        test('cart shows the added product', async ({ page }) => {
+          await page.goto('/cart');
+          await expect(page.getByTestId('cart-row')).toContainText('Sunny Tulips');
+        });
+      issues:
+        - line: 5
+          type: wrong-data
+          note:
+            en: "The case adds Sunny Tulips; the test adds Peony Dream."
+            ru: "Кейс добавляет Sunny Tulips, а тест — Peony Dream."
+        - line: 0
+          type: no-assertion
+          note:
+            en: "The first test never checks anything: it clicks and ends."
+            ru: "Первый тест ничего не проверяет: кликает и заканчивается."
+        - line: 10
+          type: test-dependency
+          note:
+            en: "The second test expects the cart from the first one. Every test gets a fresh browser context, so the cart here is empty. Put the whole case in one test."
+            ru: "Второй тест рассчитывает на корзину из первого. Каждый тест получает чистый контекст браузера, так что здесь корзина пуста. Весь кейс — в один тест."
+      types: [wrong-data, no-assertion, test-dependency, fragile-locator, hard-wait, missing-await]
+      hints:
+        - en: "Q5: right data, independent tests."
+          ru: "Вопрос 5: правильные данные, независимые тесты."
+        - en: "What's in the cart when the second test starts on its own?"
+          ru: "Что лежит в корзине, когда второй тест запускается сам по себе?"
+        - en: "Line 5, line 10 and the first test as a whole (line 0)."
+          ru: "Строка 5, строка 10 и первый тест целиком (строка 0)."
+      praise:
+        en: "You spotted the hidden dependency — the kind of bug that only shows up when tests run in a different order."
+        ru: "Ты заметил{а|} скрытую зависимость — такой баг проявляется, только когда тесты запускаются в другом порядке."
+      explain:
+        en: "One scenario = one test. Tests that rely on each other pass or fail depending on the order — and Playwright gives every test a fresh, empty context anyway."
+        ru: "Один сценарий — один тест. Тесты, которые зависят друг от друга, проходят или падают в зависимости от порядка — а Playwright и так даёт каждому тесту чистый, пустой контекст."
+
+  - type: task
+    task:
+      id: c2-l3-t8
+      kind: vocab
+      keyPoint: kp-request-changes
+      mode: cloze
+      sentence:
+        en: "The test has no assertion, so I'll ___ on this pull request."
+        ru: "В тесте нет проверки, поэтому я запрошу правки в этом пулл-реквесте."
+      answer: request changes
+      options: [request changes, approve, merge]
+
+  - type: mistakes
+    keyPoint: kp-review-checklist
+    title: { en: "Review mistakes", ru: "Ошибки ревьюера" }
+    items:
+      - wrong: "Approve: the test is green."
+        right: 'Request changes: line 9 only checks that an alert is visible; TC-102 expects "Invalid email or password."'
+        why:
+          en: "Green isn't a review. Compare the assertion with the expected result."
+          ru: "Зелёный — не ревью. Сравни проверку с ожидаемым результатом."
+      - wrong: "This is bad, fix it."
+        right: "Line 7: .btn is a CSS class. Please use getByRole('button', { name: 'Log in' })."
+        why:
+          en: "Vague comments get random fixes."
+          ru: "На размытые комментарии приходят случайные исправления."
+      - wrong: "await expect(page.getByTestId('promo-message')).toBeShown();"
+        right: "await expect(page.getByTestId('promo-message')).toBeVisible();"
+        why:
+          en: "Unfamiliar method? Check the docs before assuming you're the one who's wrong."
+          ru: "Незнакомый метод? Проверь документацию, прежде чем решить, что ошибаешься ты."
+
+  - type: explain
+    keyPoint: kp-review-checklist
+    prompt:
+      en: "List the five review questions in your own words. Which one would you never skip, and why?"
+      ru: "Перечисли пять вопросов ревью своими словами. Какой из них ты бы никогда не пропустил{а|} и почему?"
+    model:
+      en: "1) Does it check the expected result from the test case? 2) Is there a real assertion that can fail? 3) Are the locators resilient? 4) No hard waits, no missing await? 5) Right data, and independent from other tests? I'd never skip the first one: a neat, green test that checks the wrong thing gives false confidence, and the agent can't know the expected result — only the test case does."
+      ru: "1) Проверяет ли тест ожидаемый результат из тест-кейса? 2) Есть ли настоящая проверка, которая может упасть? 3) Устойчивые ли локаторы? 4) Нет ли жёстких ожиданий и пропущенных await? 5) Правильные ли данные и независим ли тест от других? Первый вопрос я бы не пропускал{а|} никогда: аккуратный зелёный тест, который проверяет не то, даёт ложную уверенность, а ожидаемый результат агент знать не может — его знает только тест-кейс."
+
+  - type: phrases
+    items:
+      - context: code-review
+        en: "Nice and clean! One thing: the test doesn't check the expected result from TC-102."
+        ru: "Чисто и аккуратно! Одно замечание: тест не проверяет ожидаемый результат из TC-102."
+        note:
+          en: "Start with something positive, then one concrete point."
+          ru: "Начни с позитивного, потом — одно конкретное замечание."
+      - context: code-review
+        en: "Line 7: this CSS class will break on redesign. Could you use getByRole instead?"
+        ru: "Строка 7: этот CSS-класс сломается при редизайне. Можешь использовать getByRole?"
+      - context: code-review
+        en: "Please remove the waitForTimeout — the assertion already waits."
+        ru: "Пожалуйста, убери waitForTimeout — проверка и так ждёт."
+      - context: code-review
+        en: "toBeShown() isn't a Playwright matcher. Did you mean toBeVisible()?"
+        ru: "toBeShown() — не матчер Playwright. Ты имел в виду toBeVisible()?"
+      - context: code-review
+        en: "Requesting changes: the second test depends on the cart from the first one."
+        ru: "Запрашиваю правки: второй тест зависит от корзины из первого."
+      - context: standup
+        en: "I reviewed Petal's PR: three tests are approved, two need changes."
+        ru: "Я сделал{а|} ревью PR от Petal: три теста одобрены, двум нужны правки."
+
+checkPool:
+  - id: c2-l3-k1
+    kind: choice
+    keyPoint: kp-review-checklist
+    placement: true
+    prompt:
+      en: "What's the first question to ask when reviewing an AI-generated test?"
+      ru: "С какого вопроса начинать ревью теста, написанного ИИ?"
+    options:
+      - text: { en: "Does it check the expected result from the test case?", ru: "Проверяет ли он ожидаемый результат из тест-кейса?" }
+        correct: true
+        why:
+          en: "Everything else is secondary if the test checks the wrong thing."
+          ru: "Всё остальное вторично, если тест проверяет не то."
+      - text: { en: "Is the code formatted nicely?", ru: "Красиво ли отформатирован код?" }
+        why:
+          en: "Formatting tools handle that. It's not what makes a test trustworthy."
+          ru: "Этим занимаются инструменты форматирования. Надёжным тест делает не это."
+      - text: { en: "Is the test title long enough?", ru: "Достаточно ли длинное название у теста?" }
+        why:
+          en: "A clear title helps, but it doesn't check anything."
+          ru: "Понятное название помогает, но ничего не проверяет."
+      - text: { en: "Did the agent say it's sure?", ru: "Сказал ли агент, что он уверен?" }
+        why:
+          en: "Agents always sound sure."
+          ru: "Агенты всегда звучат уверенно."
+    hints:
+      - en: "Think of what you'd check first in a colleague's test case."
+        ru: "Подумай, что ты первым делом проверяешь в тест-кейсе коллеги."
+      - en: "It's about the expected result."
+        ru: "Речь об ожидаемом результате."
+    explain:
+      en: "Start where the agent is weakest: knowing what *should* happen."
+      ru: "Начинай там, где агент слабее всего: в знании того, что *должно* произойти."
+
+  - id: c2-l3-k2
+    kind: review
+    keyPoint: kp-review-checklist
+    prompt:
+      en: "Review Petal's test for TC-160. Line 0 means a problem with the whole test."
+      ru: "Сделай ревью теста Petal для TC-160. Строка 0 — проблема всего теста."
+    testCase:
+      id: TC-160
+      title: Locked user can't log in
+      preconditions: ["User locked@bloomly.app / bloom123 is locked"]
+      steps:
+        - { action: "Open /login" }
+        - { action: "Log in", data: "locked@bloomly.app / bloom123", expected: "Alert \"Your account is locked. Please contact support.\"" }
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('locked user cannot log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await page.waitForTimeout(2000);
+      });
+    issues:
+      - line: 5
+        type: wrong-data
+        note:
+          en: "Anna isn't locked. The case uses locked@bloomly.app."
+          ru: "Anna не заблокирована. В кейсе — locked@bloomly.app."
+      - line: 8
+        type: hard-wait
+        note:
+          en: "A fixed 2-second pause. An assertion on the alert would wait by itself."
+          ru: "Фиксированная пауза 2 секунды. Проверка сообщения об ошибке подождала бы сама."
+      - line: 0
+        type: no-assertion
+        note:
+          en: "No check of the expected alert “Your account is locked. Please contact support.”"
+          ru: "Нет проверки ожидаемого сообщения «Your account is locked. Please contact support.»"
+    types: [wrong-data, hard-wait, no-assertion, fragile-locator, hallucination, missing-await]
+    hints:
+      - en: "Compare the data with the test case card."
+        ru: "Сравни данные с карточкой тест-кейса."
+      - en: "What does the test check at the end?"
+        ru: "Что тест проверяет в конце?"
+      - en: "Line 5, line 8 and the whole test (line 0)."
+        ru: "Строка 5, строка 8 и весь тест (строка 0)."
+    explain:
+      en: "With Anna's account and no assertion, this “locked user” test actually logs a normal user in — and passes. Three checklist questions, three findings."
+      ru: "С аккаунтом Anna и без проверки этот тест «заблокированного пользователя» на самом деле впускает обычного пользователя — и проходит. Три вопроса чек-листа — три находки."
+
+  - id: c2-l3-k3
+    kind: review
+    keyPoint: kp-spot-hallucination
+    prompt:
+      en: "Find the invented parts in Petal's search test."
+      ru: "Найди выдуманные места в тесте поиска от Petal."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('search shows a no-results message', async ({ page }) => {
+        await page.goto('/shop');
+        await page.getByRole('searchbox', { name: 'Search' }).fill('cactus');
+        await page.getByRole('button', { name: 'Search' }).click();
+        await expect(page.getByTestId('no-results')).toHaveText('No flowers found for “cactus”.');
+        await expect(page.getByTestId('results-count')).toHaveTextContent('0 products');
+      });
+    issues:
+      - line: 6
+        type: hallucination
+        note:
+          en: "There is no Search button: Bloomly filters as you type."
+          ru: "Кнопки Search нет: Bloomly фильтрует прямо при вводе."
+      - line: 8
+        type: hallucination
+        note:
+          en: "`toHaveTextContent` is from another library (jest-dom). Playwright uses `toHaveText('0 products')`."
+          ru: "`toHaveTextContent` — из другой библиотеки (jest-dom). В Playwright — `toHaveText('0 products')`."
+    types: [hallucination, fragile-locator, wrong-assertion, hard-wait]
+    hints:
+      - en: "Line 5 is real: the search field is a searchbox named “Search”."
+        ru: "Строка 5 настоящая: поле поиска — searchbox с именем «Search»."
+      - en: "One invented element, one invented matcher."
+        ru: "Один выдуманный элемент, один выдуманный матчер."
+      - en: "Lines 6 and 8."
+        ru: "Строки 6 и 8."
+    explain:
+      en: "The agent mixed patterns from other apps (a search button) and other libraries (jest-dom). Both look normal — until you check the real page and the Playwright docs."
+      ru: "Агент смешал шаблоны из других приложений (кнопка поиска) и других библиотек (jest-dom). Оба выглядят нормально — пока не сверишь с настоящей страницей и документацией Playwright."
+
+  - id: c2-l3-k4
+    kind: choice
+    keyPoint: kp-spot-hallucination
+    prompt:
+      en: "The cart has 1 Rose Bouquet. Which line contains a hallucination?"
+      ru: "В корзине 1 Rose Bouquet. В какой строке галлюцинация?"
+    optionsCode: true
+    options:
+      - text: "await page.getByLabel('Promo code').fill('BLOOM10');"
+        why:
+          en: "Real: the field is labelled “Promo code”."
+          ru: "Настоящая: у поля метка «Promo code»."
+      - text: "await page.getByRole('button', { name: 'Apply coupon' }).click();"
+        correct: true
+        why:
+          en: "Invented: the button is “Apply”."
+          ru: "Выдуманная: кнопка называется «Apply»."
+      - text: "await expect(page.getByTestId('cart-total')).toHaveText('€36.40');"
+        why:
+          en: "Real: €35.00 − 10% + €4.90 delivery = €36.40."
+          ru: "Настоящая: €35.00 − 10% + €4.90 доставки = €36.40."
+    hints:
+      - en: "Check the button name on the cart page."
+        ru: "Проверь название кнопки на странице корзины."
+      - en: "“Coupon” is a common word elsewhere. Bloomly says “promo code”."
+        ru: "«Coupon» — частое слово на других сайтах. В Bloomly — «promo code»."
+    explain:
+      en: "Agents often swap in synonyms: coupon for promo, sign in for log in, basket for cart. Locators need the exact name."
+      ru: "Агенты часто подставляют синонимы: coupon вместо promo, sign in вместо log in, basket вместо cart. Локаторам нужно точное имя."
+
+  - id: c2-l3-k5
+    kind: choice
+    keyPoint: kp-request-changes
+    prompt:
+      en: "Line 6 of Petal's test is `await page.waitForTimeout(5000);`. Which comment is best?"
+      ru: "Строка 6 в тесте Petal — `await page.waitForTimeout(5000);`. Какой комментарий лучше всего?"
+    options:
+      - text: "Line 6: please remove the 5-second wait — expect() already waits for the result, and this adds 5 s to every run."
+        correct: true
+        why:
+          en: "Where, what, the fix and the reason."
+          ru: "Где, что, как исправить и почему."
+      - text: "Waits are bad."
+        why:
+          en: "Which wait? And what should replace it?"
+          ru: "Какое ожидание? И чем его заменить?"
+      - text: "Why so slow??"
+        why:
+          en: "A question without direction — the agent may “speed it up” any way it likes."
+          ru: "Вопрос без направления — агент может «ускорить» как угодно."
+      - text: "Make it faster."
+        why:
+          en: "It might lower the wait to 4 seconds. Problem solved?"
+          ru: "Он может уменьшить ожидание до 4 секунд. Проблема решена?"
+    hints:
+      - en: "A good comment says where, what, the fix and why."
+        ru: "Хороший комментарий говорит: где, что, как исправить и почему."
+      - en: "Look for the line number."
+        ru: "Ищи номер строки."
+    explain:
+      en: "Concrete comments are faster for everyone: the agent (or developer) doesn't have to guess, and you don't have to review a wrong fix."
+      ru: "Конкретные комментарии экономят время всем: агенту (или разработчику) не надо гадать, а тебе — проверять неправильное исправление."
+
+  - id: c2-l3-k6
+    kind: choice
+    keyPoint: kp-request-changes
+    context:
+      en: "TC-141: add Sunny Tulips to the cart. Your comment was: “Please use getByRole for the Add to cart button.” Petal pushed this change."
+      ru: "TC-141: добавить Sunny Tulips в корзину. Твой комментарий был: «Please use getByRole for the Add to cart button». Petal прислал такое изменение."
+    prompt:
+      en: "Approve, request changes or reject?"
+      ru: "Одобрить, запросить правки или отклонить?"
+    diff:
+      before: |
+        await page.locator('li:nth-child(2) .btn').click();
+      after: |
+        await page.getByRole('button', { name: 'Add to cart' }).first().click();
+    options:
+      - text: { en: "Request changes: `.first()` clicks the first card (Rose Bouquet), not Sunny Tulips. Ask to filter the card by its text.", ru: "Запросить правки: `.first()` кликает первую карточку (Rose Bouquet), а не Sunny Tulips. Попросить отфильтровать карточку по тексту." }
+        correct: true
+        why:
+          en: "The locator is resilient now — but it points to the wrong product."
+          ru: "Локатор теперь устойчивый — но указывает не на тот товар."
+      - text: { en: "Approve: getByRole is resilient", ru: "Одобрить: getByRole — устойчивый локатор" }
+        why:
+          en: "Resilient, and wrong. Every card has an “Add to cart” button."
+          ru: "Устойчивый — и неправильный. На каждой карточке есть кнопка «Add to cart»."
+      - text: { en: "Reject the whole PR and write the test yourself", ru: "Отклонить весь PR и написать тест {самой|самому}" }
+        why:
+          en: "Overkill: one precise comment fixes it."
+          ru: "Слишком радикально: хватит одного точного комментария."
+    hints:
+      - en: "How many “Add to cart” buttons are on the shop page?"
+        ru: "Сколько кнопок «Add to cart» на странице магазина?"
+      - en: "Which product is first in the list?"
+        ru: "Какой товар в списке первый?"
+    explain:
+      en: "Agents often satisfy the letter of a comment, not its intent. A better comment: “Use `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' })`.”"
+      ru: "Агенты часто выполняют букву комментария, а не его смысл. Комментарий получше: «Use `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' })`.»"
+
+  - id: c2-l3-k7
+    kind: review
+    keyPoint: kp-review-checklist
+    prompt:
+      en: "Review Petal's test for “BLOOM10 gives 10% off” (cart: 1 Rose Bouquet, expected total €36.40)."
+      ru: "Сделай ревью теста Petal на «BLOOM10 даёт скидку 10%» (в корзине 1 Rose Bouquet, ожидаемый итог €36.40)."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('BLOOM10 gives 10% off', async ({ page }) => {
+        await page.goto('/cart');
+        await page.getByLabel('Promo code').fill('BLOOM10');
+        page.getByRole('button', { name: 'Apply' }).click();
+        expect(await page.getByTestId('cart-total').isVisible()).toBeTruthy();
+      });
+    issues:
+      - line: 6
+        type: missing-await
+        note:
+          en: "No `await` before the click: the check may run before the promo is applied."
+          ru: "Нет `await` перед кликом: проверка может выполниться раньше, чем применится промокод."
+      - line: 7
+        type: weak-assertion
+        note:
+          en: "Checks that a total exists, not that it's €36.40. Use `await expect(page.getByTestId('cart-total')).toHaveText('€36.40')`."
+          ru: "Проверяет, что итог есть, а не что он равен €36.40. Используй `await expect(page.getByTestId('cart-total')).toHaveText('€36.40')`."
+    types: [missing-await, weak-assertion, hard-wait, fragile-locator, wrong-data]
+    hints:
+      - en: "Look at the beginning of each action line."
+        ru: "Посмотри на начало каждой строки с действием."
+      - en: "Would the last line fail if the discount were wrong?"
+        ru: "Упадёт ли последняя строка, если скидка будет неверной?"
+      - en: "Lines 6 and 7."
+        ru: "Строки 6 и 7."
+    explain:
+      en: "A missing `await` and a presence-only check — together they make a test that can't catch a broken discount."
+      ru: "Пропущенный `await` и проверка одного лишь наличия — вместе они дают тест, который не поймает сломанную скидку."
+
+  - id: c2-l3-k8
+    kind: predict
+    keyPoint: kp-spot-hallucination
+    placement: true
+    context:
+      en: "A fresh browser context: the cart is empty."
+      ru: "Чистый контекст браузера: корзина пуста."
+    prompt:
+      en: "Pass or fail?"
+      ru: "Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('empty cart shows a message', async ({ page }) => {
+        await page.goto('/cart');
+        await expect(page.getByText('Your basket is empty.')).toBeVisible();
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "Fail: Bloomly says “Your cart is empty.” — “basket” was invented."
+          ru: "Упадёт: в Bloomly написано «Your cart is empty.» — «basket» выдуман."
+        correct: true
+      - text:
+          en: "Pass: the cart is empty, so the message is there."
+          ru: "Пройдёт: корзина пуста, значит, сообщение есть."
+      - text:
+          en: "Fail: `getByText` can't find paragraphs."
+          ru: "Упадёт: `getByText` не умеет находить абзацы."
+    hints:
+      - en: "Compare the text word by word with the real empty cart."
+        ru: "Сравни текст слово в слово с настоящей пустой корзиной."
+      - en: "Cart or basket?"
+        ru: "Cart или basket?"
+    explain:
+      en: "British “basket”, American “cart” — the agent picked the wrong synonym. A test with an invented text fails loudly, which is the *good* kind of failure: you'll notice it."
+      ru: "Британское «basket», американское «cart» — агент выбрал не тот синоним. Тест с выдуманным текстом падает громко, и это *хорошее* падение: ты его заметишь."

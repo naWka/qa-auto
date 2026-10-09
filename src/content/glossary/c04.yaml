@@ -1,0 +1,182 @@
+# Glossary entries owned by chapter 4 (How a page is built)
+- id: dom
+  en: DOM
+  ipa: /ˌdiː oʊ ˈem/
+  ru: DOM (объектная модель документа)
+  pos: noun
+  def:
+    en: "The tree of elements the browser builds from a page's HTML; tests and agents search this tree."
+    ru: "Дерево элементов, которое браузер строит из HTML страницы; тесты и агенты ищут элементы в этом дереве."
+  example:
+    en: "The button is in the DOM but hidden, so the click times out."
+    ru: "Кнопка есть в DOM, но скрыта, поэтому клик падает по тайм-ауту."
+  context: chat
+  chapter: 4
+
+- id: html
+  en: HTML
+  ipa: /ˌeɪtʃ tiː em ˈel/
+  ru: HTML (язык разметки)
+  pos: noun
+  def:
+    en: "The markup language web pages are written in: tags describe headings, buttons, fields and links."
+    ru: "Язык разметки, на котором написаны веб-страницы: теги описывают заголовки, кнопки, поля и ссылки."
+  example:
+    en: "Kai, could you add a label to this input in the HTML? Right now it only has a placeholder."
+    ru: "Кай, можешь добавить label к этому полю в HTML? Сейчас у него только плейсхолдер."
+  context: chat
+  chapter: 4
+
+- id: element
+  en: element
+  ipa: /ˈelɪmənt/
+  ru: элемент
+  pos: noun
+  def:
+    en: "One node of the page, such as a button, a field or a heading, with its attributes and content."
+    ru: "Один узел страницы — например, кнопка, поле или заголовок — со своими атрибутами и содержимым."
+  example:
+    en: "The locator matches two elements: the nav link and the submit button."
+    ru: "Локатор находит два элемента: ссылку в меню и кнопку отправки формы."
+  context: code-review
+  chapter: 4
+
+- id: tag
+  en: tag
+  ipa: /tæɡ/
+  ru: тег
+  pos: noun
+  def:
+    en: "The name in angle brackets that says what an element is, like `<button>`, `<input>` or `<h1>`."
+    ru: "Имя в угловых скобках, которое говорит, что это за элемент: `<button>`, `<input>` или `<h1>`."
+  example:
+    en: "\"Add to cart\" is a `<div>` tag, not a `<button>`, so getByRole('button') can't find it — that's an accessibility bug."
+    ru: "«Add to cart» — это тег `<div>`, а не `<button>`, поэтому getByRole('button') его не находит — это баг доступности."
+  context: bug-report
+  chapter: 4
+
+- id: attribute
+  en: attribute
+  ipa: /ˈætrɪbjuːt/
+  ru: атрибут
+  pos: noun
+  def:
+    en: "Extra information inside the opening tag, written as name=\"value\": id, class, type, data-testid."
+    ru: "Дополнительная информация в открывающем теге в виде name=\"value\": id, class, type, data-testid."
+  example:
+    en: "The input has no aria-label attribute, so the agent's snapshot shows it as a textbox without a name."
+    ru: "У поля нет атрибута aria-label, поэтому в снимке агента оно выглядит как textbox без имени."
+  context: bug-report
+  chapter: 4
+
+- id: devtools
+  en: DevTools
+  ipa: /ˈdev tuːlz/
+  ru: DevTools (инструменты разработчика)
+  pos: noun
+  def:
+    en: "The browser's built-in panel for inspecting elements, network requests and the console."
+    ru: "Встроенная панель браузера для просмотра элементов, сетевых запросов и консоли."
+  example:
+    en: "Open DevTools, check the Network tab and attach the failed request to the ticket."
+    ru: "Открой DevTools, посмотри вкладку Network и приложи упавший запрос к тикету."
+  context: bug-report
+  chapter: 4
+
+- id: inspect
+  en: inspect
+  ipa: /ɪnˈspekt/
+  ru: проинспектировать, посмотреть код элемента (inspect)
+  pos: verb
+  def:
+    en: "To open an element in DevTools and see its tag, attributes, role and accessible name."
+    ru: "Открыть элемент в DevTools, чтобы увидеть его тег, атрибуты, роль и доступное имя."
+  example:
+    en: "Before you approve the locator, inspect the button and check its accessible name."
+    ru: "Прежде чем одобрить локатор, проинспектируй кнопку и проверь её доступное имя."
+  context: code-review
+  chapter: 4
+
+- id: css-selector
+  en: CSS selector
+  ipa: /ˌsiː es ˈes səˈlektər/
+  ru: CSS-селектор
+  pos: noun
+  def:
+    en: "A pattern that finds elements by tag, id, class or position, such as `#email` or `.card > button`."
+    ru: "Шаблон, который находит элементы по тегу, id, классу или положению, например `#email` или `.card > button`."
+  example:
+    en: "Please replace this CSS selector with getByRole — the class names change in the redesign."
+    ru: "Пожалуйста, замени этот CSS-селектор на getByRole — имена классов поменяются при редизайне."
+  context: code-review
+  chapter: 4
+
+- id: xpath
+  en: XPath
+  ipa: /ˈeks pæθ/
+  ru: XPath
+  pos: noun
+  def:
+    en: "A query language that finds elements by their path in the DOM tree, for example `//div[3]/button`."
+    ru: "Язык запросов, который находит элементы по пути в DOM-дереве, например `//div[3]/button`."
+  example:
+    en: "The agent generated a 200-character XPath; let's ask for a role-based locator instead."
+    ru: "Агент сгенерировал XPath на 200 символов; давай попросим вместо него локатор по роли."
+  context: code-review
+  chapter: 4
+
+- id: test-id
+  en: test ID
+  ipa: /ˈtest aɪ ˌdiː/
+  ru: тестовый идентификатор (test ID)
+  pos: noun
+  def:
+    en: "An attribute such as data-testid that exists only for tests, so it doesn't change when the design does."
+    ru: "Атрибут вроде data-testid, который существует только для тестов, поэтому не меняется вместе с дизайном."
+  example:
+    en: "Can we add a test ID to the cart count? It has no role and no label of its own."
+    ru: "Можем добавить test ID для счётчика корзины? У него нет ни своей роли, ни подписи."
+  context: chat
+  chapter: 4
+
+- id: role
+  en: role
+  ipa: /roʊl/
+  ru: роль
+  pos: noun
+  def:
+    en: "What an element is for users and assistive technology: button, link, textbox, checkbox, heading."
+    ru: "То, чем элемент является для пользователей и вспомогательных технологий: button, link, textbox, checkbox, heading."
+  example:
+    en: "The password field has no textbox role, so use getByLabel('Password') instead."
+    ru: "У поля пароля нет роли textbox, поэтому используй getByLabel('Password')."
+  context: code-review
+  chapter: 4
+
+- id: accessible-name
+  en: accessible name
+  ipa: /əkˈsesəbl ˈneɪm/
+  ru: доступное имя (accessible name)
+  pos: noun
+  def:
+    en: "The name a screen reader announces for an element, taken from its text, label, alt or aria-label."
+    ru: "Имя, которое скринридер произносит для элемента; берётся из текста, label, alt или aria-label."
+  example:
+    en: "The cart link's accessible name is \"Cart 0\", so an exact match on \"Cart\" won't find it."
+    ru: "Доступное имя ссылки корзины — «Cart 0», поэтому точное совпадение с «Cart» её не найдёт."
+  context: code-review
+  chapter: 4
+
+- id: accessibility
+  en: accessibility
+  ipa: /əkˌsesəˈbɪləti/
+  ru: доступность (accessibility, a11y)
+  pos: noun
+  def:
+    en: "How well people with disabilities can use the app, for example with a screen reader or only a keyboard."
+    ru: "Насколько удобно приложением пользоваться людям с инвалидностью — например, со скринридером или только с клавиатуры."
+  example:
+    en: "This icon button has no name — it's an accessibility bug, and the agent can't see the button either."
+    ru: "У этой кнопки-иконки нет имени — это баг доступности, и агент эту кнопку тоже не видит."
+  context: bug-report
+  chapter: 4

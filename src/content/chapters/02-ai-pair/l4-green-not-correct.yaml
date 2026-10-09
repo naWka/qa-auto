@@ -1,0 +1,864 @@
+id: c2-l4
+chapter: c2
+title: { en: "Green is not the same as correct", ru: "Зелёный — не значит правильный" }
+goal:
+  en: "Tell a test you can trust from a test that only looks green — and make every new test prove it can fail."
+  ru: "Отличать тест, которому можно доверять, от теста, который просто зелёный, — и заставлять каждый новый тест доказать, что он умеет падать."
+minutes: 9
+keyPoints:
+  - id: kp-cant-fail
+    title: { en: "Tests that can't fail", ru: "Тесты, которые не могут упасть" }
+  - id: kp-fit-to-bug
+    title: { en: "“Fixing” a red test to match a bug", ru: "«Починка» красного теста под баг" }
+  - id: kp-make-it-fail
+    title: { en: "Trust a test after you've seen it fail for the right reason", ru: "Доверяй тесту, когда увидел{а|}, как он падает по правильной причине" }
+terms: [false-negative, false-positive, test-coverage, assertion, pass, fail, bug, diff]
+steps:
+  - type: story
+    lines:
+      - who: petal
+        text:
+          en: "Great news! I ran the whole suite: 40 tests, all green ✅"
+          ru: "Отличные новости! Я прогнал весь набор: 40 тестов, все зелёные ✅"
+      - who: sofia
+        text:
+          en: "So we can ship Bloomly 3.0 today?"
+          ru: "Значит, можно выпускать Bloomly 3.0 сегодня?"
+      - who: maya
+        text:
+          en: "Green means “nothing these tests check is broken”. Before we ship, let's see *what* they check."
+          ru: "Зелёный значит «ничего из того, что проверяют эти тесты, не сломано». Прежде чем выпускать, посмотрим, *что* они проверяют."
+      - who: mochi
+        text: { en: "Mrrp.", ru: "Мрр." }
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед стартом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c2-l4-p1
+        kind: predict
+        keyPoint: kp-cant-fail
+        app: { bugs: [add-to-cart-double] }
+        context:
+          en: "Today's build has a bug: one click on “Add to cart” adds 2 items, so the header counter shows 2 instead of 1."
+          ru: "В сегодняшней сборке баг: один клик по «Add to cart» добавляет 2 товара, и счётчик в шапке показывает 2 вместо 1."
+        prompt:
+          en: "Will Petal's test catch it — or pass?"
+          ru: "Поймает ли это тест Petal — или пройдёт?"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('adding a product updates the cart counter', async ({ page }) => {
+            await page.goto('/shop');
+            const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+            await card.getByRole('button', { name: 'Add to cart' }).click();
+            expect(await page.getByTestId('cart-count').isVisible()).toBeTruthy();
+          });
+        outcome: pass
+        reasons:
+          - text:
+              en: "Pass: it only checks that the counter is visible, not what it says."
+              ru: "Пройдёт: он проверяет только, что счётчик виден, а не что на нём написано."
+            correct: true
+          - text:
+              en: "Fail: the counter is wrong, so the test catches it."
+              ru: "Упадёт: счётчик неверный, тест это поймает."
+        hints:
+          - en: "What exactly does the last line compare?"
+            ru: "Что именно сравнивает последняя строка?"
+          - en: "Is a counter showing “2” visible?"
+            ru: "Счётчик с цифрой «2» виден?"
+        explain:
+          en: "The counter is visible whether it shows 1, 2 or 99. This test can't fail because of a wrong count — it's green on a bug."
+          ru: "Счётчик виден, что бы он ни показывал: 1, 2 или 99. Из-за неверного количества этот тест упасть не может — он зелёный при баге."
+
+  - type: theory
+    keyPoint: kp-cant-fail
+    title: { en: "Tests that can't fail", ru: "Тесты, которые не могут упасть" }
+    body:
+      - en: "A test is useful only if it *can* go red when the feature breaks. Some tests can't: they have no [[assertion]], or they check something that is always true."
+        ru: "Тест полезен, только если он *может* покраснеть, когда функция ломается. Некоторые не могут: в них нет [[проверки|assertion]] или они проверяют то, что верно всегда."
+      - en: "A classic AI pattern: `expect(await total.isVisible()).toBeTruthy()`. It checks that the total *exists* — not that it's *right*. Forty such tests look like great [[test coverage|test-coverage]] and cover almost nothing."
+        ru: "Классика от ИИ: `expect(await total.isVisible()).toBeTruthy()`. Проверяет, что итог *есть*, а не что он *правильный*. Сорок таких тестов выглядят как отличное [[покрытие|test-coverage]] и почти ничего не покрывают."
+      - en: "Manual analogy: a test case whose expected result is “the page works”. Nobody can ever fail it."
+        ru: "Аналогия из ручного тестирования: тест-кейс с ожидаемым результатом «страница работает». Его невозможно провалить."
+    code: |
+      // can't catch a wrong total:
+      expect(await page.getByTestId('cart-total').isVisible()).toBeTruthy();
+      await expect(page).toHaveURL(/cart/);
+      // can:
+      await expect(page.getByTestId('cart-total')).toHaveText('€70.00');
+    mentor:
+      en: "Ask every test: what bug would make you red? If the answer is “none”, it's decoration."
+      ru: "Спроси у каждого теста: какой баг сделает тебя красным? Если ответ «никакой» — это декорация."
+
+  - type: theory
+    keyPoint: kp-fit-to-bug
+    title: { en: "When the agent fixes the test instead of the bug", ru: "Когда агент чинит тест вместо бага" }
+    body:
+      - en: "A test goes red. The agent's goal is “make it green”, so it may change the expected value to whatever the app shows now. Green again — and the [[bug]] is now *part of the test*."
+        ru: "Тест покраснел. Цель агента — «сделать зелёным», и он может поменять ожидаемое значение на то, что приложение показывает сейчас. Снова зелёный — а [[баг|bug]] теперь *часть теста*."
+      - en: "That's a [[false negative|false-negative]]: the bug is there, the test says “all good”. Its opposite, a [[false positive|false-positive]], is a red test without a real bug — annoying, but at least it makes noise."
+        ru: "Это [[ложноотрицательный результат|false-negative]]: баг есть, а тест говорит «всё хорошо». Противоположность — [[ложное срабатывание|false-positive]]: тест красный, а бага нет. Раздражает, но хотя бы шумит."
+      - en: "Playwright's healer agent is meant to repair *tests* (a changed locator, a timing issue) and to mark real failures with `test.fixme` instead of hiding them. Any agent can still get it wrong — so read every “heal” as a [[diff]]."
+        ru: "Агент-хилер в Playwright задуман, чтобы чинить *тесты* (изменившийся локатор, проблему с таймингом) и помечать настоящие падения через `test.fixme`, а не прятать их. Но ошибиться может любой агент — поэтому читай каждое «лечение» как [[дифф|diff]]."
+    code: |
+      - await expect(page.getByTestId('cart-total')).toHaveText('€70.00');
+      + await expect(page.getByTestId('cart-total')).toHaveText('€39.90');
+    mentor:
+      en: "The expected value comes from the requirements — never from the screen. If the screen disagrees, that's a bug report, not a test fix."
+      ru: "Ожидаемое значение берётся из требований — никогда с экрана. Если экран с ним не согласен, это баг-репорт, а не правка теста."
+
+  - type: theory
+    keyPoint: kp-make-it-fail
+    title: { en: "Trust a test after you've seen it fail", ru: "Доверяй тесту, когда увидел{а|} его падение" }
+    body:
+      - en: "Before you trust a new test, make it [[fail]] on purpose: change the expected value (€70.00 → €71.00), or run it on a build where the bug is switched on. It must go red."
+        ru: "Прежде чем доверять новому тесту, заставь его [[упасть|fail]] нарочно: поменяй ожидаемое значение (€70.00 → €71.00) или запусти на сборке, где включён баг. Он обязан покраснеть."
+      - en: "Then read the message: does it fail *for the right reason*? “Expected €70.00, received €39.90” — yes. “Element not found” — no, that's a different problem."
+        ru: "Потом прочитай сообщение: падает ли он *по правильной причине*? «Expected €70.00, received €39.90» — да. «Element not found» — нет, это другая проблема."
+      - en: "You did this as a manual QA: to verify a bug fix, you first reproduce the bug. Same idea, applied to the test itself."
+        ru: "Ты делал{а|} это в ручном тестировании: чтобы проверить исправление бага, сначала воспроизводишь баг. Та же идея, только применённая к самому тесту."
+    figure: red-green
+    mentor:
+      en: "A test you have never seen red is a promise, not a proof."
+      ru: "Тест, который ты ни разу не видел{а|} красным, — это обещание, а не доказательство."
+
+  - type: example
+    keyPoint: kp-make-it-fail
+    title: { en: "Red for the right reason", ru: "Красный по правильной причине" }
+    intro:
+      en: "Maya's test for the orders status filter, run on a build where the summary bug is switched on (it always says “Showing 6 of 6 orders”). Run it: you should see red — on the right line."
+      ru: "Тест Майи для фильтра статусов заказов, запущенный на сборке с включённым багом сводки (она всегда пишет «Showing 6 of 6 orders»). Запусти: должно быть красное — и на правильной строке."
+    app: { bugs: [orders-summary-wrong], state: { user: anna@bloomly.app } }
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('status filter shows only delivered orders', async ({ page }) => {
+        await page.goto('/orders');
+        await page.getByLabel('Status').selectOption('Delivered');
+        await expect(page.getByTestId('order-row')).toHaveCount(3);
+        await expect(page.getByTestId('orders-summary')).toHaveText('Showing 3 of 6 orders');
+      });
+    notes:
+      - lines: 4
+        text:
+          en: "Anna is already logged in (preset state), so the test starts right on /orders."
+          ru: "Anna уже вошла (предустановленное состояние), поэтому тест начинается сразу с /orders."
+      - lines: 5
+        text:
+          en: "The action from the test case: filter by “Delivered”."
+          ru: "Действие из тест-кейса: фильтр по «Delivered»."
+      - lines: 6
+        text:
+          en: "Guards the filter: Anna has exactly 3 delivered orders. On this build it passes — the rows are fine."
+          ru: "Охраняет фильтр: у Anna ровно 3 доставленных заказа. На этой сборке проходит — строки в порядке."
+      - lines: 7
+        text:
+          en: "Guards the summary, with the value from the requirements. On this build it fails: “Expected Showing 3 of 6 orders, received Showing 6 of 6 orders”. Red for the right reason."
+          ru: "Охраняет сводку, со значением из требований. На этой сборке падает: «Expected Showing 3 of 6 orders, received Showing 6 of 6 orders». Красный по правильной причине."
+    runnable: true
+
+  - type: task
+    task:
+      id: c2-l4-t1
+      kind: choice
+      keyPoint: kp-cant-fail
+      multi: true
+      context:
+        en: "The cart has 1 Rose Bouquet. Each test applies BLOOM10; the correct total is €36.40."
+        ru: "В корзине 1 Rose Bouquet. Каждый тест применяет BLOOM10; правильный итог — €36.40."
+      prompt:
+        en: "Which of these tests would stay green if the total were calculated wrong? Pick all."
+        ru: "Какие из этих тестов останутся зелёными, если итог посчитается неверно? Выбери все."
+      options:
+        - text: { en: "A test with no `expect` at all", ru: "Тест вообще без `expect`" }
+          correct: true
+          why:
+            en: "No assertion — nothing can make it red except a crash."
+            ru: "Нет проверки — покраснеть он может только от падения кода."
+        - text: { en: "A test that checks `await expect(page).toHaveURL(/cart/)`", ru: "Тест, который проверяет `await expect(page).toHaveURL(/cart/)`" }
+          correct: true
+          why:
+            en: "Always true: the test itself navigated to /cart."
+            ru: "Всегда верно: тест сам перешёл на /cart."
+        - text: { en: "A test with `expect(await total.isVisible()).toBeTruthy()`", ru: "Тест с `expect(await total.isVisible()).toBeTruthy()`" }
+          correct: true
+          why:
+            en: "A wrong total is still visible."
+            ru: "Неверный итог тоже виден."
+        - text: { en: "A test with `await expect(total).toHaveText('€36.40')`", ru: "Тест с `await expect(total).toHaveText('€36.40')`" }
+          why:
+            en: "This one goes red as soon as the total is anything but €36.40."
+            ru: "Этот покраснеет, как только итог будет хоть немного не €36.40."
+      hints:
+        - en: "For each test ask: what would a wrong total change in it?"
+          ru: "Для каждого теста спроси: что в нём изменит неверный итог?"
+        - en: "Only an assertion on the *value* notices a wrong value."
+          ru: "Неверное значение замечает только проверка *значения*."
+        - en: "Three of four stay green."
+          ru: "Зелёными останутся три из четырёх."
+      praise:
+        en: "You judged each test by the bug it can catch — exactly the right question."
+        ru: "Ты оценивал{а|} каждый тест по тому, какой баг он может поймать, — ровно правильный вопрос."
+      explain:
+        en: "No assertion, an always-true URL check, a presence check — three ways to be green on a broken total. Only `toHaveText('€36.40')` turns the requirement into a check."
+        ru: "Нет проверки, всегда верная проверка URL, проверка наличия — три способа быть зелёным при сломанном итоге. Только `toHaveText('€36.40')` превращает требование в проверку."
+
+  - type: task
+    task:
+      id: c2-l4-t2
+      kind: review
+      keyPoint: kp-cant-fail
+      context:
+        en: "Petal's test for TC-205. The cart is preset with 1 Rose Bouquet."
+        ru: "Тест Petal для TC-205. В корзине заранее лежит 1 Rose Bouquet."
+      prompt:
+        en: "Flag every assertion that can't catch a broken discount."
+        ru: "Отметь каждую проверку, которая не поймает сломанную скидку."
+      testCase:
+        id: TC-205
+        title: BLOOM10 gives 10% off
+        preconditions: ["Cart has 1 Rose Bouquet (€35.00)"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Enter the promo code and click \"Apply\"", data: "BLOOM10", expected: "Message \"Promo code BLOOM10 applied: −10%.\"; total €36.40" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('BLOOM10 gives 10% off', async ({ page }) => {
+          await page.goto('/cart');
+          await page.getByLabel('Promo code').fill('BLOOM10');
+          await page.getByRole('button', { name: 'Apply' }).click();
+          await expect(page.getByTestId('promo-message')).toBeVisible();
+          expect(await page.getByTestId('cart-total').isVisible()).toBeTruthy();
+          await expect(page).toHaveURL(/cart/);
+        });
+      issues:
+        - line: 7
+          type: weak-assertion
+          note:
+            en: "An error like “This promo code is not valid.” is visible too. Check the text: “Promo code BLOOM10 applied: −10%.”"
+            ru: "Ошибка вроде «This promo code is not valid.» тоже видна. Проверяй текст: «Promo code BLOOM10 applied: −10%.»"
+        - line: 8
+          type: weak-assertion
+          note:
+            en: "Any total is visible. Use `await expect(page.getByTestId('cart-total')).toHaveText('€36.40')`."
+            ru: "Виден любой итог. Используй `await expect(page.getByTestId('cart-total')).toHaveText('€36.40')`."
+        - line: 9
+          type: weak-assertion
+          note:
+            en: "Always true — the test opened /cart itself. It checks nothing about the discount."
+            ru: "Всегда верно — тест сам открыл /cart. О скидке это ничего не говорит."
+      types: [weak-assertion, no-assertion, wrong-assertion, hard-wait, fragile-locator]
+      hints:
+        - en: "For each `expect`, imagine the discount is broken. Would it go red?"
+          ru: "Для каждого `expect` представь, что скидка сломана. Покраснеет ли он?"
+        - en: "Even an error message is “visible”."
+          ru: "Даже сообщение об ошибке «видно»."
+        - en: "Lines 7, 8 and 9 — all three assertions."
+          ru: "Строки 7, 8 и 9 — все три проверки."
+      praise:
+        en: "Three assertions, zero protection — and you saw through all of them."
+        ru: "Три проверки и ноль защиты — и ты раскусил{а|} все три."
+      explain:
+        en: "This test has three assertions and still can't fail on a broken discount. Counting `expect`s says nothing — ask what each one would catch."
+        ru: "В этом тесте три проверки, и всё равно он не упадёт на сломанной скидке. Количество `expect` ничего не значит — спрашивай, что ловит каждая."
+
+  - type: task
+    task:
+      id: c2-l4-t3
+      kind: choice
+      keyPoint: kp-fit-to-bug
+      context:
+        en: "TC-141's test went red on today's build: “Expected '1', received '2'”. Petal ran a heal and reports: “Fixed 1 test: updated the expected cart count to match the application. All green ✅”"
+        ru: "Тест TC-141 покраснел на сегодняшней сборке: «Expected '1', received '2'». Petal запустил лечение и докладывает: «Fixed 1 test: updated the expected cart count to match the application. All green ✅»"
+      testCase:
+        id: TC-141
+        title: Adding a product updates the cart counter
+        preconditions: ["Cart is empty"]
+        steps:
+          - { action: "Open /shop" }
+          - { action: "Click \"Add to cart\" on the Sunny Tulips card", expected: "Cart counter in the header shows 1" }
+      prompt:
+        en: "What do you do with this change?"
+        ru: "Что ты делаешь с этим изменением?"
+      diff:
+        before: |
+          await expect(page.getByTestId('cart-count')).toHaveText('1');
+        after: |
+          await expect(page.getByTestId('cart-count')).toHaveText('2');
+      options:
+        - text: { en: "Reject the change and file a bug: one click adds 2 items. The test was right.", ru: "Отклонить изменение и завести баг: один клик добавляет 2 товара. Тест был прав." }
+          correct: true
+          why:
+            en: "TC-141 says 1. The app shows 2. That's a bug in the app, not in the test."
+            ru: "В TC-141 — 1. Приложение показывает 2. Это баг в приложении, а не в тесте."
+        - text: { en: "Accept: the test is green again", ru: "Принять: тест снова зелёный" }
+          why:
+            en: "Green now means “the bug is still there”. That's a false negative."
+            ru: "Теперь зелёный значит «баг на месте». Это ложноотрицательный результат."
+        - text: { en: "Accept, and rename the test to “adds two items”", ru: "Принять и переименовать тест в «добавляет два товара»" }
+          why:
+            en: "That rewrites the requirement to match the bug."
+            ru: "Это переписывает требование под баг."
+        - text: { en: "Delete the test — it's flaky", ru: "Удалить тест — он нестабильный" }
+          why:
+            en: "It isn't flaky: it failed every time, for the right reason."
+            ru: "Он не нестабильный: он падал каждый раз и по правильной причине."
+      hints:
+        - en: "Where does the expected value come from: the test case or the screen?"
+          ru: "Откуда берётся ожидаемое значение: из тест-кейса или с экрана?"
+        - en: "Read TC-141's expected result."
+          ru: "Прочитай ожидаемый результат в TC-141."
+        - en: "The red test was doing its job."
+          ru: "Красный тест делал свою работу."
+      praise:
+        en: "You protected the requirement instead of the green checkmark. That's the core of QA."
+        ru: "Ты защитил{а|} требование, а не зелёную галочку. В этом суть QA."
+      explain:
+        en: "A red test with “Expected '1', received '2'” is a perfect bug report. The heal turned it into a [[false negative|false-negative]]. Reject the diff, file the bug, and keep the original assertion."
+        ru: "Красный тест с «Expected '1', received '2'» — идеальный баг-репорт. Лечение превратило его в [[ложноотрицательный результат|false-negative]]. Отклони дифф, заведи баг и оставь исходную проверку."
+
+  - type: task
+    task:
+      id: c2-l4-t4
+      kind: predict
+      keyPoint: kp-fit-to-bug
+      context:
+        en: "Nobody noticed, and Petal's “heal” was merged. A day later Kai fixed the double-add bug. Now one click adds exactly 1 item."
+        ru: "Никто не заметил, и «лечение» Petal смержили. Через день Kai починил баг с двойным добавлением. Теперь один клик добавляет ровно 1 товар."
+      prompt:
+        en: "Will the healed test pass or fail on the fixed build?"
+        ru: "«Вылеченный» тест пройдёт или упадёт на исправленной сборке?"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('adding a product updates the cart counter', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+          await card.getByRole('button', { name: 'Add to cart' }).click();
+          await expect(page.getByTestId('cart-count')).toHaveText('2');
+        });
+      outcome: fail
+      reasons:
+        - text:
+            en: "Fail: the counter now correctly shows 1, but the healed test expects the old bug, 2."
+            ru: "Упадёт: счётчик теперь правильно показывает 1, а «вылеченный» тест ждёт старый баг — 2."
+          correct: true
+        - text:
+            en: "Pass: the test was healed, so it's stable now."
+            ru: "Пройдёт: тест вылечили, теперь он стабильный."
+        - text:
+            en: "Fail: the Sunny Tulips card can't be found."
+            ru: "Упадёт: карточку Sunny Tulips не найти."
+      hints:
+        - en: "What does the counter show after the fix?"
+          ru: "Что показывает счётчик после исправления?"
+        - en: "What does the test expect?"
+          ru: "Чего ждёт тест?"
+        - en: "1 ≠ 2."
+          ru: "1 ≠ 2."
+      praise:
+        en: "Exactly: the healed test punishes the fix. Double damage."
+        ru: "Именно: «вылеченный» тест наказывает исправление. Двойной вред."
+      explain:
+        en: "Fitting a test to a bug does damage twice: first it hides the bug (false negative), then it fails on the correct app ([[false positive|false-positive]]). Kai will now waste time on a “broken” fix that actually works."
+        ru: "Подгонка теста под баг вредит дважды: сначала прячет баг (ложноотрицательный результат), потом падает на правильном приложении ([[ложное срабатывание|false-positive]]). Kai теперь потратит время на «сломанное» исправление, которое на самом деле работает."
+
+  - type: task
+    task:
+      id: c2-l4-t5
+      kind: choice
+      keyPoint: kp-fit-to-bug
+      prompt:
+        en: "The healer reports: “Updated the expected value to match the application.” What's the first question you ask?"
+        ru: "Хилер докладывает: «Updated the expected value to match the application». Какой вопрос ты задаёшь первым?"
+      options:
+        - text: { en: "Which value is right according to the requirements: the old expected one or the new actual one?", ru: "Какое значение верно по требованиям: старое ожидаемое или новое фактическое?" }
+          correct: true
+          why:
+            en: "If the requirement changed — accept. If not — it's a bug, reject and report it."
+            ru: "Если требование поменялось — принять. Если нет — это баг: отклонить и завести."
+        - text: { en: "Is the test green now?", ru: "Тест теперь зелёный?" }
+          why:
+            en: "It always is after such a heal. That's the problem."
+            ru: "После такого лечения он всегда зелёный. В этом и проблема."
+        - text: { en: "How long did the heal take?", ru: "Сколько времени заняло лечение?" }
+          why:
+            en: "Speed doesn't matter if the result hides a bug."
+            ru: "Скорость не важна, если результат прячет баг."
+        - text: { en: "Can the healer fix more tests the same way?", ru: "Может ли хилер так же починить и другие тесты?" }
+          why:
+            en: "That would hide more bugs, faster."
+            ru: "Так он спрячет больше багов, и быстрее."
+      hints:
+        - en: "A changed expected value is either a new requirement or a bug."
+          ru: "Изменённое ожидаемое значение — это либо новое требование, либо баг."
+        - en: "Who decides which one? Not the healer."
+          ru: "Кто решает, что именно? Не хилер."
+      praise:
+        en: "That's the question that separates a test fix from a bug cover-up."
+        ru: "Именно этот вопрос отличает починку теста от сокрытия бага."
+      explain:
+        en: "Locator and timing changes are fair game for a healer. A changed *expected value* always needs a human decision against the requirements."
+        ru: "Изменения локаторов и таймингов — нормальная работа для хилера. Изменённое *ожидаемое значение* всегда требует решения человека — по требованиям."
+
+  - type: task
+    task:
+      id: c2-l4-t6
+      kind: find-bug
+      keyPoint: kp-make-it-fail
+      app: { bugs: [add-to-cart-double] }
+      context:
+        en: "This is Petal's weak test from the start of the lesson. The build still has the double-add bug."
+        ru: "Это слабый тест Petal из начала урока. В сборке всё ещё баг с двойным добавлением."
+      prompt:
+        en: "Change the test so it fails on this build and passes once the bug is fixed."
+        ru: "Измени тест так, чтобы он падал на этой сборке и проходил, когда баг починят."
+      testCase:
+        id: TC-141
+        title: Adding a product updates the cart counter
+        preconditions: ["Cart is empty"]
+        steps:
+          - { action: "Open /shop" }
+          - { action: "Click \"Add to cart\" on the Sunny Tulips card", expected: "Cart counter in the header shows 1" }
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('adding a product updates the cart counter', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+          await card.getByRole('button', { name: 'Add to cart' }).click();
+          expect(await page.getByTestId('cart-count').isVisible()).toBeTruthy();
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('adding a product updates the cart counter', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+          await card.getByRole('button', { name: 'Add to cart' }).click();
+          await expect(page.getByTestId('cart-count')).toHaveText('1');
+        });
+      checks:
+        expect: fail
+        static: [hasAssertion]
+        also:
+          - app: {}
+            expect: pass
+      hints:
+        - en: "The last line checks that the counter exists. TC-141 says what it should show."
+          ru: "Последняя строка проверяет, что счётчик есть. TC-141 говорит, что он должен показывать."
+        - en: "Use a web-first assertion on the text: `await expect(...).toHaveText(...)`."
+          ru: "Используй проверку текста, которая сама ждёт: `await expect(...).toHaveText(...)`."
+        - en: "`await expect(page.getByTestId('cart-count')).toHaveText('1');`"
+          ru: "Замени последнюю строку на `await expect(page.getByTestId('cart-count')).toHaveText('1');`"
+      praise:
+        en: "Red on the bug, green on the fix. You've just turned decoration into a real test."
+        ru: "Красный при баге, зелёный после исправления. Ты только что превратил{а|} декорацию в настоящий тест."
+      explain:
+        en: "On the buggy build the run now fails with “Expected '1', received '2'” — the failure describes the bug itself. That's how you know the test fails for the right reason."
+        ru: "На багованной сборке прогон теперь падает с «Expected '1', received '2'» — падение описывает сам баг. Так ты и понимаешь, что тест падает по правильной причине."
+
+  - type: task
+    task:
+      id: c2-l4-t7
+      kind: choice
+      keyPoint: kp-make-it-fail
+      prompt:
+        en: "Your new assertion `await expect(page.getByTestId('cart-count')).toHaveText('1');` is green on the fixed build. How do you make sure it can actually catch a bug?"
+        ru: "Твоя новая проверка `await expect(page.getByTestId('cart-count')).toHaveText('1');` зелёная на исправленной сборке. Как убедиться, что она действительно может поймать баг?"
+      options:
+        - text: { en: "Temporarily change '1' to '5', run, see red with “Expected '5', received '1'”, then change it back", ru: "Временно поменять '1' на '5', запустить, увидеть красный с «Expected '5', received '1'» и вернуть обратно" }
+          correct: true
+          why:
+            en: "You've seen it fail, and fail for the right reason. (Running it on a build with the bug works too.)"
+            ru: "Ты увидел{а|}, как она падает, и по правильной причине. (Запуск на сборке с багом тоже подходит.)"
+        - text: { en: "Run it ten more times — if it stays green, it's reliable", ru: "Запустить ещё десять раз — если останется зелёной, она надёжна" }
+          why:
+            en: "Ten green runs prove it's stable, not that it can fail."
+            ru: "Десять зелёных прогонов доказывают стабильность, а не способность падать."
+        - text: { en: "Ask Petal to confirm the test is correct", ru: "Попросить Petal подтвердить, что тест правильный" }
+          why:
+            en: "Petal will say yes — about any test."
+            ru: "Petal скажет «да» — про любой тест."
+        - text: { en: "Add `waitForTimeout(2000)` before the assertion", ru: "Добавить `waitForTimeout(2000)` перед проверкой" }
+          why:
+            en: "That slows the test down and proves nothing."
+            ru: "Это замедлит тест и ничего не докажет."
+      hints:
+        - en: "To trust a test, you need to see it red at least once."
+          ru: "Чтобы доверять тесту, нужно хотя бы раз увидеть его красным."
+        - en: "Break the expectation on purpose."
+          ru: "Нарочно сломай ожидание."
+      praise:
+        en: "That's the habit: never trust a test you haven't seen fail."
+        ru: "Вот она, привычка: не доверять тесту, который ты не видел{а|} падающим."
+      explain:
+        en: "Breaking the expected value for one run is the cheapest way to prove the assertion is alive. Read the message too: it should name the value you broke."
+        ru: "Сломать ожидаемое значение на один прогон — самый дешёвый способ доказать, что проверка живая. И прочитай сообщение: в нём должно быть значение, которое ты сломал{а|}."
+
+  - type: task
+    task:
+      id: c2-l4-t8
+      kind: vocab
+      keyPoint: kp-fit-to-bug
+      mode: cloze
+      sentence:
+        en: "The healer changed the expected count from 1 to 2. Now the test is green, but the bug is still there — a ___."
+        ru: "Хилер поменял ожидаемое количество с 1 на 2. Теперь тест зелёный, а баг на месте — это ложноотрицательный результат."
+      answer: false negative
+      options: [false negative, false positive, flaky test]
+
+  - type: mistakes
+    keyPoint: kp-cant-fail
+    title: { en: "Looks like a check, isn't one", ru: "Похоже на проверку, но не проверка" }
+    items:
+      - wrong: "expect(await page.getByTestId('cart-count').isVisible()).toBeTruthy();"
+        right: "await expect(page.getByTestId('cart-count')).toHaveText('1');"
+        why:
+          en: "Presence isn't correctness. Check the value from the test case."
+          ru: "Наличие — не правильность. Проверяй значение из тест-кейса."
+      - wrong: "await expect(page).toHaveURL(/cart/);"
+        right: "await expect(page.getByTestId('cart-total')).toHaveText('€36.40');"
+        why:
+          en: "The test navigated there itself — this is always true."
+          ru: "Тест сам туда перешёл — это верно всегда."
+      - wrong: "await expect(page.getByTestId('cart-count')).toHaveText('2'); // healed"
+        right: "await expect(page.getByTestId('cart-count')).toHaveText('1'); // + bug report"
+        why:
+          en: "Never fit the expected value to the app. A disagreement is a bug report."
+          ru: "Никогда не подгоняй ожидаемое значение под приложение. Расхождение — это баг-репорт."
+
+  - type: explain
+    keyPoint: kp-make-it-fail
+    prompt:
+      en: "In your own words: why isn't a green test enough, and how do you check that a test can be trusted?"
+      ru: "Своими словами: почему зелёного теста недостаточно и как проверить, что тесту можно доверять?"
+    model:
+      en: "Green only means that what the test checks isn't broken. If it checks nothing, or only that an element exists, or if someone fitted the expected value to a bug, it stays green while the bug is there. So I read what each assertion compares, I make sure the expected values come from the test case, and I see the test fail at least once — by breaking the expected value or running it on a buggy build — and check that the message points at the right problem."
+      ru: "Зелёный значит только, что сломано не то, что проверяет тест. Если он ничего не проверяет, или проверяет лишь наличие элемента, или кто-то подогнал ожидаемое значение под баг, он остаётся зелёным при баге. Поэтому я читаю, что сравнивает каждая проверка, слежу, чтобы ожидаемые значения брались из тест-кейса, и хотя бы раз вижу, как тест падает, — ломаю ожидаемое значение или запускаю на сборке с багом — и проверяю, что сообщение указывает на правильную проблему."
+
+  - type: phrases
+    items:
+      - context: code-review
+        en: "This assertion can't fail: it only checks that the total is visible. Please assert the value from TC-205."
+        ru: "Эта проверка не может упасть: она смотрит только, видно ли итог. Пожалуйста, проверяй значение из TC-205."
+      - context: code-review
+        en: "Rejecting this heal: the app is wrong, not the test. I've filed a bug."
+        ru: "Отклоняю это лечение: ошибается приложение, а не тест. Я {завела|завёл} баг."
+        note:
+          en: "Say clearly which side is wrong — the app or the test."
+          ru: "Чётко скажи, кто ошибается, — приложение или тест."
+      - context: bug-report
+        en: "Clicking “Add to cart” once adds two items. Expected: the cart counter shows 1. Actual: 2."
+        ru: "Один клик по «Add to cart» добавляет два товара. Ожидаемый результат: счётчик корзины показывает 1. Фактический: 2."
+      - context: standup
+        en: "All 40 tests are green, but I found six that can't fail. I'm fixing their assertions today."
+        ru: "Все 40 тестов зелёные, но я нашл{а|ёл} шесть, которые не могут упасть. Сегодня исправляю их проверки."
+      - context: chat
+        en: "Before we trust the new checkout test, let's see it fail on the build with the bug."
+        ru: "Прежде чем доверять новому тесту чекаута, давай посмотрим, как он падает на сборке с багом."
+
+checkPool:
+  - id: c2-l4-k1
+    kind: predict
+    keyPoint: kp-cant-fail
+    placement: true
+    app: { bugs: [promo-stacks], state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+    context:
+      en: "This build has a bug: applying BLOOM10 twice gives −20%."
+      ru: "В этой сборке баг: если применить BLOOM10 дважды, скидка становится −20%."
+    prompt:
+      en: "Pass or fail?"
+      ru: "Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('applying BLOOM10 twice does not stack', async ({ page }) => {
+        await page.goto('/cart');
+        await page.getByLabel('Promo code').fill('BLOOM10');
+        await page.getByRole('button', { name: 'Apply' }).click();
+        await page.getByRole('button', { name: 'Apply' }).click();
+      });
+    outcome: pass
+    reasons:
+      - text:
+          en: "Pass: there is no assertion, so nothing can turn it red."
+          ru: "Пройдёт: проверки нет, покраснеть ему не от чего."
+        correct: true
+      - text:
+          en: "Fail: the discount stacks, and the test title says it shouldn't."
+          ru: "Упадёт: скидка складывается, а в названии теста сказано, что не должна."
+    hints:
+      - en: "Does the title check anything?"
+        ru: "Проверяет ли что-нибудь название теста?"
+      - en: "Look for `expect`."
+        ru: "Поищи `expect`."
+    explain:
+      en: "The title promises a check the code never makes. A great edge case — and a test that can't fail. It needs `await expect(page.getByTestId('cart-total')).toHaveText('€36.40')`."
+      ru: "Название обещает проверку, которой в коде нет. Отличный пограничный случай — и тест, который не может упасть. Нужно добавить `await expect(page.getByTestId('cart-total')).toHaveText('€36.40')`."
+
+  - id: c2-l4-k2
+    kind: choice
+    keyPoint: kp-fit-to-bug
+    context:
+      en: "The orders filter test went red: “Expected 'Showing 3 of 6 orders', received 'Showing 6 of 6 orders'”. The healer changed it like this and reports “All green ✅”."
+      ru: "Тест фильтра заказов покраснел: «Expected 'Showing 3 of 6 orders', received 'Showing 6 of 6 orders'». Хилер поменял его вот так и докладывает «All green ✅»."
+    prompt:
+      en: "Anna has 3 delivered orders out of 6. What do you do?"
+      ru: "У Anna 3 доставленных заказа из 6. Что ты делаешь?"
+    diff:
+      before: |
+        await expect(page.getByTestId('orders-summary')).toHaveText('Showing 3 of 6 orders');
+      after: |
+        await expect(page.getByTestId('orders-summary')).toHaveText('Showing 6 of 6 orders');
+    options:
+      - text: { en: "Reject the heal and file a bug: the summary ignores the filter", ru: "Отклонить лечение и завести баг: сводка игнорирует фильтр" }
+        correct: true
+        why:
+          en: "3 delivered orders → “Showing 3 of 6”. The app is wrong."
+          ru: "3 доставленных заказа → «Showing 3 of 6». Ошибается приложение."
+      - text: { en: "Accept: the healer saw the real page", ru: "Принять: хилер видел настоящую страницу" }
+        why:
+          en: "It saw what IS, not what SHOULD BE."
+          ru: "Он видел то, что ЕСТЬ, а не то, что ДОЛЖНО БЫТЬ."
+      - text: { en: "Accept and mark the test as flaky", ru: "Принять и пометить тест как нестабильный" }
+        why:
+          en: "The failure was consistent and meaningful — not flaky."
+          ru: "Падение было стабильным и осмысленным — это не нестабильность."
+    hints:
+      - en: "Count: how many delivered orders, how many in total?"
+        ru: "Посчитай: сколько доставленных заказов, сколько всего?"
+      - en: "Which line matches the requirement?"
+        ru: "Какая строка соответствует требованию?"
+    explain:
+      en: "“Showing 6 of 6” after filtering to 3 orders is exactly the bug the test was written to catch. The heal would make it a false negative."
+      ru: "«Showing 6 of 6» после фильтра до 3 заказов — ровно тот баг, ради которого писали тест. Лечение сделало бы его ложноотрицательным."
+
+  - id: c2-l4-k3
+    kind: find-bug
+    keyPoint: kp-make-it-fail
+    app: { bugs: [remove-wrong-item], state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] } }
+    context:
+      en: "The cart has Rose Bouquet and Sunny Tulips. This build has a bug: “Remove” always deletes the first row."
+      ru: "В корзине Rose Bouquet и Sunny Tulips. В этой сборке баг: «Remove» всегда удаляет первую строку."
+    prompt:
+      en: "Petal's test passes on this build. Add an assertion so it fails here and passes once the bug is fixed."
+      ru: "Тест Petal проходит на этой сборке. Добавь проверку, чтобы он падал здесь и проходил после исправления бага."
+    starter: |
+      import { test, expect } from '@playwright/test';
+
+      test('removing an item keeps the other one', async ({ page }) => {
+        await page.goto('/cart');
+        const row = page.getByTestId('cart-row').filter({ hasText: 'Sunny Tulips' });
+        await row.getByRole('button', { name: 'Remove' }).click();
+        await expect(page.getByTestId('cart-row')).toHaveCount(1);
+      });
+    solution: |
+      import { test, expect } from '@playwright/test';
+
+      test('removing an item keeps the other one', async ({ page }) => {
+        await page.goto('/cart');
+        const row = page.getByTestId('cart-row').filter({ hasText: 'Sunny Tulips' });
+        await row.getByRole('button', { name: 'Remove' }).click();
+        await expect(page.getByTestId('cart-row')).toHaveCount(1);
+        await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');
+      });
+    checks:
+      expect: fail
+      static: [hasAssertion]
+      also:
+        - app: { state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] } }
+          expect: pass
+    hints:
+      - en: "The count is 1 either way. What differs between the buggy and the correct result?"
+        ru: "Количество в любом случае 1. Чем отличается результат с багом от правильного?"
+      - en: "Check *which* product is left."
+        ru: "Проверь, *какой* товар остался."
+      - en: "`await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');`"
+        ru: "Добавь в конец `await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');`"
+    explain:
+      en: "On the buggy build Rose Bouquet disappears and Sunny Tulips stays — the count is still 1. Only an assertion on the remaining product's name tells them apart."
+      ru: "На багованной сборке исчезает Rose Bouquet, а Sunny Tulips остаётся — количество всё равно 1. Различить их может только проверка названия оставшегося товара."
+
+  - id: c2-l4-k4
+    kind: review
+    keyPoint: kp-cant-fail
+    prompt:
+      en: "Which assertions in Petal's search test can't catch a broken search?"
+      ru: "Какие проверки в тесте поиска от Petal не поймают сломанный поиск?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('search is case-insensitive', async ({ page }) => {
+        await page.goto('/shop');
+        await page.getByLabel('Search').fill('rose');
+        await expect(page.getByTestId('results-count')).toBeVisible();
+        expect(await page.getByTestId('product-card').count()).toBeGreaterThanOrEqual(0);
+      });
+    issues:
+      - line: 6
+        type: weak-assertion
+        note:
+          en: "The count is visible even when it says “0 products”. Use `toHaveText('1 product')`."
+          ru: "Счётчик виден, даже когда в нём «0 products». Используй `toHaveText('1 product')`."
+      - line: 7
+        type: weak-assertion
+        note:
+          en: "A count is always ≥ 0. This can never fail."
+          ru: "Количество всегда ≥ 0. Это не может упасть никогда."
+    types: [weak-assertion, no-assertion, wrong-assertion, hard-wait, fragile-locator]
+    hints:
+      - en: "Imagine the search finds nothing. Which line would notice?"
+        ru: "Представь, что поиск ничего не нашёл. Какая строка это заметит?"
+      - en: "Can a count be negative?"
+        ru: "Может ли количество быть отрицательным?"
+      - en: "Lines 6 and 7."
+        ru: "Строки 6 и 7."
+    explain:
+      en: "Bloomly once had exactly this bug (“rose” found nothing). Both assertions would have stayed green. A real check names the expected result: “1 product”, card “Rose Bouquet”."
+      ru: "В Bloomly был ровно такой баг («rose» ничего не находил). Обе проверки остались бы зелёными. Настоящая проверка называет ожидаемый результат: «1 product», карточка «Rose Bouquet»."
+
+  - id: c2-l4-k5
+    kind: choice
+    keyPoint: kp-make-it-fail
+    prompt:
+      en: "Your new orders filter test is red on a build with the summary bug. Which failure message shows it failed for the right reason?"
+      ru: "Твой новый тест фильтра заказов красный на сборке с багом сводки. Какое сообщение показывает, что он упал по правильной причине?"
+    optionsCode: true
+    options:
+      - text: "Expected: 'Showing 3 of 6 orders'  Received: 'Showing 6 of 6 orders'"
+        correct: true
+        why:
+          en: "It names the exact wrong value — the bug itself."
+          ru: "В нём точное неверное значение — сам баг."
+      - text: "Error: strict mode violation: getByTestId('order-row') resolved to 3 elements"
+        why:
+          en: "That's a problem in the test (a locator), not the bug you wanted to catch."
+          ru: "Это проблема в тесте (локатор), а не баг, который ты хотел{а|} поймать."
+      - text: "TimeoutError: locator.selectOption: Timeout 5000ms exceeded"
+        why:
+          en: "The test couldn't even perform a step. Different problem."
+          ru: "Тест не смог даже выполнить шаг. Другая проблема."
+      - text: "TypeError: page.getByLink is not a function"
+        why:
+          en: "A hallucinated method — the test crashed before checking anything."
+          ru: "Выдуманный метод — тест сломался, ничего не проверив."
+    hints:
+      - en: "The right failure talks about the value from the requirement."
+        ru: "Правильное падение говорит о значении из требования."
+      - en: "Look for “Expected” and “Received”."
+        ru: "Ищи «Expected» и «Received»."
+    explain:
+      en: "Red isn't enough either: it must be red *because of the bug*. A failure on a locator, a timeout or a crash means the test never reached its check."
+      ru: "Красного тоже мало: он должен быть красным *из-за бага*. Падение на локаторе, таймауте или ошибке кода значит, что тест так и не дошёл до проверки."
+
+  - id: c2-l4-k6
+    kind: predict
+    keyPoint: kp-fit-to-bug
+    app: { bugs: [orders-summary-wrong], state: { user: anna@bloomly.app } }
+    context:
+      en: "Last week the healer “fixed” this test to match the app. The summary bug is still in the build."
+      ru: "На прошлой неделе хилер «починил» этот тест под приложение. Баг сводки всё ещё в сборке."
+    prompt:
+      en: "Pass or fail?"
+      ru: "Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('status filter shows only delivered orders', async ({ page }) => {
+        await page.goto('/orders');
+        await page.getByLabel('Status').selectOption('Delivered');
+        await expect(page.getByTestId('orders-summary')).toHaveText('Showing 6 of 6 orders');
+      });
+    outcome: pass
+    reasons:
+      - text:
+          en: "Pass: the healed value matches the buggy summary — the test now protects the bug."
+          ru: "Пройдёт: «вылеченное» значение совпадает с багованной сводкой — тест теперь защищает баг."
+        correct: true
+      - text:
+          en: "Fail: after filtering, Anna has only 3 delivered orders."
+          ru: "Упадёт: после фильтра у Anna только 3 доставленных заказа."
+      - text:
+          en: "Fail: the status filter can't be selected."
+          ru: "Упадёт: фильтр статуса не выбрать."
+    hints:
+      - en: "What does the buggy summary always say?"
+        ru: "Что всегда пишет багованная сводка?"
+      - en: "Compare it with the healed expected value."
+        ru: "Сравни это с «вылеченным» ожидаемым значением."
+    explain:
+      en: "The bug and the test agree, so the run is green. A false negative in its purest form: everyone sees green, the customers see the bug."
+      ru: "Баг и тест согласны, поэтому прогон зелёный. Ложноотрицательный результат в чистом виде: все видят зелёное, покупатели видят баг."
+
+  - id: c2-l4-k7
+    kind: choice
+    keyPoint: kp-cant-fail
+    prompt:
+      en: "The cart has 2 Rose Bouquets (correct total €70.00). Which assertion goes red if the total is wrong?"
+      ru: "В корзине 2 Rose Bouquet (правильный итог €70.00). Какая проверка покраснеет, если итог неверный?"
+    optionsCode: true
+    options:
+      - text: "expect(await page.getByTestId('cart-total').isVisible()).toBeTruthy();"
+        why:
+          en: "A wrong total is visible too."
+          ru: "Неверный итог тоже виден."
+      - text: "await expect(page.getByTestId('cart-total')).toBeVisible();"
+        why:
+          en: "Better waiting, same weakness: presence, not value."
+          ru: "Ждёт лучше, но слабость та же: наличие, а не значение."
+      - text: "await expect(page.getByTestId('cart-total')).toHaveText('€70.00');"
+        correct: true
+        why:
+          en: "Only this one compares the value with the requirement."
+          ru: "Только эта сравнивает значение с требованием."
+      - text: "await expect(page.getByTestId('cart-total')).toContainText('€');"
+        why:
+          en: "Every total contains “€”. Always true."
+          ru: "Любой итог содержит «€». Всегда верно."
+    hints:
+      - en: "Which line mentions the expected amount?"
+        ru: "В какой строке есть ожидаемая сумма?"
+      - en: "“€” is in every price."
+        ru: "«€» есть в любой цене."
+    explain:
+      en: "If the expected value isn't in the assertion, the assertion can't notice a wrong value."
+      ru: "Если ожидаемого значения нет в проверке, неверное значение она не заметит."
+
+  - id: c2-l4-k8
+    kind: choice
+    keyPoint: kp-fit-to-bug
+    placement: true
+    prompt:
+      en: "A test is green, but the bug it should catch is in the app. What is this called?"
+      ru: "Тест зелёный, но баг, который он должен ловить, в приложении есть. Как это называется?"
+    options:
+      - text: "false negative"
+        correct: true
+        why:
+          en: "Yes: the test says “no problem” while there is one."
+          ru: "Да: тест говорит «проблемы нет», а она есть."
+      - text: "false positive"
+        why:
+          en: "That's the opposite: a red test without a real bug."
+          ru: "Это наоборот: красный тест без настоящего бага."
+      - text: "flaky test"
+        why:
+          en: "Flaky means sometimes green, sometimes red for the same code."
+          ru: "Нестабильный — это когда тест на том же коде то зелёный, то красный."
+      - text: "smoke test"
+        why:
+          en: "A smoke test is a quick check of the main features — unrelated."
+          ru: "Смоук-тест — быстрая проверка основных функций, это о другом."
+    hints:
+      - en: "“Negative” here means the test reports no problem."
+        ru: "«Negative» здесь значит, что тест не сообщает о проблеме."
+      - en: "It's the dangerous one."
+        ru: "Это опасный вариант."
+    explain:
+      en: "False negative: green on a bug — dangerous, because nobody looks. False positive: red without a bug — annoying, but at least it gets attention."
+      ru: "False negative: зелёный при баге — опасно, потому что никто не смотрит. False positive: красный без бага — раздражает, но хотя бы привлекает внимание."

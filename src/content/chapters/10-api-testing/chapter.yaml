@@ -1,0 +1,75 @@
+id: c10
+number: 10
+status: planned
+title: { en: "API tests", ru: "API-тесты" }
+department: { en: "Backend", ru: "Бэкенд" }
+color: mint
+summary:
+  en: "Test Bloomly without a browser: send requests to its REST API, read status codes and JSON, and use API calls to prepare data fast. You will review agent-written API tests and combine API setup with UI checks — the way real teams keep their suites fast."
+  ru: "Тестируем Bloomly без браузера: отправляем запросы к REST API, читаем коды ответа и JSON и быстро готовим данные через API. Ты научишься проверять API-тесты, написанные агентом, и сочетать подготовку через API с проверками в интерфейсе — так настоящие команды держат свои тесты быстрыми."
+intro:
+  - who: leo
+    text:
+      en: "The UI suite takes 40 minutes now. Half of that time we're just logging in and filling carts."
+      ru: "UI-набор теперь идёт 40 минут. Половину этого времени мы просто логинимся и наполняем корзины."
+  - who: maya
+    text:
+      en: "The backend has an API for all of that. One request instead of twelve clicks."
+      ru: "У бэкенда для всего этого есть API. Один запрос вместо двенадцати кликов."
+  - who: petal
+    text:
+      en: "I love APIs! I've already written tests for /api/users, /api/payments and /api/discounts."
+      ru: "Обожаю API! Я уже написал тесты для /api/users, /api/payments и /api/discounts."
+  - who: maya
+    text:
+      en: "Petal, we don't have any of those endpoints. Let's start from the real list."
+      ru: "Petal, у нас нет ни одного из этих эндпоинтов. Начнём с настоящего списка."
+plan:
+  - title: { en: "HTTP in one lesson: requests and responses", ru: "HTTP за один урок: запросы и ответы" }
+    goal:
+      en: "Read a request and a response — method, endpoint, headers, body, status code — just like in the Network tab of DevTools."
+      ru: "Читать запрос и ответ — метод, эндпоинт, заголовки, тело, код ответа — так же, как на вкладке Network в DevTools."
+    keyPoints:
+      - en: "GET reads, POST creates, PUT and PATCH update, DELETE removes."
+        ru: "GET читает, POST создаёт, PUT и PATCH обновляют, DELETE удаляет."
+      - en: "Status codes by family: 2xx success, 4xx a client mistake (400, 401, 404), 5xx a server error."
+        ru: "Коды ответа по группам: 2xx — успех, 4xx — ошибка клиента (400, 401, 404), 5xx — ошибка сервера."
+      - en: "JSON is the data format: keys and values, like an object in JavaScript."
+        ru: "JSON — формат данных: ключи и значения, как объект в JavaScript."
+      - en: "You've seen all of this before — every time you attached a failed request to a bug report."
+        ru: "Ты всё это уже видел{а|} — каждый раз, когда прикладывал{а|} упавший запрос к баг-репорту."
+  - title: { en: "API tests with the request fixture", ru: "API-тесты с фикстурой request" }
+    goal:
+      en: "Read and complete tests for GET /api/products and POST /api/login that check the status, the fields and the error cases."
+      ru: "Читать и дописывать тесты для GET /api/products и POST /api/login, которые проверяют код ответа, поля и ошибочные случаи."
+    keyPoints:
+      - en: "request.get and request.post send a call without a browser; the response has status(), ok() and json()."
+        ru: "request.get и request.post отправляют запрос без браузера; у ответа есть status(), ok() и json()."
+      - en: "Assert both the status and the body: a 200 with the wrong data is still a bug."
+        ru: "Проверяй и код ответа, и тело: 200 с неправильными данными — всё равно баг."
+      - en: "Negative cases matter in the API as much as in the UI: a wrong password, a missing token, an unknown product id."
+        ru: "Негативные случаи в API важны так же, как в интерфейсе: неверный пароль, отсутствующий токен, несуществующий id товара."
+  - title: { en: "The API for fast preconditions", ru: "API для быстрых предусловий" }
+    goal:
+      en: "Replace slow UI setup with API calls — get a token from POST /api/login, prepare data with POST /api/orders — and keep the UI for what you actually test."
+      ru: "Заменять медленную подготовку через интерфейс вызовами API — получить токен через POST /api/login, подготовить данные через POST /api/orders — и оставлять интерфейс для того, что ты на самом деле тестируешь."
+    keyPoints:
+      - en: "Use the UI for the thing you are testing; use the API for everything you only need as a precondition."
+        ru: "Через интерфейс — то, что ты тестируешь; через API — всё, что нужно только как предусловие."
+      - en: "Auth tokens: log in once via the API, then send `Authorization: Bearer <token>` in the header."
+        ru: "Токены авторизации: войди один раз через API, затем отправляй `Authorization: Bearer <token>` в заголовке."
+      - en: "API setup makes tests faster and less flaky: fewer screens, fewer waits."
+        ru: "Подготовка через API делает тесты быстрее и стабильнее: меньше экранов, меньше ожиданий."
+  - title: { en: "Reviewing agent-written API tests", ru: "Ревью API-тестов от агента" }
+    goal:
+      en: "Review an agent's API tests for invented endpoints, status-only assertions, hard-coded tokens and missing negative cases."
+      ru: "Проверять API-тесты от агента на выдуманные эндпоинты, проверки только кода ответа, зашитые токены и отсутствие негативных случаев."
+    keyPoints:
+      - en: "Check every endpoint and field against the API docs — agents invent plausible ones."
+        ru: "Сверяй каждый эндпоинт и поле с документацией API — агенты придумывают правдоподобные."
+      - en: "`expect(response.ok()).toBeTruthy()` alone is a weak assertion; check the data that matters."
+        ru: "Одно лишь `expect(response.ok()).toBeTruthy()` — слабая проверка; проверяй данные, которые важны."
+      - en: "Secrets don't belong in test code: tokens and passwords come from environment variables."
+        ru: "Секретам не место в коде тестов: токены и пароли берутся из переменных окружения."
+      - en: "Mix wisely: the API for setup and data checks, the UI for what the user actually sees."
+        ru: "Сочетай с умом: API — для подготовки и проверки данных, интерфейс — для того, что пользователь действительно видит."

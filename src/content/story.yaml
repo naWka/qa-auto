@@ -1,0 +1,148 @@
+# Characters, levels, badges. Text shown to the student lives here, not in code.
+characters:
+  maya:
+    name: Maya Chen
+    role: { en: "Senior QA Engineer · your mentor", ru: "Senior QA-инженер · твой ментор" }
+  mochi:
+    name: Mochi
+    role: { en: "Office cat · chief bug sniffer", ru: "Офисный кот · главный нюхач багов" }
+  petal:
+    name: Petal
+    role: { en: "The team's AI coding agent", ru: "ИИ-агент команды для написания кода" }
+  leo:
+    name: Leo Martins
+    role: { en: "Engineering Manager", ru: "Руководитель разработки" }
+  sofia:
+    name: Sofia Weber
+    role: { en: "Product Manager", ru: "Продакт-менеджер" }
+  kai:
+    name: Kai Nowak
+    role: { en: "Frontend Developer", ru: "Фронтенд-разработчик" }
+  you:
+    name: { en: "You", ru: "Ты" }
+    role: { en: "QA Engineer", ru: "QA-инженер" }
+
+levels:
+  - { xp: 0,    en: "Manual QA Engineer",     ru: "QA-инженер (ручное тестирование)" }
+  - { xp: 120,  en: "Test Reader",            ru: "Читаю автотесты" }
+  - { xp: 300,  en: "AI Pair Tester",         ru: "Тестирую в паре с ИИ" }
+  - { xp: 550,  en: "Test Reviewer",          ru: "Делаю ревью тестов" }
+  - { xp: 850,  en: "Locator Expert",         ru: "Эксперт по локаторам" }
+  - { xp: 1200, en: "Assertion Expert",       ru: "Эксперт по проверкам" }
+  - { xp: 1650, en: "Flake Hunter",           ru: "Охотни{ца|к} за флаки-тестами" }
+  - { xp: 2200, en: "Agent Orchestrator",     ru: "Управляю ИИ-агентами" }
+  - { xp: 2850, en: "Test Architect",         ru: "Архитектор тестов" }
+  - { xp: 3600, en: "QA Automation Engineer", ru: "Инженер по автоматизации тестирования" }
+
+# icon ids are drawn in src/components/Sticker.tsx
+badges:
+  - id: first-run
+    icon: play
+    color: lavender
+    title: { en: "First run", ru: "Первый запуск" }
+    desc: { en: "You ran your first automated test.", ru: "Ты запустил{а|} свой первый автотест." }
+  - id: first-green
+    icon: leaf
+    color: mint
+    title: { en: "First green test", ru: "Первый зелёный тест" }
+    desc: { en: "Your first test passed.", ru: "Твой первый тест прошёл." }
+  - id: red-is-info
+    icon: heart
+    color: rose
+    title: { en: "Red is information", ru: "Красный — это информация" }
+    desc: { en: "You read a failing report and found the reason.", ru: "Ты прочитал{а|} упавший отчёт и нашл{а|ёл} причину." }
+  - id: bug-hunter
+    icon: bug
+    color: peach
+    title: { en: "Bug hunter", ru: "Охотни{ца|к} за багами" }
+    desc: { en: "Your test caught a hidden bug.", ru: "Твой тест поймал скрытый баг." }
+  - id: prompt-crafter
+    icon: sparkle
+    color: lavender
+    title: { en: "Prompt crafter", ru: "Мастер промптов" }
+    desc: { en: "The agent wrote the best test on your first prompt.", ru: "Агент написал лучший тест с первого промпта." }
+  - id: sharp-eye
+    icon: eye
+    color: sky
+    title: { en: "Sharp eye", ru: "Зоркий глаз" }
+    desc: { en: "A perfect code review without hints.", ru: "Идеальное ревью без подсказок." }
+  - id: no-fragile
+    icon: shield
+    color: mint
+    title: { en: "No fragile selectors", ru: "Без хрупких селекторов" }
+    desc: { en: "A passing test with only resilient locators.", ru: "Зелёный тест только на устойчивых локаторах." }
+  - id: knows-it
+    icon: check
+    color: butter
+    title: { en: "I know this!", ru: "Я это знаю!" }
+    desc: { en: "You proved a topic with a quick check.", ru: "Ты подтвердил{а|} тему быстрой проверкой." }
+  - id: boss
+    icon: crown
+    color: peach
+    title: { en: "Boss level", ru: "Босс повержен" }
+    desc: { en: "You beat your first boss level.", ru: "Ты прош{ла|ёл} первый босс-уровень." }
+  - id: chapter
+    icon: trophy
+    color: butter
+    title: { en: "Department done", ru: "Отдел пройден" }
+    desc: { en: "You finished a whole chapter.", ru: "Ты закончил{а|} целую главу." }
+  - id: vocab-10
+    icon: book
+    color: rose
+    title: { en: "Word collector", ru: "Собиратель{ница|} слов" }
+    desc: { en: "10 professional terms learned.", ru: "10 профессиональных терминов в копилке." }
+  - id: vocab-25
+    icon: books
+    color: lavender
+    title: { en: "Fluent tester", ru: "Говорю как тестировщи{ца|к}" }
+    desc: { en: "25 terms learned.", ru: "25 терминов выучено." }
+  - id: vocab-50
+    icon: star
+    color: butter
+    title: { en: "50 terms", ru: "50 терминов" }
+    desc: { en: "50 terms — you can survive any standup.", ru: "50 терминов — тебе не страшен ни один стендап." }
+  - id: streak-3
+    icon: flame
+    color: peach
+    title: { en: "3-day streak", ru: "3 дня подряд" }
+    desc: { en: "Three days of practice in a row.", ru: "Три дня занятий подряд." }
+  - id: streak-7
+    icon: flame
+    color: rose
+    title: { en: "7-day streak", ru: "Неделя подряд" }
+    desc: { en: "A whole week of practice.", ru: "Целая неделя занятий." }
+  - id: streak-30
+    icon: flame
+    color: lavender
+    title: { en: "30-day streak", ru: "30 дней подряд" }
+    desc: { en: "A month of daily practice. Impressive.", ru: "Месяц ежедневных занятий. Впечатляет." }
+  - id: on-my-own
+    icon: compass
+    color: sky
+    title: { en: "On my own", ru: "Сам{а|}" }
+    desc: { en: "A whole lesson without hints.", ru: "Целый урок без подсказок." }
+  - id: explainer
+    icon: chat
+    color: mint
+    title: { en: "Explainer", ru: "Объясняю своими словами" }
+    desc: { en: "Five self-explanations written.", ru: "Пять объяснений своими словами." }
+  - id: predictor
+    icon: crystal
+    color: lavender
+    title: { en: "Fortune teller", ru: "Предсказатель{ница|}" }
+    desc: { en: "Five correct predictions before running a test.", ru: "Пять верных предсказаний до запуска теста." }
+  - id: comeback
+    icon: paw
+    color: rose
+    title: { en: "Welcome back", ru: "С возвращением" }
+    desc: { en: "You came back after a break. That's what counts.", ru: "Ты вернул{ась|ся} после перерыва. Это главное." }
+  - id: night-owl
+    icon: moon
+    color: sky
+    title: { en: "Night owl", ru: "Сова" }
+    desc: { en: "Practice after 10 pm.", ru: "Занятие после 22:00." }
+  - id: early-bird
+    icon: sun
+    color: butter
+    title: { en: "Early bird", ru: "Жаворонок" }
+    desc: { en: "Practice before 8 am.", ru: "Занятие до 8 утра." }

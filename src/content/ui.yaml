@@ -1,0 +1,338 @@
+# Interface strings. RU uses {f|m} gender variants where the student is addressed.
+app:
+  name: { en: "Bloom QA", ru: "Bloom QA" }
+  tagline: { en: "Playwright automation with AI — for experienced manual QA", ru: "Автоматизация на Playwright вместе с ИИ — для опытных ручных тестировщиц" }
+nav:
+  home: { en: "Home", ru: "Главная" }
+  glossary: { en: "Glossary", ru: "Глоссарий" }
+  review: { en: "Review", ru: "Повторение" }
+  badges: { en: "Stickers", ru: "Стикеры" }
+  interview: { en: "Interview prep", ru: "Собеседование" }
+  playground: { en: "Playground", ru: "Песочница" }
+  settings: { en: "Settings", ru: "Настройки" }
+  more: { en: "More", ru: "Ещё" }
+common:
+  continue: { en: "Continue", ru: "Дальше" }
+  check: { en: "Check", ru: "Проверить" }
+  next: { en: "Next", ru: "Далее" }
+  back: { en: "Back", ru: "Назад" }
+  skip: { en: "Skip", ru: "Пропустить" }
+  start: { en: "Start", ru: "Начать" }
+  retry: { en: "Try again", ru: "Попробовать ещё" }
+  close: { en: "Close", ru: "Закрыть" }
+  done: { en: "Done", ru: "Готово" }
+  locked: { en: "Locked", ru: "Закрыто" }
+  minutes: { en: "min", ru: "мин" }
+  xp: { en: "XP", ru: "XP" }
+  level: { en: "Level", ru: "Уровень" }
+  streak: { en: "Streak", ru: "Серия" }
+  days: { en: "days", ru: "дн." }
+  submit: { en: "Submit", ru: "Отправить" }
+  cancel: { en: "Cancel", ru: "Отмена" }
+  yes: { en: "Yes", ru: "Да" }
+  no: { en: "No", ru: "Нет" }
+  letsGo: { en: "Let's go", ru: "Поехали" }
+  correct: { en: "Correct", ru: "Верно" }
+  notQuite: { en: "Not quite", ru: "Не совсем" }
+  why: { en: "Why", ru: "Почему" }
+  showAnswer: { en: "Show the answer", ru: "Показать ответ" }
+  answer: { en: "Answer", ru: "Ответ" }
+  optional: { en: "optional", ru: "необязательно" }
+  of: { en: "of", ru: "из" }
+home:
+  levelLabel: { en: "Your level", ru: "Твой уровень" }
+  toNext: { en: "to next level", ru: "до следующего уровня" }
+  continueTitle: { en: "Continue where you left off", ru: "Продолжим с того места, где ты остановил{ась|ся}" }
+  startTitle: { en: "Start your journey", ru: "Начни путь" }
+  warmupTitle: { en: "Warm-up · 2–3 min", ru: "Разминка · 2–3 мин" }
+  warmupDesc: { en: "A few terms and tasks from earlier lessons — so they stay with you.", ru: "Несколько терминов и задач из прошлых уроков — чтобы они не забылись." }
+  warmupDue: { en: "items due", ru: "к повторению" }
+  weakTitle: { en: "Let's revisit", ru: "Повторим?" }
+  weakDesc: { en: "These ideas tripped you up — a short focused practice will lock them in.", ru: "На этих идеях были ошибки — короткая практика закрепит их." }
+  practice: { en: "Practise", ru: "Потренироваться" }
+  mapTitle: { en: "Bloomly departments", ru: "Отделы Bloomly" }
+  placementTitle: { en: "Already know some of this?", ru: "Что-то из этого уже знаешь?" }
+  placementDesc: { en: "Take a 10-minute entry check and skip what you know.", ru: "Пройди входную проверку на 10 минут и пропусти знакомое." }
+  allCaughtUp: { en: "All caught up for today", ru: "На сегодня всё повторено" }
+  statsLessons: { en: "lessons", ru: "уроков" }
+  statsTerms: { en: "terms", ru: "терминов" }
+  statsTasks: { en: "tasks", ru: "задач" }
+chapter:
+  chapter: { en: "Chapter", ru: "Глава" }
+  lessons: { en: "Lessons", ru: "Уроки" }
+  boss: { en: "Boss level", ru: "Босс-уровень" }
+  bossLocked: { en: "Opens when all lessons are done", ru: "Откроется, когда пройдены все уроки" }
+  iKnowThis: { en: "I know this", ru: "Я это знаю" }
+  iKnowThisDesc: { en: "2–3 practical tasks. Pass — and the topic counts.", ru: "2–3 практических задания. Справишься — тема засчитана." }
+  chapterCheck: { en: "I know this whole chapter", ru: "Я знаю всю главу" }
+  plan: { en: "Lesson plan", ru: "План уроков" }
+  comingSoon: { en: "Coming soon", ru: "Скоро" }
+  done: { en: "Done", ru: "Пройдено" }
+  viaCheck: { en: "Counted by check", ru: "Засчитано проверкой" }
+  inProgress: { en: "In progress", ru: "В процессе" }
+  start: { en: "Start", ru: "Начать" }
+  review: { en: "Review", ru: "Повторить" }
+  lockedChapter: { en: "Finish the previous department to unlock", ru: "Откроется после предыдущего отдела" }
+  mastered: { en: "Mastered", ru: "Освоено" }
+lesson:
+  step: { en: "Step", ru: "Шаг" }
+  pretest: { en: "Quick guess", ru: "Угадай" }
+  pretestNote: { en: "Before the lesson — guessing is fine. Mistakes now help you remember later.", ru: "До урока — можно гадать. Ошибки сейчас помогут запомнить." }
+  example: { en: "Worked example", ru: "Разбор примера" }
+  mapping: { en: "Test case → code", ru: "Тест-кейс → код" }
+  hoverMapping: { en: "Hover or tap a step to see its code", ru: "Наведи или нажми на шаг, чтобы увидеть его код" }
+  mistakes: { en: "Typical mistakes", ru: "Типичные ошибки" }
+  wrong: { en: "Wrong", ru: "Неправильно" }
+  right: { en: "Right", ru: "Правильно" }
+  explainTitle: { en: "Explain in your own words", ru: "Объясни своими словами" }
+  explainPlaceholder: { en: "Write a few sentences — in English or Russian…", ru: "Напиши пару предложений — по-английски или по-русски…" }
+  showModel: { en: "Compare with a good answer", ru: "Сравнить с хорошим ответом" }
+  modelAnswer: { en: "A good answer", ru: "Хороший ответ" }
+  selfGotIt: { en: "I said the same", ru: "У меня так же" }
+  selfPartly: { en: "Partly", ru: "Частично" }
+  selfMissed: { en: "I missed the point", ru: "Упустил{а|} суть" }
+  phrases: { en: "How to say it at work", ru: "Как сказать на работе" }
+  vocab: { en: "Vocabulary", ru: "Лексика" }
+  vocabNote: { en: "These terms go to your spaced-repetition review.", ru: "Эти термины попадут в интервальное повторение." }
+  finishTitle: { en: "Lesson complete", ru: "Урок пройден" }
+  earned: { en: "earned", ru: "заработано" }
+  backToChapter: { en: "Back to the chapter", ru: "К главе" }
+  nextLesson: { en: "Next lesson", ru: "Следующий урок" }
+  focusMode: { en: "Focused practice", ru: "Точечная практика" }
+  runExample: { en: "Run this example", ru: "Запустить пример" }
+  story: { en: "Meanwhile at Bloomly", ru: "Тем временем в Bloomly" }
+  exit: { en: "Exit lesson", ru: "Выйти из урока" }
+context:
+  standup: { en: "Standup", ru: "Стендап" }
+  code-review: { en: "Code review", ru: "Код-ревью" }
+  bug-report: { en: "Bug report", ru: "Баг-репорт" }
+  chat: { en: "Slack", ru: "Чат" }
+  meeting: { en: "Meeting", ru: "Встреча" }
+  prompt: { en: "Prompt to an agent", ru: "Промпт агенту" }
+  general: { en: "General", ru: "Общее" }
+task:
+  kind:
+    choice: { en: "Choose", ru: "Выбери" }
+    input: { en: "Short answer", ru: "Короткий ответ" }
+    fill: { en: "Fill the gaps", ru: "Заполни пропуски" }
+    parsons: { en: "Put in order", ru: "Расставь по порядку" }
+    match: { en: "Match pairs", ru: "Сопоставь" }
+    predict: { en: "Predict, then run", ru: "Предскажи и запусти" }
+    pick-locator: { en: "Best locator", ru: "Лучший локатор" }
+    review: { en: "Code review", ru: "Код-ревью" }
+    agent: { en: "Work with the agent", ru: "Работа с агентом" }
+    fix: { en: "Fix the test", ru: "Почини тест" }
+    find-bug: { en: "Catch the bug", ru: "Поймай баг" }
+    code: { en: "Write the test", ru: "Напиши тест" }
+    vocab: { en: "Vocabulary", ru: "Лексика" }
+  chooseOne: { en: "Choose one answer", ru: "Выбери один ответ" }
+  chooseMany: { en: "Choose all that apply", ru: "Выбери все подходящие" }
+  typeHere: { en: "Type your answer", ru: "Введи ответ" }
+  orderHint: { en: "Drag lines (or use the arrows) into the right order", ru: "Перетащи строки (или нажимай стрелки) в правильном порядке" }
+  available: { en: "Available lines", ru: "Доступные строки" }
+  yourOrder: { en: "Your test", ru: "Твой тест" }
+  extraLines: { en: "Careful: some lines are extra.", ru: "Осторожно: некоторые строки лишние." }
+  matchHint: { en: "Tap an item on the left, then its pair on the right", ru: "Нажми на элемент слева, потом на его пару справа" }
+  willPass: { en: "It will pass", ru: "Пройдёт" }
+  willFail: { en: "It will fail", ru: "Упадёт" }
+  predictQuestion: { en: "Will this test pass or fail?", ru: "Этот тест пройдёт или упадёт?" }
+  predictWhy: { en: "Why?", ru: "Почему?" }
+  nowRun: { en: "Now run it and compare", ru: "Теперь запусти и сравни" }
+  predictionRight: { en: "Your prediction matches the real run.", ru: "Твоё предсказание совпало с реальным запуском." }
+  predictionWrong: { en: "The real run is different from your prediction.", ru: "Реальный запуск отличается от предсказания." }
+  reviewHint: { en: "Click the lines with problems and name each problem. Test-level problems are below the code.", ru: "Нажми на строки с проблемами и назови каждую. Проблемы всего теста — под кодом." }
+  testLevel: { en: "Whole-test problems", ru: "Проблемы всего теста" }
+  pickType: { en: "What's wrong here?", ru: "Что здесь не так?" }
+  noProblem: { en: "No problem (unflag)", ru: "Нет проблемы (снять)" }
+  missedIssue: { en: "Missed", ru: "Пропущено" }
+  extraFlag: { en: "This line is fine", ru: "С этой строкой всё в порядке" }
+  wrongType: { en: "Right line, different problem", ru: "Строка верная, но проблема другая" }
+  composePrompt: { en: "Build the prompt: toggle the blocks you want to send to Petal", ru: "Собери промпт: включи блоки, которые отправишь Petal" }
+  sendPrompt: { en: "Send to Petal", ru: "Отправить Petal" }
+  agentThinking: { en: "Petal is exploring Bloomly and writing the test…", ru: "Petal изучает Bloomly и пишет тест…" }
+  simulated: { en: "Simulated agent: the answers are scripted for learning. A real agent's output varies from run to run.", ru: "Симуляция агента: ответы заранее написаны для обучения. Настоящий агент отвечает по-разному от запуска к запуску." }
+  improvePrompt: { en: "Improve the prompt", ru: "Улучшить промпт" }
+  promptPreview: { en: "Your prompt", ru: "Твой промпт" }
+  missingBlocks: { en: "What the agent lacked", ru: "Чего не хватило агенту" }
+  bestResponse: { en: "That's the result we wanted.", ru: "Это тот результат, который нужен." }
+  run: { en: "Run tests", ru: "Запустить тесты" }
+  running: { en: "Running…", ru: "Выполняется…" }
+  stop: { en: "Stop", ru: "Стоп" }
+  stepMode: { en: "Step by step", ru: "По шагам" }
+  nextStep: { en: "Next step", ru: "Следующий шаг" }
+  speed: { en: "Speed", ru: "Скорость" }
+  resetCode: { en: "Reset code", ru: "Сбросить код" }
+  submitSolution: { en: "Check my solution", ru: "Проверить решение" }
+  hint: { en: "Hint", ru: "Подсказка" }
+  hintCost: { en: "each hint lowers the reward", ru: "каждая подсказка уменьшает награду" }
+  hintOf: { en: "Hint", ru: "Подсказка" }
+  revealConfirm: { en: "Show the answer? You won't get XP for this task, and we'll suggest revisiting it later.", ru: "Показать ответ? XP за это задание не будет, и мы предложим вернуться к нему позже." }
+  solution: { en: "Solution", ru: "Решение" }
+  findBugGoal: { en: "Goal: the test must FAIL on the buggy app and PASS on the fixed one.", ru: "Цель: тест должен УПАСТЬ на версии с багом и ПРОЙТИ на исправленной." }
+  fixGoal: { en: "Goal: make the test pass — for the right reason.", ru: "Цель: сделать тест зелёным — по правильной причине." }
+  bugCaught: { en: "Bug caught: red on the buggy app, green on the fixed one.", ru: "Баг пойман: красный на версии с багом, зелёный на исправленной." }
+  runOnBuggy: { en: "Run on the buggy app", ru: "Прогон на версии с багом" }
+  runOnFixed: { en: "Run on the fixed app", ru: "Прогон на исправленной версии" }
+  expectedOutcome: { en: "Expected", ru: "Ожидалось" }
+  gotOutcome: { en: "Got", ru: "Получилось" }
+  appNote: { en: "App state for this task", ru: "Состояние приложения в задании" }
+  loggedInAs: { en: "logged in as", ru: "вход выполнен как" }
+  cartPreset: { en: "cart prefilled", ru: "корзина заполнена" }
+  bugsOn: { en: "a bug is switched on", ru: "включён баг" }
+  testCase: { en: "Test case", ru: "Тест-кейс" }
+  preconditions: { en: "Preconditions", ru: "Предусловия" }
+  stepsLabel: { en: "Steps", ru: "Шаги" }
+  expectedResult: { en: "Expected result", ru: "Ожидаемый результат" }
+  data: { en: "Data", ru: "Данные" }
+issue:
+  fragile-locator: { en: "Fragile locator", ru: "Хрупкий локатор" }
+  no-assertion: { en: "No assertion", ru: "Нет проверки" }
+  weak-assertion: { en: "Weak assertion", ru: "Слабая проверка" }
+  wrong-assertion: { en: "Checks the wrong thing", ru: "Проверяет не то" }
+  hard-wait: { en: "Hard wait", ru: "Жёсткое ожидание" }
+  missing-await: { en: "Missing await", ru: "Нет await" }
+  hallucination: { en: "Invented method/element", ru: "Выдуманный метод/элемент" }
+  wrong-data: { en: "Wrong test data", ru: "Неверные данные" }
+  test-dependency: { en: "Depends on another test", ru: "Зависит от другого теста" }
+  wrong-step: { en: "Step doesn't match the case", ru: "Шаг не соответствует кейсу" }
+report:
+  title: { en: "Test report", ru: "Отчёт о тестах" }
+  passed: { en: "passed", ru: "прошёл" }
+  failed: { en: "failed", ru: "упал" }
+  skipped: { en: "skipped", ru: "пропущен" }
+  timedOut: { en: "timed out", ru: "таймаут" }
+  error: { en: "Error", ru: "Ошибка" }
+  console: { en: "Console output", ru: "Вывод консоли" }
+  notes: { en: "Review notes", ru: "Замечания ревьюера" }
+  emulatorNote: { en: "Emulator note", ru: "Заметка эмулятора" }
+  mentor: { en: "What this means", ru: "Что это значит" }
+  noRun: { en: "Press “Run tests” to see the report.", ru: "Нажми «Запустить тесты», чтобы увидеть отчёт." }
+  running: { en: "Running", ru: "Выполняется" }
+  paused: { en: "Paused before", ru: "Пауза перед" }
+  steps: { en: "Steps", ru: "Шаги" }
+  didYouMean: { en: "Did you mean", ru: "Возможно, имелось в виду" }
+  output: { en: "Output", ru: "Вывод" }
+browser:
+  blank: { en: "The test hasn't opened a page yet", ru: "Тест ещё не открыл страницу" }
+  app: { en: "Bloomly (app under test)", ru: "Bloomly (тестируемое приложение)" }
+  inspector: { en: "Inspector", ru: "Инспектор" }
+  pick: { en: "Pick an element", ru: "Выбрать элемент" }
+  attributes: { en: "Attributes", ru: "Атрибуты" }
+  role: { en: "Role", ru: "Роль" }
+  name: { en: "Accessible name", ru: "Доступное имя" }
+  locator: { en: "Suggested locator", ru: "Предлагаемый локатор" }
+  desktopBetter: { en: "Code tasks are easier on a computer — but you can try here too.", ru: "Задания с кодом удобнее делать на компьютере — но можно попробовать и тут." }
+  tabCode: { en: "Code", ru: "Код" }
+  tabBrowser: { en: "Browser", ru: "Браузер" }
+  tabReport: { en: "Report", ru: "Отчёт" }
+glossary:
+  title: { en: "Glossary", ru: "Глоссарий" }
+  intro: { en: "Every term you meet, with pronunciation and real work phrases.", ru: "Все термины курса — с произношением и фразами из реальной работы." }
+  search: { en: "Search in English or Russian…", ru: "Поиск по-английски или по-русски…" }
+  all: { en: "All", ru: "Все" }
+  learned: { en: "Learned", ru: "Изученные" }
+  empty: { en: "Nothing found", ru: "Ничего не найдено" }
+  listen: { en: "Listen", ru: "Послушать" }
+  example: { en: "At work", ru: "На работе" }
+  openGlossary: { en: "Open in glossary", ru: "Открыть в глоссарии" }
+  chapterN: { en: "Chapter", ru: "Глава" }
+review:
+  title: { en: "Warm-up", ru: "Разминка" }
+  intro: { en: "Spaced repetition: we bring back what you're about to forget — and stop bothering you with what you know well.", ru: "Интервальное повторение: возвращаем то, что вот-вот забудется, и не докучаем тем, что ты знаешь хорошо." }
+  empty: { en: "Nothing to review right now. Come back tomorrow!", ru: "Сейчас повторять нечего. Возвращайся завтра!" }
+  done: { en: "Warm-up done", ru: "Разминка закончена" }
+  termCard: { en: "Term", ru: "Термин" }
+  translate: { en: "Choose the translation", ru: "Выбери перевод" }
+  translateBack: { en: "Choose the English term", ru: "Выбери английский термин" }
+  cloze: { en: "Complete the sentence", ru: "Дополни фразу" }
+  topic: { en: "From an earlier lesson", ru: "Из прошлого урока" }
+  offer: { en: "Before the lesson: a 2-minute warm-up?", ru: "Перед уроком — разминка на 2 минуты?" }
+  later: { en: "Later", ru: "Потом" }
+badges:
+  title: { en: "Sticker collection", ru: "Коллекция стикеров" }
+  intro: { en: "Collect them all — each one marks a real skill or habit.", ru: "Собери все — каждый отмечает настоящий навык или привычку." }
+  locked: { en: "Not yet", ru: "Пока нет" }
+  earned: { en: "Earned", ru: "Получен" }
+  newBadge: { en: "New sticker!", ru: "Новый стикер!" }
+interview:
+  title: { en: "Interview prep", ru: "Подготовка к собеседованию" }
+  intro: { en: "Typical QA Automation interview questions with model answers. Try answering out loud first — in English.", ru: "Типичные вопросы на собеседовании QA Automation с примерами ответов. Сначала попробуй ответить вслух — по-английски." }
+  show: { en: "Show a model answer", ru: "Показать пример ответа" }
+  tip: { en: "Tip", ru: "Совет" }
+  topic:
+    basics: { en: "Basics", ru: "Основы" }
+    playwright: { en: "Playwright", ru: "Playwright" }
+    locators: { en: "Locators", ru: "Локаторы" }
+    assertions: { en: "Assertions", ru: "Проверки" }
+    flaky: { en: "Flaky tests", ru: "Флаки-тесты" }
+    architecture: { en: "Architecture", ru: "Архитектура" }
+    api: { en: "API", ru: "API" }
+    ai: { en: "AI in testing", ru: "ИИ в тестировании" }
+    ci: { en: "CI/CD", ru: "CI/CD" }
+    behavioral: { en: "Behavioral", ru: "Поведенческие" }
+settings:
+  title: { en: "Settings", ru: "Настройки" }
+  language: { en: "Language mode", ru: "Режим языка" }
+  languageDesc: { en: "Bilingual by default: English first, Russian under it.", ru: "По умолчанию двуязычно: сначала английский, под ним русский." }
+  both: { en: "EN + RU", ru: "EN + RU" }
+  en: { en: "EN only", ru: "Только EN" }
+  ru: { en: "RU only", ru: "Только RU" }
+  address: { en: "How we address you in Russian", ru: "Как к тебе обращаться по-русски" }
+  female: { en: "Feminine (ты справилась)", ru: "Женский род (ты справилась)" }
+  male: { en: "Masculine (ты справился)", ru: "Мужской род (ты справился)" }
+  theme: { en: "Theme", ru: "Тема" }
+  themeAuto: { en: "System", ru: "Как в системе" }
+  themeLight: { en: "Light", ru: "Светлая" }
+  themeDark: { en: "Dark", ru: "Тёмная" }
+  speed: { en: "Test run speed", ru: "Скорость прогона тестов" }
+  speedDesc: { en: "Slower runs highlight every element the test touches.", ru: "Медленный прогон подсвечивает каждый элемент, с которым работает тест." }
+  slow: { en: "Slow", ru: "Медленно" }
+  fast: { en: "Fast", ru: "Быстро" }
+  motion: { en: "Celebrations (confetti, hearts)", ru: "Праздничные анимации (конфетти, сердечки)" }
+  progress: { en: "Your progress", ru: "Твой прогресс" }
+  progressDesc: { en: "Everything is stored only in this browser. Export a backup to move it to another device.", ru: "Всё хранится только в этом браузере. Сделай экспорт, чтобы перенести прогресс на другое устройство." }
+  export: { en: "Export progress (JSON)", ru: "Экспорт прогресса (JSON)" }
+  import: { en: "Import progress", ru: "Импорт прогресса" }
+  reset: { en: "Reset all progress", ru: "Сбросить весь прогресс" }
+  resetConfirm: { en: "Delete all progress, XP and stickers? This can't be undone. Export a backup first if you might need it.", ru: "Удалить весь прогресс, XP и стикеры? Отменить будет нельзя. Если может пригодиться — сначала сделай экспорт." }
+  imported: { en: "Progress imported", ru: "Прогресс импортирован" }
+  importError: { en: "This file doesn't look like a Bloom QA backup", ru: "Этот файл не похож на резервную копию Bloom QA" }
+  placement: { en: "Entry check", ru: "Входная проверка" }
+  placementRetake: { en: "Take the entry check", ru: "Пройти входную проверку" }
+onboarding:
+  hello: { en: "Hi! I'm Maya, Senior QA at Bloomly.", ru: "Привет! Я Майя, Senior QA в Bloomly." }
+  pitch: { en: "You already know how to test. Here you'll learn to automate it with Playwright — together with an AI agent that writes the code while you decide what's worth checking.", ru: "Тестировать ты уже умеешь. Здесь научишься автоматизировать это на Playwright — вместе с ИИ-агентом, который пишет код, пока ты решаешь, что стоит проверить." }
+  langTitle: { en: "How should texts look?", ru: "Как показывать тексты?" }
+  langDesc: { en: "English is part of the skill — we recommend both languages.", ru: "Английский — часть навыка, поэтому советуем оба языка." }
+  formTitle: { en: "How should I address you in Russian?", ru: "Как к тебе обращаться по-русски?" }
+  placementTitle: { en: "Want to skip what you know?", ru: "Хочешь пропустить знакомое?" }
+  placementDesc: { en: "12 practical tasks from chapters 1–3, about 10 minutes. Topics you nail are counted automatically.", ru: "12 практических заданий из глав 1–3, около 10 минут. Уверенно пройденные темы засчитаются автоматически." }
+  placementYes: { en: "Take the entry check", ru: "Пройти входную проверку" }
+  placementNo: { en: "Start from the beginning", ru: "Начать с начала" }
+check:
+  lessonTitle: { en: "I know this — quick check", ru: "Я это знаю — быстрая проверка" }
+  chapterTitle: { en: "I know this chapter — check", ru: "Я знаю эту главу — проверка" }
+  intro: { en: "Practical tasks on the key ideas. No hints this time — just show what you can do.", ru: "Практические задания на ключевые идеи. Без подсказок — просто покажи, что умеешь." }
+  passedTitle: { en: "Topic counted!", ru: "Тема засчитана!" }
+  failedTitle: { en: "Almost — a few points to polish", ru: "Почти — пара моментов, которые стоит подтянуть" }
+  failedKps: { en: "Didn't click yet:", ru: "Пока не получилось:" }
+  practiceThese: { en: "Practise only these parts", ru: "Пройти только эти части" }
+  backHome: { en: "Back to home", ru: "На главную" }
+  item: { en: "Task", ru: "Задание" }
+placement:
+  title: { en: "Entry check", ru: "Входная проверка" }
+  intro: { en: "Answer as you can — this only decides where you start. Wrong answers cost nothing.", ru: "Отвечай как получается — это лишь определит, откуда начать. Ошибки ничего не стоят." }
+  resultTitle: { en: "Here's your starting point", ru: "Вот твоя стартовая точка" }
+  credited: { en: "Counted for you", ru: "Засчитано" }
+  startHere: { en: "Start here", ru: "Начать отсюда" }
+  nothingCredited: { en: "We'll start from the beginning — it'll go fast with your experience.", ru: "Начнём с начала — с твоим опытом пойдёт быстро." }
+playground:
+  title: { en: "Playground", ru: "Песочница" }
+  intro: { en: "Write any test against Bloomly and run it. Bugs can be switched on below.", ru: "Пиши любой тест для Bloomly и запускай. Ниже можно включить баги." }
+  bugs: { en: "Switch on bugs", ru: "Включить баги" }
+  cookie: { en: "Cookie banner", ru: "Баннер cookies" }
+  slow: { en: "Slow network (random delays)", ru: "Медленная сеть (случайные задержки)" }
+celebrate:
+  levelUp: { en: "New level!", ru: "Новый уровень!" }
+  chapterDone: { en: "Department complete!", ru: "Отдел пройден!" }
+  welcomeBack: { en: "Welcome back!", ru: "С возвращением!" }

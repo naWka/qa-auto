@@ -1,0 +1,70 @@
+// Grading of code against task checks: static rules + expected run outcomes on one or more app versions.
+import { analyze, checkRules, transform, type AppSetup, type RunResult } from '../emulator';
+import type { Checks, T } from '../content/schema';
+import { errorTexts } from '../content';
+import { interpolate } from '../lib/text';
+
+export interface CodeVerdict {
+  ok: boolean;
+  problems: T[];
+  main?: RunResult;
+  also: { app: AppSetup; expect: 'pass' | 'fail'; result: RunResult; ok: boolean }[];
+  fragileFree: boolean;
+}
+
+const ASSERTION_CODES = new Set(['expect-failed', 'expect-not-found', 'expect-count', 'expect-url', 'expect-generic']);
+
+export function outcomeMatches(r: RunResult, expect: 'pass' | 'fail'): boolean {
+  if (expect === 'pass') return r.status === 'passed';
+  if (r.status !== 'failed') return false;
+  // A red run counts only when an assertion caught something (not a syntax error or a missing await).
+  return r.tests.some((t) => t.status === 'failed' && t.error && ASSERTION_CODES.has(t.error.code));
+}
+
+export async function gradeCode(
+  code: string,
+  checks: Checks | undefined,
+  app: AppSetup | undefined,
+  run: (code: string, app: AppSetup | undefined, silent: boolean) => Promise<RunResult>,
+): Promise<CodeVerdict> {
+  const problems: T[] = [];
+  let fragileFree = true;
+  try {
+    const { ast } = transform(code, 'example.spec.js', false);
+    const a = analyze(code, ast);
+    fragileFree = !a.findings.some((f) => f.rule === 'fragile-locator');
+    for (const f of checkRules(checks?.static as never, a)) {
+      const base = f.message ?? errorTexts.rules[f.rule];
+      if (base) problems.push({ en: interpolate(base.en, { value: f.value ?? '', line: f.line ?? '?' }), ru: interpolate(base.ru, { value: f.value ?? '', line: f.line ?? '?' }) });
+    }
+  } catch {
+    /* syntax errors are reported by the run */
+  }
+
+  const expect = checks?.expect ?? 'pass';
+  const main = await run(code, app, false);
+  if (!outcomeMatches(main, expect)) {
+    if (main.status === 'error') problems.unshift({ en: 'The code has an error and the tests could not run — see the report.', ru: 'В коде ошибка, тесты не запустились — посмотри отчёт.' });
+    else if (expect === 'pass') problems.unshift({ en: 'The test should pass, but it failed — see the report.', ru: 'Тест должен пройти, но упал — посмотри отчёт.' });
+    else if (main.status === 'passed') problems.unshift({ en: 'The test passed on the buggy app — it doesn\'t catch the bug yet. Check the exact expected result.', ru: 'Тест прошёл на версии с багом — значит, баг он пока не ловит. Проверь точный ожидаемый результат.' });
+    else problems.unshift({ en: 'The test failed, but not because of an assertion — fix the error first.', ru: 'Тест упал, но не из-за проверки — сначала исправь ошибку.' });
+  }
+  if (checks?.minTests && main.tests.length < checks.minTests) {
+    problems.push({ en: `Expected at least ${checks.minTests} tests, found ${main.tests.length}.`, ru: `Ожидалось минимум ${checks.minTests} тестов, найдено ${main.tests.length}.` });
+  }
+
+  const also: CodeVerdict['also'] = [];
+  if (outcomeMatches(main, expect)) {
+    for (const extra of checks?.also || []) {
+      const result = await run(code, extra.app as AppSetup, true);
+      const ok = outcomeMatches(result, extra.expect);
+      also.push({ app: extra.app as AppSetup, expect: extra.expect, result, ok });
+      if (!ok) {
+        problems.push(extra.expect === 'pass'
+          ? { en: 'On the fixed app the test fails too — so it fails for the wrong reason. A good bug-catching test is green when the bug is gone.', ru: 'На исправленной версии тест тоже падает — значит, падает не из-за бага. Хороший тест, ловящий баг, зеленеет, когда бага нет.' }
+          : { en: 'On the other app version the test should fail, but it passed.', ru: 'На другой версии приложения тест должен упасть, но прошёл.' });
+      }
+    }
+  }
+  return { ok: problems.length === 0, problems, main, also, fragileFree };
+}

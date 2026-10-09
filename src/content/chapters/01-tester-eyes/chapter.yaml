@@ -1,0 +1,267 @@
+id: c1
+number: 1
+status: ready
+title:
+  en: "An automated test through a tester's eyes"
+  ru: "Автотест глазами тестировщицы"
+department:
+  en: "Onboarding"
+  ru: "Онбординг"
+summary:
+  en: "Your first week at Bloomly. See how a test case becomes code: steps become actions, the expected result becomes an assertion, and a red report is a bug report in disguise. Petal writes — you decide what is worth checking."
+  ru: "Первая неделя в Bloomly. Смотрим, как тест-кейс превращается в код: шаги — в действия, ожидаемый результат — в проверку, а красный отчёт — это замаскированный баг-репорт. Пишет Petal, а что стоит проверять — решаешь ты."
+color: lavender
+intro:
+  - who: leo
+    text:
+      en: "Welcome to Bloomly! Bloomly 3.0 ships before the holidays, and our manual regression is about 400 test cases — three days of clicking for every release."
+      ru: "Добро пожаловать в Bloomly! Bloomly 3.0 выходит перед праздниками, а наша ручная регрессия — около 400 тест-кейсов, три дня кликов на каждый релиз."
+  - who: leo
+    text:
+      en: "We want to automate it with our AI agent, Petal. But someone has to decide what is worth checking. That's why we hired you."
+      ru: "Мы хотим автоматизировать её с нашим ИИ-агентом Petal. Но кто-то должен решать, что стоит проверять. Поэтому мы и позвали тебя."
+  - who: maya
+    text:
+      en: "Hi, I'm Maya, Senior QA. You've written hundreds of test cases and bug reports — that's exactly the skill automation needs. Code is the easy part; we'll learn to read it together."
+      ru: "Привет, я Майя, Senior QA. Ты {написала|написал} сотни тест-кейсов и баг-репортов — именно этот навык и нужен автоматизации. Код — простая часть, читать его научимся вместе."
+  - who: petal
+    text:
+      en: "Hello! I'm Petal. I can write a Playwright test in ten seconds. Just tell me what to check — I'll handle the rest!"
+      ru: "Привет! Я Petal. Я пишу Playwright-тест за десять секунд. Просто скажи, что проверить, — остальное беру на себя!"
+  - who: mochi
+    text:
+      en: "Mrrp?"
+      ru: "Мрр?"
+  - who: maya
+    text:
+      en: "Petal is fast, but it doesn't know what matters to our customers. You do. Let's start with how a test case turns into code."
+      ru: "Petal быстрый, но не знает, что важно нашим клиентам. А ты знаешь. Начнём с того, как тест-кейс превращается в код."
+outro:
+  - who: maya
+    text:
+      en: "You've read, reviewed and fixed your first tests — and made one of them catch a real bug. That's a proper start."
+      ru: "Ты {прочитала|прочитал}, {проверила|проверил} и {починила|починил} свои первые тесты — и {научила|научил} один из них ловить настоящий баг. Это настоящее начало."
+  - who: leo
+    text:
+      en: "TC-001 is green in the suite. 399 to go — and I'm only half joking."
+      ru: "TC-001 уже зелёный в наборе. Осталось 399 — и я шучу только наполовину."
+  - who: petal
+    text:
+      en: "Next time, just give me the expected result and I'll write the assertion. Promise!"
+      ru: "В следующий раз просто дай мне ожидаемый результат — и я напишу проверку. Обещаю!"
+  - who: mochi
+    text:
+      en: "Prrr."
+      ru: "Пррр."
+lessons: [c1-l1, c1-l2, c1-l3, c1-l4]
+boss:
+  id: c1-boss
+  title:
+    en: "Automate TC-001"
+    ru: "Автоматизируй TC-001"
+  story:
+    - who: leo
+      text:
+        en: "Your first real ticket: automate TC-001, our login smoke test. Petal has already drafted it."
+        ru: "Твой первый настоящий тикет: автоматизировать TC-001, наш смоук-тест логина. Petal уже набросал черновик."
+    - who: petal
+      text:
+        en: "I'm 98% sure it's perfect!"
+        ru: "Я на 98% уверен, что он идеален!"
+    - who: maya
+      text:
+        en: "Review it like any pull request: does the code do what the test case says? Then make it pass — and prove it can catch a bug."
+        ru: "Проверь его как любой пул-реквест: делает ли код то, что сказано в тест-кейсе? Потом сделай так, чтобы он проходил, — и докажи, что он умеет ловить баг."
+  tasks:
+    - id: c1-boss-t1
+      kind: review
+      keyPoint: kp-qa-role-ai
+      context:
+        en: "Petal's draft for TC-001. Compare it with the test case line by line."
+        ru: "Черновик Petal для TC-001. Сравни его с тест-кейсом строка за строкой."
+      prompt:
+        en: "Flag every problem and choose its type. If something is missing from the whole test, flag line 0."
+        ru: "Отметь все проблемы и выбери их тип. Если чего-то не хватает во всём тесте, отметь строку 0."
+      testCase:
+        id: TC-001
+        title: Registered user can log in
+        preconditions: ["User anna@bloomly.app / bloom123 exists", "The user is logged out"]
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "anna@bloomly.app"
+          - action: "Enter password"
+            data: "bloom123"
+          - action: "Click \"Log in\""
+            expected: "The account page opens and shows \"Welcome back, Anna!\""
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom1234');
+          await page.getByLabel('Remember me').check();
+          await page.getByRole('button', { name: 'Log in' }).click();
+        });
+      issues:
+        - line: 6
+          type: wrong-data
+          note:
+            en: "The password in TC-001 is \"bloom123\". \"bloom1234\" would make the login fail."
+            ru: "Пароль в TC-001 — «bloom123». С «bloom1234» вход не пройдёт."
+        - line: 7
+          type: wrong-step
+          note:
+            en: "TC-001 has no \"Remember me\" step. An extra step changes the scenario: this would test a different case."
+            ru: "В TC-001 нет шага «Remember me». Лишний шаг меняет сценарий: так проверялся бы другой кейс."
+        - line: 0
+          type: no-assertion
+          note:
+            en: "The expected result (account page, \"Welcome back, Anna!\") is never checked. The test can't fail — even with a broken login."
+            ru: "Ожидаемый результат (страница аккаунта, «Welcome back, Anna!») нигде не проверяется. Тест не может упасть — даже если вход сломан."
+      types: [wrong-data, wrong-step, no-assertion, hallucination, wrong-assertion]
+      hints:
+        - en: "Go through the test case step by step and find each step in the code. Then look for the expected result."
+          ru: "Пройди по тест-кейсу шаг за шагом и найди каждый шаг в коде. Потом поищи ожидаемый результат."
+        - en: "There are three problems: one in the data, one extra step, and one thing missing from the whole test."
+          ru: "Проблем три: одна в данных, один лишний шаг и одно, чего не хватает во всём тесте."
+        - en: "Check the password on line 6, the checkbox on line 7, and look for `expect` anywhere."
+          ru: "Проверь пароль в строке 6, чекбокс в строке 7 и поищи `expect` хоть где-нибудь."
+      praise:
+        en: "Three out of three — data, steps and the missing check. That's a reviewer Petal will learn from."
+        ru: "Три из трёх — данные, шаги и отсутствующая проверка. У такого ревьюера Petal будет учиться."
+      explain:
+        en: "A review compares the code with the test case: every step present, no extra steps, exact data, and an assertion for every expected result. Petal's draft failed on all three."
+        ru: "Ревью сравнивает код с тест-кейсом: все шаги на месте, лишних нет, данные точные, и на каждый ожидаемый результат есть проверка. Черновик Petal провалил все три пункта."
+
+    - id: c1-boss-t2
+      kind: fix
+      keyPoint: kp-what-to-assert
+      context:
+        en: "Now fix Petal's draft so it matches TC-001: the account page opens and shows \"Welcome back, Anna!\"."
+        ru: "Теперь исправь черновик Petal, чтобы он соответствовал TC-001: открывается страница аккаунта с «Welcome back, Anna!»."
+      prompt:
+        en: "Fix the data, remove the extra step and add the assertions. The test must pass on Bloomly — and fail if login sends users to the wrong page."
+        ru: "Исправь данные, убери лишний шаг и добавь проверки. Тест должен проходить на Bloomly — и падать, если вход отправляет пользователя не на ту страницу."
+      testCase:
+        id: TC-001
+        title: Registered user can log in
+        preconditions: ["User anna@bloomly.app / bloom123 exists", "The user is logged out"]
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "anna@bloomly.app"
+          - action: "Enter password"
+            data: "bloom123"
+          - action: "Click \"Log in\""
+            expected: "The account page opens and shows \"Welcome back, Anna!\""
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom1234');
+          await page.getByLabel('Remember me').check();
+          await page.getByRole('button', { name: 'Log in' }).click();
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+        });
+      checks:
+        expect: pass
+        static:
+          - hasAssertion
+          - rule: notRegex
+            value: "Remember me"
+            message:
+              en: "TC-001 has no \"Remember me\" step — remove it."
+              ru: "В TC-001 нет шага «Remember me» — убери его."
+        also:
+          - app: { bugs: [login-redirect-home] }
+            expect: fail
+      hints:
+        - en: "Three edits: the password, the extra line, and the check at the end."
+          ru: "Три правки: пароль, лишняя строка и проверка в конце."
+        - en: "The expected result has two parts: the URL `/account` and the heading. `toHaveURL` and `toBeVisible` cover them."
+          ru: "В ожидаемом результате две части: URL `/account` и заголовок. Их покрывают `toHaveURL` и `toBeVisible`."
+        - en: "Add: `await expect(page).toHaveURL('/account');` and `await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();`"
+          ru: "Добавь: `await expect(page).toHaveURL('/account');` и `await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();`"
+      praise:
+        en: "Green for the right reason: correct data, the exact steps, and a check for each part of the expected result."
+        ru: "Зелёный по правильной причине: верные данные, точные шаги и проверка на каждую часть ожидаемого результата."
+      explain:
+        en: "The fixed test follows TC-001 exactly and checks both parts of the expected result. We also ran it against a build where login lands on the home page — it failed there, which proves the assertions really work."
+        ru: "Исправленный тест точно следует TC-001 и проверяет обе части ожидаемого результата. Мы также запустили его на сборке, где после входа открывается главная, — там он упал, а значит, проверки действительно работают."
+
+    - id: c1-boss-t3
+      kind: find-bug
+      keyPoint: kp-what-to-assert
+      app: { bugs: [greeting-wrong-name] }
+      context:
+        en: "Leo: \"A customer in Lisbon says Bloomly greeted her as 'Silva'. But the TC-001 version in main is green!\" Here is that version, running against today's build."
+        ru: "Лео: «Клиентка из Лиссабона пишет, что Bloomly поздоровался с ней как с „Silva“. Но версия TC-001 в main зелёная!» Вот эта версия, она запускается на сегодняшней сборке."
+      prompt:
+        en: "Make the test catch the bug: it must fail on today's build and pass once the greeting is fixed."
+        ru: "Сделай так, чтобы тест поймал баг: он должен падать на сегодняшней сборке и проходить, когда приветствие починят."
+      testCase:
+        id: TC-001
+        title: Registered user can log in
+        preconditions: ["User anna@bloomly.app / bloom123 exists", "The user is logged out"]
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "anna@bloomly.app"
+          - action: "Enter password"
+            data: "bloom123"
+          - action: "Click \"Log in\""
+            expected: "The account page opens and shows \"Welcome back, Anna!\""
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+          await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+        });
+      checks:
+        expect: fail
+        also:
+          - app: {}
+            expect: pass
+      hints:
+        - en: "Run the starter first. Why is it green although the greeting is wrong?"
+          ru: "Сначала запусти исходный тест. Почему он зелёный, хотя приветствие неправильное?"
+        - en: "\"Welcome back\" matches \"Welcome back, Silva!\" too. The check is weaker than the expected result."
+          ru: "«Welcome back» совпадает и с «Welcome back, Silva!». Проверка слабее, чем ожидаемый результат."
+        - en: "Use the full text from TC-001 in the heading name: `'Welcome back, Anna!'`."
+          ru: "Используй в имени заголовка полный текст из TC-001: `'Welcome back, Anna!'`."
+      praise:
+        en: "Your test caught a bug that a green suite was hiding. That's what automation is for."
+        ru: "Твой тест поймал баг, который прятал зелёный набор. Вот для этого и нужна автоматизация."
+      explain:
+        en: "The old check looked for any heading containing \"Welcome back\" — \"Welcome back, Silva!\" matched, so the bug slipped through. Asserting the exact expected text from TC-001 makes the test fail on the bug and pass on the fix."
+        ru: "Старая проверка искала любой заголовок с «Welcome back» — «Welcome back, Silva!» подошёл, и баг проскочил. Проверка точного ожидаемого текста из TC-001 делает тест красным на баге и зелёным после исправления."

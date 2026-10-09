@@ -1,0 +1,154 @@
+# Glossary entries owned by chapter 9 (Test architecture)
+- id: test-isolation
+  en: test isolation
+  ipa: /ˈtest ˌaɪsəˈleɪʃn/
+  ru: изоляция тестов (test isolation)
+  pos: noun
+  def:
+    en: "Each test runs on its own, in a fresh browser context, and doesn't depend on other tests or their order."
+    ru: "Каждый тест запускается сам по себе, в чистом контексте браузера, и не зависит от других тестов и их порядка."
+  example:
+    en: "This breaks test isolation: the checkout test expects the cart that the previous test filled."
+    ru: "Это нарушает изоляцию тестов: тест оформления ожидает корзину, которую наполнил предыдущий тест."
+  context: code-review
+  chapter: 9
+
+- id: hook
+  en: hook
+  ipa: /hʊk/
+  ru: хук (hook)
+  pos: noun
+  def:
+    en: "A function that runs automatically before or after tests, such as beforeEach or afterAll."
+    ru: "Функция, которая автоматически выполняется до или после тестов, например beforeEach или afterAll."
+  example:
+    en: "Move the login steps into a beforeEach hook — all six tests repeat them."
+    ru: "Вынеси шаги входа в хук beforeEach — все шесть тестов их повторяют."
+  context: code-review
+  chapter: 9
+
+- id: describe-block
+  en: describe block
+  ipa: /dɪˈskraɪb blɑːk/
+  ru: describe-блок (describe block)
+  pos: noun
+  def:
+    en: "A `test.describe` group that collects related tests under one title, like a section in a test suite."
+    ru: "Группа `test.describe`, которая собирает связанные тесты под одним названием, как раздел в наборе тестов."
+  example:
+    en: "Let's put all promo code tests into one describe block called \"Cart promo codes\"."
+    ru: "Давай сложим все тесты промокодов в один describe-блок «Cart promo codes»."
+  context: code-review
+  chapter: 9
+
+- id: setup
+  en: setup
+  ipa: /ˈsetʌp/
+  ru: подготовка (setup)
+  pos: noun
+  def:
+    en: "Steps that prepare what a test needs before it starts: a logged-in user, a filled cart, test data."
+    ru: "Шаги, которые готовят всё нужное до начала теста: пользователя с выполненным входом, заполненную корзину, тестовые данные."
+  example:
+    en: "The setup takes 20 seconds through the UI; let's do it through the API."
+    ru: "Подготовка через интерфейс занимает 20 секунд; давай делать её через API."
+  context: meeting
+  chapter: 9
+
+- id: teardown
+  en: teardown
+  ipa: /ˈterdaʊn/
+  ru: очистка после теста (teardown)
+  pos: noun
+  def:
+    en: "Steps that clean up after a test, such as deleting the data it created, so the next test starts clean."
+    ru: "Шаги, которые убирают за тестом, например удаляют созданные им данные, чтобы следующий тест начинался с чистого листа."
+  example:
+    en: "The signup test needs a teardown — otherwise the second run fails with \"This email is already registered.\""
+    ru: "Тесту регистрации нужна очистка — иначе второй прогон упадёт с «This email is already registered.»"
+  context: code-review
+  chapter: 9
+
+- id: page-object-model
+  en: Page Object Model
+  ipa: /ˌpeɪdʒ ˈɑːbdʒekt ˌmɑːdl/
+  ru: Page Object Model (POM, паттерн «объект страницы»)
+  pos: noun
+  def:
+    en: "A pattern where each page gets a class with its locators and actions, so tests reuse them instead of repeating them."
+    ru: "Паттерн, при котором у каждой страницы есть класс с её локаторами и действиями, и тесты переиспользуют их вместо повторения."
+  example:
+    en: "With the Page Object Model, renaming \"Log in\" to \"Sign in\" is a one-line fix in LoginPage."
+    ru: "С Page Object Model переименование «Log in» в «Sign in» — исправление в одну строку в LoginPage."
+  context: meeting
+  chapter: 9
+
+- id: class
+  en: class
+  ipa: /klæs/
+  ru: класс (class)
+  pos: noun
+  def:
+    en: "In code, a template that groups related data and methods, like a LoginPage class with a login() method. Not the same as a CSS class."
+    ru: "В коде — шаблон, который объединяет связанные данные и методы, например класс LoginPage с методом login(). Не путать с CSS-классом."
+  example:
+    en: "The agent created a BasePage class with 30 methods we don't use — let's ask for a simpler version."
+    ru: "Агент создал класс BasePage с 30 методами, которыми мы не пользуемся, — давай попросим вариант попроще."
+  context: code-review
+  chapter: 9
+
+- id: fixture
+  en: fixture
+  ipa: /ˈfɪkstʃər/
+  ru: фикстура (fixture)
+  pos: noun
+  def:
+    en: "Something Playwright prepares for a test and passes into it, such as page, request or your own logged-in user."
+    ru: "То, что Playwright готовит для теста и передаёт в него: page, request или твой собственный пользователь с выполненным входом."
+  example:
+    en: "Use the loggedInPage fixture instead of logging in by hand in every test."
+    ru: "Используй фикстуру loggedInPage вместо ручного входа в каждом тесте."
+  context: code-review
+  chapter: 9
+
+- id: parameterization
+  en: parameterization
+  ipa: /pəˌræmətərəˈzeɪʃn/
+  ru: параметризация (parameterization)
+  pos: noun
+  def:
+    en: "Running the same test body with different input data and expected results."
+    ru: "Запуск одного и того же теста с разными входными данными и ожидаемыми результатами."
+  example:
+    en: "Parameterization fits here: one promo code test, five codes, five expected messages."
+    ru: "Здесь подходит параметризация: один тест промокода, пять кодов, пять ожидаемых сообщений."
+  context: code-review
+  chapter: 9
+
+- id: data-driven-testing
+  en: data-driven testing
+  ipa: /ˌdeɪtə ˌdrɪvn ˈtestɪŋ/
+  ru: тестирование на основе данных (data-driven testing)
+  pos: noun
+  def:
+    en: "An approach where test cases are rows of data — inputs and expected results — fed into one test."
+    ru: "Подход, при котором тест-кейсы — это строки данных (входные значения и ожидаемые результаты), которые подаются в один тест."
+  example:
+    en: "Let's make the signup password check data-driven: 7, 8 and 9 characters, each with its own expected result."
+    ru: "Давай сделаем проверку пароля при регистрации тестом на основе данных: 7, 8 и 9 символов, у каждого свой ожидаемый результат."
+  context: meeting
+  chapter: 9
+
+- id: refactoring
+  en: refactoring
+  ipa: /ˌriːˈfæktərɪŋ/
+  ru: рефакторинг (refactoring)
+  pos: noun
+  def:
+    en: "Changing the structure of code to make it cleaner without changing what it does."
+    ru: "Изменение структуры кода, чтобы он стал чище, без изменения того, что он делает."
+  example:
+    en: "Small refactoring request: extract the cart steps into a CartPage class and don't touch the assertions."
+    ru: "Небольшой запрос на рефакторинг: вынеси шаги корзины в класс CartPage и не трогай проверки."
+  context: prompt
+  chapter: 9

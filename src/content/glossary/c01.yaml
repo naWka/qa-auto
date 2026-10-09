@@ -1,0 +1,308 @@
+# Glossary entries owned by chapter 1 (An automated test through a tester's eyes).
+- id: manual-testing
+  en: manual testing
+  ipa: /ˈmænjuəl ˈtɛstɪŋ/
+  ru: ручное тестирование
+  pos: noun
+  def:
+    en: "Testing done by a person who performs the steps and checks the results by hand."
+    ru: "Тестирование, при котором человек сам выполняет шаги и проверяет результаты."
+  example:
+    en: "We keep manual testing for new features and automate the stable regression cases."
+    ru: "Ручное тестирование оставляем для новых фич, а стабильные регрессионные кейсы автоматизируем."
+  context: meeting
+  chapter: 1
+
+- id: test-automation
+  en: test automation
+  ipa: /tɛst ˌɔːtəˈmeɪʃn/
+  ru: автоматизация тестирования
+  pos: noun
+  def:
+    en: "Using code and tools to run checks automatically instead of by hand."
+    ru: "Использование кода и инструментов, чтобы проверки выполнялись автоматически, а не руками."
+  example:
+    en: "Test automation cut our regression from three days to forty minutes."
+    ru: "Автоматизация тестирования сократила нашу регрессию с трёх дней до сорока минут."
+  context: meeting
+  chapter: 1
+
+- id: automated-test
+  en: automated test
+  ipa: /ˈɔːtəmeɪtɪd tɛst/
+  ru: автотест
+  pos: noun
+  def:
+    en: "A test case written as code that a test runner executes: a title, steps and checks of the expected result."
+    ru: "Тест-кейс, записанный кодом, который выполняет тест-раннер: название, шаги и проверки ожидаемого результата."
+  example:
+    en: "We added an automated test for the login smoke check yesterday."
+    ru: "Вчера мы добавили автотест на смоук-проверку логина."
+  context: standup
+  chapter: 1
+
+- id: test-case
+  en: test case
+  ipa: /tɛst keɪs/
+  ru: тест-кейс
+  pos: noun
+  def:
+    en: "A documented check: a title, preconditions, steps, test data and the expected result."
+    ru: "Задокументированная проверка: название, предусловия, шаги, тестовые данные и ожидаемый результат."
+  example:
+    en: "Can you link the test case in the pull request? I want to compare the steps."
+    ru: "Можешь приложить тест-кейс к пул-реквесту? Хочу сверить шаги."
+  context: code-review
+  chapter: 1
+
+- id: test-step
+  en: test step
+  ipa: /tɛst stɛp/
+  ru: шаг теста
+  pos: noun
+  def:
+    en: "One action in a test case, like \"Enter email\" or \"Click Log in\". In code, usually one line."
+    ru: "Одно действие в тест-кейсе, например «Ввести email» или «Нажать Log in». В коде обычно одна строка."
+  example:
+    en: "Step 4 is missing in the automated test: it never ticks \"Remember me\"."
+    ru: "В автотесте нет шага 4: он ни разу не ставит галочку «Remember me»."
+  context: code-review
+  chapter: 1
+
+- id: expected-result
+  en: expected result
+  ipa: /ɪkˈspɛktɪd rɪˈzʌlt/
+  ru: ожидаемый результат
+  pos: noun
+  def:
+    en: "What should happen after a step, according to the requirements or the test case."
+    ru: "Что должно произойти после шага согласно требованиям или тест-кейсу."
+  example:
+    en: "Expected result: the account page shows \"Welcome back, Anna!\"."
+    ru: "Ожидаемый результат: на странице аккаунта написано «Welcome back, Anna!»."
+  context: bug-report
+  chapter: 1
+
+- id: actual-result
+  en: actual result
+  ipa: /ˈæktʃuəl rɪˈzʌlt/
+  ru: фактический результат
+  pos: noun
+  def:
+    en: "What really happened when the step was performed. In a Playwright error it is shown as \"Received\"."
+    ru: "Что на самом деле произошло при выполнении шага. В ошибке Playwright он показан как «Received»."
+  example:
+    en: "Actual result: the heading says \"Welcome back, Silva!\"."
+    ru: "Фактический результат: в заголовке написано «Welcome back, Silva!»."
+  context: bug-report
+  chapter: 1
+
+- id: regression-testing
+  en: regression testing
+  ipa: /rɪˈɡrɛʃn ˈtɛstɪŋ/
+  ru: регрессионное тестирование
+  pos: noun
+  def:
+    en: "Re-checking existing features to make sure new changes didn't break them."
+    ru: "Повторная проверка существующих функций, чтобы убедиться, что новые изменения их не сломали."
+  example:
+    en: "Regression testing takes three days every release — that's what we're automating first."
+    ru: "Регрессионное тестирование занимает три дня каждый релиз — его мы и автоматизируем в первую очередь."
+  context: meeting
+  chapter: 1
+
+- id: test-suite
+  en: test suite
+  ipa: /tɛst swiːt/
+  ru: набор тестов
+  pos: noun
+  def:
+    en: "A group of tests that run together, for example all login tests or the whole regression."
+    ru: "Группа тестов, которые запускаются вместе, например все тесты логина или вся регрессия."
+  example:
+    en: "The login suite has twelve tests; two of them failed last night."
+    ru: "В наборе тестов логина двенадцать тестов; два из них упали ночью."
+  context: standup
+  chapter: 1
+
+- id: spec-file
+  en: spec file
+  ipa: /spɛk faɪl/
+  ru: spec-файл (файл с тестами)
+  pos: noun
+  def:
+    en: "A file with automated tests, for example login.spec.js. The test runner runs every test inside it."
+    ru: "Файл с автотестами, например login.spec.js. Тест-раннер запускает все тесты внутри него."
+  example:
+    en: "Let's put the signup tests in a separate spec file, signup.spec.js."
+    ru: "Давай вынесем тесты регистрации в отдельный spec-файл, signup.spec.js."
+  context: code-review
+  chapter: 1
+
+- id: test-runner
+  en: test runner
+  ipa: /tɛst ˈrʌnər/
+  ru: тест-раннер
+  pos: noun
+  def:
+    en: "The tool that finds tests, runs them and reports the results. For us it is Playwright Test."
+    ru: "Инструмент, который находит тесты, запускает их и сообщает результаты. У нас это Playwright Test."
+  example:
+    en: "The test runner found 40 tests and ran them in three minutes."
+    ru: "Тест-раннер нашёл 40 тестов и прогнал их за три минуты."
+  context: general
+  chapter: 1
+
+- id: action
+  en: action
+  ipa: /ˈækʃn/
+  ru: действие
+  pos: noun
+  def:
+    en: "A command that does something on the page, like a manual step: fill, click, check, selectOption."
+    ru: "Команда, которая что-то делает на странице, как ручной шаг: fill, click, check, selectOption."
+  example:
+    en: "The action is fine, but the locator points to the wrong button."
+    ru: "Действие правильное, но локатор указывает не на ту кнопку."
+  context: code-review
+  chapter: 1
+
+- id: assertion
+  en: assertion
+  ipa: /əˈsɜːrʃn/
+  ru: проверка (assertion)
+  pos: noun
+  def:
+    en: "A line of code that checks the expected result, for example `await expect(page).toHaveURL('/account')`."
+    ru: "Строка кода, которая проверяет ожидаемый результат, например `await expect(page).toHaveURL('/account')`."
+  example:
+    en: "The test has no assertion, so it can never fail."
+    ru: "В тесте нет проверки, поэтому он никогда не упадёт."
+  context: code-review
+  chapter: 1
+
+- id: locator
+  en: locator
+  ipa: /loʊˈkeɪtər/
+  ru: локатор
+  pos: noun
+  def:
+    en: "A way to find an element on the page — \"which element\" in a step, for example `getByLabel('Email')`."
+    ru: "Способ найти элемент на странице — «какой элемент» в шаге, например `getByLabel('Email')`."
+  example:
+    en: "Use a role-based locator for the button, not a CSS class."
+    ru: "Для кнопки используй локатор по роли, а не CSS-класс."
+  context: code-review
+  chapter: 1
+
+- id: test-report
+  en: test report
+  ipa: /tɛst rɪˈpɔːrt/
+  ru: отчёт о тестировании
+  pos: noun
+  def:
+    en: "The results of a test run: which tests passed or failed, with errors and durations."
+    ru: "Результаты прогона тестов: какие прошли, какие упали, с ошибками и длительностью."
+  example:
+    en: "The test report shows one failure, and it's a real bug."
+    ru: "В отчёте о тестировании одно падение, и это настоящий баг."
+  context: standup
+  chapter: 1
+
+- id: pass
+  en: pass
+  ipa: /pæs/
+  ru: пройти (о тесте), зелёный
+  pos: verb
+  def:
+    en: "A test passes when all its steps and assertions succeed. Shown as green or ✓."
+    ru: "Тест проходит, когда все его шаги и проверки успешны. Показывается зелёным или ✓."
+  example:
+    en: "All login tests pass on staging."
+    ru: "На стейджинге все тесты логина проходят."
+  context: standup
+  chapter: 1
+
+- id: fail
+  en: fail
+  ipa: /feɪl/
+  ru: упасть (о тесте), красный
+  pos: verb
+  def:
+    en: "A test fails when a step or an assertion doesn't succeed. Shown as red or ✘."
+    ru: "Тест падает, когда шаг или проверка не выполняются. Показывается красным или ✘."
+  example:
+    en: "The checkout test fails because the total is wrong."
+    ru: "Тест оформления заказа падает, потому что итоговая сумма неверная."
+  context: standup
+  chapter: 1
+
+- id: precondition
+  en: precondition
+  ipa: /ˌpriːkənˈdɪʃn/
+  ru: предусловие
+  pos: noun
+  def:
+    en: "What must be true before the test starts, for example \"the user is logged in\"."
+    ru: "Что должно быть выполнено до начала теста, например «пользователь вошёл в систему»."
+  example:
+    en: "Precondition: the cart contains one Rose Bouquet."
+    ru: "Предусловие: в корзине лежит один Rose Bouquet."
+  context: bug-report
+  chapter: 1
+
+- id: test-data
+  en: test data
+  ipa: /tɛst ˈdeɪtə/
+  ru: тестовые данные
+  pos: noun
+  def:
+    en: "The values a test uses: emails, passwords, product names, promo codes."
+    ru: "Значения, которые использует тест: email, пароли, названия товаров, промокоды."
+  example:
+    en: "The test data is wrong: the password should be bloom123."
+    ru: "Тестовые данные неверные: пароль должен быть bloom123."
+  context: code-review
+  chapter: 1
+
+- id: smoke-test
+  en: smoke test
+  ipa: /smoʊk tɛst/
+  ru: смоук-тест
+  pos: noun
+  def:
+    en: "A quick check of the most important features, to see if a build is worth testing further."
+    ru: "Быстрая проверка самых важных функций: стоит ли тестировать сборку дальше."
+  example:
+    en: "The smoke tests are green, so the build is ready for full regression."
+    ru: "Смоук-тесты зелёные, значит, сборка готова к полной регрессии."
+  context: standup
+  chapter: 1
+
+- id: timeout
+  en: timeout
+  ipa: /ˈtaɪmaʊt/
+  ru: тайм-аут
+  pos: noun
+  def:
+    en: "The maximum time to wait for something. When it runs out, the step or assertion fails."
+    ru: "Максимальное время ожидания. Когда оно истекает, шаг или проверка падает."
+  example:
+    en: "The test failed with a timeout: the button never appeared."
+    ru: "Тест упал по тайм-ауту: кнопка так и не появилась."
+  context: chat
+  chapter: 1
+
+- id: bug
+  en: bug
+  ipa: /bʌɡ/
+  ru: баг, дефект
+  pos: noun
+  def:
+    en: "A difference between the expected and the actual behaviour of the app."
+    ru: "Расхождение между ожидаемым и фактическим поведением приложения."
+  example:
+    en: "Bug filed: the account page greets users by their last name."
+    ru: "Баг заведён: страница аккаунта приветствует пользователей по фамилии."
+  context: bug-report
+  chapter: 1

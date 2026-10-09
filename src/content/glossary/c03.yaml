@@ -1,0 +1,308 @@
+# Glossary entries owned by chapter 3 (Reading code without fear).
+- id: code
+  en: code
+  ipa: /koʊd/
+  ru: код
+  pos: noun
+  def:
+    en: "Instructions for a computer written in a programming language. A Playwright test file is code."
+    ru: "Инструкции для компьютера на языке программирования. Файл с Playwright-тестом — тоже код."
+  example:
+    en: "I don't write much code by hand, but I review every line the agent generates."
+    ru: "Я почти не пишу код руками, но проверяю каждую строку, которую генерирует агент."
+  context: general
+  chapter: 3
+
+- id: syntax
+  en: syntax
+  ipa: /ˈsɪntæks/
+  ru: синтаксис
+  pos: noun
+  def:
+    en: "The grammar of a programming language: where brackets, commas, quotes and keywords go. A syntax error stops the whole file."
+    ru: "Грамматика языка программирования: где ставить скобки, запятые, кавычки и ключевые слова. Синтаксическая ошибка останавливает весь файл."
+  example:
+    en: "The file didn't even start — there's a syntax error on line 3."
+    ru: "Файл даже не запустился — в строке 3 синтаксическая ошибка."
+  context: code-review
+  chapter: 3
+
+- id: variable
+  en: variable
+  ipa: /ˈveriəbl/
+  ru: переменная
+  pos: noun
+  def:
+    en: "A named place for a value in code. `let` creates one whose value can change; `const` creates a constant."
+    ru: "Именованное место для значения в коде. `let` создаёт переменную, значение которой можно поменять; `const` — константу."
+  example:
+    en: "Could you rename the variable `pwd` to `password`? It's easier to read."
+    ru: "Можешь переименовать переменную `pwd` в `password`? Так легче читать."
+  context: code-review
+  chapter: 3
+
+- id: constant
+  en: constant
+  ipa: /ˈkɑːnstənt/
+  ru: константа
+  pos: noun
+  def:
+    en: "A named value that stays the same after it is set, created with `const`. Tests keep their test data in constants."
+    ru: "Именованное значение, которое не меняется после того, как его задали; создаётся через `const`. В тестах в константах хранят тестовые данные."
+  example:
+    en: "Let's move the email into a constant at the top, so all five tests reuse it."
+    ru: "Давай вынесем email в константу в начале файла, чтобы все пять тестов её использовали."
+  context: code-review
+  chapter: 3
+
+- id: string
+  en: string
+  ipa: /strɪŋ/
+  ru: строка
+  pos: noun
+  def:
+    en: "A piece of text in quotes: 'Log in', \"Log in\" or `Log in`. Code compares strings exactly, character by character."
+    ru: "Кусок текста в кавычках: 'Log in', \"Log in\" или `Log in`. Код сравнивает строки точно, посимвольно."
+  example:
+    en: "The expected string has a capital B, but the page says \"Welcome back\"."
+    ru: "В ожидаемой строке заглавная B, а на странице написано «Welcome back»."
+  context: code-review
+  chapter: 3
+
+- id: number
+  en: number
+  ipa: /ˈnʌmbər/
+  ru: число
+  pos: noun
+  def:
+    en: "A numeric value, written without quotes: `2`, `35.5`, `1043`."
+    ru: "Числовое значение, пишется без кавычек: `2`, `35.5`, `1043`."
+  example:
+    en: "The quantity is a number, so it has no quotes: `qty: 2`."
+    ru: "Количество — это число, поэтому оно без кавычек: `qty: 2`."
+  context: general
+  chapter: 3
+
+- id: boolean
+  en: boolean
+  ipa: /ˈbuːliən/
+  ru: логическое значение (boolean)
+  pos: noun
+  def:
+    en: "A yes/no value: `true` or `false`, written without quotes."
+    ru: "Значение «да/нет»: `true` или `false`, пишется без кавычек."
+  example:
+    en: "`exact` takes a boolean: `{ exact: true }`."
+    ru: "`exact` принимает логическое значение: `{ exact: true }`."
+  context: code-review
+  chapter: 3
+
+- id: function
+  en: function
+  ipa: /ˈfʌŋkʃn/
+  ru: функция
+  pos: noun
+  def:
+    en: "A named, reusable sequence of steps. Defining it changes nothing; the steps run only when the function is called."
+    ru: "Именованная последовательность шагов, которую можно переиспользовать. Объявление функции ничего не делает; шаги выполняются, только когда функцию вызывают."
+  example:
+    en: "Let's extract the login steps into a function and call it in every test."
+    ru: "Давай вынесем шаги логина в функцию и будем вызывать её в каждом тесте."
+  context: code-review
+  chapter: 3
+
+- id: arrow-function
+  en: arrow function
+  ipa: /ˈæroʊ ˌfʌŋkʃn/
+  ru: стрелочная функция
+  pos: noun
+  def:
+    en: "A short way to write a function: `(parameters) => { steps }`. The body of every Playwright test is an arrow function."
+    ru: "Короткая запись функции: `(параметры) => { шаги }`. Тело каждого Playwright-теста — стрелочная функция."
+  example:
+    en: "The test body is an async arrow function that receives `{ page }`."
+    ru: "Тело теста — асинхронная стрелочная функция, которая получает `{ page }`."
+  context: code-review
+  chapter: 3
+
+- id: parameter
+  en: parameter
+  ipa: /pəˈræmɪtər/
+  ru: параметр
+  pos: noun
+  def:
+    en: "A name in a function's definition for a value the function needs, e.g. `email` in `logIn(page, email, password)`."
+    ru: "Имя в объявлении функции для значения, которое ей нужно, например `email` в `logIn(page, email, password)`."
+  example:
+    en: "The helper has three parameters: page, email and password."
+    ru: "У функции-помощника три параметра: page, email и password."
+  context: code-review
+  chapter: 3
+
+- id: argument
+  en: argument
+  ipa: /ˈɑːrɡjəmənt/
+  ru: аргумент
+  pos: noun
+  def:
+    en: "The actual value passed when a function is called, e.g. 'tom@bloomly.app'. Arguments go to parameters by position."
+    ru: "Конкретное значение, которое передают при вызове функции, например 'tom@bloomly.app'. Аргументы попадают в параметры по порядку."
+  example:
+    en: "The arguments are swapped: the password is passed where the email should be."
+    ru: "Аргументы перепутаны: пароль передан туда, где должен быть email."
+  context: code-review
+  chapter: 3
+
+- id: object
+  en: object
+  ipa: /ˈɑːbdʒekt/
+  ru: объект
+  pos: noun
+  def:
+    en: "A set of labelled values in curly braces: `{ name: 'Log in', exact: true }`. In Playwright, objects usually hold settings."
+    ru: "Набор подписанных значений в фигурных скобках: `{ name: 'Log in', exact: true }`. В Playwright в объектах обычно передают настройки."
+  example:
+    en: "Pass the options as an object: `{ name: 'Log in' }`."
+    ru: "Передай настройки объектом: `{ name: 'Log in' }`."
+  context: code-review
+  chapter: 3
+
+- id: property
+  en: property
+  ipa: /ˈprɑːpərti/
+  ru: свойство
+  pos: noun
+  def:
+    en: "One labelled value inside an object, e.g. `name: 'Log in'`. You read it with a dot: `user.email`."
+    ru: "Одно подписанное значение внутри объекта, например `name: 'Log in'`. Читается через точку: `user.email`."
+  example:
+    en: "`getByRole` has no `label` property — use `name`."
+    ru: "У `getByRole` нет свойства `label` — используй `name`."
+  context: code-review
+  chapter: 3
+
+- id: method
+  en: method
+  ipa: /ˈmeθəd/
+  ru: метод
+  pos: noun
+  def:
+    en: "A function that belongs to an object and is called with a dot: `page.goto()`, `locator.click()`."
+    ru: "Функция, которая принадлежит объекту и вызывается через точку: `page.goto()`, `locator.click()`."
+  example:
+    en: "`page.open()` isn't a real method — the agent invented it."
+    ru: "`page.open()` — несуществующий метод, агент его выдумал."
+  context: code-review
+  chapter: 3
+
+- id: array
+  en: array
+  ipa: /əˈreɪ/
+  ru: массив
+  pos: noun
+  def:
+    en: "An ordered list of values in square brackets. Positions (indexes) start at 0."
+    ru: "Упорядоченный список значений в квадратных скобках. Позиции (индексы) считаются с 0."
+  example:
+    en: "The test data is an array of three users, so the loop creates three tests."
+    ru: "Тестовые данные — массив из трёх пользователей, поэтому цикл создаёт три теста."
+  context: code-review
+  chapter: 3
+
+- id: loop
+  en: loop
+  ipa: /luːp/
+  ru: цикл
+  pos: noun
+  def:
+    en: "Code that repeats the same steps for each item of a list, e.g. `for (const user of users) { ... }`."
+    ru: "Код, который повторяет одни и те же шаги для каждого элемента списка, например `for (const user of users) { ... }`."
+  example:
+    en: "The loop creates one login test per row of test data."
+    ru: "Цикл создаёт по одному тесту логина на каждую строку тестовых данных."
+  context: code-review
+  chapter: 3
+
+- id: async
+  en: async
+  ipa: /ˈeɪsɪŋk/
+  ru: async (асинхронная функция)
+  pos: keyword
+  def:
+    en: "A keyword that marks a function whose steps take time. Only inside an async function can you use `await`."
+    ru: "Ключевое слово, которое помечает функцию с долгими шагами. Только внутри async-функции можно использовать `await`."
+  example:
+    en: "The helper uses await, so it has to be declared async."
+    ru: "В функции-помощнике есть await, значит, её нужно объявить как async."
+  context: code-review
+  chapter: 3
+
+- id: await
+  en: await
+  ipa: /əˈweɪt/
+  ru: await (дождаться)
+  pos: keyword
+  def:
+    en: "A keyword that means \"wait until this step is finished before going on\". Every browser action and every assertion needs it."
+    ru: "Ключевое слово: «дождись, пока этот шаг закончится, и только потом иди дальше». Нужно перед каждым действием в браузере и каждой проверкой."
+  example:
+    en: "Missing await on line 7 — the click may not finish before the check."
+    ru: "В строке 7 не хватает await — клик может не закончиться до проверки."
+  context: code-review
+  chapter: 3
+
+- id: promise
+  en: promise
+  ipa: /ˈprɑːmɪs/
+  ru: промис (обещание)
+  pos: noun
+  def:
+    en: "A value that says \"the result will come later\". Browser steps return promises, and `await` waits for them."
+    ru: "Значение, которое говорит: «результат будет позже». Шаги в браузере возвращают промисы, а `await` их дожидается."
+  example:
+    en: "`click()` returns a promise, so the test has to await it."
+    ru: "`click()` возвращает промис, поэтому тест должен его дождаться через await."
+  context: code-review
+  chapter: 3
+
+- id: comment
+  en: comment
+  ipa: /ˈkɑːment/
+  ru: комментарий
+  pos: noun
+  def:
+    en: "A note for humans inside code; the computer skips it. In JavaScript a comment starts with `//`."
+    ru: "Заметка для людей внутри кода; компьютер её пропускает. В JavaScript комментарий начинается с `//`."
+  example:
+    en: "Please add a comment explaining why this test uses Tom's account."
+    ru: "Добавь, пожалуйста, комментарий, почему этот тест использует аккаунт Тома."
+  context: code-review
+  chapter: 3
+
+- id: error-message
+  en: error message
+  ipa: /ˈerər ˌmesɪdʒ/
+  ru: сообщение об ошибке
+  pos: noun
+  def:
+    en: "Text that explains what went wrong — shown by the app to users, or by the test runner to you."
+    ru: "Текст, который объясняет, что пошло не так: приложение показывает его пользователю, а раннер тестов — тебе."
+  example:
+    en: "The error message says \"await is only valid in async functions\" — the helper isn't async."
+    ru: "В сообщении об ошибке написано «await is only valid in async functions» — функция-помощник не async."
+  context: bug-report
+  chapter: 3
+
+- id: console
+  en: console
+  ipa: /ˈkɑːnsoʊl/
+  ru: консоль
+  pos: noun
+  def:
+    en: "The place where code prints messages with `console.log(...)`. Handy for seeing a value while you investigate."
+    ru: "Место, куда код выводит сообщения через `console.log(...)`. Удобно, чтобы посмотреть значение, пока разбираешься."
+  example:
+    en: "Add a console.log to see which user the loop is on when it fails."
+    ru: "Добавь console.log, чтобы увидеть, на каком пользователе цикл падает."
+  context: chat
+  chapter: 3

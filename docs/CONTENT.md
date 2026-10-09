@@ -1,0 +1,416 @@
+# Content authoring guide
+
+Everything the student reads lives in YAML under `src/content/`. Schemas: `src/content/schema.ts`.
+Validate with `npm run check:content`. Code tasks are additionally verified in the browser by the
+self-test page (`#/dev/selftest`), which runs every reference solution in the emulator.
+
+Read also: `docs/AUT.md` (the Bloomly app — exact labels, roles, texts, bugs) and
+`docs/EMULATOR.md` (supported Playwright API).
+
+## 1. Audience and approach
+
+- Russian-speaking women, **experienced manual QA engineers (~3 years)**: test cases, checklists, bug reports,
+  test design (boundary values, negative cases), regression — all known. They are **not juniors**. No coding background.
+- Goal: move into automation **with AI agents**. The AI (Claude Code, Copilot, Playwright Test Agents) writes most
+  of the code. The student must **understand, direct, review and verify** it.
+- Core message, repeated in many forms: *"The agent writes code fast. You know what is worth checking.
+  In test design you are stronger than the agent."*
+- JS only to reading level. No syntax drills, no "write a loop from scratch".
+  Task mix per lesson: ~60% read / review / predict, ~25% prompt / agent / verdict, ~15% small one-line fixes.
+- Always build from their experience: "you did this by hand — here is how code does the same".
+- One idea per screen. A lesson = one new idea, 5–10 minutes. Short paragraphs (1–3 sentences each).
+- Retrieval over reading: little theory, many short tasks. Scaffolding fades inside a lesson:
+  worked example → example with gaps → task with hints → task without support.
+- English is a learning goal too: use professional English as used in real teams (B1–B2, short sentences).
+
+## 2. Voice, bilingual text, special syntax
+
+Every student-facing text is `{ en: "...", ru: "..." }`.
+- `en` is the main text; `ru` is a natural Russian translation (not a calque). Keep paragraphs aligned 1:1.
+- Code, test titles, code comments, prompts to the agent — **English only** (as in real projects).
+- Tone: a warm, smart senior colleague. Supportive, never childish. Praise is specific
+  ("you picked a resilient locator — that's how senior engineers do it").
+  Mistakes are normal and useful. Never call a wrong answer right.
+- **Russian addressing the student uses gender variants** `{feminine|masculine}`:
+  `Ты {готова|готов}`, `ты наш{ла|ёл} баг`, `ты справил{ась|ся}`, `Ты молодец`. Feminine first.
+  Every past-tense verb / short adjective about the student MUST use this syntax.
+  Maya (mentor) is a woman: her own first-person past tense is feminine and fixed ("я нашла").
+  Petal (AI agent) is grammatically masculine in Russian ("агент написал").
+- Term links: `[[locator]]` (display = id) or `[[display text|term-id]]`.
+  EN: `[[locators|locator]]`; RU: `[[локатор|locator]]`, `[[локаторы|locator]]`.
+  Link a term on its first mention in a step, not every time. Only ids that exist in the glossary (§9).
+- Markdown subset in text: `**bold**`, `*italic*`, `` `inline code` ``, lists, fenced code blocks (```js).
+  No headings, no tables, no HTML.
+
+## 3. Story
+
+Bloomly — an international flower-delivery startup (Lisbon / Berlin / Warsaw, working language English).
+"Bloomly 3.0" ships before the holiday season. Manual regression = ~400 test cases, 3 days per release.
+Leo wants regression automated with the team's AI agent **Petal**. But Petal does not know what is
+important to check — that's why they hired **you**, an experienced QA, to lead it.
+
+Speakers (`who`): `maya` (Maya Chen, Senior QA, your mentor, she/her), `mochi` (office cat — only short
+sounds/reactions, e.g. "Mrrp?"), `petal` (AI agent, polite, a bit too confident), `leo` (Leo Martins, Engineering
+Manager), `sofia` (Sofia Weber, PM), `kai` (Kai Nowak, frontend dev), `you` (the student; RU with gender variants).
+
+Chapters = departments: 1 Onboarding · 2 AI Lab · 3 Engineering · 4 Frontend · 5 Design System · 6 Checkout ·
+7 Platform · 8 QA Guild · 9 Architecture · 10 Backend · 11 Release Day.
+
+## 4. Files and ids
+
+```
+src/content/chapters/01-tester-eyes/chapter.yaml
+src/content/chapters/01-tester-eyes/l1-why-automate.yaml   # one lesson per file
+src/content/glossary/c01.yaml                              # glossary entries owned by chapter 1
+```
+Ids: lesson `c1-l2`; key point `kp-short-name`; tasks `c1-l2-t1` (lesson tasks), `c1-l2-p1` (pretest),
+`c1-l2-k1` (check pool), `c1-boss-t1` (boss). All ids globally unique.
+
+## 5. Lesson recipe
+
+```yaml
+id: c1-l2
+chapter: c1
+title: { en: "Steps become actions", ru: "Шаги становятся действиями" }
+goal: { en: "Read a test and match each line to a test-case step.", ru: "..." }
+minutes: 8
+keyPoints:                  # 2–4 ideas the lesson teaches; tasks reference them
+  - id: kp-goto
+    title: { en: "page.goto opens a page", ru: "page.goto открывает страницу" }
+terms: [action, locator, test-step]      # 5–10 ids → auto "Vocabulary" block at the end
+steps: [...]
+checkPool: [...]            # 8 tasks for "I know this" checks, review and placement
+```
+
+Recommended step order (≈12–16 screens):
+1. `story` — 1–3 lines: why this matters today at Bloomly.
+2. `pretest` — 1–2 quick questions on the new idea *before* teaching (intro says: mistakes are fine).
+3. `theory` — 2–4 screens, one idea each, with an analogy from manual testing. Optional `figure`, `mentor` aside.
+4. `example` or `mapping` — fully worked example with line notes.
+5. Tasks (5–7), fading support: e.g. `choice` → `fill` / `parsons` → `review` / `agent` → `predict` → `fix`.
+   At least one `predict` and one `review` or `agent` per lesson (chapters 1–3).
+6. `mistakes` — 2–4 typical mistakes (often mistakes AI agents make).
+7. `explain` — "explain in your own words" + a good model answer.
+8. `phrases` — "How to say it at work": 4–6 phrases (standup, code-review, bug-report, chat, prompt).
+(The vocabulary block is added automatically from `terms`.)
+
+Every task should have `keyPoint`, 2–3 `hints` (hint → direction → almost the answer), `explain`
+(why the answer is right — shown after answering) and often `praise` (specific).
+
+### checkPool (8 tasks)
+Practice, not theory recall: review, predict, fix, fill, pick-locator, agent, choice-on-code.
+Cover every key point at least twice. Different from the lesson tasks (new code, new situations).
+Mark 1–2 quick ones (`choice`/`fill`/`predict`/`input`) with `placement: true` (used in the entry test).
+
+## 6. Step types
+
+```yaml
+- type: story
+  lines:
+    - who: maya
+      text: { en: "...", ru: "..." }
+
+- type: pretest
+  intro: { en: "Quick guess before we start. Wrong answers are fine — they help you remember.", ru: "..." }
+  items: [ <task>, <task> ]           # 1–2 quick tasks (choice / input / predict)
+
+- type: theory
+  keyPoint: kp-goto
+  title: { en: "...", ru: "..." }
+  body:                                # paragraphs, EN and RU aligned
+    - { en: "...", ru: "..." }
+  code: |                              # optional snippet
+    await page.goto('/login');
+  figure: agent-loop                   # optional: agent-loop | test-anatomy | manual-vs-auto | dom-tree | review-checklist | red-green
+  mentor: { en: "...", ru: "..." }     # optional aside from Maya
+
+- type: example                        # worked example, notes attached to line numbers (1-based)
+  title: {...}
+  intro: {...}
+  code: |
+    test('user can log in', async ({ page }) => {
+      await page.goto('/login');
+    });
+  notes:
+    - lines: 1
+      text: {...}
+    - lines: [2, 3]
+      text: {...}
+  runnable: true                       # optional: "Run" button executes it in the emulator
+
+- type: mapping                        # manual test case ↔ code
+  title: {...}
+  testCase:
+    id: TC-001
+    title: Registered user can log in
+    preconditions: ["User anna@bloomly.app exists"]
+    steps:
+      - { action: "Open the login page" }
+      - { action: "Enter email", data: "anna@bloomly.app" }
+      - { action: "Click \"Log in\"", expected: "Account page shows \"Welcome back, Anna!\"" }
+  code: |
+    ...
+  links:                               # s<N> = action of step N, e<N> = expected result of step N
+    - { from: s1, lines: [2] }
+    - { from: e3, lines: [6] }
+
+- type: task
+  task: <task>
+
+- type: mistakes
+  title: {...}
+  items:
+    - wrong: "await page.waitForTimeout(3000);"
+      right: "await expect(page.getByText('Saved')).toBeVisible();"
+      why: {...}
+
+- type: explain
+  prompt: { en: "In your own words: why does a test need an assertion?", ru: "..." }
+  model: { en: "...", ru: "..." }
+
+- type: phrases
+  items:
+    - context: standup                 # standup | code-review | bug-report | chat | meeting | prompt
+      en: "I automated the login smoke test yesterday; today I'm reviewing the checkout tests."
+      ru: "..."
+      note: {...}                      # optional usage tip
+```
+
+## 7. Task kinds
+
+Common fields: `id`, `kind`, `keyPoint`, `prompt` (T), optional `context` (T, shown above), `testCase`
+(manual test case card shown above), `hints` (≤3 T), `praise` (T), `explain` (T), `app` (AppConfig, see
+docs/AUT.md), `placement`.
+
+```yaml
+# Multiple choice. Options may be code (optionsCode: true) or bilingual text. multi: true = checkboxes.
+# Optional `code` snippet or `diff` (before/after) above the question. run: script = run plain JS after answering.
+- id: c1-l2-t1
+  kind: choice
+  keyPoint: kp-goto
+  prompt: { en: "Which line opens the login page?", ru: "..." }
+  code: |
+    ...
+  options:
+    - text: "await page.goto('/login');"
+      correct: true
+      why: { en: "...", ru: "..." }
+    - text: "await page.open('/login');"
+      why: { en: "There is no `page.open` in Playwright — a typical AI hallucination.", ru: "..." }
+  optionsCode: true
+
+# Short typed answer (case-insensitive by default)
+- id: c3-l1-t2
+  kind: input
+  prompt: {...}
+  code: |
+    const email = 'anna@bloomly.app';
+  answers: ["anna@bloomly.app"]
+
+# Fill the gaps: ___ (3 underscores) in code; one blank entry per gap, in order.
+# With `options` the blank is a dropdown (more support), without — typed input (less support).
+- id: c1-l2-t3
+  kind: fill
+  code: |
+    await page.getByLabel('Email').___('anna@bloomly.app');
+    await page.getByRole('button', { name: 'Log in' }).___();
+  blanks:
+    - { answers: [fill], options: [fill, click, check] }
+    - { answers: [click] }
+  checks: { expect: pass }             # optional: also runs the completed code; omit for snippets that are not full tests
+
+# Parsons: lines in correct order; student reorders shuffled lines. distractors = extra wrong lines.
+# alt = other accepted orders (as index arrays of `lines`). code: false for non-code lines (e.g. workflow steps as text).
+- id: c1-l2-t4
+  kind: parsons
+  lines:
+    - "test('user can log in', async ({ page }) => {"
+    - "  await page.goto('/login');"
+    - "  await page.getByLabel('Email').fill('anna@bloomly.app');"
+    - "  await page.getByLabel('Password').fill('bloom123');"
+    - "  await page.getByRole('button', { name: 'Log in' }).click();"
+    - "  await expect(page).toHaveURL('/account');"
+    - "});"
+  alt: [[0, 1, 3, 2, 4, 5, 6]]
+  distractors: ["  await page.waitForTimeout(5000);"]
+  checks: { expect: pass }             # optional: run the assembled test
+
+# Match pairs (left ↔ right). leftCode/rightCode render a side as code.
+- id: c1-l1-t5
+  kind: match
+  pairs:
+    - left: { en: "Step: open the login page", ru: "..." }
+      right: "await page.goto('/login');"
+  rightCode: true
+
+# Predict, then run: student says pass/fail (+ optional reason), then sees the real run.
+- id: c1-l3-t6
+  kind: predict
+  app: { bugs: [greeting-wrong-name] }
+  code: |
+    test('...', async ({ page }) => { ... });
+  outcome: fail                         # must match the real emulator result (self-test checks it)
+  reasons:                              # optional "why?" choice
+    - text: {...}
+      correct: true
+    - text: {...}
+
+# Pick the best locator for the highlighted element (target = CSS selector inside the AUT, for highlighting only).
+- id: c4-l1-t2
+  kind: pick-locator
+  app: { route: /login }
+  target: "#email"
+  options:
+    - { text: "page.getByLabel('Email')", correct: true, why: {...} }
+    - { text: "page.locator('#login-form > input:nth-child(3)')", why: {...} }
+
+# Code review of AI-generated code: student flags problem lines and picks the issue type.
+# line: 1-based line number in `code`; line: 0 = test-level issue (e.g. the whole test has no assertion).
+# Issue types: fragile-locator, no-assertion, weak-assertion, wrong-assertion, hard-wait, missing-await,
+#              hallucination, wrong-data, test-dependency, wrong-step
+- id: c2-l3-t2
+  kind: review
+  context: { en: "Petal generated this test for TC-002.", ru: "..." }
+  testCase: {...}                       # often useful: the case the code should implement
+  code: |
+    ...
+  issues:
+    - line: 3
+      type: fragile-locator
+      note: {...}
+    - line: 0
+      type: no-assertion
+      note: {...}
+  types: [fragile-locator, no-assertion, hard-wait, wrong-data]   # optional: limit the dropdown
+
+# Simulated AI agent. Student composes a prompt from blocks (English text + RU translation),
+# the "agent" answers with the first response whose `when` blocks are all included
+# (and no `unless` block). `best: true` marks the target. `missing`: consequence shown when a block was left out.
+# Then the student runs the generated code. Explain clearly that the real agent's output varies.
+- id: c2-l2-t3
+  kind: agent
+  testCase: {...}
+  blocks:
+    - { id: task, locked: true, text: "Write a Playwright test for the Bloomly login.", ru: "Напиши Playwright-тест на вход в Bloomly." }
+    - { id: steps, text: "Steps: open /login, log in as anna@bloomly.app with password bloom123.", ru: "..." }
+    - { id: expected, text: "Expected: the account page shows the heading \"Welcome back, Anna!\".", ru: "..." }
+    - { id: locators, text: "Use getByRole and getByLabel locators. No CSS classes.", ru: "..." }
+    - { id: noise, text: "Make it perfect, please!", ru: "Сделай идеально, пожалуйста!" }
+  responses:
+    - when: [steps, expected, locators]
+      best: true
+      message: {...}                   # agent's chat reply
+      code: |
+        ...
+    - when: [steps, expected]
+      message: {...}
+      code: |                           # e.g. uses CSS selectors
+        ...
+    - when: []
+      message: {...}
+      code: |                           # e.g. no assertion
+        ...
+  missing:
+    expected: { en: "Without the expected result the agent had nothing to check — the test has no assertion.", ru: "..." }
+  checks: { expect: pass }              # applied when running the best response (self-test)
+
+# Edit code so that it passes (fix), so that it catches a bug (find-bug), or write it (code — rare).
+# find-bug: checks.expect = fail on the buggy app AND `also` a passing run on the fixed app.
+- id: c1-l4-t5
+  kind: fix
+  starter: |
+    ...
+  solution: |
+    ...
+  checks:
+    expect: pass
+    static: [hasAssertion, noHardWait]  # also: noFragile, awaitsActions, {rule: uses|notUses|regex|notRegex|minExpects, value, message}
+
+- id: c1-boss-t2
+  kind: find-bug
+  app: { bugs: [cart-total-ignores-qty], state: { cart: [{ id: rose-bouquet, qty: 2 }] } }
+  starter: |
+    ...
+  solution: |
+    ...
+  checks:
+    expect: fail
+    also:
+      - app: { state: { cart: [{ id: rose-bouquet, qty: 2 }] } }
+        expect: pass
+
+# Vocabulary quiz
+- id: c1-l1-t7
+  kind: vocab
+  mode: cloze                           # cloze | translate | match
+  sentence: { en: "The login test is ___: it fails every third run.", ru: "Тест логина нестабильный: падает через раз." }
+  answer: flaky
+  options: [flaky, green, smoke]
+- id: c1-l1-t8
+  kind: vocab
+  mode: translate
+  term: assertion
+  direction: en-ru
+- id: c1-l1-t9
+  kind: vocab
+  mode: match
+  terms: [assertion, locator, test-step, expected-result]
+```
+
+## 8. Rules for code in tasks
+
+- Code must run in the emulator against Bloomly **exactly as documented in docs/AUT.md** (labels, names, texts).
+  Prefer full tests: `test('...', async ({ page }) => { ... });`. Include
+  `import { test, expect } from '@playwright/test';` in full-file examples.
+- Use only API from docs/EMULATOR.md. Test titles and comments in English.
+- Every `fix` / `find-bug` / `code` task has a `solution` that satisfies `checks`. Every `predict` has the true `outcome`.
+  Every `agent` best response passes its `checks`. Self-test verifies all of this.
+- Keep snippets short (≤ 15 lines for tasks; boss up to ~25).
+- AI-generated code in `review`/`agent` should contain realistic AI mistakes: invented methods (`page.open`,
+  `getByButton`), CSS-class selectors, `waitForTimeout`, missing assertion, `expect(await x.isVisible()).toBeTruthy()`,
+  wrong expected text vs the test case, wrong test data, steps that don't match the case.
+- Use `app.state` to preset login/cart when the lesson isn't about those steps.
+
+## 9. Glossary
+
+One file per owning chapter: `src/content/glossary/cNN.yaml` = list of entries:
+
+```yaml
+- id: assertion
+  en: assertion
+  ipa: /əˈsɜːrʃn/
+  ru: проверка (assertion)
+  pos: noun
+  def: { en: "A line of code that checks the expected result.", ru: "Строка кода, которая проверяет ожидаемый результат." }
+  example: { en: "The test has no assertion, so it can never fail.", ru: "В тесте нет проверки, поэтому он никогда не упадёт." }
+  context: code-review                 # standup | code-review | bug-report | chat | meeting | prompt | general
+  chapter: 1
+```
+`example` = a realistic sentence from standup / code review / bug report / Slack. IPA in American English.
+
+Term ownership (who writes the entry; anyone may *reference* any id):
+- **c1**: manual-testing, test-automation, automated-test, test-case, test-step, expected-result, actual-result,
+  regression-testing, test-suite, spec-file, test-runner, action, assertion, locator, test-report, pass, fail,
+  precondition, test-data, smoke-test, timeout, bug
+- **c2**: llm, ai-agent, prompt, context, hallucination, mcp, accessibility-snapshot, code-review, diff,
+  false-positive, false-negative, request-changes, test-coverage, edge-case, negative-test
+- **c3**: code, syntax, variable, constant, string, number, boolean, function, arrow-function, parameter,
+  argument, object, property, method, array, loop, async, await, promise, comment, error-message, console
+- **c4–c11** (written together with the chapter stubs): dom, html, element, tag, attribute, devtools, inspect,
+  css-selector, xpath, test-id, role, accessible-name, accessibility · fragile-selector, resilient-locator,
+  strict-mode, chaining, filter · web-first-assertion, retry, soft-assertion, actionability · auto-waiting,
+  flaky-test, race-condition, hard-wait, trace-viewer, debugging, self-healing · test-plan, planner, generator,
+  healer, seed-test, project-rules · test-isolation, hook, describe-block, setup, teardown, page-object-model,
+  class, fixture, parameterization, data-driven-testing, refactoring · api-testing, endpoint, request, response,
+  status-code, http-method, payload, json, header, auth-token · ci-cd, pipeline, codegen, html-report, headless,
+  cross-browser-testing, pull-request, repository, commit, portfolio, config-file
+
+## 10. Quality checklist
+
+- [ ] EN/RU paragraphs aligned, RU natural; gender variants on every past-tense verb about the student.
+- [ ] One idea per screen; no wall of text (≤ 3 short paragraphs per theory step).
+- [ ] Analogy from manual QA in every lesson. AI angle in every lesson (what the agent does / gets wrong).
+- [ ] Hints go from gentle to almost-the-answer. `explain` says *why*.
+- [ ] Code uses exact Bloomly labels/texts; full tests runnable.
+- [ ] 8 checkPool tasks, every key point ≥ 2 times, 1–2 `placement: true`.
+- [ ] Only existing term ids; first mention linked.

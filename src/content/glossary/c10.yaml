@@ -1,0 +1,140 @@
+# Glossary entries owned by chapter 10 (API tests)
+- id: api-testing
+  en: API testing
+  ipa: /ˌeɪ piː ˈaɪ ˌtestɪŋ/
+  ru: API-тестирование (API testing)
+  pos: noun
+  def:
+    en: "Testing the app by sending requests straight to its API and checking the responses, without a browser."
+    ru: "Тестирование приложения отправкой запросов напрямую в его API и проверкой ответов, без браузера."
+  example:
+    en: "API testing caught the wrong total in five seconds; the UI test needed a whole minute."
+    ru: "API-тест поймал неправильную сумму за пять секунд, а UI-тесту понадобилась целая минута."
+  context: standup
+  chapter: 10
+
+- id: endpoint
+  en: endpoint
+  ipa: /ˈendpɔɪnt/
+  ru: эндпоинт (endpoint)
+  pos: noun
+  def:
+    en: "One address of an API that does one job, such as GET /api/products or POST /api/login."
+    ru: "Один адрес API, который выполняет одну задачу, например GET /api/products или POST /api/login."
+  example:
+    en: "The agent tested /api/discounts, but that endpoint doesn't exist — please check the API docs."
+    ru: "Агент тестировал /api/discounts, но такого эндпоинта нет — сверься, пожалуйста, с документацией API."
+  context: code-review
+  chapter: 10
+
+- id: request
+  en: request
+  ipa: /rɪˈkwest/
+  ru: запрос (request)
+  pos: noun
+  def:
+    en: "A message sent to a server: a method, an endpoint, headers and sometimes a body."
+    ru: "Сообщение, отправленное на сервер: метод, эндпоинт, заголовки и иногда тело."
+  example:
+    en: "Attach the failed request from DevTools to the bug report, with headers and body."
+    ru: "Приложи упавший запрос из DevTools к баг-репорту — вместе с заголовками и телом."
+  context: bug-report
+  chapter: 10
+
+- id: response
+  en: response
+  ipa: /rɪˈspɑːns/
+  ru: ответ (response)
+  pos: noun
+  def:
+    en: "What the server sends back: a status code, headers and usually a JSON body."
+    ru: "То, что сервер отправляет обратно: код ответа, заголовки и обычно тело в JSON."
+  example:
+    en: "The response is 200, but the items list in the body is empty — that's still a bug."
+    ru: "Ответ — 200, но список items в теле пустой — это всё равно баг."
+  context: bug-report
+  chapter: 10
+
+- id: status-code
+  en: status code
+  ipa: /ˈsteɪtəs koʊd/
+  ru: код ответа, статус-код (status code)
+  pos: noun
+  def:
+    en: "A three-digit number in a response: 2xx means success, 4xx a problem with the request, 5xx a server error."
+    ru: "Трёхзначное число в ответе: 2xx — успех, 4xx — проблема с запросом, 5xx — ошибка сервера."
+  example:
+    en: "Expected 401 without a token, actual 500 — the server crashes instead of refusing the request."
+    ru: "Ожидали 401 без токена, получили 500 — сервер падает, вместо того чтобы отклонить запрос."
+  context: bug-report
+  chapter: 10
+
+- id: http-method
+  en: HTTP method
+  ipa: /ˌeɪtʃ tiː tiː ˈpiː ˌmeθəd/
+  ru: HTTP-метод (HTTP method)
+  pos: noun
+  def:
+    en: "The verb of a request that says what to do: GET reads, POST creates, PUT and PATCH update, DELETE removes."
+    ru: "Глагол запроса, который говорит, что сделать: GET читает, POST создаёт, PUT и PATCH обновляют, DELETE удаляет."
+  example:
+    en: "Wrong HTTP method in the test: creating an order is POST /api/orders, not GET."
+    ru: "В тесте неверный HTTP-метод: создание заказа — это POST /api/orders, а не GET."
+  context: code-review
+  chapter: 10
+
+- id: payload
+  en: payload
+  ipa: /ˈpeɪloʊd/
+  ru: тело запроса, пейлоад (payload)
+  pos: noun
+  def:
+    en: "The data sent in the body of a request, usually JSON, such as the email and password for login."
+    ru: "Данные, которые отправляются в теле запроса (обычно в JSON), например email и пароль для входа."
+  example:
+    en: "The payload has `password` misspelled as `pasword`, so the API returns 400."
+    ru: "В пейлоаде `password` написан как `pasword`, поэтому API возвращает 400."
+  context: code-review
+  chapter: 10
+
+- id: json
+  en: JSON
+  ipa: /ˈdʒeɪsn/
+  ru: JSON (формат данных)
+  pos: noun
+  def:
+    en: "A text format for data made of keys and values, like `{ \"name\": \"Rose Bouquet\", \"price\": 35 }`."
+    ru: "Текстовый формат данных из ключей и значений, например `{ \"name\": \"Rose Bouquet\", \"price\": 35 }`."
+  example:
+    en: "Check the JSON, not just the status: `price` should be the number 35, not the string \"35\"."
+    ru: "Проверяй JSON, а не только код ответа: `price` должен быть числом 35, а не строкой \"35\"."
+  context: code-review
+  chapter: 10
+
+- id: header
+  en: header
+  ipa: /ˈhedər/
+  ru: заголовок (header)
+  pos: noun
+  def:
+    en: "Extra information sent with a request or a response, such as Content-Type or Authorization."
+    ru: "Дополнительная информация, которая передаётся вместе с запросом или ответом, например Content-Type или Authorization."
+  example:
+    en: "The orders request returns 401 because the Authorization header is missing."
+    ru: "Запрос заказов возвращает 401, потому что нет заголовка Authorization."
+  context: bug-report
+  chapter: 10
+
+- id: auth-token
+  en: auth token
+  ipa: /ˈɔːθ ˌtoʊkən/
+  ru: токен авторизации (auth token)
+  pos: noun
+  def:
+    en: "A string the server gives you after login; you send it in the Authorization header to prove who you are."
+    ru: "Строка, которую сервер выдаёт после входа; её отправляют в заголовке Authorization, чтобы подтвердить, кто ты."
+  example:
+    en: "Don't hard-code the auth token in the test — get it from POST /api/login in the setup."
+    ru: "Не зашивай токен авторизации в тест — получай его из POST /api/login на этапе подготовки."
+  context: code-review
+  chapter: 10

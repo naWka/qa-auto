@@ -1,0 +1,71 @@
+id: c5
+number: 5
+status: planned
+title: { en: "Locators", ru: "Локаторы" }
+department: { en: "Design System", ru: "Дизайн-система" }
+color: sky
+summary:
+  en: "Choose locators that survive a redesign: getByRole, getByLabel, getByText and getByTestId instead of long CSS and XPath chains. You will narrow a match with filter and chaining, review the locators an AI agent writes, and turn your choices into a locator policy the agent follows every time."
+  ru: "Выбираем локаторы, которые переживут редизайн: getByRole, getByLabel, getByText и getByTestId вместо длинных цепочек CSS и XPath. Ты научишься сужать поиск с помощью filter и цепочек, проверять локаторы, которые пишет ИИ-агент, и превращать свои решения в политику локаторов, которой агент следует каждый раз."
+intro:
+  - who: kai
+    text:
+      en: "Heads-up: Design System is renaming every CSS class next sprint. New tokens, new names."
+      ru: "Предупреждаю: в следующем спринте дизайн-система переименовывает все CSS-классы. Новые токены, новые имена."
+  - who: petal
+    text:
+      en: "No problem! I used `.btn-primary-xl` and `div:nth-child(3)` everywhere — I'll just regenerate all the tests."
+      ru: "Не проблема! Я везде использовал `.btn-primary-xl` и `div:nth-child(3)` — просто перегенерирую все тесты."
+  - who: maya
+    text:
+      en: "Or we pick locators that don't care about class names at all. After the redesign the button will still be called \"Log in\"."
+      ru: "Или мы выберем локаторы, которым вообще всё равно на имена классов. Кнопка и после редизайна будет называться «Log in»."
+  - who: you
+    text:
+      en: "So I find elements the way a user does — by what they see on the screen."
+      ru: "То есть я ищу элементы так же, как пользователь, — по тому, что видно на экране."
+plan:
+  - title: { en: "getBy* locators: find it like a user", ru: "Локаторы getBy*: ищем как пользователь" }
+    goal:
+      en: "Pick the right built-in locator for any element on the Bloomly login and shop pages."
+      ru: "Подбирать подходящий встроенный локатор для любого элемента на страницах входа и магазина Bloomly."
+    keyPoints:
+      - en: "Priority: getByRole → getByLabel → getByText / getByPlaceholder → getByTestId; CSS only as a last resort."
+        ru: "Приоритет: getByRole → getByLabel → getByText / getByPlaceholder → getByTestId; CSS — только в крайнем случае."
+      - en: "getByRole with a name covers buttons, links, headings and checkboxes; getByLabel covers form fields."
+        ru: "getByRole с именем подходит для кнопок, ссылок, заголовков и чекбоксов; getByLabel — для полей формы."
+      - en: "getByTestId is a contract with the developers: stable, but invisible to users."
+        ru: "getByTestId — договорённость с разработчиками: стабильно, но пользователю не видно."
+  - title: { en: "Fragile vs resilient", ru: "Хрупкие и устойчивые" }
+    goal:
+      en: "Spot fragile CSS and XPath selectors and explain which change in the app will break them."
+      ru: "Замечать хрупкие CSS- и XPath-селекторы и объяснять, какое изменение в приложении их сломает."
+    keyPoints:
+      - en: "A selector tied to layout (nth-child, long paths, generated classes) breaks on a redesign, not on a bug."
+        ru: "Селектор, привязанный к вёрстке (nth-child, длинные пути, сгенерированные классы), ломается от редизайна, а не от бага."
+      - en: "A resilient locator describes what the user sees, so it fails only when the user's experience changes."
+        ru: "Устойчивый локатор описывает то, что видит пользователь, поэтому падает, только когда меняется опыт пользователя."
+      - en: "False alarms from fragile selectors cost the team its trust in the whole suite."
+        ru: "Ложные падения из-за хрупких селекторов подрывают доверие команды ко всему набору тестов."
+  - title: { en: "Strict mode, filter and chaining", ru: "Строгий режим, filter и цепочки" }
+    goal:
+      en: "Fix a strict mode violation by narrowing the locator — for example, the right \"Add to cart\" among six product cards."
+      ru: "Исправлять нарушение строгого режима, сужая локатор, — например, найти нужную кнопку «Add to cart» среди шести карточек товаров."
+    keyPoints:
+      - en: "Strict mode: if a locator matches two or more elements, the action fails instead of guessing — and that's a feature."
+        ru: "Строгий режим: если локатор нашёл два элемента или больше, действие падает, а не угадывает, — и это полезно."
+      - en: "filter({ hasText }) narrows a list; chaining searches inside a container: card → button."
+        ru: "filter({ hasText }) сужает список; цепочка ищет внутри контейнера: карточка → кнопка."
+      - en: "first() and nth() silence the error but hide the question \"which one?\" — a red flag in AI code."
+        ru: "first() и nth() глушат ошибку, но прячут вопрос «какой именно?» — тревожный знак в коде агента."
+  - title: { en: "A locator policy for your agent", ru: "Политика локаторов для агента" }
+    goal:
+      en: "Review AI-written locators and write a short locator policy into the prompt and the project rules file."
+      ru: "Проверять локаторы, написанные ИИ, и записывать короткую политику локаторов в промпт и в файл правил проекта."
+    keyPoints:
+      - en: "Typical AI locator mistakes: invented methods (getByButton), CSS classes, labels that don't exist on the page."
+        ru: "Типичные ошибки ИИ в локаторах: выдуманные методы (getByButton), CSS-классы, подписи, которых нет на странице."
+      - en: "Ask the agent to take locators from the accessibility snapshot of the live page, not to guess from memory."
+        ru: "Проси агента брать локаторы из снимка доступности живой страницы, а не угадывать по памяти."
+      - en: "A policy in CLAUDE.md or .github/copilot-instructions.md works for every prompt, not just one."
+        ru: "Политика в CLAUDE.md или .github/copilot-instructions.md работает для каждого промпта, а не для одного."

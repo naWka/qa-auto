@@ -1,0 +1,98 @@
+# Glossary entries owned by chapter 7 (Flaky tests and debugging)
+- id: auto-waiting
+  en: auto-waiting
+  ipa: /ˌɔːtoʊ ˈweɪtɪŋ/
+  ru: автоожидание (auto-waiting)
+  pos: noun
+  def:
+    en: "Playwright waiting by itself until an element is ready before every action, so you don't add pauses."
+    ru: "Playwright сам ждёт перед каждым действием, пока элемент будет готов, поэтому паузы добавлять не нужно."
+  example:
+    en: "No pause needed before clicking \"Add to cart\" — auto-waiting waits until the products have loaded."
+    ru: "Пауза перед кликом по «Add to cart» не нужна — автоожидание дождётся, пока загрузятся товары."
+  context: code-review
+  chapter: 7
+
+- id: flaky-test
+  en: flaky test
+  ipa: /ˈfleɪki test/
+  ru: флаки-тест, нестабильный тест (flaky test)
+  pos: noun
+  def:
+    en: "A test that sometimes passes and sometimes fails on the same code."
+    ru: "Тест, который на одном и том же коде то проходит, то падает."
+  example:
+    en: "The orders filter test is flaky again — I'll dig into its trace today."
+    ru: "Тест фильтра заказов снова флакает — сегодня разберу его трейс."
+  context: standup
+  chapter: 7
+
+- id: race-condition
+  en: race condition
+  ipa: /ˈreɪs kənˌdɪʃn/
+  ru: состояние гонки (race condition)
+  pos: noun
+  def:
+    en: "A problem where the result depends on which of two things happens first, such as a test reading a list before it loads."
+    ru: "Проблема, при которой результат зависит от того, что случится раньше, — например, тест читает список до того, как он загрузился."
+  example:
+    en: "Classic race condition: `count()` runs while \"Loading products…\" is still on screen."
+    ru: "Классическое состояние гонки: `count()` срабатывает, пока на экране ещё «Loading products…»."
+  context: code-review
+  chapter: 7
+
+- id: hard-wait
+  en: hard wait
+  ipa: /ˈhɑːrd weɪt/
+  ru: жёсткое ожидание, фиксированная пауза (hard wait)
+  pos: noun
+  def:
+    en: "A fixed pause like `waitForTimeout(3000)` that waits the same time whether the app is ready or not."
+    ru: "Фиксированная пауза вроде `waitForTimeout(3000)`, которая ждёт одно и то же время, готово приложение или нет."
+  example:
+    en: "Requesting changes: please remove the hard wait and assert the toast instead."
+    ru: "Запрашиваю изменения: пожалуйста, убери жёсткое ожидание и проверь вместо него тост."
+  context: code-review
+  chapter: 7
+
+- id: trace-viewer
+  en: trace viewer
+  ipa: /ˈtreɪs ˌvjuːər/
+  ru: Trace Viewer (просмотрщик трейсов)
+  pos: noun
+  def:
+    en: "A Playwright tool that replays a recorded test step by step, with DOM snapshots, network calls and errors."
+    ru: "Инструмент Playwright, который пошагово воспроизводит записанный тест со снимками DOM, сетевыми запросами и ошибками."
+  example:
+    en: "In the trace viewer you can see that the toast had already disappeared when the assertion ran."
+    ru: "В Trace Viewer видно, что тост уже исчез, когда сработала проверка."
+  context: chat
+  chapter: 7
+
+- id: debugging
+  en: debugging
+  ipa: /diːˈbʌɡɪŋ/
+  ru: отладка (debugging)
+  pos: noun
+  def:
+    en: "Finding out, step by step, why code or a test behaves wrong — before changing anything."
+    ru: "Поиск причины, почему код или тест работает неправильно, — шаг за шагом и до того, как что-то менять."
+  example:
+    en: "Debugging tip: run it with `--debug` and step through until the locator stops matching."
+    ru: "Совет по отладке: запусти тест с `--debug` и иди по шагам, пока локатор не перестанет находить элемент."
+  context: chat
+  chapter: 7
+
+- id: self-healing
+  en: self-healing
+  ipa: /ˌself ˈhiːlɪŋ/
+  ru: самовосстановление (self-healing)
+  pos: noun, adjective
+  def:
+    en: "When a tool or an agent repairs a broken test by itself, for example by updating a locator after the UI changed."
+    ru: "Когда инструмент или агент сам чинит сломанный тест — например, обновляет локатор после изменения интерфейса."
+  example:
+    en: "Self-healing is fine for a renamed button, but here it changed the expected total — that hides a bug."
+    ru: "Самовосстановление уместно для переименованной кнопки, но тут оно поменяло ожидаемую сумму — это прячет баг."
+  context: code-review
+  chapter: 7

@@ -1,0 +1,77 @@
+id: c7
+number: 7
+status: planned
+title: { en: "Flaky tests and debugging", ru: "Флаки-тесты и отладка" }
+department: { en: "Platform", ru: "Платформа" }
+color: lavender
+summary:
+  en: "Find out why a test is green on Monday and red on Tuesday. You will learn how Playwright waits on its own, why an agent's `waitForTimeout` is a trap, how to read a failure in the trace viewer — and how to tell an honest fix by the healer agent from a test quietly bent to fit a bug. Docs: https://playwright.dev/docs/trace-viewer"
+  ru: "Разберёмся, почему тест зелёный в понедельник и красный во вторник. Ты узнаешь, как Playwright ждёт сам, почему `waitForTimeout` от агента — ловушка, как читать падение в Trace Viewer — и как отличить честное исправление от агента-хилера от теста, который тихо подогнали под баг. Документация: https://playwright.dev/docs/trace-viewer"
+intro:
+  - who: leo
+    text:
+      en: "The nightly run failed again. Three tests — different ones every night. The team has started ignoring red."
+      ru: "Ночной прогон снова упал. Три теста — каждую ночь разные. Команда начала игнорировать красное."
+  - who: petal
+    text:
+      en: "Easy fix: I added `waitForTimeout(5000)` everywhere. And I relaxed a couple of assertions."
+      ru: "Легко исправить: я добавил везде `waitForTimeout(5000)`. И немного ослабил пару проверок."
+  - who: mochi
+    text: { en: "Mrrp?!", ru: "Мрр?!" }
+  - who: maya
+    text:
+      en: "That's how a flaky suite becomes a slow and blind one. Let's find the real causes: a flaky test is a bug report — about the test or about the app."
+      ru: "Вот так нестабильный набор тестов становится медленным и слепым. Найдём настоящие причины: флаки-тест — это баг-репорт либо на тест, либо на приложение."
+plan:
+  - title: { en: "Auto-waiting vs hard waits", ru: "Автоожидание против жёстких пауз" }
+    goal:
+      en: "Predict what Playwright waits for before an action, and replace an agent's `waitForTimeout` with a wait for a real signal."
+      ru: "Предсказывать, чего ждёт Playwright перед действием, и заменять `waitForTimeout` от агента ожиданием настоящего сигнала."
+    keyPoints:
+      - en: "Before acting, Playwright waits until the element is attached, visible, stable, enabled and can receive clicks."
+        ru: "Перед действием Playwright ждёт, пока элемент окажется в DOM, станет видимым, неподвижным, активным и сможет принимать клики."
+      - en: "`waitForTimeout(3000)` is too long on a fast day and too short on a slow one."
+        ru: "`waitForTimeout(3000)` слишком долгий в быстрый день и слишком короткий в медленный."
+      - en: "Wait for what the user waits for — the toast, the heading, the URL, the results count — with a web-first assertion."
+        ru: "Жди того же, чего ждёт пользователь, — тоста, заголовка, URL, количества результатов — с помощью web-first проверки."
+      - en: "Agents add hard waits to turn red into green; ban them in the project rules."
+        ru: "Агенты добавляют жёсткие паузы, чтобы превратить красное в зелёное; запрети их в правилах проекта."
+  - title: { en: "Why tests flake", ru: "Почему тесты флакают" }
+    goal:
+      en: "Diagnose a flaky test by its pattern: a race condition, slow responses, or state shared between tests."
+      ru: "Диагностировать флаки-тест по его поведению: состояние гонки, медленные ответы или общее состояние между тестами."
+    keyPoints:
+      - en: "Race condition: the test reads the result before the app is done — for example, counting products while \"Loading products…\" is on screen."
+        ru: "Состояние гонки: тест читает результат раньше, чем приложение закончило, — например, считает товары, пока на экране «Loading products…»."
+      - en: "Variable latency turns hidden timing assumptions into random failures."
+        ru: "Плавающие задержки превращают скрытые допущения о времени в случайные падения."
+      - en: "Shared state — the same user, the same cart, a fixed test order — makes tests depend on each other."
+        ru: "Общее состояние — один пользователь, одна корзина, жёсткий порядок тестов — делает тесты зависимыми друг от друга."
+      - en: "Rerunning until green hides the cause: a flaky test is a bug in the test or in the app."
+        ru: "Перезапуск до зелёного прячет причину: флаки-тест — это баг в тесте или в приложении."
+  - title: { en: "Reading a failure in the trace viewer", ru: "Читаем падение в Trace Viewer" }
+    goal:
+      en: "Walk through a failing test step by step and point to the moment it went wrong. Docs: https://playwright.dev/docs/trace-viewer"
+      ru: "Пройти упавший тест шаг за шагом и показать момент, где всё пошло не так. Документация: https://playwright.dev/docs/trace-viewer"
+    keyPoints:
+      - en: "A trace records every action with DOM snapshots before and after, plus the console, network calls and the error."
+        ru: "Трейс записывает каждое действие со снимками DOM до и после, а также консоль, сетевые запросы и ошибку."
+      - en: "Read the error message first: expected vs received, which locator, how long it waited."
+        ru: "Сначала читай сообщение об ошибке: что ожидалось и что получено, какой локатор, сколько он ждал."
+      - en: "Then decide: a bug in the app, a bug in the test, or the environment? This is your bug-report instinct at work."
+        ru: "Потом реши: это баг приложения, баг теста или окружение? Здесь работает твоё чутьё на баг-репорты."
+      - en: "Give the agent the error and what you found in the trace, not just \"fix the test\"."
+        ru: "Давай агенту ошибку и то, что ты наш{ла|ёл} в трейсе, а не просто «почини тест»."
+  - title: { en: "The healer: honest fix or cover-up?", ru: "Хилер: честное исправление или прикрытие?" }
+    goal:
+      en: "Review a healer's diff and decide: accept it, ask for a different fix, or mark the test `test.fixme` and file a bug."
+      ru: "Проверять дифф от хилера и решать: принять, попросить другое исправление или пометить тест `test.fixme` и завести баг."
+    keyPoints:
+      - en: "Self-healing is fine when the app changed on purpose: a renamed button, a new step in the flow."
+        ru: "Самовосстановление уместно, когда приложение изменилось намеренно: переименовали кнопку, добавили шаг в сценарий."
+      - en: "Red flag: the healer changes the expected value to match what the app shows now (\"Welcome back, Silva!\")."
+        ru: "Тревожный знак: хилер меняет ожидаемое значение под то, что приложение показывает сейчас («Welcome back, Silva!»)."
+      - en: "Other cover-ups: weaker assertions, added waits, deleted steps, `.first()` to silence strict mode."
+        ru: "Другие способы замести следы: ослабленные проверки, добавленные паузы, удалённые шаги, `.first()`, чтобы заглушить строгий режим."
+      - en: "If the feature is broken, the right result is a bug report and `test.fixme`, not a green test."
+        ru: "Если сломана сама функция, правильный итог — баг-репорт и `test.fixme`, а не зелёный тест."

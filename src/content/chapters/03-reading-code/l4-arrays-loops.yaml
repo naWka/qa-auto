@@ -1,0 +1,840 @@
+id: c3-l4
+chapter: c3
+title: { en: "Arrays, loops and unfamiliar code", ru: "Массивы, циклы и незнакомый код" }
+goal:
+  en: "Read data-driven tests, count the tests a loop creates, and use a strategy (and the agent) to understand code you've never seen."
+  ru: "Читать тесты на наборах данных, считать, сколько тестов создаёт цикл, и разбираться в незнакомом коде — по плану и с помощью агента."
+minutes: 10
+keyPoints:
+  - id: kp-array
+    title: { en: "An array is a list of test data rows", ru: "Массив — список строк тестовых данных" }
+  - id: kp-loop
+    title: { en: "for...of repeats the steps for each row", ru: "for...of повторяет шаги для каждой строки" }
+  - id: kp-read-strategy
+    title: { en: "Read unfamiliar code in four passes — and verify the agent's explanation", ru: "Читаем незнакомый код в четыре прохода — и проверяем объяснение агента" }
+terms: [array, loop, test-data, test-case, code-review, ai-agent]
+
+steps:
+  - type: story
+    lines:
+      - who: sofia
+        text:
+          en: "We deliver to Lisbon, Berlin and Warsaw. Do we have login tests for users from every city?"
+          ru: "Мы доставляем в Лиссабон, Берлин и Варшаву. У нас есть тесты логина для пользователей из каждого города?"
+      - who: petal
+        text:
+          en: "Yes! One test, many users — I used a loop. Very elegant."
+          ru: "Да! Один тест, много пользователей — я использовал цикл. Очень элегантно."
+      - who: maya
+        text:
+          en: "A loop multiplies tests. It also multiplies a wrong data row. Let's learn to read it — and then to read anything Petal throws at us."
+          ru: "Цикл размножает тесты. И неверную строку данных — тоже. Научимся его читать, а потом — читать вообще всё, что выдаст Petal."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед началом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c3-l4-p1
+        kind: input
+        keyPoint: kp-loop
+        prompt:
+          en: "Guess: how many tests will this file show in the report?"
+          ru: "Угадай: сколько тестов этот файл покажет в отчёте?"
+        code: |
+          const users = ['anna@bloomly.app', 'tom@bloomly.app', 'maya@bloomly.app'];
+
+          for (const user of users) {
+            test(`${user} can open the account page`, async ({ page }) => {
+              // ...steps
+            });
+          }
+        answers: ["3", "three"]
+        placeholder: "Number of tests"
+        hints:
+          - { en: "The block with `test(...)` repeats for each item of the list.", ru: "Блок с `test(...)` повторяется для каждого элемента списка." }
+          - { en: "Count the emails in square brackets.", ru: "Посчитай email-адреса в квадратных скобках." }
+        explain:
+          en: "Three emails → the block runs three times → three tests, one per user. Let's see how to read this."
+          ru: "Три email → блок выполняется три раза → три теста, по одному на пользователя. Сейчас разберём, как это читать."
+
+  - type: theory
+    keyPoint: kp-array
+    title: { en: "An array is a test data table", ru: "Массив — это таблица тестовых данных" }
+    body:
+      - en: "Remember the [[test data|test-data]] table in a [[test case|test-case]]: several rows, the same columns. In code, a list of values is an [[array]]: square brackets, items separated by commas."
+        ru: "Вспомни таблицу [[тестовых данных|test-data]] в [[тест-кейсе|test-case]]: несколько строк, одни и те же колонки. В коде список значений — это [[массив|array]]: квадратные скобки, элементы через запятую."
+      - en: "Each item has a position number — an index. Counting starts at **0**: `searches[0]` is the first item, `searches[1]` the second."
+        ru: "У каждого элемента есть номер позиции — индекс. Счёт начинается с **0**: `searches[0]` — первый элемент, `searches[1]` — второй."
+      - en: "Items can be simple strings — or whole rows with named columns, written as objects: `{ email: 'tom@bloomly.app', name: 'Tom' }`. You read a column with a dot: `user.email`."
+        ru: "Элементы могут быть простыми строками — или целыми строками таблицы с именованными колонками, записанными как объекты: `{ email: 'tom@bloomly.app', name: 'Tom' }`. Колонку читают через точку: `user.email`."
+    code: |
+      const searches = ['rose', 'tulips', 'orchid'];
+      // searches[0] is 'rose', searches[2] is 'orchid'
+
+      const users = [
+        { email: 'anna@bloomly.app', name: 'Anna' },
+        { email: 'tom@bloomly.app', name: 'Tom' },
+      ];
+
+  - type: theory
+    keyPoint: kp-loop
+    title: { en: "A loop: the same steps for every row", ru: "Цикл: одни и те же шаги для каждой строки" }
+    body:
+      - en: "A data-driven test case says: \"Repeat steps 1–4 for each row of the table.\" In code that's a [[loop]]: `for (const user of users) { ... }`."
+        ru: "Тест-кейс на наборе данных говорит: «Повтори шаги 1–4 для каждой строки таблицы». В коде это [[цикл|loop]]: `for (const user of users) { ... }`."
+      - en: "Read it as: \"for each `user` of `users`, do the block\". On every round, `user` is the next row: first Anna, then Tom."
+        ru: "Читай так: «для каждого `user` из `users` выполни блок». В каждом проходе `user` — следующая строка: сначала Анна, потом Том."
+      - en: "If the block contains `test(...)`, the loop creates one test per row. Count the rows — that's how many tests you'll see in the report. A template literal in the title gives each test its own name."
+        ru: "Если в блоке есть `test(...)`, цикл создаёт по тесту на строку. Посчитай строки — столько тестов будет в отчёте. Шаблонная строка в названии даёт каждому тесту своё имя."
+    code: |
+      for (const user of users) {
+        test(`${user.name} can log in`, async ({ page }) => {
+          // ...steps using user.email
+        });
+      }
+      // creates: "Anna can log in", "Tom can log in"
+
+  - type: example
+    keyPoint: kp-loop
+    title: { en: "A data-driven login test", ru: "Тест логина на наборе данных" }
+    intro:
+      en: "Petal's loop for three users. One file — three tests in the report."
+      ru: "Цикл от Petal для трёх пользователей. Один файл — три теста в отчёте."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      const users = [
+        { email: 'anna@bloomly.app', password: 'bloom123', name: 'Anna' },
+        { email: 'tom@bloomly.app', password: 'tulips42', name: 'Tom' },
+        { email: 'maya@bloomly.app', password: 'qa-rocks', name: 'Maya' },
+      ];
+
+      for (const user of users) {
+        test(`${user.name} can log in`, async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill(user.email);
+          await page.getByLabel('Password').fill(user.password);
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('heading', { level: 1 })).toHaveText(`Welcome back, ${user.name}!`);
+        });
+      }
+    notes:
+      - lines: [3, 4, 5, 6, 7]
+        text:
+          en: "The test data table: an array of 3 rows. Each row has 3 columns: email, password, name."
+          ru: "Таблица тестовых данных: массив из 3 строк. В каждой строке 3 колонки: email, password, name."
+      - lines: 9
+        text:
+          en: "The loop: for each row, `user` is that row."
+          ru: "Цикл: для каждой строки `user` — это она."
+      - lines: 10
+        text:
+          en: "One test per row; the title becomes \"Anna can log in\", \"Tom can log in\", \"Maya can log in\"."
+          ru: "По тесту на строку; названия — «Anna can log in», «Tom can log in», «Maya can log in»."
+      - lines: [12, 13]
+        text:
+          en: "`user.email` and `user.password` — the columns of the current row."
+          ru: "`user.email` и `user.password` — колонки текущей строки."
+      - lines: 15
+        text:
+          en: "The expected result is built from the same row — it changes with the data."
+          ru: "Ожидаемый результат собирается из той же строки — он меняется вместе с данными."
+      - lines: 17
+        text:
+          en: "The end of the loop block."
+          ru: "Конец блока цикла."
+    runnable: true
+
+  - type: task
+    task:
+      id: c3-l4-t1
+      kind: choice
+      keyPoint: kp-array
+      prompt:
+        en: "What will this script print?"
+        ru: "Что выведет этот скрипт?"
+      code: |
+        const cities = ['Lisbon', 'Berlin', 'Warsaw'];
+        console.log(cities[1]);
+      options:
+        - text: "Berlin"
+          correct: true
+          why: { en: "Index 1 is the second item: counting starts at 0.", ru: "Индекс 1 — второй элемент: счёт начинается с 0." }
+        - text: "Lisbon"
+          why: { en: "Lisbon is `cities[0]`.", ru: "Lisbon — это `cities[0]`." }
+        - text: "Warsaw"
+          why: { en: "Warsaw is `cities[2]`.", ru: "Warsaw — это `cities[2]`." }
+      optionsCode: true
+      run: script
+      hints:
+        - { en: "Indexes start at 0.", ru: "Индексы начинаются с 0." }
+        - { en: "0 → Lisbon, 1 → ?", ru: "0 → Lisbon, 1 → ?" }
+      praise:
+        en: "Right — the \"counting from zero\" habit is now yours."
+        ru: "Верно — привычка «считать с нуля» теперь у тебя есть."
+      explain:
+        en: "`cities[1]` is the second item, \"Berlin\". Agents and humans both slip on this — `users[1]` is the second user, not the first."
+        ru: "`cities[1]` — второй элемент, «Berlin». На этом спотыкаются и агенты, и люди: `users[1]` — второй пользователь, а не первый."
+
+  - type: task
+    task:
+      id: c3-l4-t2
+      kind: input
+      keyPoint: kp-loop
+      prompt:
+        en: "How many tests will this file show in the report?"
+        ru: "Сколько тестов этот файл покажет в отчёте?"
+      code: |
+        const searches = ['rose', 'tulips', 'lavender', 'peony'];
+
+        for (const q of searches) {
+          test(`search finds ${q}`, async ({ page }) => {
+            await page.goto('/shop');
+            await page.getByLabel('Search').fill(q);
+            await expect(page.getByTestId('results-count')).toHaveText('1 product');
+          });
+        }
+
+        test('search with no match shows 0 products', async ({ page }) => {
+          await page.goto('/shop');
+          await page.getByLabel('Search').fill('cactus');
+          await expect(page.getByTestId('results-count')).toHaveText('0 products');
+        });
+      answers: ["5", "five"]
+      placeholder: "Number of tests"
+      hints:
+        - { en: "Count the tests the loop creates, then look below the loop.", ru: "Посчитай тесты, которые создаёт цикл, а потом посмотри ниже цикла." }
+        - { en: "The loop: one test per search term. Below it: one more `test(...)`.", ru: "Цикл: по тесту на каждое слово поиска. Ниже — ещё один `test(...)`." }
+        - { en: "4 + 1", ru: "4 + 1" }
+      praise:
+        en: "Exactly — you didn't stop at the end of the loop."
+        ru: "Именно — ты не останови{лась|лся} на конце цикла."
+      explain:
+        en: "4 search terms → 4 tests from the loop, plus 1 separate negative test = 5. When you review a PR, this count tells you how much coverage it really adds."
+        ru: "4 слова поиска → 4 теста из цикла плюс 1 отдельный негативный тест = 5. На ревью PR это число говорит, сколько покрытия он реально добавляет."
+
+  - type: task
+    task:
+      id: c3-l4-t3
+      kind: predict
+      keyPoint: kp-loop
+      prompt:
+        en: "Will the whole run be green? (A run is green only if every test passes.)"
+        ru: "Весь прогон будет зелёным? (Прогон зелёный, только если проходит каждый тест.)"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        const searches = ['rose', 'tulips', 'orchid', 'daisy'];
+
+        for (const q of searches) {
+          test(`search for ${q} finds 1 product`, async ({ page }) => {
+            await page.goto('/shop');
+            await page.getByLabel('Search').fill(q);
+            await expect(page.getByTestId('results-count')).toHaveText('1 product');
+          });
+        }
+      outcome: fail
+      reasons:
+        - text:
+            en: "The \"daisy\" test fails: Bloomly sells no daisies, so it shows \"0 products\""
+            ru: "Тест «daisy» упадёт: ромашек в Bloomly нет, будет «0 products»"
+          correct: true
+        - text:
+            en: "The \"orchid\" test fails: White Orchid is out of stock"
+            ru: "Тест «orchid» упадёт: White Orchid нет в наличии"
+          why: { en: "Search still shows out-of-stock products: \"1 product\".", ru: "Поиск всё равно показывает товары не в наличии: «1 product»." }
+        - text:
+            en: "Everything passes: a loop counts as one test"
+            ru: "Всё пройдёт: цикл считается одним тестом"
+          why: { en: "The loop creates 4 separate tests, each with its own result.", ru: "Цикл создаёт 4 отдельных теста, у каждого свой результат." }
+      hints:
+        - { en: "Check each data row against Bloomly's products.", ru: "Сверь каждую строку данных с товарами Bloomly." }
+        - { en: "Products: Rose Bouquet, Sunny Tulips, Lavender Pot, Peony Dream, Mint Succulent, White Orchid.", ru: "Товары: Rose Bouquet, Sunny Tulips, Lavender Pot, Peony Dream, Mint Succulent, White Orchid." }
+      praise:
+        en: "Right — you checked every data row against the app, like a data table in a test case."
+        ru: "Верно — ты сверил{а|} каждую строку данных с приложением, как таблицу в тест-кейсе."
+      explain:
+        en: "3 tests pass, \"search for daisy finds 1 product\" fails. The report names the failing row thanks to the template literal in the title. Here the data row is wrong, not the app."
+        ru: "3 теста проходят, «search for daisy finds 1 product» падает. Благодаря шаблонной строке в названии отчёт показывает, какая строка упала. Здесь ошибка в строке данных, а не в приложении."
+
+  - type: task
+    task:
+      id: c3-l4-t4
+      kind: review
+      keyPoint: kp-array
+      prompt:
+        en: "Review Petal's data-driven login test. One data row is wrong, and one check only works for one row."
+        ru: "Сделай ревью теста логина на наборе данных от Petal. Одна строка данных неверная, а одна проверка работает только для одной строки."
+      testCase:
+        id: TC-020
+        title: Registered users can log in
+        preconditions: ["Users: anna@bloomly.app / bloom123 (Anna), tom@bloomly.app / tulips42 (Tom)"]
+        steps:
+          - { action: "Open the login page" }
+          - { action: "Log in with the user's email and password", data: "each user from the table" }
+          - { action: "Look at the account heading", expected: "\"Welcome back, <first name>!\"" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        const users = [
+          { email: 'anna@bloomly.app', password: 'bloom123', name: 'Anna' },
+          { email: 'tom@bloomly.app', password: 'bloom123', name: 'Tom' },
+        ];
+
+        for (const user of users) {
+          test(`${user.name} can log in`, async ({ page }) => {
+            await page.goto('/login');
+            await page.getByLabel('Email').fill(user.email);
+            await page.getByLabel('Password').fill(user.password);
+            await page.getByRole('button', { name: 'Log in' }).click();
+            await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!');
+          });
+        }
+      issues:
+        - line: 5
+          type: wrong-data
+          note:
+            en: "Tom's password is 'tulips42'. 'bloom123' is Anna's — copy-pasted from the row above."
+            ru: "Пароль Тома — 'tulips42'. 'bloom123' — пароль Анны, скопирован из строки выше."
+        - line: 14
+          type: wrong-assertion
+          note:
+            en: "The expected text is hard-coded for Anna. It must come from the row: `` `Welcome back, ${user.name}!` ``."
+            ru: "Ожидаемый текст жёстко прописан для Анны. Он должен браться из строки: `` `Welcome back, ${user.name}!` ``."
+      types: [wrong-data, wrong-assertion, missing-await, fragile-locator, hard-wait]
+      hints:
+        - { en: "Compare each row with the test case table.", ru: "Сравни каждую строку с таблицей тест-кейса." }
+        - { en: "Inside the loop: does every line use `user.…` where the data should change?", ru: "Внутри цикла: каждая ли строка использует `user.…` там, где данные должны меняться?" }
+        - { en: "Line 5: Tom's password. Line 14: whose name is in the expected text?", ru: "Строка 5: пароль Тома. Строка 14: чьё имя в ожидаемом тексте?" }
+      praise:
+        en: "Both found. A loop multiplies mistakes — and your review just stopped two of them."
+        ru: "Обе найдены. Цикл размножает ошибки — а твоё ревью только что остановило две."
+      explain:
+        en: "Two classic loop bugs: a copy-pasted data row, and a value inside the loop that should come from the row but is hard-coded. Tom's test would fail at login and, even with the right password, at the heading."
+        ru: "Две классические ошибки цикла: строка данных, скопированная из соседней, и значение внутри цикла, которое должно браться из строки, но прописано жёстко. Тест Тома упал бы на логине, а с верным паролем — на заголовке."
+
+  - type: task
+    task:
+      id: c3-l4-t5
+      kind: fill
+      keyPoint: kp-loop
+      prompt:
+        en: "Complete the loop so that it creates one checkout test per city."
+        ru: "Допиши цикл, чтобы он создавал по одному тесту оформления заказа на каждый город."
+      context:
+        en: "The cart already has one Rose Bouquet, so the checkout page is available."
+        ru: "В корзине уже лежит один Rose Bouquet, поэтому страница оформления заказа доступна."
+      app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        const cities = ['Lisbon', 'Berlin', 'Warsaw'];
+
+        ___ (const city ___ cities) {
+          test(`checkout delivers to ${city}`, async ({ page }) => {
+            await page.goto('/checkout');
+            await page.getByLabel('City').selectOption(city);
+            await expect(page.getByLabel('City')).toHaveValue(city);
+          });
+        }
+      blanks:
+        - { answers: [for], options: [for, test, if] }
+        - { answers: [of], options: [of, in, from] }
+      checks: { expect: pass, minTests: 3 }
+      hints:
+        - { en: "The pattern is `for (const item of list) {`.", ru: "Шаблон: `for (const item of list) {`." }
+        - { en: "`in` exists too, but it gives positions (0, 1, 2), not the city names.", ru: "`in` тоже существует, но даёт позиции (0, 1, 2), а не названия городов." }
+      praise:
+        en: "Three green tests from one block. Data-driven testing, read and verified."
+        ru: "Три зелёных теста из одного блока. Тестирование на наборах данных — прочитано и проверено."
+      explain:
+        en: "`for (const city of cities)` — for each city of the list. With `in`, `city` would be '0', '1', '2', and `selectOption` would fail."
+        ru: "`for (const city of cities)` — для каждого города из списка. С `in` в `city` попали бы '0', '1', '2', и `selectOption` бы упал."
+
+  - type: theory
+    keyPoint: kp-read-strategy
+    title: { en: "How to read code you didn't write", ru: "Как читать код, который писал{а|} не ты" }
+    body:
+      - en: "Petal's PR has 300 lines. Don't read it top to bottom like a novel. Read it like a test case from a colleague, in four passes:"
+        ru: "В PR от Petal 300 строк. Не читай его сверху вниз, как роман. Читай как тест-кейс коллеги — в четыре прохода:"
+      - en: "1) **Titles** — what does each test claim to check? 2) **Steps** — do the actions match the scenario? 3) **Assertions** — is every expected result really checked, with the right text? 4) **Data** — constants, arrays, arguments: is every value correct?"
+        ru: "1) **Названия** — что каждый тест обещает проверить? 2) **Шаги** — совпадают ли действия со сценарием? 3) **Проверки** — каждый ли ожидаемый результат действительно проверяется, и с верным текстом? 4) **Данные** — константы, массивы, аргументы: каждое ли значение верное?"
+      - en: "Stuck on a line? Ask the [[agent|ai-agent]]: \"Explain this test line by line.\" Then verify the explanation against the code and the app — an agent can explain its own bug with total confidence."
+        ru: "Застрял{а|} на строке? Спроси [[агента|ai-agent]]: «Explain this test line by line». А потом сверь объяснение с кодом и приложением — агент может с полной уверенностью объяснить собственный баг."
+    figure: review-checklist
+    mentor:
+      en: "You already do this with other people's test cases: title, steps, expected result, data. Same eyes, new format."
+      ru: "Ты уже делаешь это с чужими тест-кейсами: название, шаги, ожидаемый результат, данные. Те же глаза, новый формат."
+
+  - type: task
+    task:
+      id: c3-l4-t6
+      kind: choice
+      keyPoint: kp-read-strategy
+      prompt:
+        en: "You open a 120-line test file the agent generated overnight. What do you read first?"
+        ru: "Ты открываешь файл на 120 строк, который агент сгенерировал за ночь. Что читаешь первым?"
+      options:
+        - text: { en: "The test titles — to know what each test claims to check", ru: "Названия тестов — чтобы понять, что каждый обещает проверить" }
+          correct: true
+          why: { en: "Titles are the map. Then you check whether steps and assertions keep the promise.", ru: "Названия — это карта. Потом проверяешь, выполняют ли шаги и проверки это обещание." }
+        - text: { en: "Every line from top to bottom, very carefully", ru: "Каждую строку сверху вниз, очень внимательно" }
+          why: { en: "You'll get lost in details before you know what matters. Passes first, details later.", ru: "Утонешь в деталях раньше, чем поймёшь, что важно. Сначала проходы, детали потом." }
+        - text: { en: "Nothing — just run it. If it's green, it's fine", ru: "Ничего — просто запустить. Зелёный — значит, всё хорошо" }
+          why: { en: "Green tests can check nothing, or the wrong thing. You've seen both this week.", ru: "Зелёные тесты могут не проверять ничего — или проверять не то. На этой неделе ты видел{а|} и то, и другое." }
+        - text: { en: "The import line, to see which libraries are used", ru: "Строку import — посмотреть, какие библиотеки используются" }
+          why: { en: "It's almost always the same line. It tells you nothing about the tests.", ru: "Это почти всегда одна и та же строка. О тестах она ничего не говорит." }
+      hints:
+        - { en: "Think of how you review a colleague's test cases.", ru: "Вспомни, как ты ревьюишь тест-кейсы коллеги." }
+        - { en: "Pass 1 of the four passes.", ru: "Проход 1 из четырёх." }
+      praise:
+        en: "Yes — start with the map, then walk the streets."
+        ru: "Да — сначала карта, потом улицы."
+      explain:
+        en: "Titles first, then steps, assertions, data. The titles also become your checklist: every title is a promise the assertions must keep."
+        ru: "Сначала названия, потом шаги, проверки, данные. Названия заодно становятся чек-листом: каждое — обещание, которое должны выполнить проверки."
+
+  - type: task
+    task:
+      id: c3-l4-t7
+      kind: agent
+      keyPoint: kp-read-strategy
+      prompt:
+        en: "Petal's test uses two things you haven't seen yet: `selectOption` and `toHaveCount`. Ask Petal to explain the test — without letting it change the code. Then run what you get back."
+        ru: "В тесте Petal есть две незнакомые вещи: `selectOption` и `toHaveCount`. Попроси Petal объяснить тест — и не дай ему поменять код. Потом запусти то, что получишь."
+      context:
+        en: |
+          Petal's test `shop-sort.spec.js`:
+          ```js
+          import { test, expect } from '@playwright/test';
+
+          test('plants sorted by price start with the cheapest', async ({ page }) => {
+            await page.goto('/shop');
+            await page.getByLabel('Category').selectOption('plants');
+            await page.getByLabel('Sort by').selectOption('price-asc');
+            await expect(page.getByTestId('product-card')).toHaveCount(3);
+            await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
+          });
+          ```
+        ru: |
+          Тест Petal `shop-sort.spec.js`:
+          ```js
+          import { test, expect } from '@playwright/test';
+
+          test('plants sorted by price start with the cheapest', async ({ page }) => {
+            await page.goto('/shop');
+            await page.getByLabel('Category').selectOption('plants');
+            await page.getByLabel('Sort by').selectOption('price-asc');
+            await expect(page.getByTestId('product-card')).toHaveCount(3);
+            await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
+          });
+          ```
+      blocks:
+        - id: task
+          locked: true
+          text: "Here is the test shop-sort.spec.js from your PR."
+          ru: "Вот тест shop-sort.spec.js из твоего PR."
+        - id: explain
+          text: "Explain this test line by line."
+          ru: "Объясни этот тест построчно."
+        - id: asserts
+          text: "List every assertion and what it checks."
+          ru: "Перечисли все проверки и что каждая проверяет."
+        - id: keep
+          text: "Put your explanation in comments. Don't change the code itself."
+          ru: "Запиши объяснение в комментариях. Сам код не меняй."
+        - id: noise
+          text: "Rewrite everything to make it better."
+          ru: "Перепиши всё, чтобы стало лучше."
+      responses:
+        - when: [explain, asserts, keep]
+          unless: [noise]
+          best: true
+          message:
+            en: "Here's the same test with my explanation as comments — I didn't change any code. There are 2 assertions: 1) `toHaveCount(3)` — exactly 3 product cards are shown (the 3 plants); 2) the first card contains \"Mint Succulent\" — the cheapest plant (€12.00) comes first. Please double-check the prices against the shop."
+            ru: "Вот тот же тест с моими объяснениями в комментариях — код я не менял. Проверок две: 1) `toHaveCount(3)` — на странице ровно 3 карточки товаров (3 растения); 2) первая карточка содержит «Mint Succulent» — самое дешёвое растение (€12.00) идёт первым. Сверь, пожалуйста, цены с магазином."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('plants sorted by price start with the cheapest', async ({ page }) => {
+              // Step 1: open the Shop page
+              await page.goto('/shop');
+              // Step 2: choose "Plants" in the Category dropdown (selectOption = pick an option)
+              await page.getByLabel('Category').selectOption('plants');
+              // Step 3: choose "Price: low to high" in the Sort by dropdown
+              await page.getByLabel('Sort by').selectOption('price-asc');
+              // Assertion 1: exactly 3 product cards (Lavender Pot, Mint Succulent, White Orchid)
+              await expect(page.getByTestId('product-card')).toHaveCount(3);
+              // Assertion 2: the first card is the cheapest plant, Mint Succulent (€12.00)
+              await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
+            });
+        - when: [noise]
+          message:
+            en: "I rewrote the test to make it shorter and more robust! It now opens the shop with URL filters and checks the first price. Much better."
+            ru: "Я переписал тест, чтобы он стал короче и надёжнее! Теперь он открывает магазин с фильтрами в адресе и проверяет первую цену. Гораздо лучше."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('shop sorting works', async ({ page }) => {
+              await page.goto('/shop?category=plants&sort=price-asc');
+              await expect(page.getByTestId('product-price').first()).toHaveText('€12.00');
+            });
+        - when: [explain, asserts]
+          message:
+            en: "Line 4 opens the shop. Lines 5–6 pick the Plants category and sort by price, low to high. Assertions: line 7 checks there are exactly 3 cards, line 8 checks the first card is Mint Succulent. (The code is unchanged.)"
+            ru: "Строка 4 открывает магазин. Строки 5–6 выбирают категорию Plants и сортировку по цене по возрастанию. Проверки: строка 7 — ровно 3 карточки, строка 8 — первая карточка Mint Succulent. (Код не изменён.)"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('plants sorted by price start with the cheapest', async ({ page }) => {
+              await page.goto('/shop');
+              await page.getByLabel('Category').selectOption('plants');
+              await page.getByLabel('Sort by').selectOption('price-asc');
+              await expect(page.getByTestId('product-card')).toHaveCount(3);
+              await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
+            });
+        - when: [explain]
+          message:
+            en: "The test opens the shop, selects some options and checks the products. selectOption chooses a value in a dropdown. It all looks correct to me!"
+            ru: "Тест открывает магазин, выбирает какие-то опции и проверяет товары. selectOption выбирает значение в выпадающем списке. По-моему, всё правильно!"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('plants sorted by price start with the cheapest', async ({ page }) => {
+              await page.goto('/shop');
+              await page.getByLabel('Category').selectOption('plants');
+              await page.getByLabel('Sort by').selectOption('price-asc');
+              await expect(page.getByTestId('product-card')).toHaveCount(3);
+              await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
+            });
+        - when: []
+          message:
+            en: "This test checks that the shop works. Looks good to me — ready to merge!"
+            ru: "Этот тест проверяет, что магазин работает. По-моему, всё отлично — можно мёржить!"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('plants sorted by price start with the cheapest', async ({ page }) => {
+              await page.goto('/shop');
+              await page.getByLabel('Category').selectOption('plants');
+              await page.getByLabel('Sort by').selectOption('price-asc');
+              await expect(page.getByTestId('product-card')).toHaveCount(3);
+              await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
+            });
+      missing:
+        explain:
+          en: "Without \"line by line\", the agent gives a one-sentence summary — the parts you didn't understand stay unexplained."
+          ru: "Без «построчно» агент выдаёт резюме в одно предложение — непонятные места так и остаются непонятными."
+        asserts:
+          en: "Without asking for assertions, steps and checks get mixed together — and the checks are what you approve."
+          ru: "Если не спросить про проверки, шаги и проверки смешиваются — а одобряешь ты именно проверки."
+        keep:
+          en: "Without \"don't change the code\", you risk getting a different test back. Comments keep the explanation next to the lines it explains."
+          ru: "Без «не меняй код» рискуешь получить обратно другой тест. Комментарии держат объяснение рядом со строками, к которым оно относится."
+      checks: { expect: pass }
+      hints:
+        - { en: "You want understanding, not a new test. Which block would make Petal change the code?", ru: "Тебе нужно понимание, а не новый тест. Какой блок заставит Petal поменять код?" }
+        - { en: "Ask for three things: line by line, the list of assertions, and comments without code changes.", ru: "Попроси три вещи: построчно, список проверок и комментарии без изменения кода." }
+      praise:
+        en: "That's how to use an agent as a tutor: precise questions, no permission to rewrite, and you still verify the answer."
+        ru: "Вот так агент становится репетитором: точные вопросы, никаких разрешений переписывать — и ответ ты всё равно проверяешь."
+      explain:
+        en: "Now verify Petal's explanation against the app: plants are Lavender Pot €18.00, Mint Succulent €12.00, White Orchid €29.00 — so 3 cards, cheapest first = Mint Succulent. The explanation holds. (A real agent's wording will differ every time — the way you ask and verify stays the same.)"
+        ru: "Теперь сверь объяснение Petal с приложением: растения — Lavender Pot €18.00, Mint Succulent €12.00, White Orchid €29.00. Значит, 3 карточки, самое дешёвое первым — Mint Succulent. Объяснение верное. (Настоящий агент каждый раз ответит другими словами — но способ спрашивать и проверять остаётся тем же.)"
+
+  - type: task
+    task:
+      id: c3-l4-t8
+      kind: vocab
+      mode: cloze
+      sentence:
+        en: "Petal put the test data into an ___ and used a loop to create one test per row."
+        ru: "Petal сложил тестовые данные в массив и с помощью цикла создал по тесту на каждую строку."
+      answer: array
+      options: [array, object, string]
+
+  - type: mistakes
+    title: { en: "Typical loop and data mistakes", ru: "Типичные ошибки с циклами и данными" }
+    items:
+      - wrong: "for (const user in users) {"
+        right: "for (const user of users) {"
+        why:
+          en: "`in` gives positions (0, 1, 2), not the rows. Agents mix them up; one letter changes everything."
+          ru: "`in` даёт позиции (0, 1, 2), а не строки. Агенты их путают; одна буква меняет всё."
+      - wrong: "test('user can log in', async ({ page }) => {"
+        right: "test(`${user.name} can log in`, async ({ page }) => {"
+        why:
+          en: "Inside a loop every test gets the same title: Playwright reports duplicate titles, and you can't tell which row failed."
+          ru: "Внутри цикла все тесты получат одно название: Playwright сообщит о дублях, и не поймёшь, какая строка упала."
+      - wrong: "await expect(heading).toHaveText('Welcome back, Anna!');"
+        right: "await expect(heading).toHaveText(`Welcome back, ${user.name}!`);"
+        why:
+          en: "A hard-coded expected value inside a loop fits only one row."
+          ru: "Жёстко прописанное ожидаемое значение внутри цикла подходит только одной строке."
+      - wrong: "const firstUser = users[1];"
+        right: "const firstUser = users[0];"
+        why:
+          en: "Indexes start at 0. `users[1]` is the second user."
+          ru: "Индексы начинаются с 0. `users[1]` — второй пользователь."
+
+  - type: explain
+    keyPoint: kp-read-strategy
+    prompt:
+      en: "In your own words: how do you read a test file you've never seen, generated by an agent?"
+      ru: "Своими словами: как ты читаешь незнакомый тестовый файл, сгенерированный агентом?"
+    model:
+      en: "I read it in passes, like a test case. First the titles: what does each test promise? Then the steps: do they match the scenario? Then the assertions: is every expected result checked, with the exact text? Then the data: constants, arrays and arguments — is every value right, and does a loop create the number of tests I expect? If a line is unclear, I ask the agent to explain it line by line without changing the code, and I check its explanation against the code and the app."
+      ru: "Я читаю его проходами, как тест-кейс. Сначала названия: что обещает каждый тест? Потом шаги: совпадают ли они со сценарием? Потом проверки: каждый ли ожидаемый результат проверяется, и с точным текстом? Потом данные: константы, массивы и аргументы — каждое ли значение верное и создаёт ли цикл столько тестов, сколько я жду? Если строка непонятна, прошу агента объяснить построчно, не меняя код, и сверяю его объяснение с кодом и приложением."
+
+  - type: phrases
+    items:
+      - context: code-review
+        en: "The data row for Tom has the wrong password; the rest of the loop looks good."
+        ru: "В строке данных Тома неверный пароль; остальной цикл выглядит хорошо."
+      - context: code-review
+        en: "Could you make the test title unique per row, e.g. include the user's name?"
+        ru: "Можешь сделать название теста уникальным для каждой строки, например добавить имя пользователя?"
+      - context: prompt
+        en: "Explain this test line by line. Don't change the code."
+        ru: "Объясни этот тест построчно. Код не меняй."
+      - context: prompt
+        en: "List every assertion in this file and what it checks."
+        ru: "Перечисли все проверки в этом файле и что каждая проверяет."
+      - context: standup
+        en: "I reviewed Petal's data-driven login test: three rows, one had wrong data. I requested changes."
+        ru: "Я посмотре{ла|л} тест логина на наборе данных от Petal: три строки, в одной неверные данные. Запроси{ла|л} изменения."
+      - context: meeting
+        en: "Before I approve it, I want to understand every line — I'll ask Petal to walk me through it first."
+        ru: "Прежде чем одобрить, хочу понимать каждую строку — сначала попрошу Petal пройтись со мной по коду."
+        note:
+          en: "A calm, professional way to say \"I won't approve what I don't understand\"."
+          ru: "Спокойный профессиональный способ сказать «я не одобряю то, чего не понимаю»."
+
+checkPool:
+  - id: c3-l4-k1
+    kind: input
+    keyPoint: kp-loop
+    placement: true
+    prompt:
+      en: "How many tests will this file create?"
+      ru: "Сколько тестов создаст этот файл?"
+    code: |
+      const statuses = ['Processing', 'Shipped', 'Delivered', 'Cancelled'];
+
+      for (const status of statuses) {
+        test(`orders can be filtered by ${status}`, async ({ page }) => {
+          // Anna is already logged in (saved login state)
+          await page.goto('/orders');
+          await page.getByLabel('Status').selectOption(status);
+          await expect(page.getByTestId('order-row').first()).toContainText(status);
+        });
+      }
+    answers: ["4", "four"]
+    placeholder: "Number of tests"
+    hints:
+      - { en: "One test per item of `statuses`.", ru: "По тесту на каждый элемент `statuses`." }
+      - { en: "Count the strings in the square brackets.", ru: "Посчитай строки в квадратных скобках." }
+    explain:
+      en: "4 statuses → 4 tests: \"orders can be filtered by Processing\", \"…Shipped\", \"…Delivered\", \"…Cancelled\"."
+      ru: "4 статуса → 4 теста: «orders can be filtered by Processing», «…Shipped», «…Delivered», «…Cancelled»."
+
+  - id: c3-l4-k2
+    kind: choice
+    keyPoint: kp-array
+    prompt:
+      en: "What will this script print?"
+      ru: "Что выведет этот скрипт?"
+    code: |
+      const products = ['Rose Bouquet', 'Sunny Tulips', 'Lavender Pot'];
+      console.log(products[0]);
+    options:
+      - text: "Rose Bouquet"
+        correct: true
+        why: { en: "Index 0 is the first item.", ru: "Индекс 0 — первый элемент." }
+      - text: "Sunny Tulips"
+        why: { en: "That's `products[1]`.", ru: "Это `products[1]`." }
+      - text: "undefined"
+        why: { en: "Index 0 exists — it's the first item.", ru: "Индекс 0 существует — это первый элемент." }
+    optionsCode: true
+    run: script
+    hints:
+      - { en: "Counting starts at 0.", ru: "Счёт начинается с 0." }
+    explain:
+      en: "`products[0]` → \"Rose Bouquet\", the first item of the list."
+      ru: "`products[0]` → «Rose Bouquet», первый элемент списка."
+
+  - id: c3-l4-k3
+    kind: review
+    keyPoint: kp-array
+    prompt:
+      en: "Review Petal's data-driven search test. Flag the wrong data row and any other problem."
+      ru: "Сделай ревью теста поиска на наборе данных от Petal. Отметь неверную строку данных и любые другие проблемы."
+    context:
+      en: "Bloomly's products: Rose Bouquet, Sunny Tulips, Lavender Pot, Peony Dream, Mint Succulent, White Orchid. Search looks for the text in product names."
+      ru: "Товары Bloomly: Rose Bouquet, Sunny Tulips, Lavender Pot, Peony Dream, Mint Succulent, White Orchid. Поиск ищет текст в названиях товаров."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      const cases = [
+        { q: 'rose', expected: '1 product' },
+        { q: 'pot', expected: '1 product' },
+        { q: 'tulip', expected: '2 products' },
+      ];
+
+      for (const c of cases) {
+        test(`search for ${c.q}`, async ({ page }) => {
+          await page.goto('/shop');
+          page.getByLabel('Search').fill(c.q);
+          await expect(page.getByTestId('results-count')).toHaveText(c.expected);
+        });
+      }
+    issues:
+      - line: 6
+        type: wrong-data
+        note:
+          en: "Only Sunny Tulips contains \"tulip\": the expected result is '1 product'."
+          ru: "«tulip» есть только в Sunny Tulips: ожидаемый результат — '1 product'."
+      - line: 12
+        type: missing-await
+        note:
+          en: "`fill` isn't awaited — the check can start before the search text is typed."
+          ru: "`fill` без await — проверка может начаться до того, как текст поиска введён."
+    types: [wrong-data, missing-await, wrong-assertion, hard-wait, no-assertion]
+    hints:
+      - { en: "Check every row against the product list in the context.", ru: "Сверь каждую строку со списком товаров из контекста." }
+      - { en: "Then scan each step inside the loop for `await`.", ru: "Потом проверь каждый шаг внутри цикла на `await`." }
+      - { en: "Line 6 and line 12.", ru: "Строка 6 и строка 12." }
+    explain:
+      en: "One wrong row breaks one test; one missing `await` inside the loop breaks every test the loop creates."
+      ru: "Одна неверная строка ломает один тест; один забытый `await` внутри цикла ломает каждый тест, который цикл создаёт."
+
+  - id: c3-l4-k4
+    kind: predict
+    keyPoint: kp-loop
+    prompt:
+      en: "Will the whole run be green?"
+      ru: "Весь прогон будет зелёным?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      const products = ['Rose Bouquet', 'Peony Dream', 'Mint Succulent'];
+
+      for (const product of products) {
+        test(`can add ${product} to the cart`, async ({ page }) => {
+          await page.goto('/shop');
+          await page.getByTestId('product-card').filter({ hasText: product })
+            .getByRole('button', { name: 'Add to cart' }).click();
+          await expect(page.getByTestId('cart-count')).toHaveText('1');
+        });
+      }
+    outcome: pass
+    reasons:
+      - text:
+          en: "Yes: each test gets a fresh browser page with an empty cart, so the count is 1 every time"
+          ru: "Да: каждый тест получает новую страницу браузера с пустой корзиной, поэтому счётчик каждый раз 1"
+        correct: true
+      - text:
+          en: "No: the third test sees 3 items, because the loop adds them one after another"
+          ru: "Нет: третий тест увидит 3 товара, потому что цикл добавляет их один за другим"
+        why: { en: "The loop creates separate tests. Each starts clean, like a fresh test environment.", ru: "Цикл создаёт отдельные тесты. Каждый начинается с чистого листа, как в новом окружении." }
+      - text:
+          en: "No: Mint Succulent is out of stock"
+          ru: "Нет: Mint Succulent нет в наличии"
+        why: { en: "Only White Orchid is out of stock.", ru: "Нет в наличии только White Orchid." }
+    hints:
+      - { en: "Remember what `{ page }` gives every test.", ru: "Вспомни, что `{ page }` даёт каждому тесту." }
+      - { en: "Do the three tests share one cart?", ru: "У трёх тестов общая корзина?" }
+    explain:
+      en: "Three independent tests, each with a fresh page and an empty cart. After one click the count is \"1\" in each of them."
+      ru: "Три независимых теста, у каждого новая страница и пустая корзина. После одного клика в каждом счётчик «1»."
+
+  - id: c3-l4-k5
+    kind: choice
+    keyPoint: kp-read-strategy
+    prompt:
+      en: "Petal explains its test: \"Line 8 checks that the order total is €39.90.\" What do you do?"
+      ru: "Petal объясняет свой тест: «Строка 8 проверяет, что сумма заказа — €39.90». Что ты делаешь?"
+    code: |
+      // line 8:
+      await expect(page.getByTestId('order-total')).toBeVisible();
+    options:
+      - text: { en: "Trust the code, not the explanation: line 8 only checks visibility. Flag it as a weak assertion and ask for `toHaveText`", ru: "Верить коду, а не объяснению: строка 8 проверяет только видимость. Отметить слабую проверку и попросить `toHaveText`" }
+        correct: true
+        why: { en: "The explanation describes what the line *should* do. The code shows what it does.", ru: "Объяснение описывает, что строка *должна* делать. Код показывает, что она делает." }
+      - text: { en: "Approve — Petal explained it clearly", ru: "Одобрить — Petal всё понятно объяснил" }
+        why: { en: "A confident explanation is not evidence. €39.90 appears nowhere in the code.", ru: "Уверенное объяснение — не доказательство. €39.90 в коде нигде нет." }
+      - text: { en: "Delete line 8 — it doesn't check anything useful", ru: "Удалить строку 8 — она ничего полезного не проверяет" }
+        why: { en: "Then nothing would be checked at all. Make the check stronger instead.", ru: "Тогда не проверялось бы вообще ничего. Лучше сделать проверку сильнее." }
+    hints:
+      - { en: "Find \"39.90\" in the code.", ru: "Найди «39.90» в коде." }
+      - { en: "What does `toBeVisible()` actually check?", ru: "Что на самом деле проверяет `toBeVisible()`?" }
+    explain:
+      en: "Always verify an explanation against the code. The right line would be `await expect(page.getByTestId('order-total')).toHaveText('Total to pay: €39.90');`."
+      ru: "Объяснение всегда сверяй с кодом. Правильная строка была бы такой: `await expect(page.getByTestId('order-total')).toHaveText('Total to pay: €39.90');`."
+
+  - id: c3-l4-k6
+    kind: choice
+    multi: true
+    keyPoint: kp-read-strategy
+    prompt:
+      en: "Which prompts help you understand unfamiliar generated code? Pick all that apply."
+      ru: "Какие промпты помогают понять незнакомый сгенерированный код? Выбери все подходящие."
+    options:
+      - text: "Explain this test line by line. Don't change the code."
+        correct: true
+        why: { en: "Specific, and it keeps the code as it is.", ru: "Конкретно, и код остаётся как есть." }
+      - text: "List every assertion in this file and what it checks."
+        correct: true
+        why: { en: "Assertions are what you approve — get them listed.", ru: "Одобряешь ты именно проверки — пусть их перечислят." }
+      - text: "Rewrite everything to make it better."
+        why: { en: "You'd get a new test to review instead of understanding the old one.", ru: "Получишь новый тест на ревью вместо понимания старого." }
+      - text: "Is this test good?"
+        why: { en: "Too vague — the agent will most likely just say yes.", ru: "Слишком размыто — агент, скорее всего, просто скажет «да»." }
+    optionsCode: true
+    hints:
+      - { en: "Good prompts are specific and don't invite rewriting.", ru: "Хорошие промпты конкретные и не провоцируют переписывание." }
+      - { en: "Two prompts are good.", ru: "Хороших промптов два." }
+    explain:
+      en: "Ask for a line-by-line explanation and a list of assertions, keep the code unchanged — then verify the answer yourself."
+      ru: "Проси построчное объяснение и список проверок, код не меняй — а ответ проверяй {сама|сам}."
+
+  - id: c3-l4-k7
+    kind: fill
+    keyPoint: kp-array
+    prompt:
+      en: "Fill in the index so that this line logs in as Tom."
+      ru: "Впиши индекс, чтобы эта строка входила как Том."
+    code: |
+      const users = ['anna@bloomly.app', 'tom@bloomly.app', 'maya@bloomly.app'];
+      // Log in as Tom:
+      await page.getByLabel('Email').fill(users[___]);
+    blanks:
+      - { answers: ["1"] }
+    hints:
+      - { en: "Tom is the second item.", ru: "Том — второй элемент." }
+      - { en: "Indexes start at 0.", ru: "Индексы начинаются с 0." }
+    explain:
+      en: "`users[1]` is the second item: 'tom@bloomly.app'."
+      ru: "`users[1]` — второй элемент: 'tom@bloomly.app'."
+
+  - id: c3-l4-k8
+    kind: input
+    keyPoint: kp-loop
+    prompt:
+      en: "What will the second printed line be? Type the exact text."
+      ru: "Какой будет вторая напечатанная строка? Напиши точный текст."
+    code: |
+      const cities = ['Lisbon', 'Berlin', 'Warsaw'];
+
+      for (const city of cities) {
+        console.log(`Delivery to ${city}`);
+      }
+    answers: ["Delivery to Berlin"]
+    run: script
+    hints:
+      - { en: "The loop prints one line per city, in order.", ru: "Цикл печатает по строке на каждый город, по порядку." }
+      - { en: "In round 2, `city` is the second city.", ru: "Во втором проходе `city` — второй город." }
+    explain:
+      en: "Round 1: \"Delivery to Lisbon\", round 2: \"Delivery to Berlin\", round 3: \"Delivery to Warsaw\"."
+      ru: "Проход 1: «Delivery to Lisbon», проход 2: «Delivery to Berlin», проход 3: «Delivery to Warsaw»."

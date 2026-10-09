@@ -1,0 +1,388 @@
+# Typical interview questions for a QA Automation Engineer (Playwright, JS/TS) role.
+# Answers are first-person model answers for an experienced manual QA moving into automation.
+# RU uses gender variants {feminine|masculine} for the student's first-person forms.
+
+questions:
+  - id: why-automate
+    topic: basics
+    q:
+      en: "Why do teams automate tests? What's the real benefit?"
+      ru: "Зачем команды автоматизируют тесты? В чём реальная польза?"
+    a:
+      en: "Automation gives fast, repeatable feedback on the things we check again and again — mostly regression. A suite that runs on every pull request catches a broken login or checkout within minutes, instead of at the end of a three-day manual cycle. It also frees testers for exploratory testing, where human judgement matters most. But automation is an investment: tests take time to write and maintain, so I automate where the repetition pays that cost back."
+      ru: "Автоматизация даёт быструю и повторяемую обратную связь по тому, что мы проверяем снова и снова, — в первую очередь по регрессу. Набор тестов, который запускается на каждый pull request, ловит сломанный логин или чекаут за минуты, а не в конце трёхдневного ручного цикла. Ещё он освобождает тестировщиков для исследовательского тестирования, где человеческое суждение важнее всего. Но автоматизация — это инвестиция: тесты нужно писать и поддерживать, поэтому я автоматизирую там, где повторяемость окупает эти затраты."
+    tip:
+      en: "Show balance: name both the value and the cost. Interviewers get nervous when a candidate wants to 'automate everything'."
+      ru: "Покажи баланс: назови и пользу, и стоимость. Интервьюеров настораживает, когда кандидат хочет «автоматизировать всё»."
+
+  - id: what-not-to-automate
+    topic: basics
+    q:
+      en: "What would you not automate?"
+      ru: "Что бы ты не {стала|стал} автоматизировать?"
+    a:
+      en: "I wouldn't automate one-off checks, features that still change every day, or anything that needs human judgement — whether a layout looks right or a flow feels confusing. Exploratory and usability testing stay human. I'm also careful with flows that depend on third-party systems we don't control: there I'd rather mock the dependency or check the contract through the API. My rule of thumb: automate what is stable, repeated and important; keep people on what is new, visual or subjective."
+      ru: "Я бы не {стала|стал} автоматизировать разовые проверки, фичи, которые меняются каждый день, и всё, что требует человеческого суждения, — например, хорошо ли выглядит вёрстка и не путает ли пользователя сценарий. Исследовательское тестирование и юзабилити остаются за людьми. Ещё я осторожно отношусь к сценариям, которые зависят от внешних систем вне нашего контроля: там я скорее замокаю зависимость или проверю контракт через API. Моё правило: автоматизировать стабильное, повторяющееся и важное, а новое, визуальное и субъективное оставлять людям."
+    tip:
+      en: "A concrete example from your own experience ('our payment sandbox went down twice a week') makes this answer memorable."
+      ru: "Конкретный пример из опыта («платёжная песочница падала дважды в неделю») делает ответ запоминающимся."
+
+  - id: test-pyramid
+    topic: basics
+    q:
+      en: "What is the test pyramid, and how does it affect what you automate through the UI?"
+      ru: "Что такое пирамида тестирования и как она влияет на то, что ты автоматизируешь через UI?"
+    a:
+      en: "The test pyramid is a model for balancing a suite: many fast unit tests at the bottom, fewer integration and API tests in the middle, and a small number of end-to-end UI tests on top. UI tests are the slowest and the most fragile, so I keep them for critical user journeys like login, search and checkout. Business rules — say, how a promo code changes the total — are cheaper and more stable to check at the API or unit level. In practice I agree with the developers which layer covers what, so we don't test the same rule three times, or not at all."
+      ru: "Пирамида тестирования — это модель баланса: внизу много быстрых юнит-тестов, посередине меньше интеграционных и API-тестов, а наверху — немного сквозных UI-тестов. UI-тесты самые медленные и хрупкие, поэтому я оставляю их для критичных пользовательских сценариев: вход, поиск, оформление заказа. Бизнес-правила — например, как промокод меняет итоговую сумму — дешевле и стабильнее проверять на уровне API или юнит-тестов. На практике я договариваюсь с разработчиками, какой уровень что покрывает, чтобы одно и то же правило не проверялось трижды — или не проверялось вовсе."
+    tip:
+      en: "Mention the trade-off: speed and stability versus realism. Knowing that some teams prefer a 'testing trophy' shape is a bonus."
+      ru: "Назови компромисс: скорость и стабильность против реалистичности. Бонус — знать, что некоторые команды предпочитают форму «testing trophy»."
+
+  - id: where-to-start
+    topic: basics
+    q:
+      en: "You join a team with 400 manual regression cases. Where do you start automating?"
+      ru: "Ты приходишь в команду, где 400 ручных регрессионных кейсов. С чего начнёшь автоматизацию?"
+    a:
+      en: "I wouldn't start by converting all 400 cases one by one. First I'd sort them by risk and frequency: critical business flows like login, cart and checkout go first, then cases we run every release that rarely change. I'd flag cases that are better checked through the API, plus duplicates and outdated ones that can simply be removed. Then I'd build a small, stable smoke suite, get it running in CI, and grow it from there. The value comes from a trusted suite that runs every day, not from the number of automated cases."
+      ru: "Я бы не {стала|стал} переводить все 400 кейсов в код по порядку. Сначала я бы рассортировал{а|} их по риску и частоте: первыми идут критичные бизнес-сценарии — вход, корзина, оформление заказа, — затем кейсы, которые мы гоняем каждый релиз и которые редко меняются. Отдельно я бы отметил{а|} кейсы, которые лучше проверять через API, а также дубли и устаревшие, которые можно просто удалить. Потом собрал{а|} бы небольшой стабильный смоук-набор, запустил{а|} его в CI и дальше наращивал{а|} бы покрытие. Ценность — в наборе тестов, которому доверяют и который запускается каждый день, а не в количестве автоматизированных кейсов."
+    tip:
+      en: "This is where manual experience shines: you know which cases actually find bugs. Say so."
+      ru: "Здесь твой ручной опыт — главный козырь: ты знаешь, какие кейсы действительно находят баги. Так и скажи."
+
+  - id: playwright-vs-others
+    topic: playwright
+    q:
+      en: "How does Playwright compare to Selenium and Cypress?"
+      ru: "Чем Playwright отличается от Selenium и Cypress?"
+    a:
+      en: "All three are solid tools, and the choice depends on the team. Selenium is the most mature: it uses the WebDriver standard, supports many languages and has a huge ecosystem, but you usually manage waits yourself. Cypress runs inside the browser and has a great developer experience with time-travel debugging, but it's JavaScript-only and has historically been more limited with multiple tabs and origins. Playwright drives Chromium, Firefox and WebKit through one API, has auto-waiting and web-first assertions built in, runs tests in parallel in isolated browser contexts, and ships with a test runner, trace viewer and HTML report. For a new TypeScript project, that's why I'd choose Playwright."
+      ru: "Все три инструмента хороши, и выбор зависит от команды. Selenium — самый зрелый: он работает по стандарту WebDriver, поддерживает много языков и имеет огромную экосистему, но ожидания обычно приходится настраивать самостоятельно. Cypress запускается внутри браузера и даёт отличный опыт разработки с «путешествием во времени» при отладке, но поддерживает только JavaScript и исторически был ограничен в работе с несколькими вкладками и доменами. Playwright управляет Chromium, Firefox и WebKit через один API, имеет встроенные авто-ожидания и web-first проверки, запускает тесты параллельно в изолированных контекстах браузера и сразу включает раннер, trace viewer и HTML-отчёт. Поэтому для нового проекта на TypeScript я бы {выбрала|выбрал} Playwright."
+    tip:
+      en: "Stay fair — don't bash other tools. Interviewers want to hear trade-offs, not a marketing page."
+      ru: "Будь {объективна|объективен} — не ругай другие инструменты. Интервьюеры хотят услышать компромиссы, а не рекламный буклет."
+
+  - id: playwright-test-features
+    topic: playwright
+    q:
+      en: "What does Playwright Test give you out of the box?"
+      ru: "Что Playwright Test даёт «из коробки»?"
+    a:
+      en: "Playwright Test is the built-in test runner. Out of the box it gives fixtures like `page`, `context` and `request`, parallel execution, retries, and projects to run the same tests in different browsers or on different devices. Settings like `baseURL`, timeouts and reporters live in `playwright.config.ts`. For debugging there's the HTML report, the trace viewer, UI mode (`npx playwright test --ui`) and codegen to record actions. So I don't have to glue lots of libraries together to get a working framework."
+      ru: "Playwright Test — это встроенный тест-раннер. Из коробки он даёт фикстуры вроде `page`, `context` и `request`, параллельный запуск, перезапуски (retries) и projects, чтобы гонять одни и те же тесты в разных браузерах и на разных устройствах. Настройки вроде `baseURL`, таймаутов и репортеров лежат в `playwright.config.ts`. Для отладки есть HTML-отчёт, trace viewer, UI-режим (`npx playwright test --ui`) и codegen для записи действий. Так что не нужно склеивать много библиотек, чтобы получить рабочий фреймворк."
+    tip:
+      en: "Naming three or four concrete features — with the commands — sounds like hands-on experience."
+      ru: "Назови три-четыре конкретные возможности вместе с командами — это звучит как реальный опыт."
+
+  - id: auto-waiting
+    topic: playwright
+    q:
+      en: "What is auto-waiting in Playwright?"
+      ru: "Что такое авто-ожидание (auto-waiting) в Playwright?"
+    a:
+      en: "Before an action like `click()` or `fill()`, Playwright automatically waits until the element is actionable: attached to the page, visible, stable (not animating), enabled and able to receive events. If that doesn't happen within the timeout, the action fails with a clear message. This removes most of the manual waits that made older test suites flaky. That's why I never need `waitForTimeout` to 'give the page time' — and when I see one in a review, I ask why it's there."
+      ru: "Перед действием вроде `click()` или `fill()` Playwright автоматически ждёт, пока элемент станет готов к действию: появится в DOM, станет видимым, стабильным (не анимируется), активным и сможет принимать события. Если этого не происходит за отведённый таймаут, действие падает с понятным сообщением. Это убирает большинство ручных ожиданий, из-за которых старые наборы тестов были нестабильными. Поэтому мне не нужен `waitForTimeout`, чтобы «дать странице время», — а если я вижу его на ревью, то спрашиваю, зачем он здесь."
+    tip:
+      en: "Use the word 'actionability' — it's the official term in the Playwright docs."
+      ru: "Используй слово «actionability» — это официальный термин из документации Playwright."
+
+  - id: locator-strategy
+    topic: locators
+    q:
+      en: "What is your locator strategy?"
+      ru: "Какой стратегии ты придерживаешься при выборе локаторов?"
+    a:
+      en: "I prefer locators that reflect how a user sees the page. First `getByRole` with an accessible name, for example `page.getByRole('button', { name: 'Add to cart' })`, then `getByLabel` for form fields and `getByText` for non-interactive text. If there's no good user-facing option, I use `getByTestId` with a test id agreed with the developers. I avoid long CSS chains, XPath and generated class names, because they break when the layout changes even though the feature still works. A nice side effect: role-based locators push the team toward better accessibility."
+      ru: "Я предпочитаю локаторы, которые отражают то, как пользователь видит страницу. Сначала `getByRole` с доступным именем, например `page.getByRole('button', { name: 'Add to cart' })`, затем `getByLabel` для полей формы и `getByText` для неинтерактивного текста. Если удобного «пользовательского» варианта нет, использую `getByTestId` с test id, согласованным с разработчиками. Я избегаю длинных CSS-цепочек, XPath и сгенерированных имён классов: они ломаются при изменении вёрстки, хотя сама фича продолжает работать. Приятный бонус: локаторы по ролям подталкивают команду к лучшей доступности."
+    tip:
+      en: "Mention that this order matches the recommendation in the Playwright docs, and give one concrete example."
+      ru: "Упомяни, что этот порядок совпадает с рекомендацией документации Playwright, и приведи один конкретный пример."
+
+  - id: strict-mode
+    topic: locators
+    q:
+      en: "What happens when a locator matches several elements?"
+      ru: "Что происходит, когда локатор находит несколько элементов?"
+    a:
+      en: "Playwright locators are strict: if an action like `click()` matches more than one element, the test fails with a 'strict mode violation' instead of clicking a random one. That's a feature — it tells me the locator is ambiguous. I fix it by making the locator more specific: adding the accessible name, filtering with `filter({ hasText: 'Sunny Tulips' })`, or chaining from a parent such as a product card. I use `first()` or `nth()` only when order is really what I'm testing, because otherwise they just hide the ambiguity."
+      ru: "Локаторы в Playwright строгие: если действие вроде `click()` находит больше одного элемента, тест падает со «strict mode violation», а не кликает по случайному. Это полезно — так я узнаю, что локатор неоднозначный. Я делаю его точнее: добавляю доступное имя, фильтрую через `filter({ hasText: 'Sunny Tulips' })` или строю цепочку от родителя, например от карточки товара. `first()` или `nth()` я использую, только когда проверяю именно порядок, — иначе они просто прячут неоднозначность."
+    tip:
+      en: "Showing that you see strictness as protection, not an annoyance, is a strong signal."
+      ru: "Сильный сигнал — показать, что строгость для тебя защита, а не помеха."
+
+  - id: web-first-assertions
+    topic: assertions
+    q:
+      en: "What are web-first assertions and why do they matter?"
+      ru: "Что такое web-first проверки и почему они важны?"
+    a:
+      en: "Web-first assertions are the async `expect` matchers that work on locators, such as `await expect(page.getByText('Thank you for your order!')).toBeVisible()`, `toHaveText`, `toHaveURL` or `toHaveCount`. They retry automatically until the condition is met or the timeout runs out, so they handle the normal delays of a real web app. The anti-pattern is `expect(await locator.isVisible()).toBe(true)`: it checks once, immediately, and fails randomly when the page is a bit slow. Switching to web-first assertions is one of the simplest ways to prevent flaky tests."
+      ru: "Web-first проверки — это асинхронные матчеры `expect`, которые работают с локаторами: например, `await expect(page.getByText('Thank you for your order!')).toBeVisible()`, `toHaveText`, `toHaveURL` или `toHaveCount`. Они автоматически повторяют проверку, пока условие не выполнится или не истечёт таймаут, и поэтому спокойно переживают обычные задержки реального веб-приложения. Антипаттерн — `expect(await locator.isVisible()).toBe(true)`: такая проверка срабатывает один раз, сразу, и случайно падает, если страница чуть-чуть тормозит. Переход на web-first проверки — один из самых простых способов избавиться от флаки-тестов."
+    tip:
+      en: "Show the anti-pattern next to the right version — it proves you'd catch it in a review."
+      ru: "Покажи антипаттерн рядом с правильным вариантом — это доказывает, что ты поймаешь его на ревью."
+
+  - id: what-to-assert
+    topic: assertions
+    q:
+      en: "How do you decide what a test should assert?"
+      ru: "Как ты решаешь, что именно должен проверять тест?"
+    a:
+      en: "The same way as with a manual test case: the expected result defines the assertion. I check the outcome the user cares about — the confirmation message, the cart total, the URL after login — not just that the page loaded. A test without an assertion, or with a weak one like 'some element is visible', can pass while the feature is broken. I also make sure the assertion can actually fail: I break the expected value once and watch the test go red. When a flow has several independent checks, I may use `expect.soft` so one failure doesn't hide the others."
+      ru: "Так же, как в ручном тест-кейсе: проверку определяет ожидаемый результат. Я проверяю то, что важно пользователю, — сообщение о подтверждении, сумму в корзине, URL после входа, — а не просто то, что страница загрузилась. Тест без проверки или со слабой проверкой вроде «какой-то элемент виден» может проходить, когда фича сломана. Ещё я убеждаюсь, что проверка вообще способна упасть: один раз ломаю ожидаемое значение и смотрю, как тест краснеет. Если в сценарии несколько независимых проверок, могу использовать `expect.soft`, чтобы одно падение не скрывало остальные."
+    tip:
+      en: "Link it to your background: 'the expected result in the test case becomes the assertion' is a great line."
+      ru: "Свяжи ответ со своим опытом: фраза «ожидаемый результат из тест-кейса превращается в assertion» отлично работает."
+
+  - id: flaky-causes
+    topic: flaky
+    q:
+      en: "What makes tests flaky?"
+      ru: "Из-за чего тесты становятся нестабильными (flaky)?"
+    a:
+      en: "A flaky test passes and fails on the same code. The usual suspects are timing — hard waits, or assertions that don't retry; shared or leftover test data; tests that depend on the order they run in; unstable external services; and ambiguous locators that match different elements depending on what has loaded. Animations, dates and time zones, and parallel tests fighting over the same user account are classics too. Most of these are test design problems, not tool problems — and sometimes the flakiness is a real race condition in the app."
+      ru: "Флаки-тест то проходит, то падает на одном и том же коде. Обычные подозреваемые — тайминги (жёсткие ожидания или проверки без повторов), общие или оставшиеся от прошлых запусков тестовые данные, зависимость от порядка запуска тестов, нестабильные внешние сервисы и неоднозначные локаторы, которые находят разные элементы в зависимости от того, что успело загрузиться. Классика — ещё анимации, даты и часовые пояса, а также параллельные тесты, которые дерутся за один и тот же аккаунт. Чаще всего это проблемы дизайна тестов, а не инструмента, — а иногда за нестабильностью прячется настоящий race condition в приложении."
+    tip:
+      en: "Group the causes — timing, data, order, environment. A structured answer sounds senior."
+      ru: "Сгруппируй причины: тайминги, данные, порядок, окружение. Структурированный ответ звучит как ответ senior-специалиста."
+
+  - id: flaky-investigate
+    topic: flaky
+    q:
+      en: "A test fails in CI about one run in five. What do you do?"
+      ru: "Тест в CI падает примерно в одном запуске из пяти. Что ты будешь делать?"
+    a:
+      en: "First, I don't just add a retry and move on. I open the trace of a failed run, compare it with a passing one and find the exact step where they differ — the DOM snapshot, network calls, console errors. I try to reproduce it locally with `--repeat-each=20`, sometimes with more workers to add load. Then I fix the cause: replace a hard wait with a web-first assertion, isolate the data, make the locator unambiguous — or report a real race condition to the developers. If it can't be fixed right away, I quarantine it visibly with a ticket, rather than letting the team learn to ignore red."
+      ru: "Во-первых, я не ограничиваюсь тем, чтобы добавить retry и забыть. Я открываю трейс упавшего запуска, сравниваю его с успешным и ищу шаг, на котором они расходятся: снимок DOM, сетевые запросы, ошибки в консоли. Пытаюсь воспроизвести падение локально через `--repeat-each=20`, иногда с большим числом воркеров, чтобы добавить нагрузку. Затем устраняю причину: заменяю жёсткое ожидание на web-first проверку, изолирую данные, делаю локатор однозначным — или сообщаю разработчикам о настоящем race condition. Если сразу починить нельзя, я открыто выношу тест в карантин с тикетом, чтобы команда не привыкала игнорировать красный."
+    tip:
+      en: "Interviewers love candidates who treat flakiness as a bug — sometimes a bug in the product itself."
+      ru: "Интервьюерам нравятся кандидаты, которые относятся к флаки-тесту как к багу — иногда это баг в самом продукте."
+
+  - id: retries
+    topic: flaky
+    q:
+      en: "Are retries a good way to deal with flaky tests?"
+      ru: "Перезапуски (retries) — хороший способ бороться с флаки-тестами?"
+    a:
+      en: "Retries are a safety net, not a fix. In Playwright I'd set something like `retries: 2` for CI, so one random network hiccup doesn't block a release, and the report marks those tests as 'flaky' — which is useful data. But if the same test keeps needing retries, it's hiding a problem in the test or in the product. I track flaky tests and fix them, because a suite that's only green on the second try slowly loses the team's trust."
+      ru: "Перезапуски — это страховочная сетка, а не лечение. В Playwright я бы включил{а|} что-то вроде `retries: 2` для CI, чтобы один случайный сетевой сбой не блокировал релиз, — а отчёт пометит такие тесты как «flaky», и это полезные данные. Но если одному и тому же тесту постоянно нужны перезапуски, он прячет проблему — в тесте или в продукте. Я отслеживаю флаки-тесты и чиню их, потому что набору, который зеленеет только со второй попытки, команда постепенно перестаёт доверять."
+    tip:
+      en: "A balanced 'yes, but' answer works best here."
+      ru: "Здесь лучше всего работает взвешенный ответ в духе «да, но»."
+
+  - id: page-object-model
+    topic: architecture
+    q:
+      en: "What is the Page Object Model? Would you use it?"
+      ru: "Что такое Page Object Model? {Стала|Стал} бы ты его использовать?"
+    a:
+      en: "The Page Object Model puts the locators and actions of one page or component into a class — for example a `LoginPage` with a `login(email, password)` method. Tests then read like test cases: `await loginPage.login('anna@bloomly.app', 'bloom123')`. When the UI changes, I fix a locator in one place instead of in twenty tests. I keep most assertions in the tests rather than hiding them in page objects, and I don't over-engineer a small suite. With AI agents, a clear POM helps too: the agent reuses existing methods instead of inventing new locators every time."
+      ru: "Page Object Model выносит локаторы и действия одной страницы или компонента в класс — например, `LoginPage` с методом `login(email, password)`. Тогда тесты читаются как тест-кейсы: `await loginPage.login('anna@bloomly.app', 'bloom123')`. Когда меняется интерфейс, я правлю локатор в одном месте, а не в двадцати тестах. Большинство проверок я оставляю в самих тестах, а не прячу в page objects, и не усложняю небольшой набор без необходимости. С ИИ-агентами понятный POM тоже помогает: агент переиспользует готовые методы, а не придумывает новые локаторы каждый раз."
+    tip:
+      en: "Mentioning when not to use a pattern shows maturity."
+      ru: "Упоминание того, когда паттерн не нужен, показывает зрелость."
+
+  - id: fixtures
+    topic: architecture
+    q:
+      en: "What are fixtures in Playwright?"
+      ru: "Что такое фикстуры в Playwright?"
+    a:
+      en: "Fixtures are how Playwright gives each test what it needs — `page`, `context`, `request` and so on — and cleans it up afterwards. A test asks for them by name: `test('...', async ({ page }) => { ... })`. I can create my own with `test.extend`, for example a `loggedInPage` or a `cartWithTwoItems` fixture that prepares state and tears it down. Compared with `beforeEach` hooks, fixtures are reusable across files, only run when a test asks for them, and keep setup out of the test body."
+      ru: "Фикстуры — это способ, которым Playwright даёт каждому тесту всё нужное (`page`, `context`, `request` и так далее) и убирает за ним после завершения. Тест запрашивает их по имени: `test('...', async ({ page }) => { ... })`. Можно создавать свои через `test.extend` — например, фикстуру `loggedInPage` или `cartWithTwoItems`, которая готовит состояние и потом его очищает. По сравнению с хуками `beforeEach` фикстуры переиспользуются между файлами, запускаются, только когда тест их запросил, и не загромождают тело теста подготовкой."
+    tip:
+      en: "Compare fixtures with preconditions in a manual test case — interviewers like that analogy."
+      ru: "Сравни фикстуры с предусловиями в ручном тест-кейсе — интервьюерам нравится эта аналогия."
+
+  - id: test-data-isolation
+    topic: architecture
+    q:
+      en: "How do you manage test data and keep tests isolated?"
+      ru: "Как ты управляешь тестовыми данными и обеспечиваешь изоляцию тестов?"
+    a:
+      en: "Each test should be able to run alone, in any order and in parallel. Playwright already gives every test a fresh browser context, so cookies and storage don't leak between tests. For data, I prefer creating what a test needs through the API or a seed script — a unique user or order — instead of relying on shared records someone might change. Unique values, like an email with a timestamp, avoid collisions between parallel workers. And I clean up, or use a disposable environment, so yesterday's run doesn't affect today's."
+      ru: "Каждый тест должен уметь запускаться отдельно, в любом порядке и параллельно с другими. Playwright уже даёт каждому тесту новый контекст браузера, так что cookies и хранилище между тестами не протекают. Данные я предпочитаю создавать под конкретный тест через API или сид-скрипт — уникального пользователя или заказ, — а не полагаться на общие записи, которые кто-то может изменить. Уникальные значения, например email с отметкой времени, предотвращают конфликты между параллельными воркерами. И я прибираю за тестами или использую одноразовое окружение, чтобы вчерашний прогон не влиял на сегодняшний."
+    tip:
+      en: "Say 'test isolation' explicitly — it's the term interviewers are listening for."
+      ru: "Произнеси «test isolation» прямо — именно этот термин интервьюеры ждут услышать."
+
+  - id: auth-reuse
+    topic: architecture
+    q:
+      en: "All your tests need a logged-in user. How do you avoid logging in through the UI every time?"
+      ru: "Всем тестам нужен залогиненный пользователь. Как не проходить вход через UI каждый раз?"
+    a:
+      en: "I test the login UI itself in a few dedicated tests, and reuse an authenticated state everywhere else. In Playwright that's usually a setup project that logs in once and saves `storageState` to a file; other projects then load it with `use: { storageState: 'playwright/.auth/user.json' }`. Another option is to log in through the API and reuse the session. This makes the suite much faster and removes a common source of flakiness. For tests that change user data, I use a separate account per worker so they don't interfere with each other."
+      ru: "Сам UI входа я проверяю в нескольких отдельных тестах, а во всех остальных переиспользую сохранённое состояние авторизации. В Playwright это обычно setup-проект, который один раз логинится и сохраняет `storageState` в файл; остальные проекты подхватывают его через `use: { storageState: 'playwright/.auth/user.json' }`. Другой вариант — логиниться через API и переиспользовать сессию. Так набор становится заметно быстрее, и уходит частый источник нестабильности. Для тестов, которые меняют данные пользователя, я беру отдельный аккаунт на каждого воркера, чтобы тесты не мешали друг другу."
+    tip:
+      en: "The keyword is storageState. Mentioning per-worker accounts shows you've thought about parallel runs."
+      ru: "Ключевое слово — storageState. Упоминание отдельных аккаунтов на воркер показывает, что ты думаешь о параллельных запусках."
+
+  - id: api-testing
+    topic: api
+    q:
+      en: "How do you test APIs with Playwright?"
+      ru: "Как ты тестируешь API с помощью Playwright?"
+    a:
+      en: "Playwright has a built-in `request` fixture, so API tests live in the same runner as UI tests. For example: `const response = await request.post('/api/orders', { data: { productId: 'rose-bouquet', qty: 2 } })`, then `expect(response.status()).toBe(201)` and checks on the JSON body. I verify status codes, the response body and important headers, plus negative cases: an invalid payload, a missing auth token, a wrong ID. API tests are fast and stable, so business rules like price calculation are often better covered there. My manual background helps a lot: boundary values and negative cases are the same idea, just sent as requests."
+      ru: "В Playwright есть встроенная фикстура `request`, поэтому API-тесты живут в том же раннере, что и UI-тесты. Например: `const response = await request.post('/api/orders', { data: { productId: 'rose-bouquet', qty: 2 } })`, затем `expect(response.status()).toBe(201)` и проверки JSON-тела ответа. Я проверяю коды статуса, тело ответа и важные заголовки, а также негативные сценарии: невалидный payload, отсутствие токена авторизации, несуществующий ID. API-тесты быстрые и стабильные, поэтому бизнес-правила вроде расчёта цены часто лучше покрывать именно там. Тут очень помогает ручной опыт: граничные значения и негативные кейсы — та же идея, только отправленная запросом."
+    tip:
+      en: "Mention negative cases — many candidates only talk about the happy path."
+      ru: "Обязательно упомяни негативные кейсы — многие кандидаты говорят только о позитивном сценарии."
+
+  - id: api-and-mocking
+    topic: api
+    q:
+      en: "How can API calls and network mocking make your UI tests better?"
+      ru: "Как API-запросы и мокирование сети помогают UI-тестам?"
+    a:
+      en: "I use the API to set up and clean up state, so the UI test only clicks through what it actually verifies. For example, I add two items to the cart via the API, then open the cart page and check the total in the UI. With `page.route` I can intercept network calls — say, return a 500 from the payment service — and check that the user sees a friendly error message, without breaking a real service. I'm careful not to mock everything, though: a few end-to-end tests should still hit the real backend, or we'd only be testing our mocks."
+      ru: "Через API я готовлю и очищаю состояние, чтобы UI-тест прокликивал только то, что действительно проверяет. Например, добавляю два товара в корзину через API, а потом открываю страницу корзины и проверяю сумму уже в интерфейсе. С помощью `page.route` можно перехватывать сетевые запросы — скажем, вернуть 500 от платёжного сервиса — и проверить, что пользователь видит понятное сообщение об ошибке, ничего не ломая в реальном сервисе. Но я слежу, чтобы не мокать всё подряд: несколько сквозных тестов должны ходить в настоящий бэкенд, иначе мы будем тестировать только собственные моки."
+    tip:
+      en: "The phrase 'or we'd only be testing our mocks' shows you understand the limits of mocking."
+      ru: "Фраза «иначе мы будем тестировать только собственные моки» показывает, что ты понимаешь границы мокирования."
+
+  - id: ci-pipeline
+    topic: ci
+    q:
+      en: "How do you run Playwright tests in CI?"
+      ru: "Как ты запускаешь Playwright-тесты в CI?"
+    a:
+      en: "Tests run on every pull request and on a schedule — for example in GitHub Actions: install dependencies, install browsers with `npx playwright install --with-deps`, then run `npx playwright test`. In CI the tests run headless with retries enabled, and I upload the HTML report and traces as artifacts so anyone can investigate a failure. For a big suite I split the work across machines with sharding, like `--shard=1/4`. The key rule: a red build must mean something — if the team learns to ignore red, the pipeline is useless."
+      ru: "Тесты запускаются на каждый pull request и по расписанию — например, в GitHub Actions: установка зависимостей, установка браузеров через `npx playwright install --with-deps`, затем `npx playwright test`. В CI тесты идут в headless-режиме с включёнными перезапусками, а HTML-отчёт и трейсы я сохраняю как артефакты, чтобы любой мог разобраться с падением. Большой набор я распределяю по машинам с помощью шардинга, например `--shard=1/4`. Главное правило: красная сборка должна что-то значить — если команда привыкла игнорировать красный, от пайплайна нет толку."
+    tip:
+      en: "You don't need to recite YAML. Explaining what runs when, and what happens to the results, is enough."
+      ru: "Пересказывать YAML не нужно. Достаточно объяснить, что и когда запускается и что происходит с результатами."
+
+  - id: debug-ci-failure
+    topic: ci
+    q:
+      en: "A test failed in CI. How do you debug it?"
+      ru: "Тест упал в CI. Как ты будешь разбираться?"
+    a:
+      en: "I start with the HTML report: which test, which step, and the error message — usually expected versus received. Then I open the trace, either from the report or with `npx playwright show-trace trace.zip`. It shows every action with DOM snapshots before and after, network requests, console logs and a timeline, so I can often see the cause right away: an error toast, a slow request, a renamed button. If needed, I reproduce it locally in UI mode or with `--debug`. Only once I know whether the test or the app is wrong do I fix the test — or file a bug with the trace attached."
+      ru: "Начинаю с HTML-отчёта: какой тест, на каком шаге и с каким сообщением упал — обычно там видно ожидаемое и полученное. Затем открываю трейс — из отчёта или командой `npx playwright show-trace trace.zip`. В нём каждое действие со снимками DOM до и после, сетевые запросы, логи консоли и таймлайн, поэтому причина часто видна сразу: всплывающая ошибка, медленный запрос, переименованная кнопка. При необходимости воспроизвожу падение локально в UI-режиме или с `--debug`. И только поняв, кто неправ — тест или приложение, — я чиню тест или завожу баг с приложенным трейсом."
+    tip:
+      en: "Mention the config option `trace: 'on-first-retry'` — it shows you know how traces get into CI in the first place."
+      ru: "Упомяни настройку `trace: 'on-first-retry'` — она показывает, что ты знаешь, откуда трейсы вообще берутся в CI."
+
+  - id: ai-workflow
+    topic: ai
+    q:
+      en: "How do you use AI agents in test automation?"
+      ru: "Как ты используешь ИИ-агентов в автоматизации тестирования?"
+    a:
+      en: "I use an agent like Claude Code or GitHub Copilot as a fast pair programmer, while I stay responsible for what gets tested. I give it a clear prompt: the test case steps, expected results, test data and our project rules — use `getByRole`, no hard waits, reuse our page objects. The agent drafts the test, often using Playwright MCP to look at the real page; I review the diff, run it, and check that it fails when the feature is broken. I also use agents to explain unfamiliar code, refactor repeated steps into fixtures and summarise failing reports. The agent writes code fast; deciding what's worth checking is my job."
+      ru: "Я использую агента вроде Claude Code или GitHub Copilot как быстрого напарника по программированию, но ответственность за то, что проверяется, остаётся на мне. Я даю ему чёткий промпт: шаги тест-кейса, ожидаемые результаты, тестовые данные и правила проекта — использовать `getByRole`, никаких жёстких ожиданий, переиспользовать наши page objects. Агент пишет черновик теста, часто заглядывая в реальную страницу через Playwright MCP; я смотрю diff, запускаю тест и проверяю, что он падает, когда фича сломана. Ещё я прошу агентов объяснить незнакомый код, вынести повторяющиеся шаги в фикстуры и кратко пересказать упавшие отчёты. Агент быстро пишет код, а решать, что стоит проверять, — моя работа."
+    tip:
+      en: "Describe a loop — prompt, generate, review, run, verify — not just 'I ask an AI to write tests'."
+      ru: "Опиши цикл — промпт, генерация, ревью, запуск, проверка, — а не просто «я прошу ИИ написать тесты»."
+
+  - id: playwright-test-agents
+    topic: ai
+    q:
+      en: "What are Playwright Test Agents?"
+      ru: "Что такое Playwright Test Agents?"
+    a:
+      en: "Playwright Test Agents are three agent definitions that come with Playwright and run inside tools like Claude Code or VS Code with Copilot; you add them to a project with `npx playwright init-agents`. The planner explores the app and writes a Markdown test plan; the generator turns that plan into Playwright tests, checking locators and assertions against the live app; the healer runs failing tests, inspects the page and proposes a fix — or skips the test if the feature itself seems broken. They usually start from a seed test that prepares the environment, for example by logging in. I see them as a strong starting point, but I review the plan before generation and every 'heal' before merging, because a healer can make a test pass by weakening it."
+      ru: "Playwright Test Agents — это три готовых агента, которые поставляются с Playwright и работают внутри инструментов вроде Claude Code или VS Code с Copilot; в проект они добавляются командой `npx playwright init-agents`. Planner исследует приложение и пишет тест-план в Markdown; generator превращает план в Playwright-тесты, сверяя локаторы и проверки с живым приложением; healer запускает упавшие тесты, изучает страницу и предлагает исправление — или пропускает тест, если похоже, что сломана сама фича. Обычно они стартуют от seed-теста, который готовит окружение, например выполняет вход. Для меня это сильная отправная точка, но план я проверяю до генерации, а каждое «лечение» — до мёрджа, потому что healer может «починить» тест, просто ослабив его."
+    tip:
+      en: "The last sentence — a critical eye on the healer — is what makes this answer senior."
+      ru: "Последняя фраза — критичный взгляд на healer — делает этот ответ ответом уровня senior."
+
+  - id: playwright-mcp
+    topic: ai
+    q:
+      en: "What is Playwright MCP, and why is it useful?"
+      ru: "Что такое Playwright MCP и чем он полезен?"
+    a:
+      en: "MCP, the Model Context Protocol, is a standard way to give an AI agent tools. Playwright MCP is a server that lets the agent control a real browser: open pages, click, type, and read the page through accessibility snapshots rather than screenshots. So the agent sees real roles, names and labels before it writes a locator, and guesses much less. I use it when generating or fixing tests and when exploring a new feature with the agent. It's still an agent, though, so I verify that what it saw matches the test case and the requirements."
+      ru: "MCP (Model Context Protocol) — это стандартный способ дать ИИ-агенту инструменты. Playwright MCP — сервер, который позволяет агенту управлять настоящим браузером: открывать страницы, кликать, вводить текст и читать страницу через снимки доступности (accessibility snapshots), а не через скриншоты. Благодаря этому агент видит реальные роли, имена и подписи ещё до того, как напишет локатор, и гадает гораздо меньше. Я использую его, когда генерирую или чиню тесты и когда вместе с агентом исследую новую фичу. Но это всё равно агент, поэтому я сверяю увиденное им с тест-кейсом и требованиями."
+    tip:
+      en: "Explaining why accessibility snapshots beat screenshots for writing locators is a nice detail."
+      ru: "Хорошая деталь — объяснить, почему для локаторов снимки доступности лучше скриншотов."
+
+  - id: review-ai-tests
+    topic: ai
+    q:
+      en: "How do you review a test generated by AI?"
+      ru: "Как ты делаешь ревью теста, сгенерированного ИИ?"
+    a:
+      en: "I review it as a test case first and as code second. Does it follow the steps and the expected result from the case, with the right test data? Does it assert the real outcome, not just 'the page loaded'? Then the code: resilient locators instead of CSS classes, no `waitForTimeout`, every action awaited, no invented methods like `page.open`, no dependency on other tests. Finally I run it — and make it fail on purpose, by changing the expected text or using a build with the bug — to prove it can catch a problem."
+      ru: "Сначала я проверяю его как тест-кейс, потом — как код. Соответствует ли он шагам и ожидаемому результату кейса, правильные ли тестовые данные? Проверяет ли он реальный результат, а не просто «страница загрузилась»? Затем код: устойчивые локаторы вместо CSS-классов, никаких `waitForTimeout`, `await` перед каждым действием, никаких выдуманных методов вроде `page.open`, никакой зависимости от других тестов. И наконец запускаю — и специально заставляю упасть, поменяв ожидаемый текст или взяв сборку с багом, — чтобы доказать, что тест способен поймать проблему."
+    tip:
+      en: "A short, ordered checklist sounds far stronger than 'I read the code carefully'."
+      ru: "Короткий упорядоченный чек-лист звучит гораздо убедительнее, чем «я внимательно читаю код»."
+
+  - id: ai-risks
+    topic: ai
+    q:
+      en: "What are the risks of AI-generated tests?"
+      ru: "Какие риски у тестов, сгенерированных ИИ?"
+    a:
+      en: "The biggest risk is false confidence: lots of green tests that don't really check anything. Agents hallucinate methods or labels that don't exist, invent expected values, or write weak assertions like `toBeTruthy()`. A subtler one: if you generate tests from the current app, the agent may record a bug as the expected behaviour — the test is fitted to the bug and ends up protecting it. Healing agents can also 'fix' a failing test by loosening it instead of reporting a real regression. So expected results must come from requirements and test cases, and a human reviews every change."
+      ru: "Главный риск — ложная уверенность: много зелёных тестов, которые на самом деле ничего не проверяют. Агенты галлюцинируют несуществующие методы и подписи, выдумывают ожидаемые значения или пишут слабые проверки вроде `toBeTruthy()`. Риск потоньше: если генерировать тесты по текущему состоянию приложения, агент может записать баг как ожидаемое поведение — тест подгоняется под баг и в итоге его защищает. А «лечащие» агенты могут «починить» упавший тест, ослабив его, вместо того чтобы сообщить о настоящей регрессии. Поэтому ожидаемые результаты должны идти из требований и тест-кейсов, а каждое изменение проверяет человек."
+    tip:
+      en: "Naming 'a test fitted to a bug' shows you've thought beyond the hype."
+      ru: "Если назовёшь риск «тест, подогнанный под баг», станет ясно, что ты смотришь глубже хайпа."
+
+  - id: prompt-as-test-case
+    topic: ai
+    q:
+      en: "What makes a good prompt for generating a test?"
+      ru: "Каким должен быть хороший промпт для генерации теста?"
+    a:
+      en: "A good prompt looks a lot like a good test case. It has preconditions, clear steps, exact test data and explicit expected results — for example, 'Expected: the cart shows Rose Bouquet with quantity 2 and the total €70.00.' Then I add constraints: which locators to use, no hard waits, which page objects or fixtures to reuse, and where to put the file. Vague prompts like 'test the checkout' produce vague tests. Years of writing test cases turn out to be great training for prompting."
+      ru: "Хороший промпт очень похож на хороший тест-кейс. В нём есть предусловия, чёткие шаги, точные тестовые данные и явные ожидаемые результаты — например: «Expected: the cart shows Rose Bouquet with quantity 2 and the total €70.00». Затем я добавляю ограничения: какие локаторы использовать, никаких жёстких ожиданий, какие page objects или фикстуры переиспользовать и куда положить файл. Расплывчатый промпт вроде «протестируй чекаут» даёт расплывчатые тесты. Оказывается, годы написания тест-кейсов — отличная тренировка для промптинга."
+    tip:
+      en: "Quote a real prompt fragment in English — prompts are usually written in English, even in Russian-speaking teams."
+      ru: "Процитируй фрагмент настоящего промпта на английском — промпты обычно пишут по-английски даже в русскоязычных командах."
+
+  - id: why-move-to-automation
+    topic: behavioral
+    q:
+      en: "Why are you moving from manual testing to automation?"
+      ru: "Почему ты переходишь из ручного тестирования в автоматизацию?"
+    a:
+      en: "I enjoy testing, and I'm good at finding what can go wrong — but I saw how much time our team spent repeating the same regression checks every release. I wanted to make that part fast and reliable, and spend my own time on the interesting testing. With AI agents writing much of the code, my strengths — test design, risk thinking, attention to detail — matter even more, because someone has to direct the agent and verify the result. So for me automation isn't leaving testing; it's doing it at a bigger scale."
+      ru: "Мне нравится тестирование, и у меня хорошо получается находить, что может пойти не так, — но я видел{а|}, сколько времени команда тратит на одни и те же регрессионные проверки в каждом релизе. Мне захотелось сделать эту часть быстрой и надёжной, а своё время тратить на действительно интересное тестирование. Теперь, когда большую часть кода пишут ИИ-агенты, мои сильные стороны — тест-дизайн, мышление в терминах рисков, внимание к деталям — становятся ещё важнее: кто-то должен направлять агента и проверять результат. Так что для меня автоматизация — это не уход из тестирования, а тестирование в большем масштабе."
+    tip:
+      en: "Frame it as growth, not escape. Never call manual testing boring — many interviewers started there too."
+      ru: "Подавай это как рост, а не как побег. Не называй ручное тестирование скучным — многие интервьюеры тоже с него начинали."
+
+  - id: proud-bug
+    topic: behavioral
+    q:
+      en: "Tell me about a bug you're proud of finding."
+      ru: "Расскажи о баге, находкой которого ты гордишься."
+    a:
+      en: "On a previous project I was testing free delivery, which should apply from €50. Everything looked fine at €49 and €60, but I always test the exact boundary — and at exactly €50.00 the customer was still charged for delivery, because the code used 'greater than' instead of 'greater than or equal'. It sounds small, but it affected a very common basket size and real money. I wrote a clear report with steps, expected versus actual and a screenshot, and it was fixed before release. Afterwards I added boundary cases to the regression suite — today I'd automate them, so this can never come back unnoticed."
+      ru: "На прошлом проекте я тестировал{а|} бесплатную доставку, которая должна действовать от €50. При €49 и €60 всё было в порядке, но я всегда проверяю ровно границу — и при сумме ровно €50.00 доставку всё равно брали: в коде стояло «больше», а не «больше или равно». Звучит мелко, но это касалось очень частой суммы заказа и реальных денег. Я написал{а|} понятный баг-репорт с шагами, ожидаемым и фактическим результатом и скриншотом, и баг исправили до релиза. После этого я добавил{а|} граничные кейсы в регресс — а сегодня я бы их автоматизировал{а|}, чтобы такая ошибка не могла вернуться незаметно."
+    tip:
+      en: "Use STAR (situation, task, action, result) and replace this example with your own real story. End with what you'd automate."
+      ru: "Используй схему STAR (ситуация, задача, действие, результат) и замени этот пример своей реальной историей. Закончи тем, что бы ты автоматизировал{а|}."
+
+  - id: disagreement-with-developer
+    topic: behavioral
+    q:
+      en: "Tell me about a time you disagreed with a developer."
+      ru: "Расскажи о случае, когда ты не {согласилась|согласился} с разработчиком."
+    a:
+      en: "A developer once closed my bug as 'works as designed': the cart counter in the header didn't update after 'Add to cart' until the page was reloaded. Instead of arguing in the comments, I collected facts — the requirement, a short screen recording, and how often users add several items in a row. I asked the product manager to confirm the expected behaviour, and we agreed it was a real issue, though not a release blocker, so it went into the next sprint. What I took away: keep it about the user and the evidence, not about who's right. Today, a failing automated test with a trace is often the most convincing evidence of all."
+      ru: "Однажды разработчик закрыл мой баг как «работает как задумано»: счётчик корзины в шапке не обновлялся после «Add to cart», пока не перезагрузишь страницу. Вместо спора в комментариях я собрал{а|} факты — требование, короткую запись экрана и данные о том, как часто пользователи добавляют несколько товаров подряд. Я попросил{а|} продакт-менеджера подтвердить ожидаемое поведение, и мы сошлись на том, что это настоящая проблема, хоть и не блокер релиза, — её взяли в следующий спринт. Вывод для себя: обсуждать пользователя и факты, а не то, кто прав. Сегодня самым убедительным аргументом часто оказывается упавший автотест с трейсом."
+    tip:
+      en: "Interviewers listen for respect and evidence. Never make the developer the villain of the story."
+      ru: "Интервьюеры слушают, есть ли в истории уважение и факты. Никогда не делай разработчика злодеем."
+
+  - id: coding-background
+    topic: behavioral
+    q:
+      en: "You don't have a programming background. How will you handle the code?"
+      ru: "У тебя нет опыта программирования. Как ты будешь справляться с кодом?"
+    a:
+      en: "I'm honest about it: I'm not a developer, and I don't need to be one to do automation well. I read TypeScript tests confidently, understand async/await, locators, assertions and fixtures, and I make targeted changes myself. For larger pieces of code I work with an AI agent, but I review every line and run every test — I don't merge anything I can't explain. And I keep learning: every review teaches me a little more of the language."
+      ru: "Скажу честно: я не {разработчица|разработчик} — и для хорошей автоматизации это не обязательно. Я уверенно читаю тесты на TypeScript, понимаю async/await, локаторы, проверки и фикстуры и сам{а|} вношу точечные изменения. Для более крупных кусков кода я работаю с ИИ-агентом, но проверяю каждую строку и запускаю каждый тест — я не мёрджу то, что не могу объяснить. И я продолжаю учиться: каждое ревью понемногу прибавляет мне знания языка."
+    tip:
+      en: "Honesty plus a clear working method beats pretending. Have one example ready of code you changed yourself."
+      ru: "Честность плюс понятный способ работы лучше притворства. Держи наготове пример кода, который ты изменил{а|} сам{а|}."

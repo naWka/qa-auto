@@ -1,0 +1,701 @@
+id: c3-l3
+chapter: c3
+title: { en: "async/await: one step at a time", ru: "async/await: шаг за шагом" }
+goal:
+  en: "Understand why browser steps start with `await`, and spot a missing `await` or `async` in generated code."
+  ru: "Понять, почему шаги в браузере начинаются с `await`, и замечать в сгенерированном коде забытый `await` или `async`."
+minutes: 8
+keyPoints:
+  - id: kp-await
+    title: { en: "await = wait until this step is finished", ru: "await — дождись, пока шаг закончится" }
+  - id: kp-missing-await
+    title: { en: "A missing await breaks the test quietly", ru: "Забытый await тихо ломает тест" }
+  - id: kp-async-keyword
+    title: { en: "await works only inside async", ru: "await работает только внутри async" }
+terms: [async, await, promise, syntax, error-message, action, assertion]
+
+steps:
+  - type: story
+    lines:
+      - who: leo
+        text:
+          en: "Some of Petal's tests are green on one run and red on the next. Nobody touched the app. What's going on?"
+          ru: "Часть тестов Petal то зелёные, то красные. Приложение никто не трогал. Что происходит?"
+      - who: petal
+        text:
+          en: "I may have skipped a few `await`s. They looked repetitive, so I optimised them away."
+          ru: "Возможно, я пропустил несколько `await`. Они выглядели однообразно, и я их «оптимизировал»."
+      - who: maya
+        text:
+          en: "They are repetitive. They are also the only reason the steps happen in order. Let's see why."
+          ru: "Они однообразные. А ещё только благодаря им шаги идут по порядку. Давай разберёмся почему."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед началом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c3-l3-p1
+        kind: choice
+        keyPoint: kp-await
+        prompt:
+          en: "Why does almost every line of a Playwright test start with `await`?"
+          ru: "Почему почти каждая строка Playwright-теста начинается с `await`?"
+        options:
+          - text: { en: "Browser steps take time; `await` waits until a step is finished before the next one starts", ru: "Шаги в браузере занимают время; `await` ждёт окончания шага, прежде чем начнётся следующий" }
+            correct: true
+            why: { en: "Exactly — the browser is slower than the code.", ru: "Именно — браузер медленнее кода." }
+          - text: { en: "It makes the test run faster", ru: "С ним тест работает быстрее" }
+            why: { en: "Waiting can't make anything faster — it makes things happen in order.", ru: "Ожидание ничего не ускоряет — оно выстраивает шаги по порядку." }
+          - text: { en: "It's a decoration — the test works the same without it", ru: "Это украшение — без него тест работает так же" }
+            why: { en: "Without it, steps start without waiting for each other. That's exactly Leo's problem.", ru: "Без него шаги стартуют, не дожидаясь друг друга. Ровно в этом проблема Лео." }
+        hints:
+          - { en: "\"Await\" means \"wait for\".", ru: "«Await» значит «дождаться»." }
+          - { en: "What do you do by hand after clicking a link, before typing?", ru: "Что ты делаешь руками после клика по ссылке, прежде чем печатать?" }
+        explain:
+          en: "Opening a page, clicking, checking — all take time. `await` makes the code wait for each step, just like you wait for a page to load before you type."
+          ru: "Открыть страницу, кликнуть, проверить — всё занимает время. `await` заставляет код дождаться каждого шага, как ты ждёшь загрузки страницы, прежде чем печатать."
+
+  - type: theory
+    keyPoint: kp-await
+    title: { en: "Browser steps take time", ru: "Шаги в браузере занимают время" }
+    body:
+      - en: "When you test by hand, you don't type into a field before the page has loaded. You wait — without even thinking about it. Code doesn't wait by itself: it only *starts* a browser step and immediately reads the next line."
+        ru: "Когда тестируешь руками, ты не печатаешь в поле, пока страница не загрузилась. Ты ждёшь — даже не задумываясь. Код сам по себе не ждёт: он только *запускает* шаг в браузере и сразу читает следующую строку."
+      - en: "Each browser step returns a [[promise]] — literally \"I'll tell you when I'm done\". [[await]] means: \"wait until this step is finished, then go to the next line\"."
+        ru: "Каждый шаг в браузере возвращает [[промис|promise]] — буквально «я скажу, когда закончу». [[await]] значит: «дождись окончания этого шага, потом переходи к следующей строке»."
+      - en: "Which lines need it? Everything that does or checks something in the browser: [[actions|action]] (`goto`, `fill`, `click`, `check`…) and [[assertions|assertion]] (`expect(...)`). A locator alone — `page.getByLabel('Email')` — only describes *where*, so it needs no `await`."
+        ru: "Каким строкам он нужен? Всему, что делает или проверяет что-то в браузере: [[действиям|action]] (`goto`, `fill`, `click`, `check`…) и [[проверкам|assertion]] (`expect(...)`). Сам по себе локатор — `page.getByLabel('Email')` — только описывает, *где*, поэтому `await` ему не нужен."
+    code: |
+      const loginButton = page.getByRole('button', { name: 'Log in' }); // "where" only — no await
+      await page.goto('/login');                                        // action — await
+      await loginButton.click();                                        // action — await
+      await expect(page).toHaveURL('/account');                         // assertion — await
+    mentor:
+      en: "A rule for review: a line that *does* or *checks* something in the browser starts with `await`. A Playwright test is a column of awaits — one finished step after another, like your numbered test steps."
+      ru: "Правило для ревью: строка, которая *делает* или *проверяет* что-то в браузере, начинается с `await`. Playwright-тест — это столбик из await: один законченный шаг за другим, как пронумерованные шаги твоего тест-кейса."
+
+  - type: theory
+    keyPoint: kp-missing-await
+    title: { en: "What happens without await", ru: "Что бывает без await" }
+    body:
+      - en: "Without `await`, the step starts, but the code doesn't wait for it and rushes to the next line. Steps overlap, and the test can even finish before a check has run."
+        ru: "Без `await` шаг запускается, но код его не ждёт и бежит к следующей строке. Шаги наезжают друг на друга, а тест может закончиться раньше, чем выполнилась проверка."
+      - en: "In real Playwright this gives random failures — or worse, a falsely green test that checked nothing. In this trainer the emulator catches it and reports the step as \"not awaited\", so the test fails."
+        ru: "В настоящем Playwright это даёт случайные падения — или, что хуже, ложно зелёный тест, который ничего не проверил. В тренажёре эмулятор это ловит и сообщает, что шаг «не дождались», — тест падает."
+      - en: "Agents forget `await` surprisingly often, and so do humans. It's one of the first things to scan for in any review."
+        ru: "Агенты забывают `await` на удивление часто — и люди тоже. Это одно из первого, что стоит высматривать на любом ревью."
+    code: |
+      test('Anna can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        page.getByRole('button', { name: 'Log in' }).click();   // no await!
+        expect(page).toHaveURL('/account');                      // no await!
+      });
+
+  - type: theory
+    keyPoint: kp-async-keyword
+    title: { en: "await needs async", ru: "await нужен async" }
+    body:
+      - en: "`await` works only inside a function marked [[async]]. That's why the test header says `async ({ page }) =>` and helpers say `async function`."
+        ru: "`await` работает только внутри функции, помеченной [[async]]. Поэтому в заголовке теста написано `async ({ page }) =>`, а у помощников — `async function`."
+      - en: "If `async` is missing, nothing runs at all: it's a [[syntax]] error, and the file breaks before the first step. The [[error message|error-message]] says: `await is only valid in async functions`."
+        ru: "Если `async` нет, не выполняется вообще ничего: это [[синтаксическая|syntax]] ошибка, и файл ломается до первого шага. [[Сообщение об ошибке|error-message]] говорит: `await is only valid in async functions`."
+      - en: "Good news: this mistake is loud. A missing `async` breaks the whole file at once; a missing `await` is quiet and sneaky."
+        ru: "Хорошая новость: эта ошибка громкая. Без `async` ломается сразу весь файл, а забытый `await` — тихий и коварный."
+    code: |
+      test('home page opens', ({ page }) => {   // async is missing
+        await page.goto('/');                    // SyntaxError
+      });
+
+  - type: example
+    keyPoint: kp-await
+    title: { en: "Where await is — and where it isn't", ru: "Где await есть — и где его нет" }
+    intro:
+      en: "A correct test. Notice which lines start with `await`, and the one that doesn't."
+      ru: "Правильный тест. Обрати внимание, какие строки начинаются с `await` и какая — нет."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('Tom can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('tom@bloomly.app');
+        await page.getByLabel('Password').fill('tulips42');
+        const loginButton = page.getByRole('button', { name: 'Log in' });
+        await loginButton.click();
+        await expect(page).toHaveURL('/account');
+        await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Tom!');
+      });
+    notes:
+      - lines: 3
+        text:
+          en: "`async` in the header — so `await` is allowed inside."
+          ru: "`async` в заголовке — значит, внутри можно использовать `await`."
+      - lines: 4
+        text:
+          en: "Wait until the login page is open."
+          ru: "Ждём, пока откроется страница логина."
+      - lines: [5, 6]
+        text:
+          en: "Wait until each value is typed."
+          ru: "Ждём, пока каждое значение будет введено."
+      - lines: 7
+        text:
+          en: "No `await`: this line only remembers *where* the button is. Nothing happens in the browser yet."
+          ru: "Без `await`: эта строка только запоминает, *где* кнопка. В браузере пока ничего не происходит."
+      - lines: 8
+        text:
+          en: "The action — awaited."
+          ru: "Действие — с await."
+      - lines: [9, 10]
+        text:
+          en: "Assertions are awaited too: they retry until the expected state appears (or time runs out), and `await` waits for that verdict."
+          ru: "Проверки тоже с await: они повторяются, пока не появится ожидаемое состояние (или не выйдет время), и `await` ждёт этого вердикта."
+    runnable: true
+
+  - type: task
+    task:
+      id: c3-l3-t1
+      kind: choice
+      multi: true
+      keyPoint: kp-await
+      prompt:
+        en: "Petal's test lost all its `await`s. Which of these lines must start with `await`? Pick all that apply."
+        ru: "Тест Petal потерял все `await`. Какие из этих строк должны начинаться с `await`? Выбери все подходящие."
+      options:
+        - text: "page.goto('/shop');"
+          correct: true
+          why: { en: "An action: opening a page takes time.", ru: "Действие: открытие страницы занимает время." }
+        - text: "page.getByLabel('Search').fill('tulips');"
+          correct: true
+          why: { en: "An action: typing.", ru: "Действие: ввод текста." }
+        - text: "const results = page.getByTestId('results-count');"
+          why: { en: "Only describes where to look. Nothing happens in the browser.", ru: "Только описывает, куда смотреть. В браузере ничего не происходит." }
+        - text: "expect(results).toHaveText('1 product');"
+          correct: true
+          why: { en: "An assertion: it waits for the text, so it must be awaited.", ru: "Проверка: она ждёт текст, значит, нужен await." }
+      optionsCode: true
+      hints:
+        - { en: "Ask for each line: does it *do* or *check* something in the browser?", ru: "Спроси про каждую строку: она *делает* или *проверяет* что-то в браузере?" }
+        - { en: "Three lines do or check. One only remembers a locator.", ru: "Три строки делают или проверяют. Одна только запоминает локатор." }
+      praise:
+        en: "Exactly the three that touch the browser. You'll spot a missing await in a second now."
+        ru: "Ровно те три, что обращаются к браузеру. Теперь забытый await ты заметишь за секунду."
+      explain:
+        en: "Actions and assertions → `await`. A locator stored in a constant → no `await`: it's just an address. The browser is only touched when you act on it or check it."
+        ru: "Действия и проверки → `await`. Локатор, сохранённый в константу, → без `await`: это просто адрес. К браузеру обращаются, только когда с ним что-то делают или проверяют."
+
+  - type: task
+    task:
+      id: c3-l3-t2
+      kind: review
+      keyPoint: kp-missing-await
+      prompt:
+        en: "This test is green on some runs and red on others. Find the cause."
+        ru: "Этот тест то зелёный, то красный. Найди причину."
+      context:
+        en: "Petal: \"The search test is a bit flaky. Maybe Bloomly is slow?\""
+        ru: "Petal: «Тест поиска немного нестабильный. Может, Bloomly тормозит?»"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('search finds Sunny Tulips', async ({ page }) => {
+          await page.goto('/shop');
+          page.getByLabel('Search').fill('tulips');
+          await expect(page.getByTestId('results-count')).toHaveText('1 product');
+          expect(page.getByTestId('product-card')).toContainText('Sunny Tulips');
+        });
+      issues:
+        - line: 5
+          type: missing-await
+          note:
+            en: "`fill` isn't awaited: the next check may start before \"tulips\" is typed."
+            ru: "`fill` без await: следующая проверка может начаться до того, как «tulips» будет введено."
+        - line: 7
+          type: missing-await
+          note:
+            en: "The last assertion isn't awaited: the test can end before it runs — a check that may never happen."
+            ru: "Последняя проверка без await: тест может закончиться раньше, чем она выполнится, — проверка, которой может и не быть."
+      types: [missing-await, hard-wait, wrong-data, no-assertion, hallucination]
+      hints:
+        - { en: "It's not Bloomly. Scan the left edge of each step line.", ru: "Дело не в Bloomly. Пробеги взглядом по левому краю каждой строки с шагом." }
+        - { en: "Which lines do or check something but don't start with `await`?", ru: "Какие строки что-то делают или проверяют, но не начинаются с `await`?" }
+        - { en: "Two lines: one action and one assertion.", ru: "Две строки: одно действие и одна проверка." }
+      praise:
+        en: "Both found — and you didn't blame the app. That's how flaky tests get fixed instead of re-run."
+        ru: "Обе найдены — и ты не свали{ла|л} всё на приложение. Так нестабильные тесты чинят, а не перезапускают."
+      explain:
+        en: "\"Sometimes green, sometimes red\" + no app changes = look for missing `await` first. Adding a pause (`waitForTimeout`) would only hide the problem."
+        ru: "«То зелёный, то красный» + приложение не меняли = первым делом ищи забытый `await`. Пауза (`waitForTimeout`) лишь спрятала бы проблему."
+
+  - type: task
+    task:
+      id: c3-l3-t3
+      kind: predict
+      keyPoint: kp-missing-await
+      prompt:
+        en: "Anna is already logged in. Will this test pass or fail in the trainer?"
+        ru: "Анна уже залогинена. Этот тест пройдёт или упадёт в тренажёре?"
+      app: { state: { user: anna@bloomly.app } }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('Anna sees all her orders', async ({ page }) => {
+          await page.goto('/orders');
+          expect(page.getByTestId('orders-summary')).toHaveText('Showing 6 of 6 orders');
+        });
+      outcome: fail
+      reasons:
+        - text:
+            en: "The assertion isn't awaited — the test ends before the check; the emulator reports \"not awaited\""
+            ru: "Проверка без await — тест заканчивается раньше проверки; эмулятор сообщает «не дождались»"
+          correct: true
+        - text:
+            en: "Anna has fewer than 6 orders"
+            ru: "У Анны меньше 6 заказов"
+          why: { en: "Anna has exactly 6 orders. The text is right — the problem is elsewhere.", ru: "У Анны ровно 6 заказов. Текст верный — проблема в другом." }
+        - text:
+            en: "/orders needs a login first"
+            ru: "Для /orders сначала нужен логин"
+          why: { en: "Anna is already logged in (preset state).", ru: "Анна уже залогинена (предустановленное состояние)." }
+      hints:
+        - { en: "The data and the text are correct. Look at the start of line 5.", ru: "Данные и текст верные. Посмотри на начало строки 5." }
+        - { en: "The orders take a moment to load. Does the test wait for the check?", ru: "Заказы грузятся не сразу. Ждёт ли тест проверку?" }
+      praise:
+        en: "Right. Correct data, correct text — and still a broken test, because of one missing word."
+        ru: "Верно. Верные данные, верный текст — и всё равно сломанный тест из-за одного пропущенного слова."
+      explain:
+        en: "The orders load for about 0.4 s. Without `await` the test ends right away, so the assertion never gets its chance. Real Playwright might even show this as green; the trainer reports it honestly as \"not awaited\"."
+        ru: "Заказы грузятся около 0,4 с. Без `await` тест заканчивается сразу, и проверка не успевает выполниться. Настоящий Playwright мог бы даже показать зелёный; тренажёр честно сообщает «не дождались»."
+
+  - type: task
+    task:
+      id: c3-l3-t4
+      kind: fix
+      keyPoint: kp-missing-await
+      prompt:
+        en: "Add the missing `await`s so the test passes. Don't change anything else."
+        ru: "Добавь недостающие `await`, чтобы тест прошёл. Больше ничего не меняй."
+      context:
+        en: "The cart already contains one Rose Bouquet (€35.00)."
+        ru: "В корзине уже лежит один Rose Bouquet (€35.00)."
+      app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('promo code BLOOM10 gives 10% off', async ({ page }) => {
+          await page.goto('/cart');
+          page.getByLabel('Promo code').fill('BLOOM10');
+          page.getByRole('button', { name: 'Apply' }).click();
+          await expect(page.getByTestId('promo-message')).toContainText('BLOOM10 applied');
+          expect(page.getByTestId('cart-total')).toHaveText('€36.40');
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('promo code BLOOM10 gives 10% off', async ({ page }) => {
+          await page.goto('/cart');
+          await page.getByLabel('Promo code').fill('BLOOM10');
+          await page.getByRole('button', { name: 'Apply' }).click();
+          await expect(page.getByTestId('promo-message')).toContainText('BLOOM10 applied');
+          await expect(page.getByTestId('cart-total')).toHaveText('€36.40');
+        });
+      checks:
+        expect: pass
+        static: [awaitsActions]
+      hints:
+        - { en: "Three lines do or check something without `await`.", ru: "Три строки что-то делают или проверяют без `await`." }
+        - { en: "Lines 5, 6 and 8.", ru: "Строки 5, 6 и 8." }
+        - { en: "Put `await ` at the start of each of them — before `page` or `expect`.", ru: "Поставь `await ` в начало каждой из них — перед `page` или `expect`." }
+      praise:
+        en: "Green and stable. Every step now waits for the previous one."
+        ru: "Зелёный и стабильный. Теперь каждый шаг ждёт предыдущий."
+      explain:
+        en: "`await` goes at the very start of the line, before `page...` or `expect(...)`. Total check: €35.00 − 10% = €31.50, + €4.90 delivery = €36.40."
+        ru: "`await` ставится в самое начало строки, перед `page...` или `expect(...)`. Проверим сумму: €35.00 − 10% = €31.50, + €4.90 доставка = €36.40."
+
+  - type: task
+    task:
+      id: c3-l3-t5
+      kind: predict
+      keyPoint: kp-async-keyword
+      prompt:
+        en: "Will this test pass or fail?"
+        ru: "Этот тест пройдёт или упадёт?"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('home page has a Shop now link', ({ page }) => {
+          await page.goto('/');
+          await expect(page.getByRole('link', { name: 'Shop now' })).toBeVisible();
+        });
+      outcome: fail
+      reasons:
+        - text:
+            en: "`async` is missing, so `await` is a syntax error — the file doesn't even start"
+            ru: "Нет `async`, поэтому `await` — синтаксическая ошибка, файл даже не запускается"
+          correct: true
+        - text:
+            en: "There is no \"Shop now\" link on the home page"
+            ru: "На главной нет ссылки «Shop now»"
+          why: { en: "There is one. The test never gets to look for it.", ru: "Есть. Просто тест до неё не доходит." }
+        - text:
+            en: "It passes — `async` is optional"
+            ru: "Пройдёт — `async` необязателен"
+          why: { en: "It's optional only if there's no `await` inside.", ru: "Он необязателен, только если внутри нет `await`." }
+      hints:
+        - { en: "Compare the header with `async ({ page }) => {`.", ru: "Сравни заголовок с `async ({ page }) => {`." }
+        - { en: "The steps use `await`. What does `await` need?", ru: "Шаги используют `await`. Что нужно для `await`?" }
+      praise:
+        en: "Correct — and you know this one is loud: the whole file stops."
+        ru: "Верно — и ты знаешь, что эта ошибка громкая: останавливается весь файл."
+      explain:
+        en: "Without `async` in the header, `await` is not allowed. The runner stops with \"SyntaxError: await is only valid in async functions\" before any test runs. Fix: `async ({ page }) => {`."
+        ru: "Без `async` в заголовке `await` не разрешён. Раннер останавливается с «SyntaxError: await is only valid in async functions» ещё до запуска тестов. Исправление: `async ({ page }) => {`."
+
+  - type: task
+    task:
+      id: c3-l3-t6
+      kind: choice
+      keyPoint: kp-async-keyword
+      prompt:
+        en: "Petal's new helper stops the whole run with this error message. Which fix is right?"
+        ru: "Новый помощник от Petal останавливает весь прогон с этим сообщением об ошибке. Какое исправление правильное?"
+      context:
+        en: "Error: `SyntaxError: await is only valid in async functions and the top level bodies of modules`"
+        ru: "Ошибка: `SyntaxError: await is only valid in async functions and the top level bodies of modules`"
+      code: |
+        function openCart(page) {
+          await page.goto('/cart');
+        }
+      options:
+        - text: "async function openCart(page) {"
+          correct: true
+          why: { en: "`async` before `function` allows `await` inside.", ru: "`async` перед `function` разрешает `await` внутри." }
+        - text: "function openCart(async page) {"
+          why: { en: "`async` marks the function, not a parameter.", ru: "`async` помечает функцию, а не параметр." }
+        - text: "await function openCart(page) {"
+          why: { en: "The definition needs `async`. `await` belongs before steps and calls.", ru: "Объявлению нужен `async`. `await` ставят перед шагами и вызовами." }
+        - text: "page.goto('/cart');   // just remove await"
+          why: { en: "The error disappears, but now the step isn't awaited — you trade a loud error for a quiet one.", ru: "Ошибка исчезнет, но шаг станет без ожидания — громкая ошибка сменится тихой." }
+      optionsCode: true
+      hints:
+        - { en: "Read the error message: where is `await` valid?", ru: "Прочитай сообщение об ошибке: где `await` разрешён?" }
+        - { en: "Compare with the helpers you've seen: `async function logIn(...)`.", ru: "Сравни с помощниками, которые ты уже видел{а|}: `async function logIn(...)`." }
+      praise:
+        en: "Yes — you read the error message and fixed the cause, not the symptom."
+        ru: "Да — ты прочита{ла|л} сообщение об ошибке и исправи{ла|л} причину, а не симптом."
+      explain:
+        en: "Error messages are worth reading word by word: \"only valid in async functions\" tells you exactly what's missing. Removing `await` would also silence the error — and create a flaky test."
+        ru: "Сообщения об ошибках стоит читать по словам: «only valid in async functions» прямо говорит, чего не хватает. Убрать `await` тоже заставит ошибку замолчать — и создаст нестабильный тест."
+
+  - type: task
+    task:
+      id: c3-l3-t7
+      kind: vocab
+      mode: cloze
+      sentence:
+        en: "The test was flaky because Petal forgot to ___ the click."
+        ru: "Тест был нестабильным, потому что Petal забыл дождаться клика (await)."
+      answer: await
+      options: [await, async, comment]
+
+  - type: mistakes
+    title: { en: "await mistakes agents make", ru: "Ошибки с await, которые делают агенты" }
+    items:
+      - wrong: "page.getByRole('button', { name: 'Log in' }).click();"
+        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+        why:
+          en: "The next line starts before the click is done. Random failures follow."
+          ru: "Следующая строка начинается до того, как клик завершился. Дальше — случайные падения."
+      - wrong: "expect(page).toHaveURL('/account');"
+        right: "await expect(page).toHaveURL('/account');"
+        why:
+          en: "An assertion without `await` may never run — a falsely green test in real Playwright."
+          ru: "Проверка без `await` может так и не выполниться — в настоящем Playwright это ложно зелёный тест."
+      - wrong: "logIn(page, 'anna@bloomly.app', 'bloom123');"
+        right: "await logIn(page, 'anna@bloomly.app', 'bloom123');"
+        why:
+          en: "An async helper must be awaited too, or the test goes on before the login is finished."
+          ru: "Асинхронного помощника тоже нужно дожидаться, иначе тест пойдёт дальше до окончания логина."
+      - wrong: "test('cart opens', ({ page }) => {"
+        right: "test('cart opens', async ({ page }) => {"
+        why:
+          en: "No `async` — every `await` inside becomes a syntax error."
+          ru: "Без `async` каждый `await` внутри становится синтаксической ошибкой."
+
+  - type: explain
+    keyPoint: kp-missing-await
+    prompt:
+      en: "In your own words: how can a test without `await` be green even though it checked nothing?"
+      ru: "Своими словами: как тест без `await` может быть зелёным, хотя ничего не проверил?"
+    model:
+      en: "Without `await`, the code starts the assertion but doesn't wait for its result. The test function reaches its end and is reported as finished before the check has had time to run or fail. So the report says green, but nobody actually verified the expected result. That's why I check that every action and every `expect` starts with `await`."
+      ru: "Без `await` код запускает проверку, но не ждёт её результата. Функция теста доходит до конца и считается завершённой раньше, чем проверка успела выполниться или упасть. Отчёт показывает зелёный, но ожидаемый результат на самом деле никто не проверил. Поэтому я смотрю, чтобы каждое действие и каждый `expect` начинались с `await`."
+
+  - type: phrases
+    items:
+      - context: code-review
+        en: "Missing await on line 7 — the assertion may never run."
+        ru: "В строке 7 не хватает await — проверка может так и не выполниться."
+      - context: code-review
+        en: "Please await the helper call; otherwise the test doesn't wait for the login to finish."
+        ru: "Добавь, пожалуйста, await перед вызовом помощника, иначе тест не ждёт окончания логина."
+      - context: chat
+        en: "Is it flaky only in CI? I suspect a missing await."
+        ru: "Он нестабилен только в CI? Подозреваю забытый await."
+      - context: standup
+        en: "The flaky search test was a missing await. I fixed it, and it's been stable for twenty runs."
+        ru: "Нестабильный тест поиска — это был забытый await. Я исправи{ла|л}, и он стабилен уже двадцать прогонов."
+      - context: prompt
+        en: "Check every action and every expect in this file: each one must be awaited."
+        ru: "Проверь каждое действие и каждый expect в этом файле: перед каждым должен быть await."
+        note:
+          en: "A good follow-up prompt after any generation: agents can check their own code for this."
+          ru: "Хороший уточняющий промпт после любой генерации: агенты умеют сами проверить на это свой код."
+
+checkPool:
+  - id: c3-l3-k1
+    kind: choice
+    keyPoint: kp-await
+    placement: true
+    prompt:
+      en: "What does `await` mean in `await page.goto('/shop');`?"
+      ru: "Что значит `await` в `await page.goto('/shop');`?"
+    options:
+      - text: { en: "Wait until the page has opened before running the next line", ru: "Дождаться, пока страница откроется, и только потом выполнять следующую строку" }
+        correct: true
+        why: { en: "That's the whole idea: finish this step first.", ru: "В этом вся идея: сначала закончить этот шаг." }
+      - text: { en: "Wait exactly 3 seconds", ru: "Подождать ровно 3 секунды" }
+        why: { en: "`await` waits for the step, not for a fixed time.", ru: "`await` ждёт окончания шага, а не фиксированное время." }
+      - text: { en: "Open the page later, in the background", ru: "Открыть страницу позже, в фоне" }
+        why: { en: "That's closer to what happens *without* `await`.", ru: "Это ближе к тому, что происходит *без* `await`." }
+    hints:
+      - { en: "\"Await\" = \"wait for\". Wait for what?", ru: "«Await» = «дождаться». Чего именно?" }
+      - { en: "It's not about seconds.", ru: "Дело не в секундах." }
+    explain:
+      en: "`await` waits for the step's promise: as long as it takes, no longer. Then the next line runs."
+      ru: "`await` ждёт промис шага: сколько нужно, не дольше. Потом выполняется следующая строка."
+
+  - id: c3-l3-k2
+    kind: choice
+    multi: true
+    keyPoint: kp-await
+    prompt:
+      en: "Which of these lines must start with `await`? Pick all that apply."
+      ru: "Какие из этих строк должны начинаться с `await`? Выбери все подходящие."
+    options:
+      - text: "page.goto('/cart');"
+        correct: true
+        why: { en: "Action: opening a page.", ru: "Действие: открыть страницу." }
+      - text: "const emptyMessage = page.getByTestId('cart-empty');"
+        why: { en: "Just a locator — an address, not a step.", ru: "Просто локатор — адрес, а не шаг." }
+      - text: "expect(emptyMessage).toHaveText('Your cart is empty.');"
+        correct: true
+        why: { en: "Assertion: it waits for the text.", ru: "Проверка: она ждёт текст." }
+      - text: "page.getByRole('link', { name: 'Continue shopping' }).click();"
+        correct: true
+        why: { en: "Action: a click.", ru: "Действие: клик." }
+    optionsCode: true
+    hints:
+      - { en: "Does the line do or check something in the browser?", ru: "Строка делает или проверяет что-то в браузере?" }
+      - { en: "Only one line is a pure locator.", ru: "Только одна строка — чистый локатор." }
+    explain:
+      en: "Actions and assertions are awaited; a locator stored in a constant is not."
+      ru: "Перед действиями и проверками — await; перед локатором, сохранённым в константу, — нет."
+
+  - id: c3-l3-k3
+    kind: review
+    keyPoint: kp-missing-await
+    prompt:
+      en: "Review Petal's helper and test. Flag every missing `await`."
+      ru: "Сделай ревью помощника и теста от Petal. Отметь каждый забытый `await`."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      async function logIn(page, email, password) {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill(email);
+        await page.getByLabel('Password').fill(password);
+        page.getByRole('button', { name: 'Log in' }).click();
+      }
+
+      test('Maya sees her name in the header', async ({ page }) => {
+        logIn(page, 'maya@bloomly.app', 'qa-rocks');
+        await expect(page.getByTestId('user-name')).toHaveText('Maya');
+      });
+    issues:
+      - line: 7
+        type: missing-await
+        note:
+          en: "The click inside the helper isn't awaited, so the helper can finish before the login is submitted."
+          ru: "Клик внутри помощника без await, поэтому помощник может закончиться раньше, чем логин отправится."
+      - line: 11
+        type: missing-await
+        note:
+          en: "The helper call isn't awaited: the check starts while the login steps are still running."
+          ru: "Вызов помощника без await: проверка начинается, пока шаги логина ещё идут."
+    types: [missing-await, wrong-data, wrong-assertion, hard-wait, no-assertion]
+    hints:
+      - { en: "Check both the helper and the test.", ru: "Проверь и помощника, и тест." }
+      - { en: "A call of an async helper needs `await` too.", ru: "Вызову асинхронного помощника тоже нужен `await`." }
+      - { en: "One line in the helper, one line in the test.", ru: "Одна строка в помощнике, одна — в тесте." }
+    explain:
+      en: "`await` is needed at every level: on steps inside the helper and on the call of the helper. Missing either one breaks the order."
+      ru: "`await` нужен на каждом уровне: на шагах внутри помощника и на вызове помощника. Без любого из них порядок ломается."
+
+  - id: c3-l3-k4
+    kind: predict
+    keyPoint: kp-missing-await
+    prompt:
+      en: "Will this test pass or fail in the trainer?"
+      ru: "Этот тест пройдёт или упадёт в тренажёре?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('search for orchid shows 1 product', async ({ page }) => {
+        await page.goto('/shop');
+        page.getByLabel('Search').fill('orchid');
+        await expect(page.getByTestId('results-count')).toHaveText('1 product');
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "`fill` isn't awaited — the emulator reports it"
+          ru: "`fill` без await — эмулятор это сообщит"
+        correct: true
+      - text:
+          en: "White Orchid is out of stock, so search hides it"
+          ru: "White Orchid нет в наличии, поэтому поиск его скрывает"
+        why: { en: "Out-of-stock products still appear in search, with a disabled button.", ru: "Товары не в наличии всё равно показываются в поиске — с неактивной кнопкой." }
+      - text:
+          en: "It passes: the assertion is awaited, so everything is fine"
+          ru: "Пройдёт: проверка с await, значит, всё в порядке"
+        why: { en: "Every step needs its own `await`, not just the last one.", ru: "Каждому шагу нужен свой `await`, а не только последнему." }
+    hints:
+      - { en: "Check every step line, not only the assertion.", ru: "Проверь каждую строку с шагом, а не только проверку." }
+      - { en: "Line 5.", ru: "Строка 5." }
+    explain:
+      en: "One un-awaited action is enough. In real Playwright this test might even pass most of the time — that's what makes such bugs so annoying. The trainer reports it every time."
+      ru: "Хватает одного действия без await. В настоящем Playwright этот тест мог бы даже чаще проходить — этим такие баги и неприятны. Тренажёр сообщает о них каждый раз."
+
+  - id: c3-l3-k5
+    kind: fix
+    keyPoint: kp-async-keyword
+    prompt:
+      en: "The whole file fails with a syntax error. Fix the helper so the test passes."
+      ru: "Весь файл падает с синтаксической ошибкой. Исправь помощника, чтобы тест прошёл."
+    starter: |
+      import { test, expect } from '@playwright/test';
+
+      function openShop(page) {
+        await page.goto('/shop');
+        await expect(page.getByRole('heading', { name: 'Shop' })).toBeVisible();
+      }
+
+      test('shop shows 6 products', async ({ page }) => {
+        await openShop(page);
+        await expect(page.getByTestId('results-count')).toHaveText('6 products');
+      });
+    solution: |
+      import { test, expect } from '@playwright/test';
+
+      async function openShop(page) {
+        await page.goto('/shop');
+        await expect(page.getByRole('heading', { name: 'Shop' })).toBeVisible();
+      }
+
+      test('shop shows 6 products', async ({ page }) => {
+        await openShop(page);
+        await expect(page.getByTestId('results-count')).toHaveText('6 products');
+      });
+    checks: { expect: pass }
+    hints:
+      - { en: "The helper uses `await`. What does a function need for that?", ru: "Помощник использует `await`. Что для этого нужно функции?" }
+      - { en: "Add one word before `function` on line 3.", ru: "Добавь одно слово перед `function` в строке 3." }
+    explain:
+      en: "`async function openShop(page)` — now `await` is allowed inside, and the test awaits the helper on line 9."
+      ru: "`async function openShop(page)` — теперь внутри можно `await`, а тест дожидается помощника в строке 9."
+
+  - id: c3-l3-k6
+    kind: predict
+    keyPoint: kp-await
+    prompt:
+      en: "Bloomly's orders are slow today: they take about 1.5 seconds to load. Will this test pass or fail?"
+      ru: "Заказы в Bloomly сегодня медленные: грузятся около 1,5 секунды. Этот тест пройдёт или упадёт?"
+    app:
+      state: { user: anna@bloomly.app }
+      latency: { orders: 1500 }
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('newest order is shown first', async ({ page }) => {
+        await page.goto('/orders');
+        await expect(page.getByTestId('order-row').first()).toContainText('#1042');
+      });
+    outcome: pass
+    reasons:
+      - text:
+          en: "It passes: the awaited assertion keeps retrying until the rows appear (up to 5 s)"
+          ru: "Пройдёт: проверка с await повторяется, пока не появятся строки (до 5 с)"
+        correct: true
+      - text:
+          en: "It fails: the page is slower than the test"
+          ru: "Упадёт: страница медленнее теста"
+        why: { en: "`await expect(...)` waits up to 5 seconds — 1.5 s is fine.", ru: "`await expect(...)` ждёт до 5 секунд — 1,5 с укладываются." }
+      - text:
+          en: "It fails: the test needs `waitForTimeout(2000)` first"
+          ru: "Упадёт: сначала нужен `waitForTimeout(2000)`"
+        why: { en: "No fixed pause needed — the assertion already waits for the result.", ru: "Фиксированная пауза не нужна — проверка и так ждёт результат." }
+    hints:
+      - { en: "Every step here is awaited.", ru: "Здесь каждый шаг с await." }
+      - { en: "How long does an assertion wait by default?", ru: "Сколько по умолчанию ждёт проверка?" }
+    explain:
+      en: "With `await`, slowness is not a problem: the assertion retries until \"#1042\" appears in the first row. It's the missing `await`, not the slow app, that makes tests flaky."
+      ru: "С `await` медленность не проблема: проверка повторяется, пока «#1042» не появится в первой строке. Нестабильными тесты делает забытый `await`, а не медленное приложение."
+
+  - id: c3-l3-k7
+    kind: choice
+    keyPoint: kp-async-keyword
+    placement: true
+    prompt:
+      en: "Which header lets you use `await` inside the test?"
+      ru: "С каким заголовком внутри теста можно использовать `await`?"
+    options:
+      - text: "test('cart opens', async ({ page }) => {"
+        correct: true
+        why: { en: "`async` before the parameters — `await` is allowed.", ru: "`async` перед параметрами — `await` разрешён." }
+      - text: "test('cart opens', ({ page }) => {"
+        why: { en: "No `async` — any `await` inside is a syntax error.", ru: "Нет `async` — любой `await` внутри будет синтаксической ошибкой." }
+      - text: "test('cart opens', await ({ page }) => {"
+        why: { en: "`await` doesn't go in the header.", ru: "`await` в заголовок не пишут." }
+      - text: "async test('cart opens', ({ page }) => {"
+        why: { en: "`async` marks the function inside `test(...)`, not `test` itself.", ru: "`async` помечает функцию внутри `test(...)`, а не сам `test`." }
+    optionsCode: true
+    hints:
+      - { en: "`async` goes right before the function's parameters.", ru: "`async` ставится прямо перед параметрами функции." }
+    explain:
+      en: "`async ({ page }) => {` — the only correct form."
+      ru: "`async ({ page }) => {` — единственная правильная форма."
+
+  - id: c3-l3-k8
+    kind: choice
+    keyPoint: kp-missing-await
+    prompt:
+      en: "In real Playwright (outside the trainer), a test is green, but its last line is `expect(...)` without `await`. What is true?"
+      ru: "В настоящем Playwright (вне тренажёра) тест зелёный, но в последней строке `expect(...)` без `await`. Что верно?"
+    options:
+      - text: { en: "The green may be false: the check might not have run before the test ended", ru: "Зелёный может быть ложным: проверка могла не выполниться до конца теста" }
+        correct: true
+        why: { en: "Nothing waited for the assertion's result.", ru: "Результата проверки никто не дождался." }
+      - text: { en: "Green is green — the check passed", ru: "Зелёный есть зелёный — проверка прошла" }
+        why: { en: "Green only means that nothing failed *in time*.", ru: "Зелёный значит лишь, что ничего не упало *вовремя*." }
+      - text: { en: "A missing await only matters for clicks", ru: "Забытый await важен только для кликов" }
+        why: { en: "Assertions need it just as much — they wait for the expected state.", ru: "Проверкам он нужен не меньше — они ждут ожидаемого состояния." }
+    hints:
+      - { en: "What does the test wait for before it ends?", ru: "Чего тест дожидается, прежде чем закончиться?" }
+      - { en: "A green report is only as honest as its assertions.", ru: "Зелёный отчёт честен ровно настолько, насколько честны его проверки." }
+    explain:
+      en: "That's a false positive: the report says green, but the expected result was never verified. Scanning for `await` before every `expect` protects you from it."
+      ru: "Это ложноположительный результат: отчёт зелёный, а ожидаемый результат никто не проверил. Защита — смотреть, есть ли `await` перед каждым `expect`."

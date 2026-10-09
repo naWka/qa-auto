@@ -1,0 +1,696 @@
+# Maya Chen's lines, shown in her speech bubble. Key = situation (see PhraseSituations in schema.ts).
+# RU addresses the student with gender variants {feminine|masculine}. Maya about herself: feminine.
+# Placeholders: {chapter} (chapterDone), {level} (levelUp), {streak} (streak), {badge} (badge),
+# {lessons} {terms} {tasks} {days} (progress). In RU, numbers go after a colon or in neutral constructions.
+
+greeting:
+  - { en: "Good to see you! Ready for today's lesson?", ru: "Рада тебя видеть! {Готова|Готов} к сегодняшнему уроку?" }
+  - { en: "Hi there! Coffee's ready, and Mochi is already on the keyboard — let's go.", ru: "Привет! Кофе готов, а Мочи уже лежит на клавиатуре — поехали." }
+  - { en: "Hey, you made it! Today's plan is short and sweet.", ru: "О, привет! План на сегодня короткий и приятный." }
+  - { en: "Come on in. Let's pick up right where we left off.", ru: "Заходи. Продолжим с того места, где остановились." }
+  - { en: "Hi! Petal generated tests all night — let's see what it got wrong.", ru: "Привет! Petal всю ночь генерировал тесты — давай посмотрим, где он ошибся." }
+  - { en: "Good to have you here. One new idea today, and a few tasks to make it stick.", ru: "Хорошо, что ты здесь. Сегодня одна новая идея и пара задач, чтобы она закрепилась." }
+  - { en: "Hello again! Ten focused minutes beat an hour of scrolling through docs.", ru: "И снова привет! Десять сосредоточенных минут лучше часа листания документации." }
+  - { en: "Hey! Mochi saved you the warm spot by the window.", ru: "Привет! Мочи занял для тебя тёплое место у окна." }
+  - { en: "There you are! Leo asked how the regression suite is going — let's give him something to brag about.", ru: "Вот и ты! Лео спрашивал, как дела с регрессом, — дадим ему повод похвастаться." }
+  - { en: "Hi! Today is a reading day: we look at code and think like testers.", ru: "Привет! Сегодня день чтения: смотрим на код и думаем как тестировщики." }
+  - { en: "Good to see you. Grab a tea — this one's fun.", ru: "Рада видеть. Бери чай — сегодня будет интересно." }
+  - { en: "Hello, colleague! Let's make Bloomly a little less buggy today.", ru: "Привет, коллега! Сделаем сегодня Bloomly чуточку менее багованным." }
+  - { en: "Ready when you are. Small steps, real progress.", ru: "Начнём, когда будешь {готова|готов}. Маленькие шаги — настоящий прогресс." }
+  - { en: "Hi! I've lined up a few tasks I think you'll enjoy.", ru: "Привет! Я подобрала несколько задач, которые, думаю, тебе понравятся." }
+  - { en: "Oh good, you're here. Petal has questions, and only you have the answers.", ru: "О, отлично, ты здесь. У Petal есть вопросы, а ответы — только у тебя." }
+  - { en: "Hey! The QA corner is open for business.", ru: "Привет! QA-уголок открыт и ждёт." }
+  - { en: "Hi! Today we'll turn something you already know from manual testing into code.", ru: "Привет! Сегодня превратим в код то, что ты и так знаешь по ручному тестированию." }
+  - { en: "Nice to see you! Let's keep the momentum going.", ru: "Приятно тебя видеть! Не будем терять темп." }
+  - { en: "Hello! Mochi just knocked a pen off my desk, so I'm officially ready to work.", ru: "Привет! Мочи только что скинул ручку с моего стола, так что я официально готова работать." }
+  - { en: "Hey you! A quick lesson, a couple of tasks, and you're free.", ru: "Привет-привет! Короткий урок, пара задач — и ты {свободна|свободен}." }
+  - { en: "Hi! Shall we hunt down a few bugs today?", ru: "Привет! Поохотимся сегодня на пару багов?" }
+  - { en: "Good to see you. The release isn't going to test itself — well, not without us.", ru: "Рада тебя видеть. Релиз сам себя не протестирует — по крайней мере, без нас." }
+  - { en: "Hi! Sofia just added three new features to the release. Perfect timing for practice.", ru: "Привет! София только что добавила в релиз три новые фичи. Самое время потренироваться." }
+  - { en: "Hey! Let's learn one thing well rather than five things badly.", ru: "Привет! Лучше разобраться в одном как следует, чем в пяти — кое-как." }
+  - { en: "Hello! I saved the most interesting part of the codebase for you.", ru: "Привет! Я приберегла для тебя самую интересную часть кода." }
+  - { en: "Hi there. Let's make today's session count — short and focused.", ru: "Привет. Пусть сегодняшнее занятие будет коротким, но насыщенным." }
+  - { en: "Hey! Kai pushed new UI changes, so our locators get a workout today.", ru: "Привет! Кай выкатил новые изменения в интерфейсе — нашим локаторам сегодня будет чем заняться." }
+  - { en: "Good to see you! Let's do what we do best: ask 'what could go wrong?'", ru: "Рада видеть! Займёмся тем, что у нас получается лучше всего: спросим «что может пойти не так?»" }
+  - { en: "Hi! You bring the tester's eye, I'll bring the snacks.", ru: "Привет! С тебя — взгляд тестировщика, с меня — печеньки." }
+  - { en: "Welcome! Today's goal: understand it well enough to explain it to Petal.", ru: "Привет! Цель на сегодня — понять тему так, чтобы объяснить её Petal." }
+  - { en: "Hey, glad you're here. Mochi has been guarding your chair.", ru: "Привет, хорошо, что ты с нами. Мочи всё это время охранял твой стул." }
+  - { en: "Hi! Fresh day, fresh tests. Let's see what breaks.", ru: "Привет! Новый день — новые тесты. Посмотрим, что сломается." }
+  - { en: "Hello! One lesson, a few tasks, zero stress.", ru: "Привет! Один урок, несколько задач, ноль стресса." }
+  - { en: "Hi! Remember: the agent writes the code, you decide what's worth checking.", ru: "Привет! Помни: код пишет агент, а что стоит проверять — решаешь ты." }
+  - { en: "Hey there! Let's add another brick to your automation skills.", ru: "Привет! Добавим ещё один кирпичик в твои навыки автоматизации." }
+
+welcomeBack:
+  - { en: "Welcome back! So good to see you.", ru: "С возвращением! Как же я рада тебя видеть." }
+  - { en: "Hey, you're back! Mochi noticed — he's already purring by your desk.", ru: "О, ты вернул{ась|ся}! Мочи заметил — уже мурчит у твоего стола." }
+  - { en: "Welcome back! Let's start with a light refresher, no pressure.", ru: "С возвращением! Начнём с лёгкой разминки, без всякого давления." }
+  - { en: "Breaks are part of learning. Your brain kept working on this while you were away.", ru: "Перерывы — часть обучения. Пока тебя не было, мозг продолжал обрабатывать материал." }
+  - { en: "There you are! Everything you learned is still here, I promise.", ru: "Вот и ты! Всё, что ты выучил{а|}, никуда не делось, обещаю." }
+  - { en: "Welcome back! Life happens — the tests waited patiently.", ru: "С возвращением! Жизнь есть жизнь — тесты терпеливо ждали." }
+  - { en: "Good to have you back. We'll ease in gently.", ru: "Хорошо, что ты снова здесь. Втянемся потихоньку." }
+  - { en: "Hi again! A short warm-up and you'll be right back in the flow.", ru: "И снова привет! Короткая разминка — и ты снова в потоке." }
+  - { en: "Welcome back! Coming back is the hardest part, and you've just done it.", ru: "С возвращением! Вернуться — самое сложное, и ты это уже сделал{а|}." }
+  - { en: "Oh, hello! I hope you had a good rest.", ru: "О, привет! Надеюсь, ты хорошо отдохнул{а|}." }
+  - { en: "Welcome back! Petal kept your seat warm. Well, Mochi did.", ru: "С возвращением! Petal держал для тебя место. Ну ладно, Мочи держал." }
+  - { en: "Hey! Picking things up after a pause is a skill too — nice.", ru: "Привет! Возвращаться после паузы — это тоже навык. Отлично." }
+  - { en: "Back in the office! Let's see what you remember — probably more than you think.", ru: "Снова в офисе! Посмотрим, что ты помнишь, — скорее всего, больше, чем кажется." }
+  - { en: "Welcome back! Nothing to catch up on — we simply continue.", ru: "С возвращением! Ничего догонять не надо — просто продолжаем." }
+  - { en: "So glad you're here. Let's start small today.", ru: "Очень рада тебя видеть. Сегодня начнём с малого." }
+  - { en: "Hey, welcome back! A little rest actually makes memories stronger.", ru: "Привет, с возвращением! Кстати, небольшой отдых даже укрепляет память." }
+  - { en: "Look who's here! Mochi, say hi.", ru: "Смотри-ка, кто у нас тут! Мочи, поздоровайся." }
+  - { en: "Welcome back! The release is still on track, and so are you.", ru: "С возвращением! Релиз идёт по плану, и ты тоже." }
+  - { en: "Good to see you again. We'll refresh a couple of ideas first.", ru: "Рада снова тебя видеть. Сначала освежим пару идей." }
+  - { en: "Hi! Whatever kept you busy, I'm glad you're here now.", ru: "Привет! Чем бы ты ни {была занята|был занят}, я рада, что ты снова здесь." }
+  - { en: "Welcome back! Your progress is saved — every last bit of it.", ru: "С возвращением! Твой прогресс сохранён — весь, до последней задачки." }
+  - { en: "There's my favourite tester! Ready to pick up the thread?", ru: "А вот и {моя любимая тестировщица|мой любимый тестировщик}! Продолжим?" }
+  - { en: "Welcome back! Rest is part of the process, not a break from it.", ru: "С возвращением! Отдых — часть процесса, а не перерыв в нём." }
+  - { en: "Hey! Let's do a gentle warm-up so it all comes back.", ru: "Привет! Сделаем мягкую разминку, чтобы всё вспомнилось." }
+  - { en: "Welcome back! Fun fact: recalling things after a pause is the best way to remember them long-term.", ru: "С возвращением! Интересный факт: вспоминать после паузы — лучший способ запомнить надолго." }
+  - { en: "Oh, you're here! Mochi just woke up too, so you're both right on time.", ru: "О, ты здесь! Мочи тоже только проснулся — так что вы оба как раз вовремя." }
+  - { en: "Welcome back. No rush — we go at your pace.", ru: "С возвращением. Никакой спешки — идём в твоём темпе." }
+  - { en: "Hi! Kai asked about you yesterday. Let's show him what you've got.", ru: "Привет! Кай вчера про тебя спрашивал. Покажем ему, на что ты способ{на|ен}." }
+  - { en: "Welcome back! The best time to continue is now, and here you are.", ru: "С возвращением! Лучшее время продолжить — сейчас, и ты уже здесь." }
+  - { en: "Hey there! Let's shake off the dust with something easy.", ru: "Привет! Стряхнём пыль чем-нибудь лёгким." }
+  - { en: "Welcome back! Every expert takes breaks — what matters is coming back.", ru: "С возвращением! Перерывы бывают у всех экспертов — главное возвращаться." }
+  - { en: "Hi! It's like you never left. Let's go.", ru: "Привет! Будто ты никуда и не уходил{а|}. Поехали." }
+  - { en: "Welcome back! I kept a seat and a fresh task for you.", ru: "С возвращением! Я сберегла для тебя место и свежую задачку." }
+  - { en: "Good to see you! Today we'll take it one step at a time.", ru: "Рада тебя видеть! Сегодня идём шаг за шагом." }
+  - { en: "Welcome back! Bloomly's bugs were getting a little too comfortable.", ru: "С возвращением! А то баги в Bloomly совсем расслабились." }
+
+pretestIntro:
+  - { en: "Quick guess before we start. Wrong answers are totally fine here.", ru: "Быстрая догадка перед началом. Ошибаться здесь — совершенно нормально." }
+  - { en: "Guess first, learn second. Guessing makes the answer stick later.", ru: "Сначала угадываем, потом учим. Догадка помогает потом лучше запомнить ответ." }
+  - { en: "You haven't learned this yet — and that's the point. Just take your best guess.", ru: "Ты этого ещё не проходил{а|} — в этом и смысл. Просто попробуй угадать." }
+  - { en: "A tiny warm-up question. No score, no judgement.", ru: "Маленький вопрос для разгона. Без оценок и без осуждения." }
+  - { en: "Mistakes here actually help: your brain gets curious about the right answer.", ru: "Ошибки здесь даже полезны: мозгу становится интересно, какой ответ правильный." }
+  - { en: "Before I explain anything — what does your tester's intuition say?", ru: "Прежде чем я что-то объясню, — что подсказывает твоя интуиция тестировщика?" }
+  - { en: "Take a guess. Even a wrong one will make the lesson easier to remember.", ru: "Попробуй угадать. Даже неверная догадка поможет лучше запомнить урок." }
+  - { en: "This doesn't count toward anything. It's just to wake up your curiosity.", ru: "Это ни на что не влияет. Просто чтобы разбудить любопытство." }
+  - { en: "New topic! Let's see what you can figure out with zero theory.", ru: "Новая тема! Посмотрим, до чего ты догадаешься без всякой теории." }
+  - { en: "Guessing is allowed. Encouraged, even.", ru: "Угадывать можно. Даже нужно." }
+  - { en: "Pre-test time: think of it as exploratory testing of your own knowledge.", ru: "Время пре-теста: считай, это исследовательское тестирование собственных знаний." }
+  - { en: "I don't expect you to know this yet. Just trust your gut.", ru: "Я не жду, что ты уже это знаешь. Просто доверься чутью." }
+  - { en: "A couple of quick questions before the lesson. Wrong answers are part of the plan.", ru: "Пара быстрых вопросов перед уроком. Неверные ответы входят в план." }
+  - { en: "Research says guessing first improves memory — so let's use that trick.", ru: "Исследования говорят: если сначала угадать, запоминается лучше. Воспользуемся этим." }
+  - { en: "No pressure: I care about your thinking, not the score.", ru: "Без давления: мне важен ход твоих мыслей, а не результат." }
+  - { en: "Let's poke at this topic a little before we open it up properly.", ru: "Давай немного потыкаем эту тему, прежде чем разбирать её как следует." }
+  - { en: "Here's a puzzle. You know more about testing than you think — use it.", ru: "Вот загадка. О тестировании ты знаешь больше, чем кажется, — используй это." }
+  - { en: "Quick one! If you get it wrong, even better — you'll remember the right answer.", ru: "Быстрый вопрос! Ошибёшься — даже лучше: запомнишь правильный ответ." }
+  - { en: "Think of it as a smoke test for your brain.", ru: "Считай это смоук-тестом для мозга." }
+  - { en: "Make a guess, and then we'll find out together.", ru: "Сделай предположение, а потом вместе выясним." }
+  - { en: "When I started, I got questions like these wrong all the time. That's exactly why they work.", ru: "Когда я начинала, постоянно ошибалась в таких вопросах. Именно поэтому они и работают." }
+  - { en: "You can't fail a pre-test. Really.", ru: "Пре-тест нельзя провалить. Правда." }
+  - { en: "A sneak peek at today's topic — what do you think happens here?", ru: "Подсмотрим одним глазком в сегодняшнюю тему — как думаешь, что тут происходит?" }
+  - { en: "Let's warm up your curiosity before the theory.", ru: "Разогреем любопытство перед теорией." }
+  - { en: "A hunch is enough. We'll sort out the details in a minute.", ru: "Достаточно просто догадки. С деталями разберёмся через минуту." }
+  - { en: "Even Petal guesses sometimes — it just never admits it. You're allowed to.", ru: "Даже Petal иногда угадывает — просто никогда в этом не признаётся. А тебе можно." }
+  - { en: "Let's start with a question you can't possibly know yet. Fun, right?", ru: "Начнём с вопроса, ответ на который ты пока знать не можешь. Весело, правда?" }
+  - { en: "Wrong answers now, right answers later. That's the deal.", ru: "Сейчас — неверные ответы, потом — верные. Таков уговор." }
+  - { en: "Here's a little teaser. Pick what feels right.", ru: "Небольшой тизер. Выбери то, что кажется правильным." }
+  - { en: "Before the lesson, a quick guess. It primes your brain for what's coming.", ru: "Перед уроком — быстрая догадка. Так мозг настраивается на новое." }
+  - { en: "Treat this like a test case with an unknown expected result.", ru: "Отнесись к этому как к тест-кейсу с неизвестным ожидаемым результатом." }
+  - { en: "Mochi always guesses where the bug is hiding. Your turn.", ru: "Мочи всегда угадывает, где спрятался баг. Твоя очередь." }
+  - { en: "Nobody gets everything right on a pre-test, and that's how it should be.", ru: "На пре-тесте никто не отвечает на всё правильно, и так и должно быть." }
+  - { en: "Go with your first instinct — we'll check it together right after.", ru: "Доверься первому впечатлению — сразу после этого проверим вместе." }
+
+correct:
+  - { en: "Great job!", ru: "Отлично!" }
+  - { en: "Spot on.", ru: "В точку." }
+  - { en: "Nailed it!", ru: "Есть! Прямо в яблочко." }
+  - { en: "That's exactly what a senior QA would flag.", ru: "Ровно то, на что обращают внимание senior QA." }
+  - { en: "This is how automation engineers think.", ru: "Именно так и думают инженеры по автоматизации." }
+  - { en: "Yes! You read that code like a pro.", ru: "Да! Ты прочитал{а|} этот код как профи." }
+  - { en: "Exactly right — well done!", ru: "{Умничка|Молодец}! Абсолютно верно." }
+  - { en: "Correct — and for the right reason, which matters even more.", ru: "Верно — и по правильной причине, а это даже важнее." }
+  - { en: "Good catch!", ru: "Отлично подмечено!" }
+  - { en: "That's the one. Your tester's instinct is working.", ru: "Оно самое. Твоё чутьё тестировщика работает." }
+  - { en: "Right! Petal would have missed that.", ru: "Верно! Petal бы это пропустил." }
+  - { en: "Perfect. With reviews like that, any team would want you.", ru: "Идеально. С таким ревью тебя возьмут в любую команду." }
+  - { en: "Yes! That's the answer of someone who has seen real bugs.", ru: "Да! Сразу видно человека, который встречал настоящие баги." }
+  - { en: "Correct. A clean, confident answer.", ru: "Правильно. Чёткий, уверенный ответ." }
+  - { en: "Exactly. That's the difference between a test that runs and a test that checks.", ru: "Именно. В этом разница между тестом, который просто запускается, и тестом, который действительно проверяет." }
+  - { en: "You're doing great!", ru: "Ты молодец!" }
+  - { en: "Bingo!", ru: "Бинго!" }
+  - { en: "Right answer. Mochi approves — that's a slow blink.", ru: "Правильный ответ. Мочи одобряет — видишь, медленно моргает." }
+  - { en: "Yes! That's how you keep a test suite trustworthy.", ru: "Да! Именно так набор тестов остаётся надёжным." }
+  - { en: "Correct — you didn't let the green checkmark fool you.", ru: "Верно — зелёная галочка тебя не обманула." }
+  - { en: "Brilliant. You picked the option that will still work next month.", ru: "Блестяще. Ты выбрал{а|} вариант, который будет работать и через месяц." }
+  - { en: "Absolutely right. Kai would merge that without a second thought.", ru: "Абсолютно верно. Кай вмёрджил бы это не раздумывая." }
+  - { en: "That's it! You see the risk, not just the syntax.", ru: "Оно! Ты видишь риск, а не только синтаксис." }
+  - { en: "Correct! Your manual testing experience is really paying off.", ru: "Правильно! Опыт ручного тестирования явно окупается." }
+  - { en: "Well done. That's a real-world answer, not a textbook one.", ru: "Здорово. Это ответ из реальной практики, а не из учебника." }
+  - { en: "Yes, yes, yes! 🌸", ru: "Да, да, да! 🌸" }
+  - { en: "Sharp eyes! You spotted it right away.", ru: "Зорко! Ты сразу это заметил{а|}." }
+  - { en: "Correct. I'd trust you with the release checklist.", ru: "Верно. Я бы доверила тебе релизный чек-лист." }
+  - { en: "Exactly right. That's what makes a test worth running.", ru: "Совершенно верно. Ради этого тест и стоит запускать." }
+  - { en: "You got it! See how much you already know?", ru: "Получилось! Видишь, сколько ты уже знаешь?" }
+  - { en: "Correct — that's QA thinking at its best.", ru: "Верно — это QA-мышление в лучшем виде." }
+  - { en: "Right on. You'd be surprised how many people miss that.", ru: "Точно. Ты удивишься, сколько людей это упускают." }
+  - { en: "That's the answer. You're reviewing like an automation engineer now.", ru: "Это правильный ответ. Ты уже делаешь ревью как инженер по автоматизации." }
+  - { en: "Great call. That's exactly the question to ask Petal.", ru: "Отличное решение. Именно такой вопрос и стоит задать Petal." }
+  - { en: "Correct! I couldn't have put it better myself.", ru: "Правильно! Я бы и сама лучше не сказала." }
+  - { en: "Yes! One more piece of the puzzle in place.", ru: "Да! Ещё один кусочек пазла на месте." }
+  - { en: "Now that's an answer! Well done.", ru: "Вот это ответ — {умничка|молодец}!" }
+
+wrong:
+  - { en: "Almost! Take another look.", ru: "Почти! Посмотри ещё раз." }
+  - { en: "Good try — mistakes are how everyone learns.", ru: "Хорошая попытка — все учатся на ошибках." }
+  - { en: "Not quite. What would you check first if this were a manual test?", ru: "Не совсем. А что бы ты проверил{а|} первым делом, если бы это был ручной тест?" }
+  - { en: "Hmm, not this one. You're close, though.", ru: "Хм, не этот вариант. Но ты близко." }
+  - { en: "Not yet. That's useful information, not a failure.", ru: "Пока нет. Это полезная информация, а не провал." }
+  - { en: "Close, but no. Have a second look at the code.", ru: "Близко, но нет. Взгляни на код ещё раз." }
+  - { en: "That's a common pick — and a common trap. Try again?", ru: "Частый выбор — и частая ловушка. Попробуешь ещё?" }
+  - { en: "Not quite right. Mochi isn't judging, and neither am I.", ru: "Не совсем так. Мочи не осуждает, и я тоже." }
+  - { en: "Oops, not this time. What's the expected result here?", ru: "Упс, не в этот раз. А какой здесь ожидаемый результат?" }
+  - { en: "Nope — but I can see why you'd think so. Look again.", ru: "Нет — но я понимаю, почему ты так подумал{а|}. Посмотри ещё раз." }
+  - { en: "Not this one. Every wrong answer narrows it down.", ru: "Не этот. Каждый неверный ответ сужает круг." }
+  - { en: "Almost there. Something small is hiding in the details.", ru: "Почти получилось. В деталях прячется какая-то мелочь." }
+  - { en: "Hmm, that's not it. Try reading it the way a user would.", ru: "Хм, не то. Попробуй прочитать это глазами пользователя." }
+  - { en: "Not quite. I made exactly this mistake when I started.", ru: "Не совсем. Я сама делала ровно эту ошибку, когда начинала." }
+  - { en: "Good thinking, wrong answer. Give it another shot.", ru: "Ход мыслей хороший, ответ — нет. Попробуй ещё раз." }
+  - { en: "That's a bug in the answer, not in you. Try again.", ru: "Это баг в ответе, а не в тебе. Попробуй снова." }
+  - { en: "Not this time — and that's okay. What else could it be?", ru: "Не в этот раз — и это нормально. Что ещё это может быть?" }
+  - { en: "Close! Re-read the question once more.", ru: "Близко! Перечитай вопрос ещё раз." }
+  - { en: "Not quite. Think about what could go wrong here.", ru: "Не совсем. Подумай, что тут может пойти не так." }
+  - { en: "Wrong turn, right direction. Try another option.", ru: "Ты сверну{ла|л} не туда, но направление верное. Попробуй другой вариант." }
+  - { en: "Hmm, no. Petal would probably pick that too — let's beat Petal.", ru: "Хм, нет. Petal, скорее всего, тоже выбрал бы это — давай обыграем Petal." }
+  - { en: "Not the right one. Mistakes stick better than easy wins, so this helps.", ru: "Не тот вариант. Ошибки запоминаются лучше лёгких побед, так что это даже на пользу." }
+  - { en: "Almost! Look at what the test actually checks.", ru: "Почти! Посмотри, что тест на самом деле проверяет." }
+  - { en: "That's not it, but you're asking the right questions.", ru: "Не то, но вопросы ты задаёшь правильные." }
+  - { en: "Not quite. Imagine you're writing a bug report — where's the evidence?", ru: "Не совсем. Представь, что ты пишешь баг-репорт, — где доказательства?" }
+  - { en: "Nope, but it's a smart mistake.", ru: "Нет, но это умная ошибка." }
+  - { en: "Not this one. Tricky, I know.", ru: "Не этот. Хитро, я знаю." }
+  - { en: "Hmm, not quite. Want to look again?", ru: "Хм, не совсем. Посмотришь ещё раз?" }
+  - { en: "Not right yet. Your second guess is usually better than your first.", ru: "Пока не то. Вторая попытка обычно точнее первой." }
+  - { en: "Good try! Look at each option like a code reviewer.", ru: "Хорошая попытка! Посмотри на каждый вариант глазами ревьюера." }
+  - { en: "No worries — that one trips up lots of people.", ru: "Ничего страшного — на этом спотыкаются многие." }
+  - { en: "Not quite. Mochi just tilted his head at that one.", ru: "Не совсем. Мочи как-то с сомнением наклонил голову." }
+  - { en: "Not quite. Compare it with the test case, step by step.", ru: "Не совсем. Сверь с тест-кейсом шаг за шагом." }
+  - { en: "Wrong one — but you're learning faster than you think.", ru: "Мимо — но учишься ты быстрее, чем кажется." }
+  - { en: "Oh, so close! One more look.", ru: "Ох, совсем рядом! Ещё один взгляд." }
+
+wrongAgain:
+  - { en: "Still not it — let's slow down a little.", ru: "Всё ещё не то — давай чуть притормозим." }
+  - { en: "No rush. Read the case once more, line by line.", ru: "Не спеши. Прочитай кейс ещё раз, строчку за строчкой." }
+  - { en: "Let's take a breath and look at one detail at a time.", ru: "Сделаем вдох и посмотрим на детали по одной." }
+  - { en: "Hmm, not yet. Try reading the expected result first.", ru: "Хм, пока нет. Попробуй сначала прочитать ожидаемый результат." }
+  - { en: "Still tricky, huh? Look at the exact text in the code.", ru: "Всё ещё хитро, да? Посмотри на точный текст в коде." }
+  - { en: "Not quite again — totally normal. What does each line actually do?", ru: "Снова мимо — это абсолютно нормально. Что на самом деле делает каждая строка?" }
+  - { en: "Let's zoom in. Which word in the question matters most?", ru: "Давай приблизим. Какое слово в вопросе самое важное?" }
+  - { en: "Pause for a second. Imagine running this test by hand.", ru: "Остановись на секунду. Представь, что выполняешь этот тест вручную." }
+  - { en: "Not this one either. Try ruling out the options you're sure are wrong.", ru: "И это не то. Попробуй исключить варианты, в ошибочности которых ты {уверена|уверен}." }
+  - { en: "Still not right, and that's fine. Reread the task slowly.", ru: "Опять не то, и это нормально. Перечитай задание медленно." }
+  - { en: "Let's step back. What is this test supposed to prove?", ru: "Давай отступим на шаг. Что этот тест должен доказать?" }
+  - { en: "Hmm. Check the small things: quotes, names, the exact label.", ru: "Хм. Проверь мелочи: кавычки, названия, точную подпись." }
+  - { en: "Not yet. Sometimes the answer hides in the line you skimmed.", ru: "Пока нет. Иногда ответ прячется в строчке, которую ты пробежал{а|} глазами." }
+  - { en: "Still not it. Mochi suggests a slow blink and a fresh look.", ru: "Всё ещё не то. Мочи советует медленно моргнуть и посмотреть свежим взглядом." }
+  - { en: "Let's go detail by detail, like checking a bug report before you send it.", ru: "Пройдёмся по деталям, как при проверке баг-репорта перед отправкой." }
+  - { en: "No worries. Read the code out loud — honestly, it helps.", ru: "Ничего страшного. Прочитай код вслух — честно, помогает." }
+  - { en: "A second miss just means this is worth learning properly.", ru: "Второй промах значит только одно: это стоит разобрать как следует." }
+  - { en: "Take your time. Compare what the test does with what the case says.", ru: "Не торопись. Сравни, что делает тест, с тем, что написано в кейсе." }
+  - { en: "Still not right. Which line would fail first?", ru: "Всё ещё не то. Какая строка упадёт первой?" }
+  - { en: "Hmm, let's slow down. What would a user see on the screen?", ru: "Хм, давай медленнее. Что пользователь увидит на экране?" }
+  - { en: "Not quite. Look at the data — is it the same as in the case?", ru: "Не совсем. Посмотри на данные — они совпадают с кейсом?" }
+  - { en: "Still not there, but you're narrowing it down.", ru: "Ещё не то, но круг сужается." }
+  - { en: "Let's try a different angle: what's missing, rather than what's wrong?", ru: "Попробуем с другой стороны: чего здесь не хватает, а не что тут не так?" }
+  - { en: "Not yet. Re-read the question — it's sneakier than it looks.", ru: "Пока нет. Перечитай вопрос — он хитрее, чем кажется." }
+  - { en: "Okay, slow mode on. One option at a time.", ru: "Так, включаем медленный режим. По одному варианту." }
+  - { en: "Not this one. A few mistakes in a row are part of learning, really.", ru: "Не этот. Несколько ошибок подряд — нормальная часть обучения, правда." }
+  - { en: "Still no. Try explaining each option to Mochi — he's a great listener.", ru: "Всё ещё нет. Попробуй объяснить каждый вариант Мочи — он отличный слушатель." }
+  - { en: "Hmm. Find the one detail that makes all the difference.", ru: "Хм. Найди ту самую деталь, которая всё меняет." }
+  - { en: "It's okay to slow down. Here, accuracy beats speed.", ru: "Притормозить — нормально. Здесь точность важнее скорости." }
+  - { en: "Not quite. Look at the order of the steps.", ru: "Не совсем. Посмотри на порядок шагов." }
+  - { en: "Let's look again together. What exactly does the expect line compare?", ru: "Давай посмотрим ещё раз вместе. Что именно сравнивает строка с expect?" }
+  - { en: "Still not right. Read it as if you were reviewing someone else's test.", ru: "Пока не то. Прочитай так, будто проверяешь чужой тест." }
+  - { en: "Not there yet. Close your eyes for a second, then read the case afresh.", ru: "Ещё не то. Закрой глаза на секунду и прочитай кейс заново." }
+  - { en: "The second try didn't land — happens to all of us. Small details first.", ru: "Вторая попытка не сработала — со всеми бывает. Сначала мелкие детали." }
+
+hintOffer:
+  - { en: "This one's tricky — want a hint?", ru: "Это хитрая штука — хочешь подсказку?" }
+  - { en: "Lots of people get stuck here. I did too when I started. A hint?", ru: "Здесь застревают многие. Я тоже застряла, когда начинала. Подсказать?" }
+  - { en: "Let me give you a nudge — this topic confuses almost everyone at first.", ru: "Давай я немного подтолкну — эта тема поначалу сбивает с толку почти всех." }
+  - { en: "Three tries on a hard one means you're really working. Want a small hint?", ru: "Три попытки на сложном вопросе — значит, ты по-настоящему стараешься. Дать маленькую подсказку?" }
+  - { en: "There's no shame in hints. Senior engineers ask for help every day.", ru: "В подсказках нет ничего стыдного. Senior-инженеры просят помощи каждый день." }
+  - { en: "Honestly, this tripped me up for weeks. Shall I point you in the right direction?", ru: "Честно, я на этом спотыкалась неделями. Подсказать направление?" }
+  - { en: "How about a hint? It won't give the answer away, just the direction.", ru: "Как насчёт подсказки? Ответ она не выдаст, только направление." }
+  - { en: "This is one of the trickiest bits. Want me to help a little?", ru: "Это одно из самых каверзных мест. Помочь немножко?" }
+  - { en: "Let's not fight it alone. Tap the hint — that's what it's for.", ru: "Не будем бороться в одиночку. Нажми на подсказку — она для этого и есть." }
+  - { en: "Even Kai asks for a hint on this one. Want one?", ru: "Даже Кай здесь просит подсказку. Хочешь?" }
+  - { en: "This topic is a classic stumbling block. A hint might unlock it.", ru: "Эта тема — классический камень преткновения. Подсказка может всё прояснить." }
+  - { en: "Want a clue? Mochi already has one, but he's not telling.", ru: "Хочешь подсказку? У Мочи она уже есть, но он молчит." }
+  - { en: "When I learned this, I needed three hints. Here's the first one, if you like.", ru: "Когда я это учила, мне понадобилось три подсказки. Вот первая, если хочешь." }
+  - { en: "Getting stuck is normal. Asking for a hint is a smart move, not a weakness.", ru: "Застрять — нормально. Попросить подсказку — умный ход, а не слабость." }
+  - { en: "A small hint could save you some time. Want to see it?", ru: "Маленькая подсказка сэкономит время. Показать?" }
+  - { en: "This one is hard for nearly everyone. Shall we look at a hint together?", ru: "Это сложно почти для всех. Посмотрим подсказку вместе?" }
+  - { en: "Let me help. On a real team, we'd just pair up on this.", ru: "Давай помогу. В настоящей команде мы бы просто разобрали это в паре." }
+  - { en: "Hint time? Understanding it is the whole point here.", ru: "Время подсказки? Здесь главное — разобраться." }
+  - { en: "I can see this is a tough one. Want a gentle hint?", ru: "Вижу, задачка непростая. Дать мягкую подсказку?" }
+  - { en: "Here's a secret: this exact question confuses most people who are new to automation. Hint?", ru: "Секрет: именно этот вопрос сбивает с толку почти всех, кто только приходит в автоматизацию. Подсказать?" }
+  - { en: "Shall I share what helped me understand this?", ru: "Рассказать, что помогло понять это мне?" }
+  - { en: "No need to guess blindly. A hint is right there.", ru: "Не нужно гадать вслепую. Подсказка рядом." }
+  - { en: "This one deserves a hint. Seriously, it's sneaky.", ru: "Здесь подсказка вполне заслужена. Серьёзно, вопрос с подвохом." }
+  - { en: "Let's turn frustration into progress — want a hint?", ru: "Давай превратим досаду в прогресс — хочешь подсказку?" }
+  - { en: "Three misses only mean the topic is new. A hint will help it click.", ru: "Три промаха значат только то, что тема новая. С подсказкой всё встанет на место." }
+  - { en: "I'd love to help here. Open a hint?", ru: "С удовольствием помогу. Открыть подсказку?" }
+  - { en: "Even Petal would need a hint here — and it never asks. You can.", ru: "Тут даже Petal понадобилась бы подсказка — только он никогда не просит. А ты можешь." }
+  - { en: "Lots of experienced testers pause right here. Want a hint?", ru: "Многие опытные тестировщики останавливаются именно здесь. Подсказать?" }
+  - { en: "Want me to walk you through the first step?", ru: "Хочешь, я проведу тебя через первый шаг?" }
+  - { en: "It's okay to ask. That's how good teams work.", ru: "Спрашивать — нормально. Так работают хорошие команды." }
+  - { en: "Tricky topic alert! A hint might be the fastest way forward.", ru: "Внимание, каверзная тема! Подсказка может быть самым быстрым путём вперёд." }
+  - { en: "I remember staring at this for ages. Let me save you the trouble — hint?", ru: "Помню, как сама подолгу на это смотрела. Давай сэкономлю тебе время — подсказка?" }
+  - { en: "You don't have to crack this alone. Want a clue?", ru: "Не обязательно разгадывать это в одиночку. Дать зацепку?" }
+  - { en: "Let's get you unstuck. One hint, coming up?", ru: "Давай сдвинемся с мёртвой точки. Показать одну подсказку?" }
+
+testGreen:
+  - { en: "Green! Your test passed.", ru: "Зелёный! Твой тест прошёл." }
+  - { en: "All green. Nice work!", ru: "Всё зелёное. Отличная работа!" }
+  - { en: "It passed! Now a quick question: would it fail if the app were broken?", ru: "Прошёл! А теперь вопрос: упал бы он, если бы приложение сломалось?" }
+  - { en: "Green is good — when it can also be red.", ru: "Зелёный хорош, когда он может стать и красным." }
+  - { en: "Look at that green checkmark. You earned it.", ru: "Посмотри на эту зелёную галочку. Ты её заслужил{а|}." }
+  - { en: "Passed! Mochi is doing his happy tail thing.", ru: "Прошёл! Мочи радостно задрал хвост трубой." }
+  - { en: "Green across the board! 🌿", ru: "Всё зелёное! 🌿" }
+  - { en: "Test passed. That's one less thing to click through by hand.", ru: "Тест прошёл. На одну ручную проверку меньше." }
+  - { en: "Green! A test that checks the right thing and passes — beautiful.", ru: "Зелёный! Тест, который проверяет нужное и проходит, — красота." }
+  - { en: "It works! And it'll keep working every night in CI.", ru: "Работает! И будет работать каждую ночь в CI." }
+  - { en: "Green run. Remember: a test with no assertion is green too — yours has one, right?", ru: "Зелёный прогон. Помни: тест без проверки тоже зелёный — в твоём ведь она есть?" }
+  - { en: "Passed on the first run! Love to see it.", ru: "Прошёл с первого запуска! Обожаю такое." }
+  - { en: "Green! That's the sound of a three-day manual regression getting shorter.", ru: "Зелёный! Так звучит сокращение трёхдневного ручного регресса." }
+  - { en: "Everything passed. Leo will be pleased.", ru: "Всё прошло. Лео будет доволен." }
+  - { en: "Green! Now you know it works — and you know why.", ru: "Зелёный! Теперь ты знаешь, что он работает, — и знаешь почему." }
+  - { en: "Passed. Clean and confident, just like your code review.", ru: "Прошёл. Чисто и уверенно — как твоё ревью." }
+  - { en: "Yes! Green and meaningful.", ru: "Да! Зелёный и осмысленный." }
+  - { en: "The test is green. Bonus round: break the app in your head — would this test catch it?", ru: "Тест зелёный. Бонусный раунд: мысленно сломай приложение — этот тест бы поймал?" }
+  - { en: "Passed! Petal is impressed, though it'll pretend it isn't.", ru: "Прошёл! Petal впечатлён, хотя сделает вид, что нет." }
+  - { en: "Green light! That one's going into the regression suite.", ru: "Зелёный свет! Этот тест отправляется в регрессионный набор." }
+  - { en: "Passed. You've made the computer check what you used to check by hand.", ru: "Прошёл. Ты заставил{а|} компьютер проверять то, что раньше проверял{а|} руками." }
+  - { en: "Green! Small test, big win.", ru: "Зелёный! Маленький тест, большая победа." }
+  - { en: "It passed. Trust it — but only because you know what it checks.", ru: "Прошёл. Ему можно доверять — но только потому, что ты знаешь, что он проверяет." }
+  - { en: "Green! That's a test you can be proud of.", ru: "Зелёный! Таким тестом можно гордиться." }
+  - { en: "Passed! Kai owes you a coffee.", ru: "Прошёл! Кай должен тебе кофе." }
+  - { en: "All tests green. Take a second to enjoy it.", ru: "Все тесты зелёные. Насладись моментом." }
+  - { en: "Green! A passing test is a promise: if this ever breaks, we'll know.", ru: "Зелёный! Проходящий тест — это обещание: если здесь что-то сломается, мы узнаем." }
+  - { en: "Passed. Healthy suspicion check: did it really click and verify, not just load the page?", ru: "Прошёл. Проверка на здоровую подозрительность: он правда кликнул и проверил, а не просто открыл страницу?" }
+  - { en: "Green and stable. That's the dream.", ru: "Зелёный и стабильный. Мечта!" }
+  - { en: "The run is green ✨", ru: "Прогон зелёный ✨" }
+  - { en: "Passed! I'd approve that pull request.", ru: "Прошёл! Я бы одобрила такой pull request." }
+  - { en: "Green! You're officially automating Bloomly's regression.", ru: "Зелёный! Ты официально автоматизируешь регресс Bloomly." }
+  - { en: "Passed. Between us: I trust a green test more once I've seen it fail.", ru: "Прошёл. Между нами: я больше доверяю зелёному тесту, когда хоть раз видела его красным." }
+  - { en: "Green! That's how confidence in a release is built — one test at a time.", ru: "Зелёный! Так и строится уверенность в релизе — тест за тестом." }
+
+testRed:
+  - { en: "Red! Don't worry — red is information.", ru: "Красный! Не переживай — красный это информация." }
+  - { en: "It failed. Let's read the report together.", ru: "Упал. Давай вместе прочитаем отчёт." }
+  - { en: "A red run. Every automation engineer sees this a dozen times a day.", ru: "Красный прогон. Любой инженер по автоматизации видит такое по десять раз на дню." }
+  - { en: "Failed — great, now we get to investigate.", ru: "Упал — отлично, теперь можно поисследовать." }
+  - { en: "Red means the test is talking to us. What is it saying?", ru: "Красный значит, что тест с нами разговаривает. Что он говорит?" }
+  - { en: "A failure! Let's check: is it the test or the app?", ru: "Падение! Проверим: проблема в тесте или в приложении?" }
+  - { en: "Red. Start with the first error message — it usually tells the whole story.", ru: "Красный. Начни с первого сообщения об ошибке — обычно в нём вся история." }
+  - { en: "It didn't pass. That's exactly why we run tests.", ru: "Не прошёл. Ровно для этого мы и запускаем тесты." }
+  - { en: "Red! Maybe you've just found a bug. Let's look closer.", ru: "Красный! Возможно, ты только что наш{ла|ёл} баг. Давай присмотримся." }
+  - { en: "Failing test, calm team. Let's read what happened.", ru: "Тест упал, а мы спокойны. Читаем, что произошло." }
+  - { en: "Red is not a grade. It's a clue.", ru: "Красный — это не оценка. Это подсказка." }
+  - { en: "Failed. Look at the line number — that's where the story starts.", ru: "Упал. Посмотри на номер строки — с неё и начинается история." }
+  - { en: "Red! Mochi's ears are up. Something interesting happened.", ru: "Красный! У Мочи ушки на макушке. Случилось что-то интересное." }
+  - { en: "It failed — which means it can fail. That's actually reassuring.", ru: "Упал — значит, он умеет падать. Это даже успокаивает." }
+  - { en: "A red run. Expected vs actual — that's your bug report, already half written.", ru: "Красный прогон. Ожидаемое и фактическое — вот тебе наполовину готовый баг-репорт." }
+  - { en: "Failed. Let's be detectives: what did the test expect, and what did it get?", ru: "Упал. Побудем детективами: что тест ожидал и что получил?" }
+  - { en: "Red. Happens to me every single day, no exaggeration.", ru: "Красный. У меня такое каждый день, без преувеличения." }
+  - { en: "Not green this time. Let's open the report before changing any code.", ru: "В этот раз не зелёный. Прежде чем менять код, откроем отчёт." }
+  - { en: "A red test is either doing its job or asking to be fixed. Let's find out which.", ru: "Красный тест либо делает свою работу, либо просит его починить. Выясним, что из двух." }
+  - { en: "Failed! Don't rush to fix it — understand it first.", ru: "Упал! Не спеши чинить — сначала разберись." }
+  - { en: "Red. Read the error the way you'd read a bug report from a colleague.", ru: "Красный. Прочитай ошибку так, как читал{а|} бы баг-репорт от коллеги." }
+  - { en: "Uh-oh, red. Totally normal. What's the first line of the error?", ru: "Ой, красный. Абсолютно нормально. Что в первой строке ошибки?" }
+  - { en: "It failed. Good — that means we're about to learn something.", ru: "Упал. Хорошо — значит, сейчас чему-то научимся." }
+  - { en: "Red! Petal would just rewrite the test. We'll read the report first.", ru: "Красный! Petal бы просто переписал тест. А мы сначала прочитаем отчёт." }
+  - { en: "A failed run. The report is your best friend right now.", ru: "Прогон упал. Отчёт сейчас — твой лучший друг." }
+  - { en: "Red happens. The skill is in what you do next.", ru: "Красное бывает. Мастерство — в том, что ты делаешь дальше." }
+  - { en: "A failure — let's see whether the app or the test is lying.", ru: "Падение — посмотрим, кто врёт: приложение или тест." }
+  - { en: "Red. Breathe. Read. Then decide.", ru: "Красный. Вдох. Читаем. Потом решаем." }
+  - { en: "Not passing yet. Compare the expected text with what's actually on the page.", ru: "Пока не проходит. Сравни ожидаемый текст с тем, что реально есть на странице." }
+  - { en: "It's red, and that's fine. Most of automation is reading failures.", ru: "Красный, и это нормально. Большая часть автоматизации — это чтение падений." }
+  - { en: "Failed. If the app is right and the test is wrong, we fix the test. If not, we file a bug.", ru: "Упал. Если право приложение, а ошибся тест, — чиним тест. Если нет — заводим баг." }
+  - { en: "Red! This is where your manual testing instincts shine.", ru: "Красный! Вот где пригодится твоё чутьё из ручного тестирования." }
+  - { en: "Failing test spotted. Let's treat it like any other bug investigation.", ru: "Обнаружен падающий тест. Разберём его, как любой другой баг." }
+  - { en: "Red run. No panic — the report has everything we need.", ru: "Красный прогон. Без паники — в отчёте есть всё, что нужно." }
+
+lessonDone:
+  - { en: "Lesson done! Nicely done.", ru: "Урок пройден! Здорово получилось." }
+  - { en: "That's a wrap for this lesson. You did great.", ru: "На этом урок всё. Ты отлично поработал{а|}." }
+  - { en: "Lesson complete. One more idea firmly in your toolbox.", ru: "Урок завершён. Ещё одна идея надёжно в твоём арсенале." }
+  - { en: "Done! Notice what you understand now that was fuzzy before.", ru: "Готово! Заметь: теперь тебе понятно то, что раньше было в тумане." }
+  - { en: "Lesson finished. Mochi is stretching in your honour.", ru: "Урок закончен. Мочи потягивается в твою честь." }
+  - { en: "You did it! Short lesson, solid progress.", ru: "Получилось! Короткий урок, серьёзный прогресс." }
+  - { en: "That's it for today's lesson. Proud of you.", ru: "На сегодня урок всё. Горжусь тобой." }
+  - { en: "Lesson complete! The next warm-up will help it stick.", ru: "Урок пройден! Следующая разминка поможет всё закрепить." }
+  - { en: "Done and dusted! 💪", ru: "Готово, и без хвостов! 💪" }
+  - { en: "Lesson finished. Could you explain it to Petal now? I bet you could.", ru: "Урок закончен. Объяснишь теперь это Petal? Уверена, у тебя получится." }
+  - { en: "Another lesson down. You're building real skills here.", ru: "Ещё один урок позади. Ты строишь настоящие навыки." }
+  - { en: "Lesson complete. That's exactly the pace that works.", ru: "Урок пройден. Именно такой темп и работает." }
+  - { en: "Finished! A short break, or one more? Your call.", ru: "Готово! Небольшой перерыв или ещё один урок? Решать тебе." }
+  - { en: "And that's the lesson. You stuck with the tricky parts — that's what counts.", ru: "Вот и весь урок. Ты не сдал{ась|ся} на сложных местах — это главное." }
+  - { en: "Lesson done. Bloomly's release just got a little safer.", ru: "Урок пройден. Релиз Bloomly стал чуточку надёжнее." }
+  - { en: "Well done! You learned one new thing properly — that's a great day.", ru: "Молодец! Ты как следует разобрал{ась|ся} в одной новой теме — отличный день." }
+  - { en: "Complete! The new terms are already in your vocabulary.", ru: "Готово! Новые термины уже в твоём словаре." }
+  - { en: "That's the lesson! Have a sip of tea — you've earned it.", ru: "Урок окончен! Сделай глоток чая — ты это заслужил{а|}." }
+  - { en: "Done! Small lessons add up faster than you'd think.", ru: "Готово! Маленькие уроки складываются быстрее, чем кажется." }
+  - { en: "Lesson complete. Now you speak a little more automation.", ru: "Урок пройден. Теперь ты говоришь на языке автоматизации чуть свободнее." }
+  - { en: "Finished! Leo will be glad to hear it.", ru: "Закончено! Лео будет рад это услышать." }
+  - { en: "You made it to the end! That one had some depth to it.", ru: "Ты дош{ла|ёл} до конца! Урок был непростой." }
+  - { en: "Lesson done. I really like the way you think these through.", ru: "Урок пройден. Мне очень нравится, как ты рассуждаешь." }
+  - { en: "Done! Another step from manual QA towards automation.", ru: "Готово! Ещё один шаг от ручного тестирования к автоматизации." }
+  - { en: "That's another lesson in the bag. Nicely handled.", ru: "Урок в копилке. Ты отлично справил{ась|ся}." }
+  - { en: "Complete! Mochi approved this lesson by falling asleep next to you.", ru: "Пройдено! Мочи одобрил урок, уснув рядом с тобой." }
+  - { en: "Lesson finished. You're more ready for the release than you were ten minutes ago.", ru: "Урок закончен. К релизу ты {готова|готов} лучше, чем десять минут назад." }
+  - { en: "Great session! You can tick this one off.", ru: "Отличное занятие! Этот урок можно отметить галочкой." }
+  - { en: "Done! Remember the phrases — you'll hear them at real standups.", ru: "Готово! Запомни фразы — ты услышишь их на настоящих стендапах." }
+  - { en: "Lesson complete ✨ Enjoy that feeling.", ru: "Урок пройден ✨ Насладись этим чувством." }
+  - { en: "You finished it! Consistency like this is what gets people hired.", ru: "Ты закончил{а|}! Именно такая регулярность и приводит к офферу." }
+  - { en: "That's it! You went from 'what is this?' to 'I get it'.", ru: "Вот и всё! Ты прош{ла|ёл} путь от «что это?» до «я понимаю»." }
+  - { en: "Lesson done. Petal learned nothing new today, but you did.", ru: "Урок пройден. Petal сегодня ничему новому не научился, а ты — да." }
+  - { en: "Finished! Every lesson makes the next one easier.", ru: "Закончено! Каждый урок облегчает следующий." }
+
+chapterDone:
+  - { en: "Chapter complete! You've finished “{chapter}”.", ru: "Глава пройдена! «{chapter}» — позади." }
+  - { en: "That's the whole chapter! I'm genuinely impressed.", ru: "Вся глава пройдена! Я по-настоящему впечатлена." }
+  - { en: "{chapter} — done. Time to celebrate a little.", ru: "«{chapter}» — готово. Самое время немного отпраздновать." }
+  - { en: "A whole department, conquered. The Bloomly team is noticing.", ru: "Целый отдел покорён. Команда Bloomly это замечает." }
+  - { en: "You finished “{chapter}”! That's a big milestone.", ru: "Ты прош{ла|ёл} главу «{chapter}»! Это большая веха." }
+  - { en: "Chapter done! Look back at the first lesson — it feels easy now, right?", ru: "Глава закончена! Оглянись на первый урок — сейчас он кажется простым, правда?" }
+  - { en: "Congratulations! “{chapter}” is officially behind you.", ru: "Поздравляю! Глава «{chapter}» официально позади." }
+  - { en: "You've wrapped up the chapter. Leo wants to shake your hand.", ru: "Глава завершена. Лео хочет пожать тебе руку." }
+  - { en: "Chapter complete! Mochi brought you his favourite toy — that's the highest honour.", ru: "Глава пройдена! Мочи принёс тебе свою любимую игрушку — это высшая награда." }
+  - { en: "{chapter}: complete. On to the next department!", ru: "«{chapter}»: пройдено. Вперёд, в следующий отдел!" }
+  - { en: "That's a chapter done! You should be proud of this one.", ru: "Целая глава! Этим можно гордиться." }
+  - { en: "Finished the chapter! Your skills just grew in a very real way.", ru: "Глава закончена! Твои навыки по-настоящему выросли." }
+  - { en: "“{chapter}” — in the bag. What a journey.", ru: "«{chapter}» — в копилке. Вот это путь." }
+  - { en: "Chapter done. You now know things many manual testers wish they knew.", ru: "Глава пройдена. Теперь ты знаешь то, что хотели бы знать многие ручные тестировщики." }
+  - { en: "A whole chapter, finished. Take a proper break — you've earned it.", ru: "Целая глава позади. Устрой себе нормальный перерыв — ты его заслужил{а|}." }
+  - { en: "Bravo! “{chapter}” is complete. 🎉", ru: "Браво! Глава «{chapter}» пройдена. 🎉" }
+  - { en: "Chapter finished. Sofia says the release plan looks a lot calmer now.", ru: "Глава закончена. София говорит, что план релиза теперь выглядит куда спокойнее." }
+  - { en: "You've closed the chapter “{chapter}”. That's real, lasting progress.", ru: "Ты закрыл{а|} главу «{chapter}». Это настоящий, прочный прогресс." }
+  - { en: "Department complete! Your sticker collection has a new neighbour coming.", ru: "Отдел пройден! Коллекцию стикеров скоро ждёт пополнение." }
+  - { en: "The end of “{chapter}” — and the start of something even more interesting.", ru: "Конец главы «{chapter}» — и начало чего-то ещё интереснее." }
+  - { en: "Chapter complete. I remember when this felt impossible to me.", ru: "Глава пройдена. Помню, как мне самой это когда-то казалось невозможным." }
+  - { en: "Well done on finishing the chapter. That takes persistence.", ru: "Поздравляю с завершением главы. Для этого нужно упорство." }
+  - { en: "“{chapter}”: done and dusted. Petal is taking notes.", ru: "«{chapter}»: сделано. Petal конспектирует." }
+  - { en: "Another chapter in the books! You're really doing this.", ru: "Ещё одна глава позади! У тебя действительно получается." }
+  - { en: "You made it through a whole chapter. Let that sink in.", ru: "Ты прош{ла|ёл} целую главу. Осознай это." }
+  - { en: "Chapter finished! This is the kind of progress you can put on a CV.", ru: "Глава закончена! Такой прогресс можно смело вписывать в резюме." }
+  - { en: "{chapter} — mastered. Ready for the next floor of the office?", ru: "«{chapter}» — освоено. {Готова|Готов} к следующему этажу офиса?" }
+  - { en: "Look at you, finishing chapters! Kai is slightly jealous.", ru: "Вот это да, главы одна за другой! Кай даже немного завидует." }
+  - { en: "Chapter complete. Remember how much was new when you started it?", ru: "Глава пройдена. Помнишь, сколько всего было новым в её начале?" }
+  - { en: "That's “{chapter}” wrapped up. The whole team noticed.", ru: "Глава «{chapter}» завершена. Вся команда заметила." }
+  - { en: "Chapter done! A cup of something nice is officially in order.", ru: "Глава пройдена! Официально пора выпить чего-нибудь вкусного." }
+  - { en: "You've completed “{chapter}”. Onward and upward! ✨", ru: "Глава «{chapter}» пройдена. Только вперёд! ✨" }
+  - { en: "Chapter finished — and you didn't just read it, you practised it.", ru: "Глава пройдена — и ты её не просто прочитал{а|}, а отработал{а|}." }
+  - { en: "Chapter complete! The next department has been waiting for someone like you.", ru: "Глава пройдена! Следующий отдел давно ждал кого-то вроде тебя." }
+
+levelUp:
+  - { en: "Level up! New level: {level}.", ru: "Новый уровень: «{level}»!" }
+  - { en: "New level unlocked: {level}!", ru: "Открыт новый уровень — «{level}»!" }
+  - { en: "{level} — that has a nice ring to it.", ru: "«{level}» — звучит гордо, правда?" }
+  - { en: "Congratulations! Welcome to {level}.", ru: "Поздравляю! Добро пожаловать на уровень «{level}»." }
+  - { en: "Level up! {level} suits you.", ru: "Уровень повышен! «{level}» тебе к лицу." }
+  - { en: "You've reached {level}. I'd update my LinkedIn headline, just saying.", ru: "Ты дости{гла|г} уровня «{level}». Я бы уже обновила заголовок в LinkedIn, просто говорю." }
+  - { en: "New title: {level}. Mochi bowed. Sort of.", ru: "Новое звание: «{level}». Мочи поклонился. Ну, почти." }
+  - { en: "{level}! You earned every single point of it.", ru: "«{level}»! Каждое очко ты заработал{а|} честно." }
+  - { en: "Level up to {level}! The team will hear about this at standup.", ru: "Новый уровень — «{level}»! Команда узнает об этом на стендапе." }
+  - { en: "And just like that — {level}.", ru: "И вот так просто — «{level}»." }
+  - { en: "You're officially at {level}. Petal is recalculating how much it respects you.", ru: "Ты официально на уровне «{level}». Petal пересчитывает, насколько тебя уважает." }
+  - { en: "Hello, {level}! Nice to meet you.", ru: "Привет, «{level}»! Приятно познакомиться." }
+  - { en: "Level up! {level} today — who knows what next month brings.", ru: "Новый уровень! Сегодня «{level}», а что будет через месяц — кто знает." }
+  - { en: "{level} unlocked. You grew into this one.", ru: "Уровень «{level}» открыт. Ты до него дорос{ла|}." }
+  - { en: "New level: {level}. This is what steady practice looks like.", ru: "Теперь твой уровень — «{level}». Вот как выглядит регулярная практика." }
+  - { en: "Big news: you're now at {level}! ✨", ru: "Большая новость: ты теперь на уровне «{level}»! ✨" }
+  - { en: "Level up! That's a real step in your career, not just in the app.", ru: "Новый уровень! Это шаг в карьере, а не только в приложении." }
+  - { en: "{level} — and honestly, well deserved.", ru: "«{level}» — и, честно, вполне заслуженно." }
+  - { en: "You levelled up to {level}. Leo just nodded approvingly.", ru: "Ты поднял{ась|ся} до уровня «{level}». Лео одобрительно кивнул." }
+  - { en: "Ding! {level}.", ru: "Дзынь! «{level}»." }
+  - { en: "Welcome to the {level} club. We have snacks.", ru: "Добро пожаловать в клуб «{level}». У нас есть печеньки." }
+  - { en: "From now on, your title is {level}. Wear it proudly.", ru: "С этого момента твоё звание — «{level}». Носи его с гордостью." }
+  - { en: "Level reached: {level}. Remember the day you started?", ru: "Достигнут уровень «{level}». Помнишь, с чего всё начиналось?" }
+  - { en: "Levelled up! You're further along than you think.", ru: "Уровень вверх! Ты продвинул{ась|ся} дальше, чем думаешь." }
+  - { en: "{level}! Mochi has requested your autograph.", ru: "«{level}»! Мочи просит автограф." }
+  - { en: "Congrats on {level}. That one took real effort.", ru: "Поздравляю с уровнем «{level}». Он дался тебе честным трудом." }
+  - { en: "New level! Your profile now says {level}.", ru: "Новый уровень! В твоём профиле теперь значится «{level}»." }
+  - { en: "You've hit {level}! That's a skill set, not just a number.", ru: "Ты на уровне «{level}»! Это набор навыков, а не просто цифра." }
+  - { en: "Level up! I knew you'd get here.", ru: "Новый уровень! Я знала, что ты до него доберёшься." }
+  - { en: "{level} achieved. Your future team lead is going to love you.", ru: "«{level}» — есть. Будущий тимлид будет в восторге." }
+  - { en: "Look who just reached {level}!", ru: "Смотри-ка, кто у нас теперь на уровне «{level}»!" }
+  - { en: "Up you go: {level}. Keep that curiosity going.", ru: "Выше: «{level}». Не теряй это любопытство." }
+  - { en: "New level, new confidence: {level}.", ru: "Новый уровень — новая уверенность: «{level}»." }
+  - { en: "Level up! The hard parts are starting to feel normal, aren't they?", ru: "Новый уровень! Сложное уже начинает казаться обычным, правда?" }
+  - { en: "{level} — officially yours.", ru: "«{level}» — официально твой." }
+
+streak:
+  - { en: "{streak} days in a row! That's a real habit now.", ru: "Дней подряд: {streak}! Это уже настоящая привычка." }
+  - { en: "Streak: {streak}. Consistency beats intensity every time.", ru: "Серия: {streak}. Регулярность всегда побеждает интенсивность." }
+  - { en: "{streak} — that's how many days you've kept the rhythm.", ru: "{streak} — столько дней подряд ты держишь ритм." }
+  - { en: "Look at that streak: {streak}! Mochi is impressed.", ru: "Посмотри на серию: {streak}! Мочи впечатлён." }
+  - { en: "Day {streak} in a row. Small daily steps, big results.", ru: "Сегодня твой {streak}-й день подряд. Маленькие ежедневные шаги — большие результаты." }
+  - { en: "Your streak is at {streak}. Future you is going to love this.", ru: "Твоя серия — {streak}. Тебе из будущего это очень понравится." }
+  - { en: "{streak} days running! That's how skills are built.", ru: "Уже {streak}-й день подряд! Так и вырастают навыки." }
+  - { en: "Streak milestone: {streak} 🔥", ru: "Серия достигла отметки {streak} 🔥" }
+  - { en: "{streak} days of showing up. That's the hardest part, and you're doing it.", ru: "Счётчик серии: {streak}. Самое сложное — просто приходить, и у тебя получается." }
+  - { en: "A {streak}-day streak! Leo would call that 'reliable delivery'.", ru: "Серия длиной {streak}! Лео назвал бы это «стабильной поставкой»." }
+  - { en: "{streak} days straight. Your regression suite would envy that stability.", ru: "Серия без перерывов: {streak}. Такой стабильности позавидует любой регрессионный набор." }
+  - { en: "Streak at {streak}! Not flaky at all.", ru: "Серия: {streak}! Ни капли флаки." }
+  - { en: "{streak} in a row. I'm genuinely proud of you.", ru: "{streak} подряд. Я по-настоящему тобой горжусь." }
+  - { en: "Your streak just hit {streak}. Keep it gentle, keep it going.", ru: "Твоя серия дошла до отметки {streak}. Спокойно, без надрыва — продолжаем." }
+  - { en: "{streak} days! Even Mochi isn't that consistent about breakfast.", ru: "Дней подряд — {streak}! Даже Мочи не так пунктуален с завтраком." }
+  - { en: "Streak: {streak}. This is what green-every-day looks like.", ru: "На счётчике {streak}. Вот как выглядит «зелёный каждый день»." }
+  - { en: "{streak} — your streak is growing like a well-watered bouquet. 🌸", ru: "{streak} — твоя серия растёт, как букет, который не забывают поливать. 🌸" }
+  - { en: "You've practised {streak} days in a row. A pipeline that never breaks.", ru: "Занятия идут без перерыва уже {streak}-й день. Пайплайн, который не ломается." }
+  - { en: "{streak}-day streak unlocked! Your brain loves this routine.", ru: "Открыта серия: {streak}! Мозг обожает такой режим." }
+  - { en: "Streak count: {streak}. Small habits, serious skills.", ru: "Счёт серии: {streak}. Маленькие привычки — серьёзные навыки." }
+  - { en: "{streak} days in a row — that's commitment.", ru: "Число дней подряд — {streak}. Вот это настрой." }
+  - { en: "Your streak reads {streak}. Petal runs 24/7, but you're the one actually learning.", ru: "На счётчике серии — {streak}. Petal работает круглосуточно, но учишься по-настоящему ты." }
+  - { en: "{streak} straight days! That's the rhythm of someone who's going to make it.", ru: "{streak} — и это дни подряд! Это ритм человека, у которого всё получится." }
+  - { en: "Streak: {streak}. Rest when you need to — but wow, look at this.", ru: "Серия: {streak}. Отдыхай, когда нужно, — но какая красота!" }
+  - { en: "{streak} days! You're turning practice into a habit.", ru: "Дней в серии: {streak}! Практика превращается в привычку." }
+  - { en: "A streak of {streak}! Leo says consistency is his favourite engineering quality.", ru: "Серия — {streak}! Лео говорит, что регулярность — его любимое инженерное качество." }
+  - { en: "{streak} in a row. That's not luck, that's discipline.", ru: "{streak} подряд — это не удача, это дисциплина." }
+  - { en: "Your streak: {streak}. The more days you show up, the easier the next one gets.", ru: "Твоя серия: {streak}. С каждым днём приходить становится легче." }
+  - { en: "Wow, {streak} days running! ✨", ru: "Ого, дней подряд — {streak}! ✨" }
+  - { en: "{streak} days, one lesson at a time. That's the way.", ru: "{streak} — столько дней ты идёшь урок за уроком. Так и надо." }
+  - { en: "Streak milestone: {streak}. Mochi purrs approvingly.", ru: "Рубеж серии: {streak}. Мочи одобрительно мурлычет." }
+  - { en: "{streak}-day streak! With reliability like that, you could be on call.", ru: "Серия: {streak}! С такой надёжностью тебя можно ставить на дежурство." }
+  - { en: "{streak} days of practice in a row — a stat worth putting on a slide.", ru: "Дней практики подряд: {streak}. Такую статистику можно выносить на слайд." }
+  - { en: "Hey, {streak} in a row! Keep that streak warm.", ru: "Эй, {streak} подряд! Береги эту серию." }
+
+badge:
+  - { en: "New sticker: {badge}!", ru: "Новый стикер: «{badge}»!" }
+  - { en: "You earned the {badge} sticker!", ru: "Ты получил{а|} стикер «{badge}»!" }
+  - { en: "{badge} — fresh for your collection.", ru: "«{badge}» — свежий экземпляр в коллекцию." }
+  - { en: "Sticker unlocked: {badge}. Mochi wants to sniff it.", ru: "Открыт стикер «{badge}». Мочи хочет его понюхать." }
+  - { en: "Look what you got: {badge}! ✨", ru: "Смотри, что у тебя: «{badge}»! ✨" }
+  - { en: "The {badge} sticker is yours. Well deserved.", ru: "Стикер «{badge}» — твой. Заслуженно." }
+  - { en: "A new sticker for your laptop: {badge}.", ru: "Новая наклейка на ноутбук: «{badge}»." }
+  - { en: "{badge}! I have the same one on my laptop.", ru: "«{badge}»! У меня на ноутбуке такой же." }
+  - { en: "Achievement: {badge}. A small sticker with a real skill behind it.", ru: "Достижение: «{badge}». Маленький стикер, а за ним — настоящий навык." }
+  - { en: "Congrats on {badge}! Your collection is getting colourful.", ru: "Поздравляю со стикером «{badge}»! Твоя коллекция становится всё ярче." }
+  - { en: "You've unlocked {badge}. Show it off at the next standup.", ru: "Открыт стикер «{badge}». Похвастайся на ближайшем стендапе." }
+  - { en: "{badge} — added to your collection.", ru: "«{badge}» — добавлен в коллекцию." }
+  - { en: "A new sticker! {badge} looks great on you.", ru: "Новый стикер! «{badge}» тебе очень идёт." }
+  - { en: "Ooh, {badge}. That's one of my favourites.", ru: "О, «{badge}». Один из моих любимых." }
+  - { en: "You earned {badge} — and I know exactly what it took.", ru: "Ты заработал{а|} «{badge}» — и я знаю, чего это стоило." }
+  - { en: "Sticker time! {badge} is now on your profile.", ru: "Время стикеров! «{badge}» теперь в твоём профиле." }
+  - { en: "{badge} unlocked. Kai is asking where he can get one.", ru: "«{badge}» получен. Кай спрашивает, где взять такой же." }
+  - { en: "Here's a little something for you: {badge}.", ru: "Вот тебе маленький подарок: «{badge}»." }
+  - { en: "{badge}! Petal doesn't get stickers. Just saying.", ru: "«{badge}»! А Petal стикеры не дают. Просто к слову." }
+  - { en: "New in the collection: {badge}. Keep them coming!", ru: "Новинка в коллекции: «{badge}». Пусть их будет больше!" }
+  - { en: "Your hard work just turned into a sticker: {badge}.", ru: "Твой труд превратился в стикер: «{badge}»." }
+  - { en: "{badge} — a sticker with a story. Remember how you earned it.", ru: "«{badge}» — стикер с историей. Запомни, как ты его получил{а|}." }
+  - { en: "Ding! {badge} is yours.", ru: "Дзынь! «{badge}» — твой." }
+  - { en: "You collected {badge}. Mochi demands a closer look.", ru: "В коллекции появился «{badge}». Мочи требует рассмотреть поближе." }
+  - { en: "{badge}: earned, not given.", ru: "«{badge}»: заработан, а не подарен." }
+  - { en: "Another sticker! {badge} joins the gang.", ru: "Ещё один стикер! «{badge}» присоединяется к компании." }
+  - { en: "Well done — the {badge} sticker is officially yours.", ru: "Отлично — стикер «{badge}» официально твой." }
+  - { en: "New sticker: {badge}. Your laptop lid is running out of space.", ru: "Ещё одна наклейка — «{badge}». На крышке ноутбука скоро не останется места." }
+  - { en: "Proud moment: {badge}! 🌸", ru: "Момент гордости: «{badge}»! 🌸" }
+  - { en: "{badge} — that one's not easy to get. Nicely done.", ru: "«{badge}» — его непросто получить. Отличная работа." }
+  - { en: "Sticker earned: {badge}. Collect them all? I think you might.", ru: "Стикер получен: «{badge}». Собрать все? Думаю, у тебя получится." }
+  - { en: "Surprise! You've just earned {badge}.", ru: "Сюрприз! Ты только что получил{а|} «{badge}»." }
+  - { en: "{badge} is in. Leo saw it and gave a thumbs up.", ru: "«{badge}» — есть. Лео увидел и показал большой палец." }
+  - { en: "A shiny new {badge} sticker for a shiny achievement.", ru: "Новенький стикер «{badge}» за блестящее достижение." }
+
+checkPassed:
+  - { en: "You know this! Topic counted.", ru: "Ты это знаешь! Тема засчитана." }
+  - { en: "Check passed. No need to sit through what you already know.", ru: "Проверка пройдена. Незачем проходить то, что ты уже знаешь." }
+  - { en: "Confirmed — this one's already yours. On to the next.", ru: "Подтверждено — эта тема уже твоя. Идём дальше." }
+  - { en: "Passed! Your experience shows. Let's not waste your time here.", ru: "Пройдено! Опыт чувствуется. Не будем тратить твоё время." }
+  - { en: "Nice — you clearly knew this already. Topic marked as done.", ru: "Здорово — ты явно это уже знал{а|}. Тема отмечена как пройденная." }
+  - { en: "That's what years of real testing get you. Topic counted.", ru: "Вот что дают годы настоящего тестирования. Тема засчитана." }
+  - { en: "Check passed! I love it when people show they know their stuff.", ru: "Проверка пройдена! Обожаю, когда человек показывает, что знает своё дело." }
+  - { en: "You know this topic — no need to repeat it.", ru: "Эту тему ты знаешь — повторять незачем." }
+  - { en: "Passed. Respect — you came in already knowing this.", ru: "Пройдено. Уважаю — ты приш{ла|ёл} уже со знаниями." }
+  - { en: "Counted! We'll spend your time on what's actually new.", ru: "Засчитано! Потратим твоё время на то, что действительно ново." }
+  - { en: "Check complete. You didn't need the lesson for this one.", ru: "Проверка завершена. Для этой темы урок тебе не понадобился." }
+  - { en: "Passed with confidence! The topic is yours.", ru: "Уверенно пройдено! Тема твоя." }
+  - { en: "Yes — you really do know this. Moving on.", ru: "Да — ты действительно это знаешь. Двигаемся дальше." }
+  - { en: "That's a pass. Your knowledge is officially on the record.", ru: "Зачёт. Твои знания официально зафиксированы." }
+  - { en: "Proved it! The topic is checked off.", ru: "Доказано! Тема отмечена." }
+  - { en: "Check passed. Mochi gives you a respectful nod.", ru: "Проверка пройдена. Мочи уважительно кивает." }
+  - { en: "Good call taking the check — you clearly knew this already.", ru: "Правильно, что ты реши{ла|л} пройти проверку, — ты это явно знал{а|}." }
+  - { en: "Passed. That's the advantage of experience.", ru: "Пройдено. Вот оно, преимущество опыта." }
+  - { en: "You knew it! Let's save the time for harder things.", ru: "Ты это знал{а|}! Сбережём время для задач посложнее." }
+  - { en: "Counted. I'll trust you on this one — you've earned it.", ru: "Засчитано. Здесь я тебе доверяю — ты это заслужил{а|}." }
+  - { en: "Passed! No point re-teaching what you already know.", ru: "Пройдено! Нет смысла заново учить тому, что ты уже знаешь." }
+  - { en: "Topic confirmed. That was quick and clean.", ru: "Тема подтверждена. Быстро и чисто." }
+  - { en: "Check passed — you're ahead of the curve here.", ru: "Проверка пройдена — здесь ты опережаешь программу." }
+  - { en: "Well, you obviously didn't need me for this one. Counted!", ru: "Что ж, здесь я тебе явно не нужна. Засчитано!" }
+  - { en: "Your existing knowledge just saved you a whole lesson. Nice.", ru: "Твои знания только что сэкономили тебе целый урок. Здорово." }
+  - { en: "Passed! Experience is a shortcut, and you took it.", ru: "Пройдено! Опыт — это короткий путь, и ты им воспользовал{ась|ся}." }
+  - { en: "Yes! The topic is counted — on to something new.", ru: "Да! Тема засчитана — переходим к новому." }
+  - { en: "Check passed. Petal would have needed three prompts for that.", ru: "Проверка пройдена. Petal на это понадобилось бы три промпта." }
+  - { en: "Counted as done. You know it, and now the app knows it too.", ru: "Засчитано. Ты это знаешь, и теперь приложение тоже знает." }
+  - { en: "Passed. That's how you respect your own time.", ru: "Пройдено. Вот так и надо ценить своё время." }
+  - { en: "Confirmed! This topic goes straight into your 'already know' pile.", ru: "Подтверждено! Тема отправляется прямиком в стопку «уже знаю»." }
+  - { en: "Check passed ✨ Your experience speaks for itself.", ru: "Проверка пройдена ✨ Твой опыт говорит сам за себя." }
+  - { en: "Done. We'll still revisit it in a warm-up now and then, just to keep it fresh.", ru: "Готово. Иногда будем возвращаться к теме в разминках, чтобы не забывалась." }
+  - { en: "Passed — you've got this topic covered, like a good regression suite.", ru: "Пройдено — эта тема у тебя покрыта, как хороший регрессионный набор." }
+
+checkFailed:
+  - { en: "Not this time — let's practise just the parts that didn't click.", ru: "Не в этот раз — давай потренируем только то, что не сложилось." }
+  - { en: "No worries. We'll go through the lesson — it'll be quick for you.", ru: "Ничего страшного. Пройдём урок — для тебя он будет быстрым." }
+  - { en: "That's completely normal. Some parts are new, and that's why the lesson exists.", ru: "Это совершенно нормально. Что-то здесь новое — для этого и есть урок." }
+  - { en: "Almost! Let's fill the gaps instead of repeating everything.", ru: "Почти! Давай закроем пробелы, а не будем повторять всё подряд." }
+  - { en: "Not quite yet. Now we know where to focus.", ru: "Пока не совсем. Зато теперь понятно, на чём сосредоточиться." }
+  - { en: "This check is about finding gaps, and we found one. That's useful.", ru: "Эта проверка нужна, чтобы находить пробелы, — и мы один нашли. Это полезно." }
+  - { en: "No judgement here. Let's practise the tricky bits.", ru: "Никакого осуждения. Потренируем каверзные места." }
+  - { en: "Good that you tried! Now we know exactly what to work on.", ru: "Хорошо, что ты попробовал{а|}! Теперь мы точно знаем, над чем работать." }
+  - { en: "Not a pass yet, and that's okay. You'll breeze through the lesson.", ru: "Пока не зачёт, и это нормально. Урок пролетишь на одном дыхании." }
+  - { en: "Some of it clicked, some didn't. Let's focus on the second part.", ru: "Что-то сложилось, что-то нет. Сосредоточимся на втором." }
+  - { en: "That's fine — automation has its own quirks, even for experienced testers.", ru: "Это нормально — у автоматизации свои особенности даже для опытных тестировщиков." }
+  - { en: "Not yet! Think of it as a test that found a gap. Good test.", ru: "Пока нет! Считай, что тест нашёл пробел. Хороший тест." }
+  - { en: "No problem. One short lesson, and you'll own this topic.", ru: "Не беда. Один короткий урок — и тема будет твоей." }
+  - { en: "We'll practise the parts that didn't land. You already know the rest.", ru: "Потренируем то, что не зашло. Остальное ты уже знаешь." }
+  - { en: "Honestly, I'd have missed some of these at first too.", ru: "Честно, я бы поначалу тоже ошиблась в некоторых из них." }
+  - { en: "That's okay! Better to find out now than in an interview.", ru: "Ничего! Лучше выяснить сейчас, чем на собеседовании." }
+  - { en: "Not counted yet — but you're closer than the score suggests.", ru: "Пока не засчитано — но ты ближе, чем кажется по результату." }
+  - { en: "Totally fine. Let's turn these misses into knowledge.", ru: "Всё в порядке. Превратим эти промахи в знания." }
+  - { en: "No stress. Let's take the lesson — you'll see what was missing.", ru: "Без стресса. Пройдём урок — и ты увидишь, чего не хватало." }
+  - { en: "Now we know where to dig. That's what checks are for.", ru: "Теперь ясно, где копать. Для этого проверки и нужны." }
+  - { en: "Not this round. Mochi says: one more lesson, then a nap.", ru: "Не в этот раз. Мочи говорит: ещё один урок, а потом поспать." }
+  - { en: "Let's practise. You clearly have a foundation — we'll build on it.", ru: "Давай потренируемся. Основа у тебя явно есть — будем на неё опираться." }
+  - { en: "Not quite, and that's exactly why we check. Let's learn the missing piece.", ru: "Не совсем, и именно поэтому мы проверяем. Давай разберём недостающий кусочек." }
+  - { en: "Fine by me! A few targeted tasks will sort this out.", ru: "Меня это устраивает! Несколько точечных задач всё исправят." }
+  - { en: "No harm done. The lesson will feel like a review for you.", ru: "Ничего страшного. Урок покажется тебе повторением." }
+  - { en: "Not yet — automation terms take a little time to settle.", ru: "Пока нет — термины автоматизации не сразу укладываются в голове." }
+  - { en: "Okay, let's work on it together. No rush.", ru: "Хорошо, поработаем над этим вместе. Без спешки." }
+  - { en: "Some answers missed the mark — that's information, not a verdict.", ru: "Некоторые ответы мимо — это информация, а не приговор." }
+  - { en: "We'll go through it properly. You'll be faster than you expect.", ru: "Разберём как следует. Ты справишься быстрее, чем ожидаешь." }
+  - { en: "That check was tough. Let's practise the specific bits that tripped you up.", ru: "Проверка была непростая. Потренируем именно те места, где ты споткнул{ась|ся}." }
+  - { en: "Not a pass, not a problem. Let's learn.", ru: "Не зачёт — не проблема. Учимся." }
+  - { en: "Good attempt. Now we know what's solid and what needs a little work.", ru: "Хорошая попытка. Теперь понятно, что уже крепко, а что надо подтянуть." }
+  - { en: "Your experience got you part of the way. The lesson will cover the rest.", ru: "Опыт провёл тебя часть пути. Остальное покроет урок." }
+  - { en: "No worries at all. Even senior engineers brush up on the basics.", ru: "Совершенно не о чем переживать. Даже senior-инженеры время от времени освежают базу." }
+
+warmupStart:
+  - { en: "Quick warm-up! Two or three minutes on things you've already learned.", ru: "Быстрая разминка! Две-три минуты на то, что ты уже прош{ла|ёл}." }
+  - { en: "Let's stretch those memory muscles before we start.", ru: "Разомнём мышцы памяти перед началом." }
+  - { en: "Warm-up time. Remembering is what makes it stick.", ru: "Время разминки. Именно вспоминание помогает закрепить." }
+  - { en: "A few quick questions from earlier lessons. Ready?", ru: "Несколько быстрых вопросов из прошлых уроков. {Готова|Готов}?" }
+  - { en: "Before anything new, let's visit a few old friends.", ru: "Прежде чем браться за новое, навестим старых знакомых." }
+  - { en: "Warm-up: short, easy, and very good for your memory.", ru: "Разминка: коротко, легко и очень полезно для памяти." }
+  - { en: "Let's see what stuck! Just a couple of minutes.", ru: "Посмотрим, что запомнилось! Всего пара минут." }
+  - { en: "Mochi always stretches before doing anything. Let's do the same.", ru: "Мочи всегда потягивается, прежде чем что-то делать. Давай и мы." }
+  - { en: "Quick recap round. Don't overthink it.", ru: "Быстрый круг повторения. Не перемудряй." }
+  - { en: "Time for a little spaced repetition — fancy name, simple idea.", ru: "Время интервального повторения — название мудрёное, идея простая." }
+  - { en: "Let's warm up with a few things you've seen before.", ru: "Разомнёмся на том, что ты уже видел{а|}." }
+  - { en: "A short regression run — for your brain.", ru: "Короткий регресс — для мозга." }
+  - { en: "Two minutes of review. Like a smoke test before the main suite.", ru: "Две минуты повторения. Как смоук-тест перед основным набором." }
+  - { en: "Let's refresh a few ideas so the new ones have something to hold on to.", ru: "Освежим пару идей, чтобы новым было за что зацепиться." }
+  - { en: "Warm-up! If something feels fuzzy, that's exactly why we do this.", ru: "Разминка! Если что-то подзабылось — для этого мы её и делаем." }
+  - { en: "A few quick ones from the past. No pressure, just practice.", ru: "Пара быстрых вопросов из прошлого. Без давления, просто практика." }
+  - { en: "Let's dust off some earlier topics.", ru: "Сдуем пыль с прошлых тем." }
+  - { en: "Coffee in one hand, warm-up in the other. Let's go.", ru: "Кофе в одной руке, разминка — в другой. Поехали." }
+  - { en: "A quick memory check before the lesson. Forgetting a bit is normal.", ru: "Быстрая проверка памяти перед уроком. Немного подзабыть — нормально." }
+  - { en: "Warm-up round! These will feel easier than last time.", ru: "Разминочный раунд! В этот раз будет легче, чем раньше." }
+  - { en: "Let's start by pulling a few things out of long-term memory.", ru: "Начнём с того, что достанем кое-что из долговременной памяти." }
+  - { en: "Every time you recall something, the memory gets stronger. Let's recall a little.", ru: "Каждое припоминание укрепляет память. Давай немного повспоминаем." }
+  - { en: "Mini-review time — just a handful of questions.", ru: "Время мини-повторения — всего несколько вопросов." }
+  - { en: "Let's revisit some earlier lessons, quick and light.", ru: "Вернёмся к прошлым урокам — быстро и легко." }
+  - { en: "Warm-up first. Even pros run a quick check before the big stuff.", ru: "Сначала разминка. Даже профи делают быструю проверку перед серьёзной работой." }
+  - { en: "A short warm-up from your past lessons. Think of it as a sanity check.", ru: "Короткая разминка по прошлым урокам. Считай это санити-чеком." }
+  - { en: "Back to some old topics for a moment. They've been waiting for you.", ru: "Ненадолго вернёмся к старым темам. Они тебя ждали." }
+  - { en: "Let's warm up! Three minutes, tops.", ru: "Разминаемся! Максимум три минуты." }
+  - { en: "Retrieval practice time. Your brain will thank you later.", ru: "Время практики припоминания. Мозг потом скажет спасибо." }
+  - { en: "Quick! What do you remember? Let's find out.", ru: "Быстро! Что ты помнишь? Сейчас узнаем." }
+  - { en: "Before the new stuff, a little look back.", ru: "Перед новым — небольшой взгляд назад." }
+  - { en: "Warm-up time — Petal reruns old tests too, you know.", ru: "Время разминки — Petal ведь тоже перезапускает старые тесты." }
+  - { en: "Let's make sure the basics are still solid. Quick round.", ru: "Убедимся, что база всё ещё крепкая. Быстрый раунд." }
+  - { en: "A gentle warm-up to get the gears turning ✨", ru: "Мягкая разминка, чтобы шестерёнки закрутились ✨" }
+
+progress:
+  - { en: "{days} days ago you hadn't read a single Playwright test — now you review Petal's code.", ru: "В первый день ты ещё не прочитал{а|} ни одного Playwright-теста, а сейчас делаешь ревью кода Petal. Дней с того момента: {days}." }
+  - { en: "Lessons done: {lessons}. That's a real foundation.", ru: "Пройдено уроков: {lessons}. Это настоящий фундамент." }
+  - { en: "You've learned {terms} terms. You could follow a real standup now.", ru: "Терминов в копилке: {terms}. Ты уже можешь следить за настоящим стендапом." }
+  - { en: "Tasks solved: {tasks}. Each one made you a little sharper.", ru: "Решено задач: {tasks}. Каждая сделала тебя чуточку внимательнее." }
+  - { en: "{lessons} lessons, {tasks} tasks. That's not 'just studying' — that's training.", ru: "Уроков: {lessons}, задач: {tasks}. Это уже не просто учёба, а настоящая тренировка." }
+  - { en: "Remember day one? That was {days} days ago. Look at you now.", ru: "Помнишь первый день? С тех пор прошло дней: {days}. Посмотри на себя сейчас." }
+  - { en: "{terms} new words in your professional English. Kai noticed.", ru: "Новых слов в твоём рабочем английском: {terms}. Кай заметил." }
+  - { en: "You started with manual test cases; now you read automated tests. It took {days} days.", ru: "Ты начинал{а|} с ручных тест-кейсов, а теперь читаешь автотесты. Дней на это ушло: {days}." }
+  - { en: "{tasks} tasks solved — more practice than many people get in a month.", ru: "{tasks} — столько задач ты уже решил{а|}. Это больше практики, чем у многих за месяц." }
+  - { en: "{lessons} lessons behind you. The next ones will build on every one of them.", ru: "Уже {lessons} — столько уроков позади. Следующие будут опираться на каждый из них." }
+  - { en: "Your vocabulary: {terms} terms and counting.", ru: "Твой словарь: {terms} — и это не предел." }
+  - { en: "{days} days in, and you already think in locators and assertions.", ru: "Дней с начала: {days} — а ты уже мыслишь локаторами и проверками." }
+  - { en: "You've solved {tasks} tasks. Petal has generated more code, but you've made better decisions.", ru: "Решено задач: {tasks}. Кода Petal нагенерировал больше, но решения у тебя — лучше." }
+  - { en: "Progress check: {lessons} lessons, {terms} terms, {tasks} tasks. Not bad at all.", ru: "Сводка: уроков — {lessons}, терминов — {terms}, задач — {tasks}. Совсем неплохо." }
+  - { en: "{terms} terms learned. You could survive a code review in English now.", ru: "Терминов выучено: {terms}. Ревью на английском тебе уже по силам." }
+  - { en: "{days} days ago, 'locator' was just a word. Now it's a tool you use.", ru: "В начале пути «локатор» был просто словом, а теперь это твой рабочий инструмент. Дней с тех пор: {days}." }
+  - { en: "{tasks} tasks done — each one a decision a real automation engineer makes every day.", ru: "Задач решено: {tasks} — и каждая похожа на решения, которые инженер по автоматизации принимает каждый день." }
+  - { en: "Look how far you've come: {lessons} lessons since you started.", ru: "Посмотри, какой путь пройден: уроков с самого начала — {lessons}." }
+  - { en: "From zero to {terms} terms. Your English is growing along with your skills.", ru: "Терминов было ноль, стало {terms}. Английский растёт вместе с навыками." }
+  - { en: "{days} days of learning. Your future team is lucky.", ru: "Дней учёбы: {days}. Твоей будущей команде повезло." }
+  - { en: "You've finished {lessons} lessons. Leo would call that a steady velocity.", ru: "Уроков за плечами: {lessons}. Лео назвал бы это стабильной скоростью." }
+  - { en: "{tasks} tasks! Every one of them a step from 'I click' to 'I automate'.", ru: "Задач: {tasks}! Каждая — шаг от «я кликаю» к «я автоматизирую»." }
+  - { en: "It's been {days} days. You now read test reports as calmly as bug reports.", ru: "Прошло дней: {days}. Теперь ты читаешь отчёты о тестах так же спокойно, как баг-репорты." }
+  - { en: "{lessons} lessons and {terms} terms — a solid start to a new career.", ru: "Уроки: {lessons}. Термины: {terms}. Отличное начало новой карьеры." }
+  - { en: "{terms} terms in your pocket — standups in English are getting easier, right?", ru: "Терминов в кармане: {terms} — стендапы на английском уже даются легче, правда?" }
+  - { en: "{days} days ago you only tested by hand. Today you automate.", ru: "Ещё недавно ты тестировал{а|} только руками. Сегодня — автоматизируешь. Дней с начала: {days}." }
+  - { en: "Tasks solved so far: {tasks}. Mochi watched every single one.", ru: "Решённых задач пока: {tasks}. Мочи наблюдал за каждой." }
+  - { en: "{lessons} lessons in, and you're asking the kind of questions I'd expect from a mid-level automation engineer.", ru: "Уроков позади: {lessons} — а ты уже задаёшь вопросы уровня мидл-инженера по автоматизации." }
+  - { en: "In {days} days you've built a habit and a skill. Both count.", ru: "Дней с начала: {days}. За это время появились и привычка, и навык — считается и то, и другое." }
+  - { en: "{tasks} tasks, {terms} terms, and a lot of determination.", ru: "Задачи: {tasks}. Термины: {terms}. И очень много упорства." }
+  - { en: "You've been at this for {days} days, and it shows in how you review code.", ru: "Ты занимаешься уже {days}-й день, и это видно по твоему ревью." }
+  - { en: "{lessons} lessons done. Remember when await looked scary?", ru: "Уроков пройдено: {lessons}. Помнишь, как пугал await?" }
+  - { en: "{terms} terms learned — you'd follow most of a Playwright PR discussion now.", ru: "Выучено терминов: {terms} — ты уже поймёшь большую часть обсуждения в PR про Playwright." }
+  - { en: "{tasks} solved tasks later, Petal checks with you before it guesses.", ru: "Решённых задач: {tasks} — и Petal теперь сначала советуется с тобой, а потом уже угадывает." }
+  - { en: "Since you started {days} days ago: {lessons} lessons, {tasks} tasks, {terms} terms. Wow.", ru: "С начала пути (дней: {days}) — уроков: {lessons}, задач: {tasks}, терминов: {terms}. Ого." }
+
+bossIntro:
+  - { en: "Boss time! Everything from this chapter, in one real task.", ru: "Время босса! Всё из этой главы — в одной настоящей задаче." }
+  - { en: "This is the big one. Take your time and read carefully.", ru: "Это главная задача. Не спеши и читай внимательно." }
+  - { en: "Leo needs this done before the release. I know you can do it.", ru: "Лео нужно, чтобы это было готово до релиза. Я знаю, ты справишься." }
+  - { en: "Chapter boss ahead. It's harder — and you're ready.", ru: "Впереди босс главы. Он сложнее — но ты {готова|готов}." }
+  - { en: "Ready for a real challenge? This one is like an actual ticket from the sprint.", ru: "{Готова|Готов} к настоящему испытанию? Эта задача — как реальный тикет из спринта." }
+  - { en: "Final task of the chapter. Think like the senior QA you're becoming.", ru: "Финальная задача главы. Думай как senior QA, {которой|которым} ты становишься." }
+  - { en: "Boss level! Bring everything you've learned — and your QA instincts.", ru: "Босс-уровень! Бери с собой всё, что выучил{а|}, — и своё QA-чутьё." }
+  - { en: "Deep breath. This is where it all comes together.", ru: "Глубокий вдох. Здесь всё сходится воедино." }
+  - { en: "Boss task: this one asks for judgement, not just knowledge.", ru: "Задача-босс: здесь нужно не только знать, но и принимать решения." }
+  - { en: "Mochi is hiding under the desk. That's how you know it's a boss.", ru: "Мочи спрятался под стол. Значит, босс." }
+  - { en: "This is a real Bloomly scenario. Petal already tried — and didn't quite manage.", ru: "Это реальный сценарий Bloomly. Petal уже пытался — и не совсем справился." }
+  - { en: "It's boss time. Read the case twice, then trust yourself.", ru: "Время босса. Прочитай кейс дважды, а потом доверься себе." }
+  - { en: "The chapter's final challenge. Slow and careful wins here.", ru: "Финальное испытание главы. Здесь выигрывает тот, кто идёт медленно и внимательно." }
+  - { en: "Boss ahead! Mistakes are allowed here too — it's still practice.", ru: "Впереди босс! Ошибаться можно и здесь — это всё ещё практика." }
+  - { en: "Ready? This is the task that proves the chapter was worth it.", ru: "{Готова|Готов}? Эта задача покажет, что глава прошла не зря." }
+  - { en: "Time to put it all together, just like on a real project.", ru: "Пора собрать всё вместе — как на настоящем проекте." }
+  - { en: "Boss level. Sofia is watching this ticket closely. No pressure. 😉", ru: "Босс-уровень. София пристально следит за этим тикетом. Без давления. 😉" }
+  - { en: "This is the hardest task in the chapter — and the most satisfying one to solve.", ru: "Это самая сложная задача главы — и самая приятная, когда её решишь." }
+  - { en: "Final boss. You've got through every lesson so far; this is just one more step.", ru: "Финальный босс. Все уроки ты уже прош{ла|ёл}; это просто ещё один шаг." }
+  - { en: "Here comes the boss. Remember: you know what's worth checking better than any agent.", ru: "А вот и босс. Помни: что стоит проверять, ты знаешь лучше любого агента." }
+  - { en: "A real-world task to close the chapter. Take your time.", ru: "Задача из реальной жизни, чтобы закрыть главу. Не торопись." }
+  - { en: "Boss fight! Well, boss review. Same adrenaline.", ru: "Битва с боссом! Ну, ревью с боссом. Адреналин тот же." }
+  - { en: "This is your chapter exam — except it's fun.", ru: "Это твой экзамен по главе — только интересный." }
+  - { en: "Big task ahead. Break it into steps, like any good test case.", ru: "Впереди большая задача. Разбей её на шаги, как любой хороший тест-кейс." }
+  - { en: "Boss task unlocked. I picked this one because I know you can handle it.", ru: "Открыта задача-босс. Я выбрала её, потому что знаю: ты справишься." }
+  - { en: "The release depends on this one. Just kidding — mostly. Let's go!", ru: "От этой задачи зависит релиз. Шучу — почти. Поехали!" }
+  - { en: "Boss time. If it feels hard, that's because it's real.", ru: "Время босса. Если кажется сложно — это потому, что всё по-настоящему." }
+  - { en: "Here's the chapter boss. Petal is nervous. You shouldn't be.", ru: "Вот и босс главы. Petal нервничает. А тебе не стоит." }
+  - { en: "Final challenge! Read every line as if it's hiding a bug — because one probably is.", ru: "Финальное испытание! Читай каждую строку так, будто в ней прячется баг, — скорее всего, так и есть." }
+  - { en: "Ready for the boss? Kai says he couldn't solve this on the first try.", ru: "{Готова|Готов} к боссу? Кай говорит, что сам не решил это с первой попытки." }
+  - { en: "This is the moment. Show the chapter what you've learned. 💪", ru: "Вот он, момент. Покажи главе, чему ты научил{ась|ся}. 💪" }
+  - { en: "Boss ahead. It's long, but you've already done every part of it before.", ru: "Впереди босс. Задача длинная, но каждую её часть ты уже делал{а|}." }
+  - { en: "The boss awaits. Trust your process: read, predict, verify.", ru: "Босс ждёт. Доверься своему процессу: прочитать, предсказать, проверить." }
+  - { en: "Last task before the next department. Make it count!", ru: "Последняя задача перед следующим отделом. Сделай её как следует!" }

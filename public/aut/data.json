@@ -1,0 +1,194 @@
+{
+  "products": [
+    {
+      "id": "rose-bouquet",
+      "name": "Rose Bouquet",
+      "category": "bouquets",
+      "price": 35,
+      "inStock": true,
+      "img": "rose.svg",
+      "alt": "Bouquet of pink roses",
+      "popularity": 1
+    },
+    {
+      "id": "sunny-tulips",
+      "name": "Sunny Tulips",
+      "category": "bouquets",
+      "price": 24,
+      "inStock": true,
+      "img": "tulips.svg",
+      "alt": "Bunch of yellow tulips",
+      "popularity": 2
+    },
+    {
+      "id": "lavender-pot",
+      "name": "Lavender Pot",
+      "category": "plants",
+      "price": 18,
+      "inStock": true,
+      "img": "lavender.svg",
+      "alt": "Lavender in a clay pot",
+      "popularity": 3
+    },
+    {
+      "id": "peony-dream",
+      "name": "Peony Dream",
+      "category": "bouquets",
+      "price": 42,
+      "inStock": true,
+      "img": "peony.svg",
+      "alt": "Bouquet of soft pink peonies",
+      "popularity": 4
+    },
+    {
+      "id": "mint-succulent",
+      "name": "Mint Succulent",
+      "category": "plants",
+      "price": 12,
+      "inStock": true,
+      "img": "succulent.svg",
+      "alt": "Small mint-green succulent",
+      "popularity": 5
+    },
+    {
+      "id": "white-orchid",
+      "name": "White Orchid",
+      "category": "plants",
+      "price": 29,
+      "inStock": false,
+      "img": "orchid.svg",
+      "alt": "White orchid in a pot",
+      "popularity": 6
+    }
+  ],
+  "users": [
+    {
+      "email": "anna@bloomly.app",
+      "password": "bloom123",
+      "name": "Anna Silva",
+      "city": "Lisbon",
+      "memberSince": "2024-03-12",
+      "locked": false
+    },
+    {
+      "email": "tom@bloomly.app",
+      "password": "tulips42",
+      "name": "Tom Becker",
+      "city": "Berlin",
+      "memberSince": "2025-01-20",
+      "locked": false
+    },
+    {
+      "email": "maya@bloomly.app",
+      "password": "qa-rocks",
+      "name": "Maya Chen",
+      "city": "Lisbon",
+      "memberSince": "2023-06-01",
+      "locked": false
+    },
+    {
+      "email": "locked@bloomly.app",
+      "password": "bloom123",
+      "name": "Lucy Locked",
+      "city": "Warsaw",
+      "memberSince": "2024-11-02",
+      "locked": true
+    }
+  ],
+  "orders": [
+    {
+      "id": 1042,
+      "user": "anna@bloomly.app",
+      "date": "2026-09-28",
+      "items": [
+        "Rose Bouquet",
+        "Lavender Pot"
+      ],
+      "total": 53,
+      "status": "Delivered"
+    },
+    {
+      "id": 1041,
+      "user": "anna@bloomly.app",
+      "date": "2026-09-21",
+      "items": [
+        "Sunny Tulips"
+      ],
+      "total": 28.9,
+      "status": "Shipped"
+    },
+    {
+      "id": 1040,
+      "user": "anna@bloomly.app",
+      "date": "2026-09-14",
+      "items": [
+        "Peony Dream"
+      ],
+      "total": 46.9,
+      "status": "Processing"
+    },
+    {
+      "id": 1039,
+      "user": "anna@bloomly.app",
+      "date": "2026-09-02",
+      "items": [
+        "Mint Succulent",
+        "Mint Succulent"
+      ],
+      "total": 28.9,
+      "status": "Delivered"
+    },
+    {
+      "id": 1038,
+      "user": "anna@bloomly.app",
+      "date": "2026-08-25",
+      "items": [
+        "White Orchid"
+      ],
+      "total": 33.9,
+      "status": "Cancelled"
+    },
+    {
+      "id": 1037,
+      "user": "anna@bloomly.app",
+      "date": "2026-08-11",
+      "items": [
+        "Rose Bouquet",
+        "Sunny Tulips"
+      ],
+      "total": 59,
+      "status": "Delivered"
+    },
+    {
+      "id": 1036,
+      "user": "tom@bloomly.app",
+      "date": "2026-09-30",
+      "items": [
+        "Lavender Pot"
+      ],
+      "total": 22.9,
+      "status": "Processing"
+    },
+    {
+      "id": 1035,
+      "user": "tom@bloomly.app",
+      "date": "2026-09-10",
+      "items": [
+        "Peony Dream",
+        "Rose Bouquet"
+      ],
+      "total": 77,
+      "status": "Shipped"
+    }
+  ],
+  "promoCodes": {
+    "BLOOM10": {
+      "percent": 10,
+      "expired": false
+    },
+    "SPRING20": {
+      "percent": 20,
+      "expired": true
+    }
+  }
+}

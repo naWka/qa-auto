@@ -1,0 +1,930 @@
+id: c2-l1
+chapter: c2
+title: { en: "How an AI agent writes a test", ru: "Как ИИ-агент пишет тест" }
+goal:
+  en: "See what the agent does step by step — and what it can't know without you."
+  ru: "Увидеть, что агент делает шаг за шагом, — и чего он не может знать без тебя."
+minutes: 9
+keyPoints:
+  - id: kp-agent-loop
+    title: { en: "The agent loop: prompt → context → browser → code → run → report", ru: "Цикл агента: промпт → контекст → браузер → код → запуск → отчёт" }
+  - id: kp-agent-limits
+    title: { en: "The agent doesn't know the requirements and can hallucinate", ru: "Агент не знает требований и может галлюцинировать" }
+  - id: kp-you-decide
+    title: { en: "You decide what to test and whether to trust the result", ru: "Ты решаешь, что проверять и можно ли доверять результату" }
+terms: [ai-agent, llm, prompt, context, mcp, accessibility-snapshot, hallucination, negative-test, edge-case]
+steps:
+  - type: story
+    lines:
+      - who: leo
+        text:
+          en: "Welcome to the AI Lab! This is Petal, our AI coding agent. Your access is ready."
+          ru: "Добро пожаловать в ИИ-лабораторию! Это Petal, наш ИИ-агент для написания кода. Доступ у тебя уже есть."
+      - who: petal
+        text:
+          en: "Hello! I can write a Playwright test for anything in Bloomly. In seconds!"
+          ru: "Привет! Я могу написать Playwright-тест на что угодно в Bloomly. За секунды!"
+      - who: maya
+        text:
+          en: "Fast isn't the same as right. Today we look inside: how Petal works, and where it slips."
+          ru: "Быстро — не значит правильно. Сегодня заглянем внутрь: как работает Petal и где он ошибается."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед стартом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c2-l1-p1
+        kind: choice
+        keyPoint: kp-agent-loop
+        prompt:
+          en: "Petal opens Bloomly in a browser through Playwright MCP. What does it actually “see”?"
+          ru: "Petal открывает Bloomly в браузере через Playwright MCP. Что он на самом деле «видит»?"
+        options:
+          - text:
+              en: "A list of elements with roles and names, like `button \"Log in\"`"
+              ru: "Список элементов с ролями и именами, например `button \"Log in\"`"
+            correct: true
+            why:
+              en: "Right. It's an accessibility snapshot: the page the way a screen reader hears it — text, not pixels."
+              ru: "Верно. Это снимок доступности: страница такой, какой её «слышит» экранный диктор, — текст, а не пиксели."
+          - text:
+              en: "A screenshot, pixel by pixel, like a human"
+              ru: "Скриншот, пиксель за пикселем, как человек"
+            why:
+              en: "Agents can take screenshots, but Playwright MCP mainly gives them the accessibility snapshot — structured text."
+              ru: "Агенты умеют делать скриншоты, но Playwright MCP в основном отдаёт им снимок доступности — структурированный текст."
+          - text:
+              en: "The server code and the database"
+              ru: "Код сервера и базу данных"
+            why:
+              en: "No. Through the browser it sees only what the page shows — like a user."
+              ru: "Нет. Через браузер он видит только то, что показывает страница, — как пользователь."
+        hints:
+          - en: "MCP gives the agent tools to drive a real browser. Think about what a browser can expose as text."
+            ru: "MCP даёт агенту инструменты для управления настоящим браузером. Подумай, что браузер может отдать в виде текста."
+          - en: "Screen readers don't look at pixels either."
+            ru: "Экранные дикторы тоже не смотрят на пиксели."
+        explain:
+          en: "Playwright MCP sends the agent an accessibility snapshot: roles (button, heading, textbox) and accessible names (“Log in”). That's why agents are good at writing `getByRole(...)` locators."
+          ru: "Playwright MCP отправляет агенту снимок доступности: роли (button, heading, textbox) и доступные имена («Log in»). Поэтому агенты хорошо пишут локаторы `getByRole(...)`."
+      - id: c2-l1-p2
+        kind: choice
+        keyPoint: kp-agent-limits
+        prompt:
+          en: "Petal logs in as Anna and sees the heading “Welcome back, Silva!”. What will it most likely do?"
+          ru: "Petal входит как Anna и видит заголовок «Welcome back, Silva!». Что он, скорее всего, сделает?"
+        options:
+          - text:
+              en: "Write a test that expects “Welcome back, Silva!”"
+              ru: "Напишет тест, который ожидает «Welcome back, Silva!»"
+            correct: true
+            why:
+              en: "Yes. Petal doesn't know the requirement (greet by first name). It records what the page shows today — even if it's a bug."
+              ru: "Да. Petal не знает требования (приветствовать по имени). Он записывает то, что страница показывает сегодня, — даже если это баг."
+          - text:
+              en: "Report a bug: the greeting should use the first name"
+              ru: "Заведёт баг: в приветствии должно быть имя, а не фамилия"
+            why:
+              en: "That needs the requirement. Petal doesn't have it unless you give it."
+              ru: "Для этого нужно знать требование. У Petal его нет, пока ты его не дашь."
+          - text:
+              en: "Refuse to write the test until someone confirms the text"
+              ru: "Откажется писать тест, пока кто-нибудь не подтвердит текст"
+            why:
+              en: "Agents rarely stop to ask. They are built to finish the task."
+              ru: "Агенты редко останавливаются, чтобы спросить. Они созданы, чтобы довести задачу до конца."
+        hints:
+          - en: "Does Petal know how Bloomly *should* greet people?"
+            ru: "Знает ли Petal, как Bloomly *должен* приветствовать людей?"
+          - en: "An agent writes down what it observes."
+            ru: "Агент записывает то, что наблюдает."
+        explain:
+          en: "The agent tests what IS. Only someone who knows the requirement can say that “Silva” is wrong. That someone is you."
+          ru: "Агент проверяет то, что ЕСТЬ. Сказать, что «Silva» — ошибка, может только тот, кто знает требование. Это ты."
+
+  - type: theory
+    keyPoint: kp-agent-loop
+    title: { en: "LLM + tools = agent", ru: "LLM + инструменты = агент" }
+    body:
+      - en: "An [[LLM|llm]] (large language model) predicts text: you give it text, it continues it. It has read a huge part of the internet — but on its own it can't click anything."
+        ru: "[[LLM|llm]] (большая языковая модель) предсказывает текст: даёшь ей текст — она его продолжает. Она прочитала огромную часть интернета, но сама по себе ничего не кликает."
+      - en: "An [[AI agent|ai-agent]] is an LLM plus tools: it can read files, run commands and drive a browser. Claude Code, GitHub Copilot in agent mode, Cursor — these are all agents."
+        ru: "[[ИИ-агент|ai-agent]] — это LLM плюс инструменты: он читает файлы, запускает команды и управляет браузером. Claude Code, GitHub Copilot в режиме агента, Cursor — всё это агенты."
+      - en: "Picture a new colleague who reads and types incredibly fast — but joined yesterday and has never seen your requirements."
+        ru: "Представь нового коллегу, который невероятно быстро читает и печатает, — но пришёл вчера и ни разу не видел ваших требований."
+    mentor:
+      en: "That's Petal. Brilliant on day one, and knows nothing about our business."
+      ru: "Это и есть Petal. Блестящий с первого дня — и ничего не знает о нашем бизнесе."
+
+  - type: theory
+    keyPoint: kp-agent-loop
+    title: { en: "The agent loop", ru: "Цикл агента" }
+    body:
+      - en: "1) You write a [[prompt]]. 2) The agent reads the [[context]]: your prompt, the project files, the existing tests."
+        ru: "1) Ты пишешь [[промпт|prompt]]. 2) Агент читает [[контекст|context]]: твой промпт, файлы проекта, существующие тесты."
+      - en: "3) It opens a real browser through [[Playwright MCP|mcp]] (or the more token-efficient Playwright CLI, `@playwright/cli`) and reads an [[accessibility snapshot|accessibility-snapshot]] — roles and names, like the fragment below."
+        ru: "3) Он открывает настоящий браузер через [[Playwright MCP|mcp]] (или более экономный по токенам Playwright CLI, `@playwright/cli`) и читает [[снимок доступности|accessibility-snapshot]] — роли и имена, как во фрагменте ниже."
+      - en: "4) It writes the test, 5) runs `npx playwright test`, reads the output and fixes what broke, 6) reports back to you."
+        ru: "4) Пишет тест, 5) запускает `npx playwright test`, читает вывод и чинит то, что сломалось, 6) отчитывается тебе."
+    code: |
+      - article:
+        - img "Bouquet of pink roses"
+        - heading "Rose Bouquet" [level=2]
+        - paragraph: €35.00
+        - button "Add to cart"
+    figure: agent-loop
+    mentor:
+      en: "Notice: the snapshot has `button \"Add to cart\"` — no colours, no CSS classes. That's why a good agent writes `getByRole('button', { name: 'Add to cart' })`."
+      ru: "Обрати внимание: в снимке есть `button \"Add to cart\"` — ни цветов, ни CSS-классов. Поэтому хороший агент пишет `getByRole('button', { name: 'Add to cart' })`."
+
+  - type: theory
+    keyPoint: kp-agent-limits
+    title: { en: "Where the agent slips", ru: "Где агент ошибается" }
+    body:
+      - en: "**It doesn't know the requirements.** It sees what the page does *now* and writes that down — even if it's a bug."
+        ru: "**Он не знает требований.** Он видит, что страница делает *сейчас*, и записывает это — даже если это баг."
+      - en: "**It hallucinates.** A [[hallucination]] is confident nonsense: a method that doesn't exist (`page.open`), a button that isn't there, a text nobody wrote."
+        ru: "**Он галлюцинирует.** [[Галлюцинация|hallucination]] — это уверенная чепуха: несуществующий метод (`page.open`), кнопка, которой нет, текст, который никто не писал."
+      - en: "**It sounds equally sure when it's wrong.** “Done, all tests pass ✅” tells you nothing about *what* they check."
+        ru: "**Он так же уверен, когда ошибается.** «Готово, все тесты проходят ✅» ничего не говорит о том, *что* они проверяют."
+    mentor:
+      en: "The agent tests what IS. You test what SHOULD BE. That's the whole difference."
+      ru: "Агент проверяет то, что ЕСТЬ. Ты — то, что ДОЛЖНО БЫТЬ. В этом вся разница."
+
+  - type: theory
+    keyPoint: kp-you-decide
+    title: { en: "What stays yours", ru: "Что остаётся за тобой" }
+    body:
+      - en: "The agent takes the typing: code, runs, reading error output. You keep the thinking: **what** to test, **reviewing** the code, **verifying** that a green test means something."
+        ru: "Агент берёт на себя набор: код, запуски, чтение ошибок. За тобой — мышление: **что** проверять, **ревью** кода и **проверка** того, что зелёный тест что-то значит."
+      - en: "Boundary values, [[negative tests|negative-test]], [[edge cases|edge-case]], product knowledge — that's your three years of experience. The agent has none of it."
+        ru: "Граничные значения, [[негативные тесты|negative-test]], [[пограничные случаи|edge-case]], знание продукта — это твои три года опыта. У агента ничего этого нет."
+      - en: "Since v1.56 Playwright even ships its own Test Agents — planner, generator and healer (`npx playwright init-agents --loop=claude`). We'll meet them in chapter 8. The rule stays the same: a human decides."
+        ru: "С версии 1.56 в Playwright есть даже собственные Test Agents — planner, generator и healer (`npx playwright init-agents --loop=claude`). Познакомимся с ними в главе 8. Правило то же: решает человек."
+    mentor:
+      en: "You've reviewed requirements and junior colleagues' test cases. Reviewing Petal is the same job — in code."
+      ru: "Ты уже проверял{а|} требования и тест-кейсы младших коллег. Ревью Petal — та же работа, только в коде."
+
+  - type: example
+    keyPoint: kp-agent-loop
+    title: { en: "Petal's first test, line by line", ru: "Первый тест Petal построчно" }
+    intro:
+      en: "Leo asked Petal: “Write a test: Anna logs in and sees her greeting.” Here is the result — and where each piece came from."
+      ru: "Leo попросил Petal: «Напиши тест: Anna входит и видит приветствие». Вот результат — и откуда взялась каждая часть."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('registered user can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+      });
+    notes:
+      - lines: 1
+        text:
+          en: "The standard import. Petal copied it from the existing test files — that's context."
+          ru: "Стандартный импорт. Petal взял его из существующих тестов — это контекст."
+      - lines: 4
+        text:
+          en: "The URL /login: Petal found it by clicking around the app in the browser."
+          ru: "URL /login: Petal нашёл его, пощёлкав по приложению в браузере."
+      - lines: [5, 6]
+        text:
+          en: "The email and password came from the prompt. The labels “Email” and “Password” came from the accessibility snapshot."
+          ru: "Email и пароль пришли из промпта. Метки «Email» и «Password» — из снимка доступности."
+      - lines: 7
+        text:
+          en: "Role and name straight from the snapshot: `button \"Log in\"`."
+          ru: "Роль и имя прямо из снимка: `button \"Log in\"`."
+      - lines: 8
+        text:
+          en: "The expected greeting: the prompt said “sees her greeting”, and Petal took the text from the page. Is “Welcome back, Anna!” the *required* text? Only the test case knows."
+          ru: "Ожидаемое приветствие: в промпте было «видит приветствие», а текст Petal взял со страницы. Это *требуемый* текст — «Welcome back, Anna!»? Знает только тест-кейс."
+    runnable: true
+
+  - type: task
+    task:
+      id: c2-l1-t1
+      kind: agent
+      keyPoint: kp-agent-loop
+      context:
+        en: "Petal in this trainer is **simulated**: its answers are scripted so you can practise safely. A real agent's output differs from run to run — but its mistakes are of the same kinds."
+        ru: "Petal в тренажёре **симулирован**: его ответы написаны заранее, чтобы тренироваться было безопасно. Настоящий агент отвечает по-разному от запуска к запуску, но ошибается так же."
+      prompt:
+        en: "Build a prompt for Petal from the blocks: pick the ones that give a good test for TC-101. Then run what Petal writes."
+        ru: "Собери промпт для Petal из блоков: выбери те, что дадут хороший тест для TC-101. Потом запусти то, что напишет Petal."
+      testCase:
+        id: TC-101
+        title: Registered user can log in
+        preconditions: ["User anna@bloomly.app / bloom123 exists"]
+        steps:
+          - { action: "Open /login" }
+          - { action: "Enter email and password", data: "anna@bloomly.app / bloom123" }
+          - { action: "Click \"Log in\"", expected: "Heading \"Welcome back, Anna!\" is shown" }
+      blocks:
+        - { id: task, locked: true, text: "Write a Playwright test for TC-101: a registered user can log in to Bloomly.", ru: "Напиши Playwright-тест для TC-101: зарегистрированный пользователь может войти в Bloomly." }
+        - { id: steps, text: 'Steps: open /login, enter anna@bloomly.app and bloom123, click "Log in".', ru: "Шаги: открой /login, введи anna@bloomly.app и bloom123, нажми «Log in»." }
+        - { id: expected, text: 'Expected: the heading "Welcome back, Anna!" is visible.', ru: "Ожидаемый результат: виден заголовок «Welcome back, Anna!»." }
+        - { id: noise, text: "Make it perfect!!!", ru: "Сделай идеально!!!" }
+      responses:
+        - when: [steps, expected]
+          best: true
+          message:
+            en: "Done! I opened /login, read the form in the accessibility snapshot and wrote the test. It checks the greeting from TC-101. Ran it once — green ✅"
+            ru: "Готово! Я открыл /login, прочитал форму в снимке доступности и написал тест. Он проверяет приветствие из TC-101. Один раз запустил — зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('registered user can log in', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('bloom123');
+              await page.getByRole('button', { name: 'Log in' }).click();
+              await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+            });
+        - when: [steps]
+          message:
+            en: "Done! The test logs in as Anna. Ran it — green ✅"
+            ru: "Готово! Тест входит как Anna. Запустил — зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('registered user can log in', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('bloom123');
+              await page.getByRole('button', { name: 'Log in' }).click();
+            });
+        - when: []
+          message:
+            en: "Done! I wasn't sure which user to take, so I checked that the login page opens. Green ✅"
+            ru: "Готово! Я не знал, какого пользователя взять, поэтому проверил, что страница входа открывается. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('login page opens', async ({ page }) => {
+              await page.goto('/login');
+              await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible();
+            });
+      missing:
+        steps:
+          en: "Without steps and data Petal didn't know which account to use — so it only checked that the login page opens. That's not TC-101."
+          ru: "Без шагов и данных Petal не знал, какой аккаунт взять, — и проверил только, что открывается страница входа. Это не TC-101."
+        expected:
+          en: "Without the expected result Petal had nothing to check: the test logs in and stops. It's green — and proves nothing."
+          ru: "Без ожидаемого результата Petal нечего было проверять: тест входит и останавливается. Он зелёный — и ничего не доказывает."
+      checks:
+        expect: pass
+        static: [hasAssertion, noHardWait]
+      hints:
+        - en: "Look at TC-101: which parts of the test case does Petal need?"
+          ru: "Посмотри на TC-101: какие части тест-кейса нужны Petal?"
+        - en: "A test needs actions *and* something to check at the end."
+          ru: "Тесту нужны действия *и* то, что проверить в конце."
+        - en: "Take the steps block and the expected block. “Make it perfect!!!” adds nothing."
+          ru: "Возьми блок шагов и блок ожидаемого результата. «Сделай идеально!!!» ничего не добавляет."
+      praise:
+        en: "Your prompt carried the whole test case — that's why Petal's test checks the right thing."
+        ru: "В твоём промпте был весь тест-кейс — поэтому тест Petal проверяет то, что нужно."
+      explain:
+        en: "Steps, data and the expected result give Petal everything TC-101 has. “Make it perfect!!!” sounds motivating, but it contains no information: an agent can't turn emotions into checks."
+        ru: "Шаги, данные и ожидаемый результат дают Petal всё, что есть в TC-101. «Сделай идеально!!!» звучит мотивирующе, но информации в этом нет: эмоции агент в проверки не превратит."
+
+  - type: task
+    task:
+      id: c2-l1-t2
+      kind: choice
+      keyPoint: kp-agent-limits
+      multi: true
+      prompt:
+        en: "Which of these can Petal NOT find out on its own by exploring Bloomly in the browser? Pick all."
+        ru: "Что из этого Petal НЕ сможет узнать сам, исследуя Bloomly в браузере? Выбери всё подходящее."
+      options:
+        - text:
+            en: "That the greeting must use the first name (“Anna”), not the last name"
+            ru: "Что в приветствии должно быть имя («Anna»), а не фамилия"
+          correct: true
+          why:
+            en: "That's a requirement. The page shows whatever it shows — right or wrong."
+            ru: "Это требование. Страница показывает то, что показывает, — правильно это или нет."
+        - text:
+            en: "Which test account is meant for this case"
+            ru: "Какой тестовый аккаунт нужен для этого кейса"
+          correct: true
+          why:
+            en: "It may guess or even invent one. Test data is your decision."
+            ru: "Он может угадать или даже выдумать аккаунт. Тестовые данные — твоё решение."
+        - text:
+            en: "That a locked user must see “Your account is locked. Please contact support.”"
+            ru: "Что заблокированный пользователь должен видеть «Your account is locked. Please contact support.»"
+          correct: true
+          why:
+            en: "Unless it happens to try the locked account, it won't even know this rule exists."
+            ru: "Если он случайно не попробует заблокированный аккаунт, то даже не узнает, что такое правило есть."
+        - text:
+            en: "The accessible name of the login button"
+            ru: "Доступное имя кнопки входа"
+          why:
+            en: "This it *can* see: the snapshot shows `button \"Log in\"`."
+            ru: "Это он *может* увидеть: в снимке есть `button \"Log in\"`."
+        - text:
+            en: "The URL of the login page"
+            ru: "URL страницы входа"
+          why:
+            en: "It can find it by clicking the “Log in” link."
+            ru: "Он найдёт его, нажав на ссылку «Log in»."
+      hints:
+        - en: "Split the list: what's visible on the page vs what lives in requirements and in your head."
+          ru: "Раздели список: что видно на странице, а что живёт в требованиях и у тебя в голове."
+        - en: "Names, labels and URLs are on the page. Rules and intentions are not."
+          ru: "Имена, метки и URL есть на странице. Правил и намерений там нет."
+        - en: "Three answers: the first-name rule, the test account and the locked-user rule."
+          ru: "Три ответа: правило про имя, тестовый аккаунт и правило про заблокированного пользователя."
+      praise:
+        en: "Exactly — you separated what the page shows from what the business wants."
+        ru: "Именно — ты отделил{а|} то, что показывает страница, от того, чего хочет бизнес."
+      explain:
+        en: "The agent sees structure: roles, names, URLs. Requirements, business rules and the choice of test data are outside the page. That's where you come in."
+        ru: "Агент видит структуру: роли, имена, URL. Требования, бизнес-правила и выбор тестовых данных — за пределами страницы. Здесь вступаешь ты."
+
+  - type: task
+    task:
+      id: c2-l1-t3
+      kind: review
+      keyPoint: kp-agent-limits
+      context:
+        en: "Petal wrote this login test in a hurry and hasn't run it yet."
+        ru: "Petal написал этот тест входа в спешке и ещё не запускал его."
+      prompt:
+        en: "Find the lines with problems and choose the issue type."
+        ru: "Найди строки с проблемами и выбери тип проблемы."
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user can log in', async ({ page }) => {
+          await page.open('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByButton('Log in').click();
+          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+        });
+      issues:
+        - line: 4
+          type: hallucination
+          note:
+            en: "There is no `page.open` in Playwright. Pages are opened with `page.goto('/login')`."
+            ru: "В Playwright нет `page.open`. Страницы открывают через `page.goto('/login')`."
+        - line: 7
+          type: hallucination
+          note:
+            en: "`getByButton` doesn't exist. Buttons are found by role: `page.getByRole('button', { name: 'Log in' })`."
+            ru: "`getByButton` не существует. Кнопки ищут по роли: `page.getByRole('button', { name: 'Log in' })`."
+      types: [hallucination, fragile-locator, no-assertion, wrong-data]
+      hints:
+        - en: "Compare the method names with Petal's first test from the example."
+          ru: "Сравни названия методов с первым тестом Petal из примера."
+        - en: "Look at how the page is opened and how the button is found."
+          ru: "Посмотри, как открывается страница и как ищется кнопка."
+        - en: "Lines 4 and 7 use methods Playwright doesn't have."
+          ru: "В строках 4 и 7 — методы, которых в Playwright нет."
+      praise:
+        en: "Sharp eye: plausible-looking but invented methods are the classic AI hallucination."
+        ru: "Зоркий глаз: правдоподобные, но выдуманные методы — классическая галлюцинация ИИ."
+      explain:
+        en: "Agents mix up APIs from different tools and invent plausible names. `page.open` and `getByButton` look reasonable — that's what makes them dangerous. A run would crash with “is not a function”; a good agent fixes that in its next loop, a hurried one leaves it to you."
+        ru: "Агенты путают API разных инструментов и придумывают правдоподобные имена. `page.open` и `getByButton` выглядят разумно — этим они и опасны. Прогон упадёт с ошибкой «is not a function»; хороший агент исправит это на следующем круге цикла, торопливый — оставит тебе."
+
+  - type: task
+    task:
+      id: c2-l1-t4
+      kind: predict
+      keyPoint: kp-agent-limits
+      app: { bugs: [greeting-wrong-name] }
+      context:
+        en: "Kai's latest build has a bug: the account greeting uses the last name. Petal explored this build and wrote a test from what it saw."
+        ru: "В последней сборке Kai есть баг: приветствие в аккаунте использует фамилию. Petal исследовал эту сборку и написал тест по тому, что увидел."
+      prompt:
+        en: "Will this test pass or fail on that build?"
+        ru: "Этот тест пройдёт или упадёт на этой сборке?"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('user sees a greeting after login', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('heading', { name: 'Welcome back, Silva!' })).toBeVisible();
+        });
+      outcome: pass
+      reasons:
+        - text:
+            en: "Pass: Petal copied the buggy text from the page, so the test agrees with the bug."
+            ru: "Пройдёт: Petal списал текст с багованной страницы, и тест согласен с багом."
+          correct: true
+        - text:
+            en: "Fail: the app has a bug, so the test must be red."
+            ru: "Упадёт: в приложении баг, значит, тест обязан покраснеть."
+        - text:
+            en: "Fail: `getByRole('heading')` can't find headings by text."
+            ru: "Упадёт: `getByRole('heading')` не умеет искать заголовки по тексту."
+      hints:
+        - en: "Compare the expected text in the test with what this build shows."
+          ru: "Сравни ожидаемый текст в тесте с тем, что показывает эта сборка."
+        - en: "The test expects “Silva”. What does the buggy build show?"
+          ru: "Тест ждёт «Silva». Что показывает багованная сборка?"
+        - en: "The test and the bug say the same thing — so they agree."
+          ru: "Тест и баг говорят одно и то же — значит, они согласны."
+      praise:
+        en: "You saw it: green, and wrong. That's exactly the trap the agent can't see."
+        ru: "Ты это увидел{а|}: зелёный — и неправильный. Именно эту ловушку агент не видит."
+      explain:
+        en: "A test only knows what you tell it. Petal took its expected value from a buggy screen, so the bug became “expected”. This is a [[false negative|false-negative]]: the bug is there, the test is green. Only the requirement “greet by first name” — your knowledge — catches it."
+        ru: "Тест знает только то, что ему сказали. Petal взял ожидаемое значение с багованного экрана, и баг стал «ожидаемым». Это [[ложноотрицательный результат|false-negative]]: баг есть, а тест зелёный. Поймать его можно только через требование «приветствовать по имени» — то есть через твоё знание."
+
+  - type: task
+    task:
+      id: c2-l1-t5
+      kind: choice
+      keyPoint: kp-you-decide
+      prompt:
+        en: "Sofia asks in Slack: “Can Petal just test the whole checkout by itself? Then we don't need test design anymore, right?” What's your best reply?"
+        ru: "Sofia спрашивает в Slack: «А Petal может сам протестировать весь чекаут? Тогда тест-дизайн нам больше не нужен, да?» Какой ответ лучший?"
+      options:
+        - text:
+            en: "“Petal can write and run the tests fast. I'll decide what to cover — past delivery dates, empty fields, the gift message limit — and review what it writes.”"
+            ru: "«Petal быстро напишет и прогонит тесты. А я решу, что покрывать, — даты в прошлом, пустые поля, лимит подарочного сообщения — и проверю, что он написал.»"
+          correct: true
+          why:
+            en: "That's the split: the agent types and runs, you design and verify."
+            ru: "Вот это разделение: агент печатает и запускает, ты проектируешь и проверяешь."
+        - text:
+            en: "“Yes, Petal knows the app better than we do — it reads the code.”"
+            ru: "«Да, Petal знает приложение лучше нас — он же читает код.»"
+          why:
+            en: "It reads code and pages, not requirements. It can't tell a bug from a feature."
+            ru: "Он читает код и страницы, а не требования. Отличить баг от фичи он не может."
+        - text:
+            en: "“No, AI agents are useless for testing.”"
+            ru: "«Нет, ИИ-агенты для тестирования бесполезны.»"
+          why:
+            en: "Too far the other way. Petal saves hours of typing — when someone leads it."
+            ru: "Перегиб в другую сторону. Petal экономит часы набора — если им кто-то руководит."
+        - text:
+            en: "“Yes, if we ask it to make the tests perfect.”"
+            ru: "«Да, если попросить его сделать тесты идеальными.»"
+          why:
+            en: "“Perfect” isn't a requirement. The agent needs concrete checks."
+            ru: "«Идеально» — не требование. Агенту нужны конкретные проверки."
+      hints:
+        - en: "Who knows which cases are risky in checkout?"
+          ru: "Кто знает, какие кейсы в чекауте рискованные?"
+        - en: "The best answer gives each side the work it's good at."
+          ru: "Лучший ответ отдаёт каждой стороне ту работу, в которой она сильна."
+        - en: "Look for the reply that names concrete risky cases."
+          ru: "Ищи ответ, где названы конкретные рискованные кейсы."
+      praise:
+        en: "A calm, senior answer: you value the agent's speed and keep the test design."
+        ru: "Спокойный ответ уровня senior: ты ценишь скорость агента и оставляешь тест-дизайн за собой."
+      explain:
+        en: "Past dates, empty required fields, the 200-character gift message — that's test design: [[negative tests|negative-test]] and [[edge cases|edge-case]]. The agent won't invent them from requirements it has never seen. In test design you are stronger than the agent."
+        ru: "Даты в прошлом, пустые обязательные поля, подарочное сообщение на 200 символов — это тест-дизайн: [[негативные тесты|negative-test]] и [[пограничные случаи|edge-case]]. Агент не придумает их из требований, которых никогда не видел. В тест-дизайне ты сильнее агента."
+
+  - type: task
+    task:
+      id: c2-l1-t6
+      kind: vocab
+      keyPoint: kp-agent-limits
+      mode: cloze
+      sentence:
+        en: "Petal used `page.open()` — a method that doesn't exist. That's a ___."
+        ru: "Petal использовал `page.open()` — метод, которого не существует. Это галлюцинация."
+      answer: hallucination
+      options: [hallucination, prompt, context]
+
+  - type: task
+    task:
+      id: c2-l1-t7
+      kind: vocab
+      keyPoint: kp-agent-loop
+      mode: match
+      terms: [llm, ai-agent, mcp, accessibility-snapshot]
+
+  - type: mistakes
+    keyPoint: kp-agent-limits
+    title: { en: "Agent mistakes from this lesson", ru: "Ошибки агента из этого урока" }
+    items:
+      - wrong: "await page.open('/login');"
+        right: "await page.goto('/login');"
+        why:
+          en: "Invented method. Playwright opens pages with `goto`."
+          ru: "Выдуманный метод. Playwright открывает страницы через `goto`."
+      - wrong: "await page.getByButton('Log in').click();"
+        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+        why:
+          en: "Invented locator. Buttons are found by role and accessible name."
+          ru: "Выдуманный локатор. Кнопки ищут по роли и доступному имени."
+      - wrong: "await expect(page.getByRole('heading', { name: 'Welcome back, Silva!' })).toBeVisible();"
+        right: "await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();"
+        why:
+          en: "Copied from a buggy page. The expected value must come from the requirement, not from the screen."
+          ru: "Списано с багованной страницы. Ожидаемое значение берётся из требования, а не с экрана."
+
+  - type: explain
+    keyPoint: kp-agent-limits
+    prompt:
+      en: "In your own words: what does the agent see when it works with Bloomly — and what can't it know?"
+      ru: "Своими словами: что видит агент, когда работает с Bloomly, — и чего он знать не может?"
+    model:
+      en: "It sees my prompt, the project files and the page as an accessibility snapshot: roles, names, texts. It can't know the requirements, which test data matters, or whether what the page shows is correct. It may also invent methods or elements. So I decide what to check, and I review what it writes."
+      ru: "Он видит мой промпт, файлы проекта и страницу в виде снимка доступности: роли, имена, тексты. Он не может знать требований, какие тестовые данные важны и правильно ли то, что показывает страница. А ещё он может выдумать методы или элементы. Поэтому что проверять, решаю я, и я же проверяю то, что он написал."
+
+  - type: phrases
+    items:
+      - context: prompt
+        en: "Write a Playwright test for TC-101. Use the existing account anna@bloomly.app."
+        ru: "Напиши Playwright-тест для TC-101. Используй существующий аккаунт anna@bloomly.app."
+      - context: standup
+        en: "Yesterday I paired with Petal on the login tests; today I'm reviewing what it generated."
+        ru: "Вчера я работал{а|} с Petal в паре над тестами входа, сегодня проверяю, что он сгенерировал."
+      - context: chat
+        en: "Petal wrote the test, but I'm checking it against the requirements before we merge."
+        ru: "Petal написал тест, но перед мержем я сверяю его с требованиями."
+      - context: code-review
+        en: "This method doesn't exist in Playwright — looks like a hallucination. Please use page.goto()."
+        ru: "Такого метода в Playwright нет — похоже на галлюцинацию. Используй, пожалуйста, page.goto()."
+        note:
+          en: "“Looks like” keeps the comment polite and factual."
+          ru: "«Looks like» делает комментарий вежливым и по существу."
+      - context: meeting
+        en: "The agent can write the code, but someone has to own the test design."
+        ru: "Код может написать агент, но за тест-дизайн кто-то должен отвечать."
+
+checkPool:
+  - id: c2-l1-k1
+    kind: choice
+    keyPoint: kp-agent-loop
+    placement: true
+    prompt:
+      en: "Petal reads Bloomly through Playwright MCP. Which line could appear in the accessibility snapshot it gets?"
+      ru: "Petal читает Bloomly через Playwright MCP. Какая строка может оказаться в снимке доступности, который он получает?"
+    options:
+      - text: '- button "Add to cart"'
+        correct: true
+        why:
+          en: "Yes: a role and an accessible name. That's what the snapshot is made of."
+          ru: "Да: роль и доступное имя. Из этого и состоит снимок."
+      - text: '<button class="btn small" data-id="rose-bouquet">Add to cart</button>'
+        why:
+          en: "That's raw HTML. The snapshot keeps roles, names and text — not classes."
+          ru: "Это сырой HTML. В снимке остаются роли, имена и текст, а не классы."
+      - text: "pixel (412, 230): rgb(233, 30, 99)"
+        why:
+          en: "Pixels are what a screenshot has. The snapshot is text."
+          ru: "Пиксели — это скриншот. Снимок доступности — это текст."
+    optionsCode: true
+    hints:
+      - en: "The snapshot describes the page the way a screen reader would."
+        ru: "Снимок описывает страницу так, как это сделал бы экранный диктор."
+      - en: "Look for a role plus a name."
+        ru: "Ищи роль плюс имя."
+    explain:
+      en: "Accessibility snapshots list roles and accessible names (`button \"Add to cart\"`). That's also why `getByRole` locators come so naturally to agents."
+      ru: "Снимок доступности перечисляет роли и доступные имена (`button \"Add to cart\"`). Поэтому агентам так легко даются локаторы `getByRole`."
+
+  - id: c2-l1-k2
+    kind: parsons
+    keyPoint: kp-agent-loop
+    code: false
+    prompt:
+      en: "Put the agent loop in order."
+      ru: "Расставь шаги цикла агента по порядку."
+    lines:
+      - "You write a prompt with the test case"
+      - "The agent reads the context: prompt, project files, existing tests"
+      - "It opens the app via Playwright MCP and reads the accessibility snapshot"
+      - "It writes the test code"
+      - "It runs npx playwright test and reads the output"
+      - "It reports back, and you review the result"
+    distractors:
+      - "It asks the product manager for the requirements"
+    hints:
+      - en: "Everything starts with you."
+        ru: "Всё начинается с тебя."
+      - en: "The agent can't write locators before it has seen the page."
+        ru: "Агент не может писать локаторы, пока не увидел страницу."
+      - en: "Prompt → context → browser → code → run → report."
+        ru: "Промпт → контекст → браузер → код → запуск → отчёт."
+    explain:
+      en: "Prompt, context, browser, code, run, report — and the loop ends with your review. Agents don't go and ask the PM: that's your job."
+      ru: "Промпт, контекст, браузер, код, запуск, отчёт — а завершает цикл твоё ревью. Агенты не ходят к продакт-менеджеру с вопросами: это твоя работа."
+
+  - id: c2-l1-k3
+    kind: predict
+    keyPoint: kp-agent-limits
+    prompt:
+      en: "Petal wrote this test from memory without running it. Pass or fail?"
+      ru: "Petal написал этот тест по памяти и не запускал его. Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('user can open the shop from home', async ({ page }) => {
+        await page.goto('/');
+        await page.getByLink('Shop now').click();
+        await expect(page.getByRole('heading', { name: 'Shop' })).toBeVisible();
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "Fail: `getByLink` doesn't exist in Playwright — the test crashes on line 5."
+          ru: "Упадёт: `getByLink` в Playwright не существует — тест сломается на строке 5."
+        correct: true
+      - text:
+          en: "Pass: the “Shop now” link is on the home page."
+          ru: "Пройдёт: ссылка «Shop now» есть на главной."
+      - text:
+          en: "Fail: there is no “Shop” heading on /shop."
+          ru: "Упадёт: на /shop нет заголовка «Shop»."
+    hints:
+      - en: "Read every method name carefully."
+        ru: "Внимательно прочитай названия всех методов."
+      - en: "How are links found in Playwright? By role."
+        ru: "Как в Playwright ищут ссылки? По роли."
+      - en: "Line 5 should be `page.getByRole('link', { name: 'Shop now' })`."
+        ru: "В строке 5 должно быть `page.getByRole('link', { name: 'Shop now' })`."
+    explain:
+      en: "`getByLink` is a hallucination: it sounds like `getByLabel` or `getByText`, but it doesn't exist. The run fails with “page.getByLink is not a function”."
+      ru: "`getByLink` — галлюцинация: звучит как `getByLabel` или `getByText`, но не существует. Прогон падает с «page.getByLink is not a function»."
+
+  - id: c2-l1-k4
+    kind: review
+    keyPoint: kp-agent-limits
+    context:
+      en: "Petal wrote this test for “wrong password shows an error” without opening the app."
+      ru: "Petal написал этот тест на «неверный пароль показывает ошибку», не открывая приложение."
+    prompt:
+      en: "Find the invented parts."
+      ru: "Найди выдуманные места."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('wrong password shows an error', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Username').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('wrong-pass');
+        await page.getByRole('button', { name: 'Sign in' }).click();
+        await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+      });
+    issues:
+      - line: 5
+        type: hallucination
+        note:
+          en: "Bloomly has no “Username” field. The label is “Email”."
+          ru: "В Bloomly нет поля «Username». Метка — «Email»."
+      - line: 7
+        type: hallucination
+        note:
+          en: "The button is “Log in”, not “Sign in”."
+          ru: "Кнопка называется «Log in», а не «Sign in»."
+    types: [hallucination, wrong-assertion, hard-wait, no-assertion]
+    hints:
+      - en: "Compare every label and button name with the real login page."
+        ru: "Сравни каждую метку и название кнопки с настоящей страницей входа."
+      - en: "Many sites say “Username” and “Sign in”. Bloomly doesn't."
+        ru: "На многих сайтах пишут «Username» и «Sign in». В Bloomly — нет."
+      - en: "Lines 5 and 7."
+        ru: "Строки 5 и 7."
+    explain:
+      en: "Without looking at the page, the agent filled the gaps with the most common words on the internet. Elements can be hallucinated just like methods."
+      ru: "Не глядя на страницу, агент заполнил пробелы самыми частыми словами из интернета. Элементы галлюцинируются так же, как методы."
+
+  - id: c2-l1-k5
+    kind: choice
+    keyPoint: kp-you-decide
+    multi: true
+    prompt:
+      en: "Petal proposes three login tests: Anna logs in; wrong password shows an error; empty email shows an error. Which tests would you add? Pick all that are worth it."
+      ru: "Petal предлагает три теста входа: Anna входит; неверный пароль показывает ошибку; пустой email показывает ошибку. Какие тесты ты бы добавил{а|}? Выбери все стоящие."
+    options:
+      - text:
+          en: "A locked account sees “Your account is locked. Please contact support.”"
+          ru: "Заблокированный аккаунт видит «Your account is locked. Please contact support.»"
+        correct: true
+        why:
+          en: "A business rule with its own message — a negative test the agent didn't think of."
+          ru: "Бизнес-правило со своим сообщением — негативный тест, о котором агент не подумал."
+      - text:
+          en: "“ Anna@Bloomly.app ” (spaces, capital letters) still logs in"
+          ru: "« Anna@Bloomly.app » (пробелы, заглавные буквы) всё равно входит"
+        correct: true
+        why:
+          en: "A classic edge case: real users paste emails with spaces and capitals."
+          ru: "Классический пограничный случай: реальные пользователи вставляют email с пробелами и заглавными."
+      - text:
+          en: "Anna logs in again, with a different test title"
+          ru: "Anna снова входит, просто с другим названием теста"
+        why:
+          en: "A duplicate. It adds run time, not coverage."
+          ru: "Дубликат. Добавляет время прогона, а не покрытие."
+      - text:
+          en: "The login page has a heading"
+          ru: "На странице входа есть заголовок"
+        why:
+          en: "Low value: if the heading is missing, the other tests will notice anyway."
+          ru: "Мало пользы: если заголовка нет, другие тесты это и так заметят."
+    hints:
+      - en: "Think like a test designer: negative cases and edge cases."
+        ru: "Думай как тест-дизайнер: негативные и пограничные случаи."
+      - en: "Which cases have their own business rule or their own risk?"
+        ru: "У каких кейсов есть своё бизнес-правило или свой риск?"
+      - en: "The locked account and the email with spaces and capitals."
+        ru: "Заблокированный аккаунт и email с пробелами и заглавными."
+    praise:
+      en: "That's test design the agent doesn't do on its own: you went for rules and risks."
+      ru: "Это тест-дизайн, который агент сам не делает: ты пош{ла|ёл} за правилами и рисками."
+    explain:
+      en: "Agents tend to cover the happy path and the obvious errors. A [[negative test|negative-test]] for locked users and an [[edge case|edge-case]] for messy input come from your experience."
+      ru: "Агенты обычно покрывают позитивный сценарий и очевидные ошибки. [[Негативный тест|negative-test]] на заблокированных пользователей и [[пограничный случай|edge-case]] с «грязным» вводом приходят из твоего опыта."
+
+  - id: c2-l1-k6
+    kind: agent
+    keyPoint: kp-you-decide
+    context:
+      en: "Petal is simulated here; a real agent's wording and code will vary."
+      ru: "Petal здесь симулирован; у настоящего агента формулировки и код будут другими."
+    prompt:
+      en: "Compose the prompt for TC-102 and run Petal's test."
+      ru: "Собери промпт для TC-102 и запусти тест Petal."
+    testCase:
+      id: TC-102
+      title: Wrong password shows an error
+      steps:
+        - { action: "Open /login" }
+        - { action: "Enter email and a wrong password", data: "anna@bloomly.app / nope123" }
+        - { action: "Click \"Log in\"", expected: "Alert \"Invalid email or password.\"; the user stays on /login" }
+    blocks:
+      - { id: task, locked: true, text: "Write a Playwright test for TC-102: a wrong password shows an error.", ru: "Напиши Playwright-тест для TC-102: неверный пароль показывает ошибку." }
+      - { id: steps, text: 'Steps: open /login, enter anna@bloomly.app and the wrong password nope123, click "Log in".', ru: "Шаги: открой /login, введи anna@bloomly.app и неверный пароль nope123, нажми «Log in»." }
+      - { id: expected, text: 'Expected: the alert says "Invalid email or password." and the URL stays /login.', ru: "Ожидаемый результат: в сообщении об ошибке «Invalid email or password.», URL остаётся /login." }
+      - { id: noise, text: "Use waitForTimeout(5000) to be safe.", ru: "Используй waitForTimeout(5000) на всякий случай." }
+    responses:
+      - when: [steps, expected]
+        unless: [noise]
+        best: true
+        message:
+          en: "Done! The test enters the wrong password and checks the exact alert text from TC-102 and the URL. Green ✅"
+          ru: "Готово! Тест вводит неверный пароль и проверяет точный текст ошибки из TC-102 и URL. Зелёный ✅"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('wrong password shows an error', async ({ page }) => {
+            await page.goto('/login');
+            await page.getByLabel('Email').fill('anna@bloomly.app');
+            await page.getByLabel('Password').fill('nope123');
+            await page.getByRole('button', { name: 'Log in' }).click();
+            await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+            await expect(page).toHaveURL('/login');
+          });
+      - when: [steps, expected]
+        message:
+          en: "Done! I added a 5-second wait to be safe, as you asked. Green ✅ (it takes a bit longer now)."
+          ru: "Готово! Как ты и просил{а|}, добавил ожидание 5 секунд на всякий случай. Зелёный ✅ (правда, теперь он идёт дольше)."
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('wrong password shows an error', async ({ page }) => {
+            await page.goto('/login');
+            await page.getByLabel('Email').fill('anna@bloomly.app');
+            await page.getByLabel('Password').fill('nope123');
+            await page.getByRole('button', { name: 'Log in' }).click();
+            await page.waitForTimeout(5000);
+            await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+          });
+      - when: [steps]
+        message:
+          en: "Done! After the click the test checks that we're still on the login page. Green ✅"
+          ru: "Готово! После клика тест проверяет, что мы всё ещё на странице входа. Зелёный ✅"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('wrong password shows an error', async ({ page }) => {
+            await page.goto('/login');
+            await page.getByLabel('Email').fill('anna@bloomly.app');
+            await page.getByLabel('Password').fill('nope123');
+            await page.getByRole('button', { name: 'Log in' }).click();
+            await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible();
+          });
+      - when: []
+        message:
+          en: "I wasn't sure about the details, so I checked the login page title. Green ✅"
+          ru: "Я не был уверен в деталях, поэтому проверил заголовок вкладки страницы входа. Зелёный ✅"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('login page works', async ({ page }) => {
+            await page.goto('/login');
+            await expect(page).toHaveTitle('Log in · Bloomly');
+          });
+    missing:
+      expected:
+        en: "Without the expected result Petal only checked that the “Log in” heading is there. That passes even if no error appears at all."
+        ru: "Без ожидаемого результата Petal проверил только, что на месте заголовок «Log in». Это пройдёт, даже если ошибка вообще не появится."
+      steps:
+        en: "Without steps and data Petal never even tried a wrong password."
+        ru: "Без шагов и данных Petal даже не попробовал ввести неверный пароль."
+    checks:
+      expect: pass
+      static: [hasAssertion, noHardWait]
+    hints:
+      - en: "The expected result is the part only you can give: the exact error text."
+        ru: "Ожидаемый результат — то, что можешь дать только ты: точный текст ошибки."
+      - en: "One block makes every run 5 seconds slower."
+        ru: "Один блок делает каждый прогон на 5 секунд медленнее."
+      - en: "Steps + expected. Leave out the waitForTimeout block."
+        ru: "Шаги + ожидаемый результат. Блок с waitForTimeout не бери."
+    praise:
+      en: "You gave Petal the exact error text and kept the hard wait out. Clean prompt."
+      ru: "Ты дал{а|} Petal точный текст ошибки и не пустил{а|} в промпт жёсткое ожидание. Чистый промпт."
+    explain:
+      en: "The error text “Invalid email or password.” is a requirement — Petal can't know it's the *right* text. And `expect(...)` already waits for the alert, so a 5-second pause only slows the suite down."
+      ru: "Текст ошибки «Invalid email or password.» — это требование: Petal не может знать, что это *правильный* текст. А `expect(...)` и так ждёт появления ошибки, так что пауза в 5 секунд только замедляет набор тестов."
+
+  - id: c2-l1-k7
+    kind: choice
+    keyPoint: kp-agent-limits
+    prompt:
+      en: "Petal reports: “All 12 new tests pass ✅”. What do you do first?"
+      ru: "Petal докладывает: «Все 12 новых тестов проходят ✅». Что ты делаешь в первую очередь?"
+    options:
+      - text:
+          en: "Open the tests and check what each one asserts, against the test cases"
+          ru: "Открываю тесты и сверяю, что проверяет каждый, с тест-кейсами"
+        correct: true
+        why:
+          en: "Green says nothing about *what* is checked. The review answers that."
+          ru: "Зелёный цвет ничего не говорит о том, *что* проверяется. На это отвечает ревью."
+      - text:
+          en: "Merge them — green is green"
+          ru: "Мержу — зелёный значит зелёный"
+        why:
+          en: "A test without a real assertion is green too."
+          ru: "Тест без настоящей проверки тоже зелёный."
+      - text:
+          en: "Ask Petal whether it's sure"
+          ru: "Спрашиваю Petal, уверен ли он"
+        why:
+          en: "It will say yes. Agents sound equally confident when they're wrong."
+          ru: "Он скажет «да». Агенты звучат одинаково уверенно, когда ошибаются."
+      - text:
+          en: "Run them ten more times"
+          ru: "Запускаю их ещё десять раз"
+        why:
+          en: "Ten green runs of a test that checks nothing still check nothing."
+          ru: "Десять зелёных прогонов теста, который ничего не проверяет, всё так же ничего не проверяют."
+    hints:
+      - en: "What does “green” actually prove?"
+        ru: "Что на самом деле доказывает «зелёный»?"
+      - en: "Confidence isn't evidence."
+        ru: "Уверенность — не доказательство."
+    explain:
+      en: "An agent's report is a claim, not a proof. Reading what each test asserts is the first step of every review."
+      ru: "Отчёт агента — это утверждение, а не доказательство. Прочитать, что проверяет каждый тест, — первый шаг любого ревью."
+
+  - id: c2-l1-k8
+    kind: choice
+    keyPoint: kp-agent-loop
+    placement: true
+    prompt:
+      en: "Petal runs its new test and gets: `TypeError: page.open is not a function`. What does a good agent do next in its loop?"
+      ru: "Petal запускает новый тест и получает: `TypeError: page.open is not a function`. Что хороший агент делает дальше в своём цикле?"
+    options:
+      - text:
+          en: "Reads the error, replaces it with `page.goto` and runs the test again"
+          ru: "Читает ошибку, заменяет на `page.goto` и запускает тест снова"
+        correct: true
+        why:
+          en: "Run → read output → fix → run again. That's the loop."
+          ru: "Запуск → чтение вывода → исправление → снова запуск. Это и есть цикл."
+      - text:
+          en: "Reports success — the test file was created"
+          ru: "Докладывает об успехе — файл с тестом ведь создан"
+        why:
+          en: "A crashing test isn't a success. (Though a hurried agent might say so.)"
+          ru: "Падающий тест — не успех. (Хотя торопливый агент может так и сказать.)"
+      - text:
+          en: "Deletes the test"
+          ru: "Удаляет тест"
+        why:
+          en: "The goal is a working test, not an empty folder."
+          ru: "Цель — работающий тест, а не пустая папка."
+    hints:
+      - en: "Remember steps 5 and 6 of the loop."
+        ru: "Вспомни шаги 5 и 6 цикла."
+      - en: "Agents read the output of their own runs."
+        ru: "Агенты читают вывод собственных прогонов."
+    explain:
+      en: "Running and reading the output is what makes an agent more than a chatbot: it can catch its own crashes. It still can't catch a *wrong expected value* — that one doesn't crash."
+      ru: "Запуск и чтение вывода — то, что отличает агента от чат-бота: он может поймать собственные падения. А вот *неверное ожидаемое значение* он не поймает — оно не вызывает падения."

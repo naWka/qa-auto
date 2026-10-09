@@ -1,0 +1,278 @@
+id: c2
+number: 2
+status: ready
+title: { en: "Your AI pair", ru: "ИИ-напарник" }
+department: { en: "AI Lab", ru: "ИИ-лаборатория" }
+color: rose
+summary:
+  en: "Meet Petal, the team's AI agent. See how it writes a test, prompt it like a good test case, review its code — and learn why a green test is not always a correct one."
+  ru: "Знакомство с Petal, ИИ-агентом команды. Как он пишет тест, как ставить ему задачу так же точно, как в хорошем тест-кейсе, как делать ревью его кода — и почему зелёный тест не всегда правильный."
+intro:
+  - who: leo
+    text:
+      en: "Bloomly 3.0 ships before the holidays, and 400 manual test cases won't run themselves. So — meet Petal. You have access from today."
+      ru: "Bloomly 3.0 выходит перед праздниками, а 400 ручных тест-кейсов сами себя не прогонят. Так что знакомься: Petal. С сегодняшнего дня у тебя есть доступ."
+  - who: petal
+    text:
+      en: "Hi! I'm Petal, the team's AI agent. I write Playwright tests in seconds. Just tell me what you need!"
+      ru: "Привет! Я Petal, ИИ-агент команды. Пишу Playwright-тесты за секунды. Просто скажи, что нужно!"
+  - who: maya
+    text:
+      en: "Petal is fast and eager. It's also confidently wrong more often than it admits."
+      ru: "Petal быстрый и старательный. А ещё он уверенно ошибается — чаще, чем признаёт."
+  - who: maya
+    text:
+      en: "So here's the deal: Petal writes code; you decide what's worth checking and whether the test is trustworthy."
+      ru: "Поэтому договоримся так: Petal пишет код, а ты решаешь, что стоит проверять и можно ли этому тесту доверять."
+  - who: mochi
+    text: { en: "Mrrp?", ru: "Мрр?" }
+  - who: you
+    text:
+      en: "So I lead, and the agent types. Got it."
+      ru: "Значит, веду я, а печатает агент. {Поняла|Понял}."
+outro:
+  - who: maya
+    text:
+      en: "You prompted Petal like a test case, reviewed its code and caught a test that lied. That's the job."
+      ru: "Ты ставил{а|} Petal задачи как тест-кейсы, делал{а|} ревью его кода и поймал{а|} тест, который врал. Это и есть работа."
+  - who: petal
+    text:
+      en: "From now on I'll take expected values from the test case, not from the screen. Promise!"
+      ru: "Теперь буду брать ожидаемые значения из тест-кейса, а не с экрана. Обещаю!"
+  - who: leo
+    text:
+      en: "Next stop: Engineering. Time to read the code Petal writes — line by line."
+      ru: "Следующая остановка — инженерный отдел. Пора научиться читать код, который пишет Petal, строка за строкой."
+lessons: [c2-l1, c2-l2, c2-l3, c2-l4]
+boss:
+  id: c2-boss
+  title: { en: "Full cycle", ru: "Полный цикл" }
+  story:
+    - who: sofia
+      text:
+        en: "Customers say the cart total looks off when they buy more than one bouquet. Can we have a test for it today?"
+        ru: "Покупатели пишут, что итог в корзине странный, если взять больше одного букета. Можно сегодня получить на это тест?"
+    - who: maya
+      text:
+        en: "Full cycle, on your own: prompt Petal, review what it writes, then make sure the test really catches the bug."
+        ru: "Полный цикл, самостоятельно: поставь задачу Petal, сделай ревью того, что он напишет, и убедись, что тест действительно ловит баг."
+    - who: petal
+      text: { en: "Ready when you are!", ru: "Готов, когда скажешь!" }
+  tasks:
+    - id: c2-boss-t1
+      kind: agent
+      prompt:
+        en: "Compose the prompt for TC-310. Pick only the blocks that lead to a test you can trust."
+        ru: "Собери промпт для TC-310. Выбери только те блоки, которые приведут к тесту, которому можно доверять."
+      context:
+        en: "The cart is preset with 1 Rose Bouquet — like a saved browser state in a real project. Petal is simulated, as everywhere in the trainer."
+        ru: "В корзине заранее лежит 1 Rose Bouquet — как сохранённое состояние браузера в реальном проекте. Petal здесь, как и везде в тренажёре, симулирован."
+      app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+      testCase:
+        id: TC-310
+        title: Cart total respects quantity
+        preconditions: ["Cart has 1 Rose Bouquet (€35.00)"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Click \"Increase Rose Bouquet\" (+) once", expected: "Row subtotal €70.00; cart total €70.00 (delivery is free from €50)" }
+      blocks:
+        - { id: task, locked: true, text: "Write a Playwright test for TC-310: the cart total respects quantity.", ru: "Напиши Playwright-тест для TC-310: итог корзины учитывает количество." }
+        - { id: precondition, text: "Precondition: the cart already has 1 Rose Bouquet (preset state). Start on /cart.", ru: "Предусловие: в корзине уже лежит 1 Rose Bouquet (предустановленное состояние). Начни с /cart." }
+        - { id: steps, text: 'Steps: click the "Increase Rose Bouquet" button once.', ru: "Шаги: один раз нажми кнопку «Increase Rose Bouquet»." }
+        - { id: expected, text: 'Expected: row subtotal "€70.00" and cart total "€70.00" (delivery is free from €50).', ru: "Ожидаемый результат: сумма строки «€70.00» и итог корзины «€70.00» (от €50 доставка бесплатная)." }
+        - { id: rules, text: "Rules: getByRole or getByTestId locators only. No CSS selectors, no waitForTimeout.", ru: "Правила: только локаторы getByRole или getByTestId. Без CSS-селекторов и без waitForTimeout." }
+        - { id: adjust, text: "If the total looks different, adjust the expected value so the test passes.", ru: "Если итог выглядит иначе, подгони ожидаемое значение, чтобы тест проходил." }
+      responses:
+        - when: [precondition, steps, expected, rules]
+          unless: [adjust]
+          best: true
+          message:
+            en: "Done! I start on /cart, click “Increase Rose Bouquet” once and check both values from TC-310: row subtotal and total, €70.00 each. Roles and test ids only, no pauses."
+            ru: "Готово! Начинаю с /cart, один раз нажимаю «Increase Rose Bouquet» и проверяю оба значения из TC-310: сумму строки и итог, по €70.00. Только роли и test id, никаких пауз."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('cart total respects quantity', async ({ page }) => {
+              await page.goto('/cart');
+              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+              await expect(page.getByTestId('cart-total')).toHaveText('€70.00');
+            });
+        - when: [adjust]
+          message:
+            en: "No problem! I made the check flexible: it accepts whatever total the app shows, as long as it's in euros. Green ✅ — and it will never break!"
+            ru: "Без проблем! Я сделал проверку гибкой: она принимает любой итог, который покажет приложение, лишь бы в евро. Зелёный ✅ — и никогда не сломается!"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('cart total respects quantity', async ({ page }) => {
+              await page.goto('/cart');
+              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+              await expect(page.getByTestId('cart-total')).toContainText('€');
+            });
+        - when: [precondition, steps, expected]
+          message:
+            en: "Done! I used the data attributes and the table structure, plus a 1-second pause so the totals can update. Green ✅"
+            ru: "Готово! Я взял data-атрибуты и структуру таблицы, плюс паузу в 1 секунду, чтобы итоги успели обновиться. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('cart total respects quantity', async ({ page }) => {
+              await page.goto('/cart');
+              await page.locator('button[data-qty="1"]').click();
+              await page.waitForTimeout(1000);
+              await expect(page.locator('tbody td:nth-child(4)')).toHaveText('€70.00');
+              await expect(page.locator('dd.total')).toHaveText('€70.00');
+            });
+        - when: []
+          message:
+            en: "I wasn't sure what exactly to check, so I made sure the cart page opens. Green ✅"
+            ru: "Я не был уверен, что именно проверять, поэтому убедился, что страница корзины открывается. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('cart page opens', async ({ page }) => {
+              await page.goto('/cart');
+              await expect(page.getByRole('heading', { name: 'Your cart' })).toBeVisible();
+            });
+      missing:
+        expected:
+          en: "Without the expected values Petal had nothing to compare against — it only checked that the cart page opens."
+          ru: "Без ожидаемых значений у Petal не было эталона для сравнения — он проверил только, что страница корзины открывается."
+        steps:
+          en: "Without the step Petal didn't know it had to change the quantity at all."
+          ru: "Без шага Petal даже не знал, что нужно менять количество."
+        precondition:
+          en: "Without the precondition Petal didn't know where to start or what is already in the cart."
+          ru: "Без предусловия Petal не знал, откуда начинать и что уже лежит в корзине."
+        rules:
+          en: "Without rules Petal used `button[data-qty=\"1\"]`, `td:nth-child(4)`, `dd.total` and a 1-second pause. Green today, broken by the next redesign — and slower on every run."
+          ru: "Без правил Petal взял `button[data-qty=\"1\"]`, `td:nth-child(4)`, `dd.total` и паузу в 1 секунду. Сегодня зелёный, после ближайшего редизайна — сломанный, и каждый прогон медленнее."
+      checks:
+        expect: pass
+        static: [hasAssertion, noHardWait, noFragile]
+        also:
+          - app: { bugs: [cart-total-ignores-qty], state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+            expect: fail
+      hints:
+        - en: "A good prompt contains everything TC-310 contains — plus the team's rules."
+          ru: "В хорошем промпте есть всё, что есть в TC-310, — плюс правила команды."
+        - en: "One block sounds helpful but tells Petal to make the test agree with whatever the app shows."
+          ru: "Один блок звучит заботливо, но велит Petal подогнать тест под то, что покажет приложение."
+        - en: "Take precondition, steps, expected and rules. Leave out “adjust the expected value”."
+          ru: "Возьми предусловие, шаги, ожидаемый результат и правила. Блок «подгони ожидаемое значение» не бери."
+      praise:
+        en: "You left out the “adjust the expected value” trap. A test that agrees with any total protects nothing — and you knew it."
+        ru: "Ты не взял{а|} ловушку «подгони ожидаемое значение». Тест, который согласен с любым итогом, ничего не защищает, — и ты это знал{а|}."
+      explain:
+        en: "The best prompt is TC-310 itself plus the team rules. The trap was “adjust the expected value”: it turns the test into a mirror of the app, so it can never catch a wrong total. Expected values come from the test case, not from the screen. Bonus: Petal's best test goes red on the build with the total bug — exactly what we want."
+        ru: "Лучший промпт — это сам TC-310 плюс правила команды. Ловушкой был блок «подгони ожидаемое значение»: он превращает тест в зеркало приложения, и неверный итог такой тест не поймает никогда. Ожидаемые значения берутся из тест-кейса, а не с экрана. Бонус: лучший тест Petal краснеет на сборке с багом итога — ровно то, что нужно."
+
+    - id: c2-boss-t2
+      kind: review
+      prompt:
+        en: "Review Petal's draft: flag every problem line and pick the issue type."
+        ru: "Сделай ревью черновика Petal: отметь каждую проблемную строку и выбери тип проблемы."
+      context:
+        en: "Meanwhile Petal's first draft of TC-310 landed in a pull request. Petal wrote it while exploring the staging build — the one customers complain about."
+        ru: "Тем временем первый черновик Petal для TC-310 пришёл в пулл-реквесте. Petal писал его, исследуя стейджинг — ту самую сборку, на которую жалуются покупатели."
+      testCase:
+        id: TC-310
+        title: Cart total respects quantity
+        preconditions: ["Cart has 1 Rose Bouquet (€35.00)"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Click \"Increase Rose Bouquet\" (+) once", expected: "Row subtotal €70.00; cart total €70.00 (delivery is free from €50)" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('cart total respects quantity', async ({ page }) => {
+          await page.goto('/cart');
+          await page.locator('.qty button:last-child').click();
+          await page.waitForTimeout(2000);
+          const total = page.getByTestId('cart-total');
+          expect(await total.isVisible()).toBeTruthy();
+          await expect(page.getByTestId('cart-delivery')).toHaveText('€4.90');
+        });
+      issues:
+        - line: 5
+          type: fragile-locator
+          note:
+            en: "`.qty button:last-child` depends on CSS classes and the order of buttons. Use `getByRole('button', { name: 'Increase Rose Bouquet' })`."
+            ru: "`.qty button:last-child` зависит от CSS-классов и порядка кнопок. Используй `getByRole('button', { name: 'Increase Rose Bouquet' })`."
+        - line: 6
+          type: hard-wait
+          note:
+            en: "A fixed 2-second pause: slow on every run and still no guarantee. An `expect(...)` assertion waits by itself."
+            ru: "Фиксированная пауза в 2 секунды: медленно на каждом прогоне и всё равно без гарантии. Проверка `expect(...)` ждёт сама."
+        - line: 8
+          type: weak-assertion
+          note:
+            en: "It checks that the total exists, not that it's €70.00 — a wrong total passes. Use `await expect(total).toHaveText('€70.00')`."
+            ru: "Проверяет, что итог есть, а не что он равен €70.00, — неверный итог пройдёт. Используй `await expect(total).toHaveText('€70.00')`."
+        - line: 9
+          type: wrong-assertion
+          note:
+            en: "TC-310 says delivery is free from €50, so at €70.00 it must be “Free”. €4.90 was copied from the buggy staging build — the test now protects the bug."
+            ru: "По TC-310 доставка бесплатна от €50, значит, при €70.00 должно быть «Free». €4.90 списано с багованного стейджинга — тест теперь защищает баг."
+      types: [fragile-locator, hard-wait, weak-assertion, wrong-assertion, hallucination, no-assertion, missing-await]
+      hints:
+        - en: "Go through the five review questions: expected result, real assertion, locators, waits, data."
+          ru: "Пройди по пяти вопросам ревью: ожидаемый результат, настоящая проверка, локаторы, ожидания, данные."
+        - en: "Four lines have problems. One of them has a value that contradicts the test case."
+          ru: "Проблемы в четырёх строках. В одной из них значение противоречит тест-кейсу."
+        - en: "Lines 5, 6, 8 and 9. Compare line 9 with “delivery is free from €50”."
+          ru: "Строки 5, 6, 8 и 9. Сравни строку 9 с «доставка бесплатна от €50»."
+      praise:
+        en: "Four for four — including the €4.90 that Petal copied from a buggy screen. That's a reviewer who reads the requirements."
+        ru: "Четыре из четырёх — включая €4.90, которые Petal списал с багованного экрана. Так работает ревьюер, который читает требования."
+      explain:
+        en: "Lines 5–6 make the test fragile and slow; line 8 can't catch a wrong total; line 9 asserts the bug itself. Line 9 is the scariest: it looks like a real check, but its expected value came from the screen, not from the test case."
+        ru: "Строки 5–6 делают тест хрупким и медленным; строка 8 не поймает неверный итог; строка 9 проверяет сам баг. Строка 9 опаснее всех: она выглядит как настоящая проверка, но ожидаемое значение взято с экрана, а не из тест-кейса."
+
+    - id: c2-boss-t3
+      kind: find-bug
+      prompt:
+        en: "This version checks the row subtotal and only that a total exists — it's green on the buggy build. Change it so it fails on the buggy build and passes once Kai fixes the bug."
+        ru: "Эта версия проверяет сумму строки и только наличие итога — на багованной сборке она зелёная. Измени тест так, чтобы он падал на багованной сборке и проходил, когда Kai починит баг."
+      context:
+        en: "This build has the cart total bug switched on: row subtotals are right, but the total ignores quantity."
+        ru: "В этой сборке включён баг итога корзины: суммы строк верные, а итог не учитывает количество."
+      app: { bugs: [cart-total-ignores-qty], state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('cart total respects quantity', async ({ page }) => {
+          await page.goto('/cart');
+          await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+          await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+          await expect(page.getByTestId('cart-total')).toBeVisible();
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('cart total respects quantity', async ({ page }) => {
+          await page.goto('/cart');
+          await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+          await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+          await expect(page.getByTestId('cart-total')).toHaveText('€70.00');
+        });
+      checks:
+        expect: fail
+        static: [hasAssertion, noHardWait]
+        also:
+          - app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+            expect: pass
+      hints:
+        - en: "The row subtotal is right even on the buggy build. Which line can't tell a right total from a wrong one?"
+          ru: "Сумма строки верна даже на багованной сборке. Какая строка не отличает верный итог от неверного?"
+        - en: "Line 7 only checks that the total is visible. Check its value instead."
+          ru: "Строка 7 проверяет только, что итог виден. Проверь вместо этого его значение."
+        - en: "Replace `toBeVisible()` on line 7 with `toHaveText('€70.00')`."
+          ru: "Замени `toBeVisible()` в строке 7 на `toHaveText('€70.00')`."
+      praise:
+        en: "Red on the buggy build, green on the fixed one — for the right reason. Now this test is worth keeping."
+        ru: "Красный на багованной сборке, зелёный на исправленной — и по правильной причине. Вот теперь этот тест стоит оставить."
+      explain:
+        en: "`toBeVisible()` passes for any total; `toHaveText('€70.00')` passes only for the right one. On the buggy build the run now fails with “expected €70.00, received €39.90” — a failure that points straight at the bug. That's a test you can trust."
+        ru: "`toBeVisible()` проходит при любом итоге, `toHaveText('€70.00')` — только при верном. На багованной сборке прогон теперь падает с сообщением «ожидалось €70.00, получено €39.90» — падение указывает прямо на баг. Такому тесту можно доверять."

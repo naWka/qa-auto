@@ -1,0 +1,71 @@
+id: c4
+number: 4
+status: planned
+title: { en: "How a page is built", ru: "Как устроена страница" }
+department: { en: "Frontend", ru: "Фронтенд" }
+color: mint
+summary:
+  en: "Look under the hood of a web page: the DOM tree, elements, attributes, roles and accessible names. You will inspect Bloomly in DevTools and read the accessibility snapshot — exactly what an AI agent sees through Playwright MCP. After this chapter you can tell whether the agent saw the page the way you do."
+  ru: "Заглянем под капот веб-страницы: DOM-дерево, элементы, атрибуты, роли и доступные имена. Ты будешь исследовать Bloomly в DevTools и читать снимок доступности — ровно то, что видит ИИ-агент через Playwright MCP. После этой главы ты сможешь понять, увидел ли агент страницу так же, как ты."
+intro:
+  - who: kai
+    text:
+      en: "Welcome to Frontend! I build the Bloomly pages. For you a page is buttons and fields. For a test it's a tree of elements."
+      ru: "Добро пожаловать во фронтенд! Я верстаю страницы Bloomly. Для тебя страница — это кнопки и поля. Для теста — дерево элементов."
+  - who: petal
+    text:
+      en: "And I see the page as an accessibility snapshot: roles and names, no colors, no pixels. Very efficient!"
+      ru: "А я вижу страницу как снимок доступности: роли и имена, никаких цветов и пикселей. Очень эффективно!"
+  - who: maya
+    text:
+      en: "Which means: if a button has no proper name, Petal has to guess what it is. Let's learn to see the page through both pairs of eyes."
+      ru: "А значит, если у кнопки нет нормального имени, Petal приходится угадывать, что это. Давай научимся видеть страницу глазами обоих."
+plan:
+  - title: { en: "The page as a tree: the DOM", ru: "Страница как дерево: DOM" }
+    goal:
+      en: "Read a short piece of Bloomly HTML and find elements, tags and nesting in the DOM tree."
+      ru: "Читать короткий фрагмент HTML Bloomly и находить в DOM-дереве элементы, теги и вложенность."
+    keyPoints:
+      - en: "HTML is the source text; the DOM is the live tree the browser builds from it."
+        ru: "HTML — исходный текст, DOM — живое дерево, которое браузер строит из него."
+      - en: "An element is an opening tag, content and a closing tag; elements nest inside each other like folders."
+        ru: "Элемент — это открывающий тег, содержимое и закрывающий тег; элементы вложены друг в друга, как папки."
+      - en: "Playwright finds elements in the DOM, not by pixels on the screen."
+        ru: "Playwright ищет элементы в DOM, а не по пикселям на экране."
+  - title: { en: "Attributes: id, class, data-testid, aria-*", ru: "Атрибуты: id, class, data-testid, aria-*" }
+    goal:
+      en: "Tell attributes that describe an element for people and tests from attributes that only serve styling."
+      ru: "Отличать атрибуты, которые описывают элемент для людей и тестов, от атрибутов, которые нужны только для стилей."
+    keyPoints:
+      - en: "Attributes are name=\"value\" pairs inside the opening tag: id, class, type, placeholder."
+        ru: "Атрибуты — пары name=\"value\" внутри открывающего тега: id, class, type, placeholder."
+      - en: "class is for styling and changes with every redesign; data-testid exists only for tests."
+        ru: "class нужен для стилей и меняется при каждом редизайне; data-testid существует только для тестов."
+      - en: "aria-* attributes (aria-label, aria-checked) give elements names and states for screen readers — and for Playwright."
+        ru: "Атрибуты aria-* (aria-label, aria-checked) дают элементам имена и состояния для скринридеров — и для Playwright."
+  - title: { en: "Roles and accessible names", ru: "Роли и доступные имена" }
+    goal:
+      en: "Name the role and accessible name of any Bloomly element: button \"Log in\", textbox \"Email\", link \"Cart 0\"."
+      ru: "Называть роль и доступное имя любого элемента Bloomly: button «Log in», textbox «Email», link «Cart 0»."
+    keyPoints:
+      - en: "A role says what an element is (button, link, textbox, checkbox, heading); many tags have one built in."
+        ru: "Роль говорит, что это за элемент (button, link, textbox, checkbox, heading); у многих тегов она встроена."
+      - en: "The accessible name comes from the text, the label, alt or aria-label — it's what a screen reader announces."
+        ru: "Доступное имя берётся из текста, label, alt или aria-label — именно его произносит скринридер."
+      - en: "Role + name is how users find things, so it is also the most stable way for tests to find them."
+        ru: "Роль + имя — это то, как элементы находят пользователи, поэтому и тестам так искать надёжнее всего."
+      - en: "An accessibility bug, like a button without a name, is a real bug — and it confuses the agent too."
+        ru: "Баг доступности, например кнопка без имени, — настоящий баг, и он сбивает с толку агента."
+  - title: { en: "DevTools and the agent's view", ru: "DevTools и взгляд агента" }
+    goal:
+      en: "Inspect an element in DevTools, then find the same element in a Playwright MCP accessibility snapshot."
+      ru: "Исследовать элемент в DevTools, а затем найти тот же элемент в снимке доступности из Playwright MCP."
+    keyPoints:
+      - en: "Right-click → Inspect opens the element in the Elements panel; the Accessibility pane shows its role and name."
+        ru: "Правый клик → «Просмотреть код» открывает элемент на панели Elements; вкладка Accessibility показывает его роль и имя."
+      - en: "Through Playwright MCP the agent gets an accessibility snapshot: a YAML-like tree of roles, names and refs, without colors or layout."
+        ru: "Через Playwright MCP агент получает снимок доступности — дерево ролей, имён и ссылок (ref) в виде YAML, без цветов и вёрстки."
+      - en: "If an element is missing or unnamed in the snapshot, the agent will guess — expect invented locators."
+        ru: "Если элемента нет в снимке или у него нет имени, агент будет угадывать — жди выдуманных локаторов."
+      - en: "Check the agent's locators against the real page in DevTools before you trust them."
+        ru: "Сверяй локаторы агента с реальной страницей в DevTools, прежде чем им доверять."

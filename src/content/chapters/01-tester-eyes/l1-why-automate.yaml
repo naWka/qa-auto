@@ -1,0 +1,902 @@
+id: c1-l1
+chapter: c1
+title:
+  en: "Why automate — and where AI fits"
+  ru: "Зачем автоматизировать — и где здесь ИИ"
+goal:
+  en: "See an automated test as a test case written in code, and know what the AI agent does and what you do."
+  ru: "Увидеть в автотесте тест-кейс, записанный кодом, и понять, что делает ИИ-агент, а что — ты."
+minutes: 8
+keyPoints:
+  - id: kp-regression-cost
+    title:
+      en: "Automation runs slow, repetitive regression in minutes"
+      ru: "Автоматизация прогоняет долгую однообразную регрессию за минуты"
+  - id: kp-test-is-script
+    title:
+      en: "An automated test is a test case written as code"
+      ru: "Автотест — это тест-кейс, записанный кодом"
+  - id: kp-qa-role-ai
+    title:
+      en: "The agent writes the code; you decide what to check"
+      ru: "Код пишет агент, а что проверять — решаешь ты"
+terms: [manual-testing, test-automation, automated-test, regression-testing, test-case, test-runner, test-suite, smoke-test]
+
+steps:
+  - type: story
+    lines:
+      - who: leo
+        text:
+          en: "Last release, regression took three full days. Two people clicked through the same 400 test cases. Again."
+          ru: "В прошлый релиз регрессия заняла три полных дня. Два человека прокликали те же 400 тест-кейсов. Опять."
+      - who: maya
+        text:
+          en: "And by day three everyone is tired — that's exactly when bugs slip through. Let's see what automation changes, and where Petal fits in."
+          ru: "А к третьему дню все устают — и именно тогда баги проскакивают. Давай посмотрим, что меняет автоматизация и какое место в ней у Petal."
+      - who: mochi
+        text:
+          en: "Mrrp?"
+          ru: "Мрр?"
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед началом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c1-l1-p1
+        kind: choice
+        keyPoint: kp-regression-cost
+        prompt:
+          en: "Bloomly has about 400 regression test cases. What changes first when they are automated?"
+          ru: "В Bloomly около 400 регрессионных тест-кейсов. Что изменится в первую очередь, когда их автоматизируют?"
+        options:
+          - text:
+              en: "The same checks run in minutes on every release, and people get time for exploratory testing."
+              ru: "Те же проверки проходят за минуты на каждом релизе, а у людей появляется время на исследовательское тестирование."
+            correct: true
+            why:
+              en: "Automation takes over the repetitive part. People keep the part that needs thinking."
+              ru: "Автоматизация забирает однообразную часть. Людям остаётся то, где нужно думать."
+          - text:
+              en: "Testers are no longer needed."
+              ru: "Тестировщики больше не нужны."
+            why:
+              en: "Someone still decides what to check and reads the results. That someone is a tester."
+              ru: "Кто-то всё равно решает, что проверять, и разбирает результаты. Это тестировщик."
+          - text:
+              en: "The app stops having bugs."
+              ru: "В приложении перестают появляться баги."
+            why:
+              en: "Automation doesn't prevent bugs. It finds regressions faster — minutes after a change, not days."
+              ru: "Автоматизация не предотвращает баги. Она быстрее находит регрессии — через минуты после изменения, а не через дни."
+        hints:
+          - en: "Think about what is slow and boring in manual regression."
+            ru: "Подумай, что в ручной регрессии долго и скучно."
+          - en: "Automation repeats known checks. Does it replace thinking?"
+            ru: "Автоматизация повторяет известные проверки. Заменяет ли она мышление?"
+        explain:
+          en: "Automated tests repeat the same checks quickly and reliably. Bugs still happen, and testers still decide what is worth checking — they just stop doing it by hand 400 times."
+          ru: "Автотесты быстро и надёжно повторяют одни и те же проверки. Баги по-прежнему случаются, и тестировщики по-прежнему решают, что стоит проверять, — просто больше не делают это руками 400 раз."
+      - id: c1-l1-p2
+        kind: choice
+        keyPoint: kp-qa-role-ai
+        prompt:
+          en: "Petal, the team's AI agent, can write a test in ten seconds. What does it do badly without you?"
+          ru: "Petal, ИИ-агент команды, пишет тест за десять секунд. Что у него плохо получается без тебя?"
+        options:
+          - text:
+              en: "Decide what is important to check and what the correct expected result is."
+              ru: "Решить, что важно проверить и какой ожидаемый результат правильный."
+            correct: true
+            why:
+              en: "The agent doesn't know Bloomly's risks or requirements. It guesses — and sounds sure. That judgement is yours."
+              ru: "Агент не знает рисков и требований Bloomly. Он угадывает — и звучит уверенно. Это решение за тобой."
+          - text:
+              en: "Type code quickly."
+              ru: "Быстро набирать код."
+            why:
+              en: "Speed is exactly what agents are good at."
+              ru: "Скорость — как раз сильная сторона агентов."
+          - text:
+              en: "Write JavaScript."
+              ru: "Писать на JavaScript."
+            why:
+              en: "Agents write JavaScript well. They are weaker at knowing what the code should check."
+              ru: "На JavaScript агенты пишут хорошо. Слабее у них понимание, что именно код должен проверять."
+        hints:
+          - en: "What does an agent not know about Bloomly?"
+            ru: "Чего агент не знает о Bloomly?"
+          - en: "Think about expected results and product risks."
+            ru: "Подумай об ожидаемых результатах и рисках продукта."
+        explain:
+          en: "Agents are fast at code but don't know what matters for the product. Choosing what to check and the right expected result is test design — your strongest skill."
+          ru: "Агенты быстро пишут код, но не знают, что важно для продукта. Выбрать, что проверять, и правильный ожидаемый результат — это тест-дизайн, твой самый сильный навык."
+
+  - type: theory
+    keyPoint: kp-regression-cost
+    title:
+      en: "Regression: the same checks, every release"
+      ru: "Регрессия: те же проверки на каждом релизе"
+    figure: manual-vs-auto
+    body:
+      - en: "[[Regression testing|regression-testing]] checks that what worked yesterday still works today. You know it well: the same cases, every release, by hand."
+        ru: "[[Регрессионное тестирование|regression-testing]] проверяет, что работавшее вчера работает и сегодня. Ты хорошо это знаешь: те же кейсы, каждый релиз, руками."
+      - en: "At Bloomly that's ~400 cases and 3 days of [[manual testing|manual-testing]]. [[Test automation|test-automation]] runs the same checks in minutes — on every release, even at night."
+        ru: "В Bloomly это около 400 кейсов и 3 дня [[ручного тестирования|manual-testing]]. [[Автоматизация тестирования|test-automation]] прогоняет те же проверки за минуты — на каждом релизе, хоть ночью."
+      - en: "Automation doesn't replace testing. It takes the repetitive part, so you get time for exploratory testing and new features."
+        ru: "Автоматизация не заменяет тестирование. Она забирает однообразную часть, и у тебя появляется время на исследовательское тестирование и новые фичи."
+    mentor:
+      en: "In my last team, the login smoke check ran forty times a day — after every merge. Nobody could do that by hand."
+      ru: "В моей прошлой команде смоук-проверка логина запускалась сорок раз в день — после каждого мержа. Вручную так не сможет никто."
+
+  - type: theory
+    keyPoint: kp-test-is-script
+    title:
+      en: "An automated test is a test case written as code"
+      ru: "Автотест — это тест-кейс, записанный кодом"
+    body:
+      - en: "You already write [[test cases|test-case]]: a title, steps, an expected result. An [[automated test|automated-test]] has exactly the same parts — only written as code."
+        ru: "Ты уже пишешь [[тест-кейсы|test-case]]: название, шаги, ожидаемый результат. У [[автотеста|automated-test]] ровно те же части — только записаны они кодом."
+      - en: "A [[test runner|test-runner]] (for us, Playwright) reads this code, opens a browser, does the steps and checks the result. Then it reports: passed or failed."
+        ru: "[[Тест-раннер|test-runner]] (у нас это Playwright) читает этот код, открывает браузер, выполняет шаги и проверяет результат. Потом сообщает: прошёл тест или упал."
+      - en: "Don't try to read every symbol yet. Find the three parts you already know: the title, the steps, the check."
+        ru: "Пока не пытайся разобрать каждый символ. Найди три знакомые части: название, шаги, проверку."
+    code: |
+      test('registered user can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page).toHaveURL('/account');
+      });
+
+  - type: mapping
+    keyPoint: kp-test-is-script
+    title:
+      en: "TC-001 and its automated test, side by side"
+      ru: "TC-001 и его автотест рядом"
+    intro:
+      en: "Every line of the test case has its own line of code. Tap a step to see where it lives."
+      ru: "У каждой строки тест-кейса есть своя строка кода. Нажми на шаг, чтобы увидеть, где он в коде."
+    testCase:
+      id: TC-001
+      title: Registered user can log in
+      preconditions: ["User anna@bloomly.app / bloom123 exists", "The user is logged out"]
+      steps:
+        - action: "Open the login page"
+        - action: "Enter email"
+          data: "anna@bloomly.app"
+        - action: "Enter password"
+          data: "bloom123"
+        - action: "Click \"Log in\""
+          expected: "The account page opens and shows \"Welcome back, Anna!\""
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('registered user can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page).toHaveURL('/account');
+        await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+      });
+    links:
+      - { from: s1, lines: [4] }
+      - { from: s2, lines: [5] }
+      - { from: s3, lines: [6] }
+      - { from: s4, lines: [7] }
+      - { from: e4, lines: [8, 9] }
+
+  - type: example
+    keyPoint: kp-test-is-script
+    title:
+      en: "Your first run: a smoke test"
+      ru: "Первый запуск: смоук-тест"
+    intro:
+      en: "A [[smoke test|smoke-test]] is a quick check that the most important path works. Read the notes, then press Run and watch the runner do the steps."
+      ru: "[[Смоук-тест|smoke-test]] — быстрая проверка, что самый важный путь работает. Прочитай пояснения, потом нажми «Run» и посмотри, как раннер выполняет шаги."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('home page leads to the shop', async ({ page }) => {
+        await page.goto('/');
+        await page.getByRole('link', { name: 'Shop now' }).click();
+        await expect(page).toHaveURL('/shop');
+        await expect(page.getByRole('heading', { name: 'Shop' })).toBeVisible();
+      });
+    notes:
+      - lines: 1
+        text:
+          en: "A standard first line: it brings in `test` and `expect` from Playwright. You'll see it in every test file."
+          ru: "Стандартная первая строка: подключает `test` и `expect` из Playwright. Она будет в каждом файле с тестами."
+      - lines: 3
+        text:
+          en: "The test case title, in English. It describes the behaviour."
+          ru: "Название тест-кейса, по-английски. Оно описывает поведение."
+      - lines: [4, 5]
+        text:
+          en: "Steps: open the home page, click the \"Shop now\" link."
+          ru: "Шаги: открыть главную, нажать ссылку «Shop now»."
+      - lines: [6, 7]
+        text:
+          en: "Expected result: the shop page opens and its heading \"Shop\" is visible."
+          ru: "Ожидаемый результат: открылась страница магазина, виден заголовок «Shop»."
+    runnable: true
+
+  - type: theory
+    keyPoint: kp-qa-role-ai
+    title:
+      en: "Where Petal fits — and where you do"
+      ru: "Где здесь Petal — и где ты"
+    figure: agent-loop
+    body:
+      - en: "An AI agent like Petal turns a request into code in seconds. It reads the page, picks methods, writes the test."
+        ru: "ИИ-агент вроде Petal превращает запрос в код за секунды. Он читает страницу, подбирает методы, пишет тест."
+      - en: "But it doesn't know your product's risks. It doesn't know the greeting must show the first name, or that \"Remember me\" broke last month. It guesses — and sounds sure."
+        ru: "Но он не знает рисков твоего продукта. Не знает, что в приветствии должно быть имя, или что «Remember me» сломался в прошлом месяце. Он угадывает — и звучит уверенно."
+      - en: "So the loop is: you decide what to check → the agent writes → you review and run → you accept or ask for changes. Your test design is the core skill here."
+        ru: "Поэтому цикл такой: ты решаешь, что проверять → агент пишет → ты проверяешь и запускаешь → принимаешь или просишь исправить. Твой тест-дизайн здесь — главный навык."
+    mentor:
+      en: "Petal once \"tested\" checkout without checking the total. The test was green, the price was wrong. The agent was fast — it just checked the wrong thing."
+      ru: "Однажды Petal «протестировал» оформление заказа, не проверив итоговую сумму. Тест был зелёный, цена — неправильная. Агент был быстрым — просто проверял не то."
+
+  - type: task
+    task:
+      id: c1-l1-t1
+      kind: match
+      keyPoint: kp-test-is-script
+      prompt:
+        en: "Match each part of TC-001 with its line of code."
+        ru: "Сопоставь каждую часть TC-001 со строкой кода."
+      pairs:
+        - left: { en: "Test case title", ru: "Название тест-кейса" }
+          right: "test('registered user can log in', async ({ page }) => {"
+        - left: { en: "Step: open the login page", ru: "Шаг: открыть страницу входа" }
+          right: "await page.goto('/login');"
+        - left: { en: "Step: enter the password bloom123", ru: "Шаг: ввести пароль bloom123" }
+          right: "await page.getByLabel('Password').fill('bloom123');"
+        - left: { en: "Expected result: the account page opens", ru: "Ожидаемый результат: открывается страница аккаунта" }
+          right: "await expect(page).toHaveURL('/account');"
+      rightCode: true
+      hints:
+        - en: "Look for familiar words in each line: a title, a page address, a password, an expectation."
+          ru: "Ищи знакомые слова в каждой строке: название, адрес страницы, пароль, ожидание."
+        - en: "The line that starts with `test(` holds the title. The line with `expect` is the check."
+          ru: "Строка, которая начинается с `test(`, содержит название. Строка с `expect` — это проверка."
+        - en: "`goto('/login')` opens the login page; `fill('bloom123')` types the password."
+          ru: "`goto('/login')` открывает страницу входа; `fill('bloom123')` вводит пароль."
+      praise:
+        en: "You read code through the test case — that's the habit that makes reviews fast."
+        ru: "Ты {прочитала|прочитал} код через тест-кейс — именно эта привычка делает ревью быстрым."
+      explain:
+        en: "Each part of a test case has a direct twin in code: the title goes into `test('...')`, each step is one `await` line, and the expected result becomes `expect(...)`."
+        ru: "У каждой части тест-кейса есть прямой двойник в коде: название идёт в `test('...')`, каждый шаг — одна строка с `await`, а ожидаемый результат становится `expect(...)`."
+
+  - type: task
+    task:
+      id: c1-l1-t2
+      kind: choice
+      keyPoint: kp-regression-cost
+      prompt:
+        en: "Leo asks: \"What should we automate first?\" Which candidate is the best start?"
+        ru: "Лео спрашивает: «Что автоматизируем первым?» Какой кандидат лучше всего для старта?"
+      options:
+        - text:
+            en: "The login smoke check that the team runs before every release"
+            ru: "Смоук-проверка логина, которую команда гоняет перед каждым релизом"
+          correct: true
+          why:
+            en: "Stable, repeated often, high value if it breaks. A perfect first candidate."
+            ru: "Стабильная, повторяется часто, очень важна, если сломается. Идеальный первый кандидат."
+        - text:
+            en: "A one-time check of the holiday banner that will be removed next week"
+            ru: "Разовая проверка праздничного баннера, который уберут через неделю"
+          why:
+            en: "It runs once. Writing and maintaining a test costs more than checking it by hand."
+            ru: "Её запустят один раз. Написать и поддерживать тест дороже, чем проверить руками."
+        - text:
+            en: "Exploring how a brand-new feature behaves with unusual input"
+            ru: "Исследовать, как новая фича ведёт себя на необычных данных"
+          why:
+            en: "Exploratory testing needs curiosity and judgement. Automate what you already know how to check."
+            ru: "Исследовательскому тестированию нужны любопытство и суждение. Автоматизируют то, что уже понятно, как проверять."
+        - text:
+            en: "Checking that the bouquet photos \"look fresh\""
+            ru: "Проверка, что фото букетов «выглядят свежими»"
+          why:
+            en: "A subjective judgement. Code can't decide what \"fresh\" looks like."
+            ru: "Это субъективная оценка. Код не решит, как выглядит «свежий»."
+      hints:
+        - en: "Which check repeats most often?"
+          ru: "Какая проверка повторяется чаще всего?"
+        - en: "Good candidates are stable, repeated, and important if broken."
+          ru: "Хорошие кандидаты стабильны, повторяются и важны, если сломаются."
+        - en: "Think about what runs before every release."
+          ru: "Подумай, что гоняют перед каждым релизом."
+      praise:
+        en: "That's a test lead's answer: automate what is stable, frequent and risky."
+        ru: "Это ответ тест-лида: автоматизировать стабильное, частое и рискованное."
+      explain:
+        en: "Automation pays off when a check runs many times. A smoke check before every release is the classic first target. One-off, exploratory and subjective checks stay manual."
+        ru: "Автоматизация окупается, когда проверка запускается много раз. Смоук-проверка перед каждым релизом — классическая первая цель. Разовые, исследовательские и субъективные проверки остаются ручными."
+
+  - type: task
+    task:
+      id: c1-l1-t3
+      kind: vocab
+      mode: cloze
+      prompt:
+        en: "Pick the word that fits."
+        ru: "Выбери подходящее слово."
+      sentence:
+        en: "Before every release we run the ___ suite: about 400 cases that check old features still work."
+        ru: "Перед каждым релизом мы прогоняем регрессионный набор: около 400 кейсов, которые проверяют, что старые функции работают."
+      answer: regression
+      options: [regression, smoke, exploratory]
+
+  - type: task
+    task:
+      id: c1-l1-t4
+      kind: predict
+      keyPoint: kp-test-is-script
+      context:
+        en: "Petal copied the TC-001 test to check that Tom (tom@bloomly.app / tulips42) can log in. The data is correct. Read the last line carefully."
+        ru: "Petal скопировал тест TC-001, чтобы проверить вход Тома (tom@bloomly.app / tulips42). Данные верные. Внимательно прочитай последнюю строку."
+      prompt:
+        en: "Will this test pass or fail?"
+        ru: "Этот тест пройдёт или упадёт?"
+      code: |
+        test('tom can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('tom@bloomly.app');
+          await page.getByLabel('Password').fill('tulips42');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+        });
+      outcome: fail
+      reasons:
+        - text:
+            en: "The page greets Tom, but the test expects Anna. The check compares expected with actual — just like you would."
+            ru: "Страница приветствует Тома, а тест ждёт Анну. Проверка сравнивает ожидаемое с фактическим — как {сделала|сделал} бы ты."
+          correct: true
+        - text:
+            en: "Tom's password is wrong."
+            ru: "У Тома неверный пароль."
+          why:
+            en: "tulips42 is Tom's real password — the login itself works."
+            ru: "tulips42 — настоящий пароль Тома, сам вход работает."
+        - text:
+            en: "It passes: the heading check only looks for any heading."
+            ru: "Пройдёт: проверка заголовка ищет любой заголовок."
+          why:
+            en: "The check names the exact heading text: \"Welcome back, Anna!\"."
+            ru: "Проверка называет точный текст заголовка: «Welcome back, Anna!»."
+      hints:
+        - en: "What will the account page say for Tom?"
+          ru: "Что покажет страница аккаунта для Тома?"
+        - en: "Compare that with the text in the last line."
+          ru: "Сравни это с текстом в последней строке."
+        - en: "Tom sees \"Welcome back, Tom!\" — the test waits for Anna."
+          ru: "Том видит «Welcome back, Tom!» — а тест ждёт Анну."
+      praise:
+        en: "You compared expected with actual before running anything. That's a tester's eye."
+        ru: "Ты {сравнила|сравнил} ожидаемое с фактическим ещё до запуска. Вот он, глаз тестировщика."
+      explain:
+        en: "The steps work, so Tom logs in and sees \"Welcome back, Tom!\". The last line expects \"Welcome back, Anna!\" — the expected result doesn't match the actual one, so the test fails. Copy-paste mistakes like this are typical for AI agents."
+        ru: "Шаги работают, Том входит и видит «Welcome back, Tom!». Последняя строка ждёт «Welcome back, Anna!» — ожидаемое не совпадает с фактическим, и тест падает. Такие ошибки копипаста типичны для ИИ-агентов."
+
+  - type: task
+    task:
+      id: c1-l1-t5
+      kind: review
+      keyPoint: kp-qa-role-ai
+      context:
+        en: "Petal: \"Here's TC-002, done in 4 seconds!\" Compare the code with the test case before you trust it."
+        ru: "Petal: «Вот TC-002, готово за 4 секунды!» Сравни код с тест-кейсом, прежде чем ему доверять."
+      prompt:
+        en: "Find the line that doesn't match the test case and choose the problem type."
+        ru: "Найди строку, которая не совпадает с тест-кейсом, и выбери тип проблемы."
+      testCase:
+        id: TC-002
+        title: Wrong password shows an error
+        preconditions: ["User anna@bloomly.app exists", "The user is logged out"]
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "anna@bloomly.app"
+          - action: "Enter password"
+            data: "wrong-pass"
+          - action: "Click \"Log in\""
+            expected: "Error \"Invalid email or password.\" is shown"
+      code: |
+        test('wrong password shows an error', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+        });
+      issues:
+        - line: 4
+          type: wrong-data
+          note:
+            en: "TC-002 uses the wrong password \"wrong-pass\". Petal copied the real password from the happy-path test — this test would log in instead of showing the error."
+            ru: "В TC-002 неверный пароль «wrong-pass». Petal скопировал настоящий пароль из позитивного теста — этот тест войдёт в аккаунт вместо того, чтобы показать ошибку."
+      types: [wrong-data, wrong-step, no-assertion, hallucination]
+      hints:
+        - en: "Read the test case data column, then the values in the code."
+          ru: "Прочитай данные в тест-кейсе, а потом значения в коде."
+        - en: "A negative test needs negative data. Which value is from the happy path?"
+          ru: "Негативному тесту нужны негативные данные. Какое значение — из позитивного сценария?"
+        - en: "Look at the password on line 4."
+          ru: "Посмотри на пароль в строке 4."
+      praise:
+        en: "You checked the data against the test case — the agent can't do that for you."
+        ru: "Ты {сверила|сверил} данные с тест-кейсом — агент этого за тебя не сделает."
+      explain:
+        en: "The steps and the check look right, but line 4 uses the correct password. The test would log in, never see the error, and fail for the wrong reason. Agents often reuse data from a similar test — always compare with the test case."
+        ru: "Шаги и проверка выглядят правильно, но в строке 4 верный пароль. Тест войдёт в аккаунт, не увидит ошибку и упадёт не по той причине. Агенты часто переиспользуют данные из похожего теста — всегда сверяйся с тест-кейсом."
+
+  - type: task
+    task:
+      id: c1-l1-t6
+      kind: agent
+      keyPoint: kp-qa-role-ai
+      prompt:
+        en: "Build a prompt for Petal from the blocks. Add what the agent needs, leave out what it doesn't. Then run the test it writes."
+        ru: "Собери промпт для Petal из блоков. Добавь то, что нужно агенту, и не добавляй лишнее. Потом запусти тест, который он напишет."
+      context:
+        en: "This is a simulation: a real agent's answers vary, but the pattern is the same — vague input, vague test."
+        ru: "Это симуляция: ответы настоящего агента бывают разными, но закономерность та же — размытый запрос, размытый тест."
+      testCase:
+        id: TC-001
+        title: Registered user can log in
+        preconditions: ["User anna@bloomly.app / bloom123 exists"]
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "anna@bloomly.app"
+          - action: "Enter password"
+            data: "bloom123"
+          - action: "Click \"Log in\""
+            expected: "The account page shows \"Welcome back, Anna!\""
+      blocks:
+        - id: task
+          locked: true
+          text: "Write a Playwright test for TC-001: a registered user can log in to Bloomly."
+          ru: "Напиши Playwright-тест для TC-001: зарегистрированный пользователь может войти в Bloomly."
+        - id: steps
+          text: "Steps: open /login, enter anna@bloomly.app and bloom123, click the \"Log in\" button."
+          ru: "Шаги: открой /login, введи anna@bloomly.app и bloom123, нажми кнопку «Log in»."
+        - id: expected
+          text: "Expected result: the account page shows the heading \"Welcome back, Anna!\"."
+          ru: "Ожидаемый результат: на странице аккаунта виден заголовок «Welcome back, Anna!»."
+        - id: noise
+          text: "You are the best tester in the world. Make no mistakes!"
+          ru: "Ты лучший тестировщик в мире. Не ошибайся!"
+      responses:
+        - when: [steps, expected]
+          best: true
+          message:
+            en: "Here's the test for TC-001. It follows your steps and checks the greeting from the expected result."
+            ru: "Вот тест для TC-001. Он идёт по твоим шагам и проверяет приветствие из ожидаемого результата."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('registered user can log in', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('bloom123');
+              await page.getByRole('button', { name: 'Log in' }).click();
+              await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+            });
+        - when: [steps]
+          message:
+            en: "Done! The test logs in successfully. It's ready to merge."
+            ru: "Готово! Тест успешно входит в аккаунт. Можно мержить."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('registered user can log in', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('bloom123');
+              await page.getByRole('button', { name: 'Log in' }).click();
+            });
+        - when: [expected]
+          message:
+            en: "I used standard test credentials for the login. The test checks the greeting."
+            ru: "Для входа я взял стандартные тестовые данные. Тест проверяет приветствие."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('registered user can log in', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('test@example.com');
+              await page.getByLabel('Password').fill('password123');
+              await page.getByRole('button', { name: 'Log in' }).click();
+              await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+            });
+        - when: []
+          message:
+            en: "You didn't say which flow, so I tested that the home page opens. Looks great!"
+            ru: "Ты не {сказала|сказал}, какой сценарий, поэтому я проверил, что открывается главная. Выглядит отлично!"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('bloomly works', async ({ page }) => {
+              await page.goto('/');
+              await expect(page).toHaveTitle('Bloomly — Fresh flowers delivered');
+            });
+      missing:
+        steps:
+          en: "Without the steps and data, the agent guessed — it invented test@example.com, a user that doesn't exist in Bloomly."
+          ru: "Без шагов и данных агент угадывал — и придумал test@example.com, пользователя, которого в Bloomly нет."
+        expected:
+          en: "Without the expected result, the agent had nothing to check — the test has no assertion and stays green even if login breaks."
+          ru: "Без ожидаемого результата агенту нечего было проверять — в тесте нет проверки, и он останется зелёным, даже если вход сломается."
+        noise:
+          en: "Flattery doesn't change the code. Facts from the test case do."
+          ru: "Комплименты не меняют код. Меняют его факты из тест-кейса."
+      checks: { expect: pass }
+      hints:
+        - en: "What does a tester need to run TC-001? The agent needs the same."
+          ru: "Что нужно тестировщику, чтобы пройти TC-001? Агенту нужно то же самое."
+        - en: "Steps with data, and the expected result."
+          ru: "Шаги с данными и ожидаемый результат."
+        - en: "Add the steps and expected blocks. Motivational text adds nothing."
+          ru: "Добавь блоки со шагами и ожидаемым результатом. Мотивирующий текст ничего не даёт."
+      praise:
+        en: "You gave the agent exactly what a good test case gives a tester: steps, data, expected result."
+        ru: "Ты {дала|дал} агенту ровно то, что хороший тест-кейс даёт тестировщику: шаги, данные, ожидаемый результат."
+      explain:
+        en: "An agent can only check what you tell it to check. Your test case is the best prompt: steps with exact data and an expected result. Without them, the agent invents data or skips the assertion."
+        ru: "Агент проверяет только то, что ты {попросила|попросил} проверить. Твой тест-кейс — лучший промпт: шаги с точными данными и ожидаемый результат. Без них агент выдумывает данные или пропускает проверку."
+
+  - type: mistakes
+    keyPoint: kp-qa-role-ai
+    title:
+      en: "Typical mistakes when an agent writes the test"
+      ru: "Типичные ошибки, когда тест пишет агент"
+    items:
+      - wrong: "await page.getByRole('button', { name: 'Log in' }).click(); // done, test is green"
+        right: "await page.getByRole('button', { name: 'Log in' }).click();\nawait expect(page).toHaveURL('/account');"
+        why:
+          en: "A test that ends after the click checks nothing. It stays green even when login is broken. Ask: what would make this test fail?"
+          ru: "Тест, который заканчивается после клика, ничего не проверяет. Он остаётся зелёным, даже когда вход сломан. Спроси себя: что заставит этот тест упасть?"
+      - wrong: "await page.getByLabel('Password').fill('password123');"
+        right: "await page.getByLabel('Password').fill('bloom123');"
+        why:
+          en: "Agents invent plausible test data. Take the data from the test case, not from the agent's imagination."
+          ru: "Агенты придумывают правдоподобные тестовые данные. Бери данные из тест-кейса, а не из фантазии агента."
+      - wrong: "test('test 1', async ({ page }) => {"
+        right: "test('registered user can log in', async ({ page }) => {"
+        why:
+          en: "The title is the test case title. In a red report, \"test 1\" tells nobody what broke."
+          ru: "Название — это название тест-кейса. В красном отчёте «test 1» никому не скажет, что сломалось."
+
+  - type: explain
+    keyPoint: kp-qa-role-ai
+    prompt:
+      en: "In your own words: if Petal can write tests in seconds, why does Bloomly need you?"
+      ru: "Своими словами: если Petal пишет тесты за секунды, зачем Bloomly {нужна|нужен} ты?"
+    model:
+      en: "Petal writes code fast, but it doesn't know what matters for our customers. I decide what to check, take the steps, data and expected results from the test case, and verify that the test really checks them. Without that, a fast agent produces fast green tests that catch nothing."
+      ru: "Petal быстро пишет код, но не знает, что важно для наших клиентов. Я решаю, что проверять, беру шаги, данные и ожидаемые результаты из тест-кейса и проверяю, что тест действительно их проверяет. Без этого быстрый агент быстро наделает зелёных тестов, которые ничего не ловят."
+
+  - type: phrases
+    items:
+      - context: standup
+        en: "Today I'm starting on regression automation. First target: the login smoke tests."
+        ru: "Сегодня начинаю автоматизацию регрессии. Первая цель — смоук-тесты логина."
+      - context: chat
+        en: "How long does the full regression take right now? I'd like to estimate what to automate first."
+        ru: "Сколько сейчас занимает полная регрессия? Хочу оценить, что автоматизировать первым."
+        note:
+          en: "\"I'd like to\" sounds polite and professional in a team chat."
+          ru: "«I'd like to» звучит вежливо и профессионально в рабочем чате."
+      - context: prompt
+        en: "Write a Playwright test for TC-001. Use the steps, test data and expected result from the test case."
+        ru: "Напиши Playwright-тест для TC-001. Используй шаги, тестовые данные и ожидаемый результат из тест-кейса."
+      - context: code-review
+        en: "The test passes, but it doesn't check the expected result from TC-001. Could you add an assertion?"
+        ru: "Тест проходит, но не проверяет ожидаемый результат из TC-001. Можешь добавить проверку?"
+      - context: meeting
+        en: "Let's automate the stable, repetitive cases first and keep exploratory testing manual."
+        ru: "Давайте сначала автоматизируем стабильные повторяющиеся кейсы, а исследовательское тестирование оставим ручным."
+
+checkPool:
+  - id: c1-l1-k1
+    kind: choice
+    keyPoint: kp-regression-cost
+    placement: true
+    prompt:
+      en: "Checkout has 30 test cases that run before every release. The new holiday banner needs one check before launch. What goes to automation?"
+      ru: "У оформления заказа 30 тест-кейсов, которые гоняют перед каждым релизом. Новый праздничный баннер нужно проверить один раз перед запуском. Что отдаём в автоматизацию?"
+    options:
+      - text:
+          en: "The 30 checkout cases"
+          ru: "30 кейсов оформления заказа"
+        correct: true
+        why:
+          en: "They repeat every release — automation pays off many times."
+          ru: "Они повторяются каждый релиз — автоматизация окупится много раз."
+      - text:
+          en: "The banner check"
+          ru: "Проверку баннера"
+        why:
+          en: "It runs once; automating it costs more than doing it by hand."
+          ru: "Её запустят один раз; автоматизировать дороже, чем проверить руками."
+      - text:
+          en: "Both, right now"
+          ru: "Обе, прямо сейчас"
+        why:
+          en: "Automation time is limited. Start where repetition is highest."
+          ru: "Время на автоматизацию ограничено. Начинай там, где больше всего повторов."
+    hints:
+      - en: "Which check will be repeated many times?"
+        ru: "Какая проверка будет повторяться много раз?"
+      - en: "One-off checks rarely pay off as code."
+        ru: "Разовые проверки редко окупаются в виде кода."
+    explain:
+      en: "Automate what repeats: regression cases that run every release. A one-off check is cheaper by hand."
+      ru: "Автоматизируют то, что повторяется: регрессионные кейсы, которые гоняют каждый релиз. Разовую проверку дешевле сделать руками."
+
+  - id: c1-l1-k2
+    kind: choice
+    keyPoint: kp-regression-cost
+    prompt:
+      en: "Leo: \"Once the regression is automated, do we still need manual testing?\" What is the best answer?"
+      ru: "Лео: «Когда регрессию автоматизируем, ручное тестирование ещё понадобится?» Какой ответ лучший?"
+    options:
+      - text:
+          en: "Yes. Automation repeats known checks; people explore new features and risky areas."
+          ru: "Да. Автоматизация повторяет известные проверки, а люди исследуют новые фичи и рискованные места."
+        correct: true
+        why:
+          en: "Automated and manual testing do different jobs. Together they cover more."
+          ru: "Автоматизированное и ручное тестирование решают разные задачи. Вместе они покрывают больше."
+      - text:
+          en: "No. Automated tests find every bug."
+          ru: "Нет. Автотесты находят все баги."
+        why:
+          en: "Automated tests only find what they were written to check."
+          ru: "Автотесты находят только то, что им велели проверить."
+      - text:
+          en: "Only if the automated tests fail."
+          ru: "Только если автотесты упадут."
+        why:
+          en: "New features, usability and unusual scenarios need people even when everything is green."
+          ru: "Новым фичам, удобству и необычным сценариям нужны люди, даже когда всё зелёное."
+    hints:
+      - en: "Can a test check something nobody thought of?"
+        ru: "Может ли тест проверить то, о чём никто не подумал?"
+      - en: "Automation repeats; people discover."
+        ru: "Автоматизация повторяет, люди открывают новое."
+    explain:
+      en: "Automation frees people from repeating known checks. Exploratory testing of new and risky areas stays human work."
+      ru: "Автоматизация освобождает людей от повторения известных проверок. Исследовательское тестирование нового и рискованного остаётся работой людей."
+
+  - id: c1-l1-k3
+    kind: match
+    keyPoint: kp-test-is-script
+    prompt:
+      en: "Match the parts of TC-002 \"Wrong password shows an error\" with the code."
+      ru: "Сопоставь части TC-002 «Wrong password shows an error» с кодом."
+    pairs:
+      - left: { en: "Title", ru: "Название" }
+        right: "test('wrong password shows an error', async ({ page }) => {"
+      - left: { en: "Step: open the login page", ru: "Шаг: открыть страницу входа" }
+        right: "await page.goto('/login');"
+      - left: { en: "Step: enter the password wrong-pass", ru: "Шаг: ввести пароль wrong-pass" }
+        right: "await page.getByLabel('Password').fill('wrong-pass');"
+      - left: { en: "Expected: the error \"Invalid email or password.\" is shown", ru: "Ожидаемый результат: показана ошибка «Invalid email or password.»" }
+        right: "await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');"
+    rightCode: true
+    hints:
+      - en: "Find the title first: it's inside `test('...')`."
+        ru: "Сначала найди название: оно внутри `test('...')`."
+      - en: "The expected result is the line with `expect`."
+        ru: "Ожидаемый результат — строка с `expect`."
+    explain:
+      en: "Same structure as every test case: title → steps → expected result. Only the words are code."
+      ru: "Та же структура, что у любого тест-кейса: название → шаги → ожидаемый результат. Только слова — код."
+
+  - id: c1-l1-k4
+    kind: predict
+    keyPoint: kp-test-is-script
+    placement: true
+    prompt:
+      en: "Will this smoke test pass or fail on Bloomly?"
+      ru: "Этот смоук-тест пройдёт или упадёт на Bloomly?"
+    context:
+      en: "The Bloomly home page heading says \"Fresh flowers, delivered with love\"."
+      ru: "Заголовок главной страницы Bloomly — «Fresh flowers, delivered with love»."
+    code: |
+      test('home page shows the main heading', async ({ page }) => {
+        await page.goto('/');
+        await expect(page.getByRole('heading', { name: 'Fresh flowers, delivered with love' })).toBeVisible();
+      });
+    outcome: pass
+    reasons:
+      - text:
+          en: "It opens the home page and the expected heading is really there."
+          ru: "Он открывает главную, и ожидаемый заголовок там действительно есть."
+        correct: true
+      - text:
+          en: "It fails: a test needs at least one click."
+          ru: "Упадёт: в тесте должен быть хотя бы один клик."
+        why:
+          en: "A test can be just \"open and check\". Steps depend on the test case."
+          ru: "Тест может быть просто «открыть и проверить». Шаги зависят от тест-кейса."
+    hints:
+      - en: "Compare the expected heading with the context."
+        ru: "Сравни ожидаемый заголовок с контекстом."
+      - en: "Does the test need any other steps for this check?"
+        ru: "Нужны ли этому тесту другие шаги для такой проверки?"
+    explain:
+      en: "One step and one check: open the home page, expect the main heading. The text matches the page exactly, so the test passes."
+      ru: "Один шаг и одна проверка: открыть главную, ожидать главный заголовок. Текст совпадает со страницей, поэтому тест проходит."
+
+  - id: c1-l1-k5
+    kind: review
+    keyPoint: kp-qa-role-ai
+    prompt:
+      en: "Petal wrote a test for TC-004. Find the line that contradicts the test case."
+      ru: "Petal написал тест для TC-004. Найди строку, которая противоречит тест-кейсу."
+    testCase:
+      id: TC-004
+      title: Account page shows the customer's city
+      preconditions: ["Anna (anna@bloomly.app) is logged in"]
+      steps:
+        - action: "Open the account page"
+          expected: "City shows \"Lisbon\""
+    code: |
+      test('account page shows the city', async ({ page }) => {
+        await page.goto('/account');
+        await expect(page.getByTestId('account-city')).toHaveText('Berlin');
+      });
+    issues:
+      - line: 3
+        type: wrong-assertion
+        note:
+          en: "TC-004 expects \"Lisbon\" — Anna's city. \"Berlin\" is Tom's city: the agent mixed up the test data of two users."
+          ru: "TC-004 ожидает «Lisbon» — город Анны. «Berlin» — город Тома: агент перепутал тестовые данные двух пользователей."
+    types: [wrong-assertion, wrong-data, no-assertion, hallucination]
+    hints:
+      - en: "Read the expected result in the test case."
+        ru: "Прочитай ожидаемый результат в тест-кейсе."
+      - en: "Compare it with the value inside `toHaveText(...)`."
+        ru: "Сравни его со значением внутри `toHaveText(...)`."
+    explain:
+      en: "The assertion expects the wrong value. The test would fail on a correct app — or, worse, someone would \"fix\" the app to match it. The test case is the source of truth."
+      ru: "Проверка ждёт неправильное значение. Тест упадёт на правильном приложении — или, что хуже, кто-то «починит» приложение под него. Источник истины — тест-кейс."
+
+  - id: c1-l1-k6
+    kind: choice
+    keyPoint: kp-qa-role-ai
+    prompt:
+      en: "Petal: \"All 12 tests I wrote overnight are green!\" What do you do first?"
+      ru: "Petal: «Все 12 тестов, что я написал за ночь, зелёные!» Что ты делаешь первым делом?"
+    options:
+      - text:
+          en: "Open the tests and compare each one with its test case: steps, data, and a real check of the expected result."
+          ru: "Открываю тесты и сверяю каждый с его тест-кейсом: шаги, данные и настоящая проверка ожидаемого результата."
+        correct: true
+        why:
+          en: "Green only means \"nothing failed\". You need to know what was actually checked."
+          ru: "Зелёный значит только «ничего не упало». Нужно знать, что на самом деле проверялось."
+      - text:
+          en: "Merge them — green means they work."
+          ru: "Мержу — зелёные же, значит работают."
+        why:
+          en: "A test without an assertion is also green. Green proves nothing until you know what it checks."
+          ru: "Тест без проверки тоже зелёный. Зелёный цвет ничего не доказывает, пока ты не знаешь, что тест проверяет."
+      - text:
+          en: "Ask Petal whether it's sure."
+          ru: "Спрашиваю Petal, уверен ли он."
+        why:
+          en: "Agents almost always say yes. Verify the code, not the confidence."
+          ru: "Агенты почти всегда отвечают «да». Проверяй код, а не уверенность."
+      - text:
+          en: "Run them three more times."
+          ru: "Запускаю их ещё три раза."
+        why:
+          en: "They will be green again. That still doesn't tell you what they check."
+          ru: "Они снова будут зелёными. Это всё равно не скажет, что они проверяют."
+    hints:
+      - en: "Can a useless test be green?"
+        ru: "Может ли бесполезный тест быть зелёным?"
+      - en: "What is the source of truth for each test?"
+        ru: "Что для каждого теста источник истины?"
+    explain:
+      en: "Your job is to verify that each test checks what its test case says. Green tests that check the wrong thing are worse than no tests — they give false confidence."
+      ru: "Твоя задача — убедиться, что каждый тест проверяет то, что сказано в его тест-кейсе. Зелёные тесты, которые проверяют не то, хуже отсутствия тестов — они дают ложную уверенность."
+
+  - id: c1-l1-k7
+    kind: predict
+    keyPoint: kp-qa-role-ai
+    context:
+      en: "Petal got the request \"test the login\" without a test case and picked the data itself."
+      ru: "Petal получил запрос «протестируй логин» без тест-кейса и сам выбрал данные."
+    prompt:
+      en: "Will this test pass or fail on Bloomly?"
+      ru: "Этот тест пройдёт или упадёт на Bloomly?"
+    code: |
+      test('registered user can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('test@example.com');
+        await page.getByLabel('Password').fill('password123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page).toHaveURL('/account');
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "There is no such user in Bloomly — the agent invented the test data, so login fails and the page stays on /login."
+          ru: "Такого пользователя в Bloomly нет — агент выдумал тестовые данные, вход не проходит, и страница остаётся на /login."
+        correct: true
+      - text:
+          en: "Any email works on a test site."
+          ru: "На тестовом сайте подходит любой email."
+        why:
+          en: "Bloomly checks real users. Only existing accounts can log in."
+          ru: "Bloomly проверяет настоящих пользователей. Войти могут только существующие аккаунты."
+    hints:
+      - en: "Who are the real Bloomly test users?"
+        ru: "Кто настоящие тестовые пользователи Bloomly?"
+      - en: "test@example.com is not one of them."
+        ru: "test@example.com среди них нет."
+    explain:
+      en: "test@example.com / password123 is what agents typically invent. Bloomly says \"Invalid email or password.\", the URL stays /login, and the check fails. Give the agent real test data from your test case."
+      ru: "test@example.com / password123 — типичные данные, которые выдумывают агенты. Bloomly отвечает «Invalid email or password.», URL остаётся /login, и проверка падает. Давай агенту настоящие тестовые данные из тест-кейса."
+
+  - id: c1-l1-k8
+    kind: choice
+    keyPoint: kp-test-is-script
+    prompt:
+      en: "What does the test runner do with a test like this?"
+      ru: "Что тест-раннер делает с таким тестом?"
+    code: |
+      test('registered user can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page).toHaveURL('/account');
+      });
+    options:
+      - text:
+          en: "Opens a browser, performs the steps one by one, checks the expected result and reports pass or fail."
+          ru: "Открывает браузер, выполняет шаги по очереди, проверяет ожидаемый результат и сообщает: прошёл тест или упал."
+        correct: true
+        why:
+          en: "Exactly what you do with a test case — only automatically."
+          ru: "Ровно то же, что ты делаешь с тест-кейсом, — только автоматически."
+      - text:
+          en: "Sends the code to a tester to run it by hand."
+          ru: "Отправляет код тестировщику, чтобы тот прошёл его руками."
+        why:
+          en: "The whole point is that nobody has to click through it."
+          ru: "Весь смысл в том, что никому не нужно прокликивать это вручную."
+      - text:
+          en: "Only checks the code for typos."
+          ru: "Только проверяет код на опечатки."
+        why:
+          en: "It really runs the test against the app."
+          ru: "Он по-настоящему запускает тест на приложении."
+      - text:
+          en: "Generates new test cases from the code."
+          ru: "Генерирует из кода новые тест-кейсы."
+        why:
+          en: "Test cases come from you. The runner executes them."
+          ru: "Тест-кейсы придумываешь ты. Раннер их выполняет."
+    hints:
+      - en: "Think of the runner as a very fast, very literal tester."
+        ru: "Представь раннер как очень быстрого и очень буквального тестировщика."
+      - en: "What happens to each line, and what do you get at the end?"
+        ru: "Что происходит с каждой строкой и что получаешь в конце?"
+    explain:
+      en: "The test runner (Playwright Test) executes the steps in a real browser, checks the assertions and writes a report: passed or failed, with details."
+      ru: "Тест-раннер (Playwright Test) выполняет шаги в настоящем браузере, проверяет утверждения и пишет отчёт: прошёл или упал, с подробностями."

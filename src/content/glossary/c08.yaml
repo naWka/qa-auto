@@ -1,0 +1,84 @@
+# Glossary entries owned by chapter 8 (Test plans and Playwright agents)
+- id: test-plan
+  en: test plan
+  ipa: /ˈtest plæn/
+  ru: тест-план (test plan)
+  pos: noun
+  def:
+    en: "A document that lists what will be tested: scenarios with steps and expected results. The planner agent writes it in Markdown."
+    ru: "Документ со списком того, что будет протестировано: сценарии с шагами и ожидаемыми результатами. Агент-планировщик пишет его в Markdown."
+  example:
+    en: "Before we run the generator, let's add the free-delivery boundary to the test plan."
+    ru: "Прежде чем запускать генератор, давай добавим в тест-план границу бесплатной доставки."
+  context: meeting
+  chapter: 8
+
+- id: planner
+  en: planner
+  ipa: /ˈplænər/
+  ru: планировщик (planner)
+  pos: noun
+  def:
+    en: "The Playwright test agent that explores the app and writes a Markdown test plan into the specs folder."
+    ru: "Агент Playwright, который исследует приложение и пишет тест-план в Markdown в папку specs."
+  example:
+    en: "The planner missed the expired promo code case — please add it to specs/cart.md."
+    ru: "Планировщик пропустил случай с просроченным промокодом — добавь его, пожалуйста, в specs/cart.md."
+  context: chat
+  chapter: 8
+
+- id: generator
+  en: generator
+  ipa: /ˈdʒenəreɪtər/
+  ru: генератор (generator)
+  pos: noun
+  def:
+    en: "The Playwright test agent that turns a Markdown test plan into test files, checking locators on the live app."
+    ru: "Агент Playwright, который превращает тест-план в Markdown в файлы тестов, сверяя локаторы с живым приложением."
+  example:
+    en: "The generator used getByText for the button; our rules say getByRole, so I'll update the rules file."
+    ru: "Генератор использовал getByText для кнопки, а в наших правилах — getByRole, так что я обновлю файл правил."
+  context: code-review
+  chapter: 8
+
+- id: healer
+  en: healer
+  ipa: /ˈhiːlər/
+  ru: хилер (healer)
+  pos: noun
+  def:
+    en: "The Playwright test agent that runs failing tests, looks for the cause, and repairs them or marks them `test.fixme`."
+    ru: "Агент Playwright, который запускает упавшие тесты, ищет причину и чинит их или помечает `test.fixme`."
+  example:
+    en: "The healer marked the orders filter test as fixme — it's a real bug, not a broken locator."
+    ru: "Хилер пометил тест фильтра заказов как fixme — это настоящий баг, а не сломанный локатор."
+  context: standup
+  chapter: 8
+
+- id: seed-test
+  en: seed test
+  ipa: /ˈsiːd test/
+  ru: seed-тест, стартовый тест (seed test)
+  pos: noun
+  def:
+    en: "A small test that prepares the starting state for the agents and shows them the project's style."
+    ru: "Небольшой тест, который готовит стартовое состояние для агентов и показывает им стиль проекта."
+  example:
+    en: "Update the seed test to log in as Anna first, so the planner can reach the orders page."
+    ru: "Обнови seed-тест, чтобы он сначала входил под Анной, — тогда планировщик доберётся до страницы заказов."
+  context: chat
+  chapter: 8
+
+- id: project-rules
+  en: project rules
+  ipa: /ˈprɑːdʒekt ruːlz/
+  ru: правила проекта (project rules)
+  pos: noun
+  def:
+    en: "A file such as CLAUDE.md or .github/copilot-instructions.md that the agent reads before every task: conventions, locator policy, things to avoid."
+    ru: "Файл вроде CLAUDE.md или .github/copilot-instructions.md, который агент читает перед каждой задачей: соглашения, политика локаторов, запреты."
+  example:
+    en: "Add \"No waitForTimeout\" to the project rules — this is the third PR with a hard wait."
+    ru: "Добавь «No waitForTimeout» в правила проекта — это уже третий PR с жёстким ожиданием."
+  context: code-review
+  chapter: 8

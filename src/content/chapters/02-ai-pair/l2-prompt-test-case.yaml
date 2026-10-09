@@ -1,0 +1,1032 @@
+id: c2-l2
+chapter: c2
+title: { en: "A prompt is a good test case", ru: "Промпт — это хороший тест-кейс" }
+goal:
+  en: "Write prompts that give the agent everything a good test case has: goal, preconditions, steps, data, expected result — plus the team's rules."
+  ru: "Писать промпты, в которых есть всё, что есть в хорошем тест-кейсе: цель, предусловия, шаги, данные, ожидаемый результат — плюс правила команды."
+minutes: 9
+keyPoints:
+  - id: kp-prompt-parts
+    title: { en: "Prompt parts = test case parts", ru: "Части промпта = части тест-кейса" }
+  - id: kp-prompt-rules
+    title: { en: "Rules: how the team writes tests", ru: "Правила: как команда пишет тесты" }
+  - id: kp-prompt-context
+    title: { en: "Give context; specific beats vague", ru: "Дай контекст: конкретика лучше размытости" }
+terms: [prompt, context, test-case, precondition, test-data, expected-result, assertion, locator]
+steps:
+  - type: story
+    lines:
+      - who: kai
+        text:
+          en: "I asked Petal to “test the search”. It wrote a test. It's green. I have no idea what it checks."
+          ru: "Я попросил Petal «протестировать поиск». Он написал тест. Тест зелёный. Понятия не имею, что он проверяет."
+      - who: petal
+        text:
+          en: "It checks that the search field exists! A very stable test."
+          ru: "Он проверяет, что поле поиска существует! Очень стабильный тест."
+      - who: maya
+        text:
+          en: "A vague prompt gets a vague test. Good news: you already know how to write precise instructions. They're called test cases."
+          ru: "Размытый промпт — размытый тест. Хорошая новость: ты уже умеешь писать точные инструкции. Они называются тест-кейсы."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед стартом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c2-l2-p1
+        kind: choice
+        keyPoint: kp-prompt-context
+        prompt:
+          en: "Which prompt gives Petal the best chance to write a useful search test?"
+          ru: "Какой промпт даст Petal больше всего шансов написать полезный тест поиска?"
+        options:
+          - text: "Test the search."
+            why:
+              en: "Petal will guess what “test” means. Often it just checks that the field exists."
+              ru: "Petal будет гадать, что значит «протестировать». Часто он просто проверяет, что поле существует."
+          - text: 'On /shop type "tulip" into Search. Expect "1 product" and a single card "Sunny Tulips".'
+            correct: true
+            why:
+              en: "Page, action, data, expected result — nothing left to guess."
+              ru: "Страница, действие, данные, ожидаемый результат — гадать не о чем."
+          - text: "You are a world-class QA. Write an amazing search test!"
+            why:
+              en: "Compliments add no facts. The agent still has to guess what to check."
+              ru: "Комплименты не добавляют фактов. Агенту всё равно придётся гадать, что проверять."
+        hints:
+          - en: "Which prompt would a junior tester be able to execute without questions?"
+            ru: "Какой промпт младший тестировщик смог бы выполнить без вопросов?"
+          - en: "Look for an expected result."
+            ru: "Ищи ожидаемый результат."
+        explain:
+          en: "The precise prompt reads like a mini test case: where, what to do, with which data, what to expect. That's exactly what an agent needs."
+          ru: "Точный промпт читается как мини-тест-кейс: где, что делать, с какими данными, чего ожидать. Именно это агенту и нужно."
+
+  - type: theory
+    keyPoint: kp-prompt-parts
+    title: { en: "You already write prompts", ru: "Ты уже пишешь промпты" }
+    body:
+      - en: "A good [[test case|test-case]] has a goal, [[preconditions|precondition]], steps, [[test data|test-data]] and an [[expected result|expected-result]]. A good [[prompt]] for a test has *exactly the same parts*."
+        ru: "В хорошем [[тест-кейсе|test-case]] есть цель, [[предусловия|precondition]], шаги, [[тестовые данные|test-data]] и [[ожидаемый результат|expected-result]]. В хорошем [[промпте|prompt]] на тест — *ровно те же части*."
+      - en: "Every missing part becomes a guess. No expected result → no [[assertion]]. No data → an invented account. No preconditions → the test starts in the wrong state."
+        ru: "Каждая пропущенная часть превращается в догадку. Нет ожидаемого результата → нет [[проверки|assertion]]. Нет данных → выдуманный аккаунт. Нет предусловий → тест стартует не из того состояния."
+    code: |
+      Goal: TC-130 "Search finds tulips".
+      Preconditions: none, the user can be logged out.
+      Steps: open /shop, type "tulip" into the Search field.
+      Test data: search term "tulip" (lower case on purpose).
+      Expected: results count shows "1 product"; the only card is "Sunny Tulips".
+    mentor:
+      en: "If a junior tester could run your test case without asking you a single question — Petal can too."
+      ru: "Если младший тестировщик может пройти твой тест-кейс, не задав тебе ни одного вопроса, — Petal тоже сможет."
+
+  - type: theory
+    keyPoint: kp-prompt-rules
+    title: { en: "Rules: the team's conventions", ru: "Правила: договорённости команды" }
+    body:
+      - en: "Besides the case itself, tell the agent *how* your team writes tests. Without rules it does what it has seen most often on the internet — CSS classes and fixed pauses included."
+        ru: "Кроме самого кейса, скажи агенту, *как* ваша команда пишет тесты. Без правил он делает то, что чаще всего видел в интернете, — включая CSS-классы и фиксированные паузы."
+      - en: "Bloomly's rules: [[locators|locator]] by role, label or test id; no `waitForTimeout`; one scenario per test; English titles; existing test data only."
+        ru: "Правила Bloomly: [[локаторы|locator]] по роли, метке или test id; никаких `waitForTimeout`; один сценарий на тест; названия на английском; только существующие тестовые данные."
+      - en: "In real projects these rules live in a file the agent reads every time — `CLAUDE.md`, `AGENTS.md` or `.github/copilot-instructions.md`. Like a test case template the whole team follows."
+        ru: "В реальных проектах эти правила лежат в файле, который агент читает каждый раз, — `CLAUDE.md`, `AGENTS.md` или `.github/copilot-instructions.md`. Как шаблон тест-кейса, которому следует вся команда."
+    code: |
+      Rules:
+      - Locators: getByRole, getByLabel or getByTestId. No CSS classes.
+      - No waitForTimeout: wait with expect(...) assertions.
+      - One scenario per test, title in English.
+      - Use existing test data (anna@bloomly.app / bloom123).
+
+  - type: theory
+    keyPoint: kp-prompt-context
+    title: { en: "Context, and specific beats vague", ru: "Контекст и конкретика" }
+    body:
+      - en: "[[Context|context]] is everything the agent knows when it starts: your prompt, the page you point to, the files it can read. More relevant context means fewer guesses."
+        ru: "[[Контекст|context]] — это всё, что агент знает на старте: твой промпт, страница, на которую ты указываешь, файлы, которые он может прочитать. Больше нужного контекста — меньше догадок."
+      - en: "Name the page or URL, the account, and an existing test to copy the style from: “Follow tests/login.spec.ts”."
+        ru: "Назови страницу или URL, аккаунт и существующий тест, с которого брать стиль: «Follow tests/login.spec.ts»."
+      - en: "Compare “test the login” with “TC-102: a wrong password shows ‘Invalid email or password.’ and the user stays on /login”. The first gets *a* test. The second gets *your* test."
+        ru: "Сравни «протестируй логин» и «TC-102: неверный пароль показывает ‘Invalid email or password.’, пользователь остаётся на /login». Первый промпт даст *какой-то* тест. Второй — *твой* тест."
+    mentor:
+      en: "A vague bug report gets “works on my machine”. A vague prompt gets a green test that checks nothing."
+      ru: "На размытый баг-репорт отвечают «у меня всё работает». На размытый промпт — зелёным тестом, который ничего не проверяет."
+
+  - type: example
+    keyPoint: kp-prompt-parts
+    title: { en: "A prompt, part by part", ru: "Промпт по частям" }
+    intro:
+      en: "Maya's prompt for the promo code case. Every line maps to a part of the test case."
+      ru: "Промпт Майи для кейса с промокодом. Каждая строка соответствует части тест-кейса."
+    code: |
+      Write a Playwright test for TC-205 "BLOOM10 gives 10% off".
+      Precondition: the cart has 1 Rose Bouquet (€35.00); the user is logged out.
+      Steps: open /cart, type BLOOM10 into "Promo code", click "Apply".
+      Expected: message "Promo code BLOOM10 applied: −10%." and total "€36.40".
+      Rules: getByRole / getByLabel / getByTestId only, no waitForTimeout.
+      Follow the style of tests/cart.spec.ts. One test, English title.
+    notes:
+      - lines: 1
+        text:
+          en: "Goal, with the test case id. Later anyone can trace the test back to the case."
+          ru: "Цель с номером тест-кейса. Потом любой сможет найти, из какого кейса вырос тест."
+      - lines: 2
+        text:
+          en: "Preconditions: the starting state, so Petal doesn't have to invent one."
+          ru: "Предусловия: стартовое состояние, чтобы Petal не пришлось его выдумывать."
+      - lines: 3
+        text:
+          en: "Steps with the test data (BLOOM10) and the exact names of the field and the button."
+          ru: "Шаги с тестовыми данными (BLOOM10) и точными названиями поля и кнопки."
+      - lines: 4
+        text:
+          en: "Expected result: these two values become the assertions. €35.00 − 10% + €4.90 delivery = €36.40."
+          ru: "Ожидаемый результат: эти два значения станут проверками. €35.00 − 10% + €4.90 доставки = €36.40."
+      - lines: 5
+        text:
+          en: "Rules: how the team writes tests."
+          ru: "Правила: как команда пишет тесты."
+      - lines: 6
+        text:
+          en: "Context and scope: a file to copy conventions from, and exactly one test."
+          ru: "Контекст и объём: файл, с которого брать соглашения, и ровно один тест."
+
+  - type: task
+    task:
+      id: c2-l2-t1
+      kind: parsons
+      keyPoint: kp-prompt-parts
+      code: false
+      prompt:
+        en: "Put the parts of the prompt in the order of a test case. Leave out the lines that don't belong."
+        ru: "Расставь части промпта в порядке тест-кейса. Лишние строки не используй."
+      lines:
+        - 'Write a Playwright test for TC-140 "Out-of-stock product can''t be added".'
+        - "Precondition: the user is logged out, the cart is empty."
+        - 'Steps: open /shop, find the "White Orchid" card.'
+        - 'Expected: its "Add to cart" button is disabled and the card says "Out of stock".'
+        - "Rules: use getByRole and getByTestId, no waitForTimeout."
+      alt: [[0, 4, 1, 2, 3]]
+      distractors:
+        - "Make it perfect!!!"
+        - "Use waitForTimeout(5000) to be safe."
+      hints:
+        - en: "Think of the fields of a test case template, top to bottom."
+          ru: "Вспомни поля шаблона тест-кейса сверху вниз."
+        - en: "Goal → precondition → steps → expected. Rules can go at the end."
+          ru: "Цель → предусловие → шаги → ожидаемый результат. Правила можно поставить в конец."
+        - en: "The two lines without facts (and the one that breaks the rules) stay out."
+          ru: "Две строки без фактов (одна из них ещё и нарушает правила) остаются за бортом."
+      praise:
+        en: "Clean structure — and you kept the noise out. That's a prompt Petal can't misread."
+        ru: "Чистая структура — и никакого шума. Такой промпт Petal не поймёт неправильно."
+      explain:
+        en: "A prompt in test case order is easy to check: is there a goal? a start state? an expected result? “Make it perfect!!!” carries no facts, and the waitForTimeout line breaks the team rule."
+        ru: "Промпт в порядке тест-кейса легко проверить: есть цель? стартовое состояние? ожидаемый результат? «Сделай идеально!!!» не несёт фактов, а строка с waitForTimeout нарушает правило команды."
+
+  - type: task
+    task:
+      id: c2-l2-t2
+      kind: agent
+      keyPoint: kp-prompt-parts
+      context:
+        en: "Petal is simulated: a real agent would phrase things differently, but it fails in the same ways."
+        ru: "Petal симулирован: настоящий агент выразится иначе, но ошибётся так же."
+      prompt:
+        en: "Compose the prompt for TC-130. Try leaving out the expected result once and see what happens."
+        ru: "Собери промпт для TC-130. Попробуй разок убрать ожидаемый результат и посмотри, что получится."
+      testCase:
+        id: TC-130
+        title: Search finds tulips
+        steps:
+          - { action: "Open /shop" }
+          - { action: "Type into Search", data: "tulip", expected: "Results count shows \"1 product\"; the only card is \"Sunny Tulips\"" }
+      blocks:
+        - { id: task, locked: true, text: "Write a Playwright test for TC-130: search in the shop finds tulips.", ru: "Напиши Playwright-тест для TC-130: поиск в магазине находит тюльпаны." }
+        - { id: steps, text: 'Steps: open /shop and type "tulip" into the Search field.', ru: "Шаги: открой /shop и введи «tulip» в поле Search." }
+        - { id: expected, text: 'Expected: the results count shows "1 product" and the only product card is "Sunny Tulips".', ru: "Ожидаемый результат: счётчик показывает «1 product», единственная карточка — «Sunny Tulips»." }
+        - { id: waitrule, text: "Wait with expect(...) assertions only, never with waitForTimeout.", ru: "Жди только через проверки expect(...), никогда через waitForTimeout." }
+        - { id: noise, text: "Add waitForTimeout(3000) after typing, the shop is slow.", ru: "Добавь waitForTimeout(3000) после ввода, магазин медленный." }
+      responses:
+        - when: [steps, expected, waitrule]
+          unless: [noise]
+          best: true
+          message:
+            en: "Done! The test types “tulip” and checks the count, the number of cards and the card name. The assertions wait for the products by themselves. Green ✅"
+            ru: "Готово! Тест вводит «tulip» и проверяет счётчик, количество карточек и название. Проверки сами дожидаются товаров. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('search finds tulips', async ({ page }) => {
+              await page.goto('/shop');
+              await page.getByLabel('Search').fill('tulip');
+              await expect(page.getByTestId('results-count')).toHaveText('1 product');
+              await expect(page.getByTestId('product-card')).toHaveCount(1);
+              await expect(page.getByTestId('product-card')).toContainText('Sunny Tulips');
+            });
+        - when: [steps, expected]
+          message:
+            en: "Done! Products load with a delay, so I added a 3-second pause after typing to be safe. Green ✅"
+            ru: "Готово! Товары грузятся с задержкой, поэтому я на всякий случай добавил паузу 3 секунды после ввода. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('search finds tulips', async ({ page }) => {
+              await page.goto('/shop');
+              await page.getByLabel('Search').fill('tulip');
+              await page.waitForTimeout(3000);
+              await expect(page.getByTestId('results-count')).toHaveText('1 product');
+              await expect(page.getByTestId('product-card')).toContainText('Sunny Tulips');
+            });
+        - when: [steps]
+          message:
+            en: "Done! The test types “tulip” into the search. Green ✅"
+            ru: "Готово! Тест вводит «tulip» в поиск. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('search finds tulips', async ({ page }) => {
+              await page.goto('/shop');
+              await page.getByLabel('Search').fill('tulip');
+            });
+        - when: []
+          message:
+            en: "I checked that the shop page opens. Green ✅"
+            ru: "Я проверил, что страница магазина открывается. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('shop page opens', async ({ page }) => {
+              await page.goto('/shop');
+              await expect(page.getByRole('heading', { name: 'Shop' })).toBeVisible();
+            });
+      missing:
+        expected:
+          en: "Without the expected result there was nothing to assert: the test types “tulip” and stops. It would stay green even if the search returned nothing."
+          ru: "Без ожидаемого результата проверять было нечего: тест вводит «tulip» и останавливается. Он останется зелёным, даже если поиск ничего не найдёт."
+        waitrule:
+          en: "Without the waiting rule Petal fell back on an old habit: a fixed 3-second pause. Every run is 3 seconds slower, and it's still not a guarantee."
+          ru: "Без правила об ожиданиях Petal вернулся к старой привычке — фиксированной паузе в 3 секунды. Каждый прогон на 3 секунды дольше, и гарантии всё равно нет."
+        steps:
+          en: "Without steps Petal never searched for anything — it only opened the shop."
+          ru: "Без шагов Petal вообще ничего не искал — только открыл магазин."
+      checks:
+        expect: pass
+        static: [hasAssertion, noHardWait]
+      hints:
+        - en: "Which part of the test case turns into `expect(...)`?"
+          ru: "Какая часть тест-кейса превращается в `expect(...)`?"
+        - en: "Two blocks talk about waiting. Only one of them follows the team rules."
+          ru: "Два блока говорят об ожидании. Только один из них соответствует правилам команды."
+        - en: "Steps + expected + the expect-only waiting rule. Not the 3-second pause."
+          ru: "Шаги + ожидаемый результат + правило «ждать только через expect». Без паузы в 3 секунды."
+      praise:
+        en: "Expected result in, hard wait out — Petal's test now checks something and stays fast."
+        ru: "Ожидаемый результат — в промпте, жёсткое ожидание — за бортом. Тест Petal теперь что-то проверяет и остаётся быстрым."
+      explain:
+        en: "The expected result is the source of every assertion: no expected result, no check. And “the shop is slow” is exactly why you *don't* pause: `expect(...)` retries until the products appear, then moves on immediately."
+        ru: "Ожидаемый результат — источник каждой проверки: нет ожидаемого результата — нет проверки. А «магазин медленный» — как раз причина *не* ставить паузу: `expect(...)` повторяет попытки, пока товары не появятся, и сразу идёт дальше."
+
+  - type: task
+    task:
+      id: c2-l2-t3
+      kind: agent
+      keyPoint: kp-prompt-rules
+      prompt:
+        en: "Compose the prompt for TC-141. What happens if you leave out the locator rule?"
+        ru: "Собери промпт для TC-141. Что будет, если убрать правило про локаторы?"
+      testCase:
+        id: TC-141
+        title: Adding a product updates the cart counter
+        preconditions: ["Cart is empty"]
+        steps:
+          - { action: "Open /shop" }
+          - { action: "Click \"Add to cart\" on the Sunny Tulips card", expected: "Cart counter in the header shows 1" }
+      blocks:
+        - { id: task, locked: true, text: "Write a Playwright test for TC-141: adding a product updates the cart counter.", ru: "Напиши Playwright-тест для TC-141: добавление товара обновляет счётчик корзины." }
+        - { id: steps, text: 'Steps: open /shop, click "Add to cart" on the Sunny Tulips card.', ru: "Шаги: открой /shop, нажми «Add to cart» на карточке Sunny Tulips." }
+        - { id: expected, text: 'Expected: the header cart counter (test id "cart-count") shows "1".', ru: "Ожидаемый результат: счётчик корзины в шапке (test id «cart-count») показывает «1»." }
+        - { id: locators, text: "Locators: getByRole, getByLabel or getByTestId only. No CSS classes, ids or positions.", ru: "Локаторы: только getByRole, getByLabel или getByTestId. Никаких CSS-классов, id и позиций." }
+        - { id: noise, text: "Make it perfect!!!", ru: "Сделай идеально!!!" }
+      responses:
+        - when: [steps, expected, locators]
+          best: true
+          message:
+            en: "Done! I find the Sunny Tulips card by test id and text, click its button by role and check the counter. Green ✅"
+            ru: "Готово! Нахожу карточку Sunny Tulips по test id и тексту, нажимаю её кнопку по роли и проверяю счётчик. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('adding a product updates the cart counter', async ({ page }) => {
+              await page.goto('/shop');
+              const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+              await card.getByRole('button', { name: 'Add to cart' }).click();
+              await expect(page.getByTestId('cart-count')).toHaveText('1');
+            });
+        - when: [steps, expected]
+          message:
+            en: "Done! Sunny Tulips is the second item in the list, so I click the button in the second `li`. The counter is the `.badge` element. Green ✅"
+            ru: "Готово! Sunny Tulips — второй товар в списке, поэтому нажимаю кнопку во втором `li`. Счётчик — элемент `.badge`. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('adding a product updates the cart counter', async ({ page }) => {
+              await page.goto('/shop');
+              await page.locator('li:nth-child(2) .btn').click();
+              await expect(page.locator('.badge')).toHaveText('1');
+            });
+        - when: [steps]
+          message:
+            en: "Done! The test clicks “Add to cart” on Sunny Tulips. Green ✅"
+            ru: "Готово! Тест нажимает «Add to cart» на Sunny Tulips. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('adding a product updates the cart counter', async ({ page }) => {
+              await page.goto('/shop');
+              await page.locator('li:nth-child(2) .btn').click();
+            });
+        - when: []
+          message:
+            en: "I checked that the shop shows all six products. Green ✅"
+            ru: "Я проверил, что в магазине показаны все шесть товаров. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('shop shows products', async ({ page }) => {
+              await page.goto('/shop');
+              await expect(page.getByTestId('results-count')).toHaveText('6 products');
+            });
+      missing:
+        locators:
+          en: "Without the locator rule Petal picked a position and CSS classes: `li:nth-child(2) .btn`, `.badge`. Green today — red as soon as the sorting or the styles change."
+          ru: "Без правила про локаторы Petal выбрал позицию и CSS-классы: `li:nth-child(2) .btn`, `.badge`. Сегодня зелёный — и красный, как только поменяется сортировка или стили."
+        expected:
+          en: "Without the expected result the test clicks and stops. The counter could show 0 or 99 — still green."
+          ru: "Без ожидаемого результата тест кликает и останавливается. Счётчик может показать 0 или 99 — всё равно зелёный."
+        steps:
+          en: "Without steps Petal didn't add anything to the cart at all."
+          ru: "Без шагов Petal вообще ничего не добавил в корзину."
+      checks:
+        expect: pass
+        static: [hasAssertion, noFragile]
+      hints:
+        - en: "Run the response without the locator block and read the selectors."
+          ru: "Запусти ответ без блока про локаторы и прочитай селекторы."
+        - en: "Which block stops Petal from using positions like `nth-child(2)`?"
+          ru: "Какой блок не даёт Petal использовать позиции вроде `nth-child(2)`?"
+        - en: "Steps + expected + locators. The noise block is harmless but useless."
+          ru: "Шаги + ожидаемый результат + локаторы. Шумовой блок безвреден, но бесполезен."
+      praise:
+        en: "Your prompt carried the team's locator rule — Petal's test will survive the next redesign."
+        ru: "В твоём промпте было правило команды про локаторы — тест Petal переживёт следующий редизайн."
+      explain:
+        en: "Both versions are green today. The difference shows up later: `li:nth-child(2)` breaks when the sort order changes, `.badge` breaks when a designer renames a class. `getByTestId` and `getByRole` describe *what* the element is, not *where* it is."
+        ru: "Сегодня обе версии зелёные. Разница проявится позже: `li:nth-child(2)` сломается при смене сортировки, `.badge` — когда дизайнер переименует класс. `getByTestId` и `getByRole` описывают, *что* это за элемент, а не *где* он находится."
+
+  - type: task
+    task:
+      id: c2-l2-t4
+      kind: agent
+      keyPoint: kp-prompt-context
+      prompt:
+        en: "Compose the prompt for TC-118. Try it once without the test data block."
+        ru: "Собери промпт для TC-118. Попробуй разок без блока с тестовыми данными."
+      testCase:
+        id: TC-118
+        title: Orders page lists all orders of the customer
+        preconditions: ["Customer anna@bloomly.app / bloom123 has 6 orders"]
+        steps:
+          - { action: "Log in", data: "anna@bloomly.app / bloom123" }
+          - { action: "Open My orders", expected: "Summary shows \"Showing 6 of 6 orders\"" }
+      blocks:
+        - { id: task, locked: true, text: "Write a Playwright test for TC-118: the orders page lists all orders of the customer.", ru: "Напиши Playwright-тест для TC-118: страница заказов показывает все заказы покупателя." }
+        - { id: steps, text: "Steps: log in on /login, wait for the account page, then open /orders.", ru: "Шаги: войди на /login, дождись страницы аккаунта, затем открой /orders." }
+        - { id: data, text: "Test data: use the existing customer anna@bloomly.app / bloom123 — she has 6 orders.", ru: "Тестовые данные: используй существующего покупателя anna@bloomly.app / bloom123 — у неё 6 заказов." }
+        - { id: expected, text: 'Expected: the summary (test id "orders-summary") says "Showing 6 of 6 orders".', ru: "Ожидаемый результат: в сводке (test id «orders-summary») написано «Showing 6 of 6 orders»." }
+        - { id: noise, text: "You are the best QA engineer in the world.", ru: "Ты лучший QA-инженер в мире." }
+      responses:
+        - when: [steps, data, expected]
+          best: true
+          message:
+            en: "Done! I log in as Anna, wait for /account, open /orders and check the summary. Green ✅"
+            ru: "Готово! Вхожу как Anna, жду /account, открываю /orders и проверяю сводку. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('orders page lists all orders of the customer', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('bloom123');
+              await page.getByRole('button', { name: 'Log in' }).click();
+              await expect(page).toHaveURL('/account');
+              await page.goto('/orders');
+              await expect(page.getByTestId('orders-summary')).toHaveText('Showing 6 of 6 orders');
+            });
+        - when: [steps, expected]
+          message:
+            en: "Done! I used a standard test account, test@example.com / password123. Hmm, the run is red ❌ — login didn't work. Should I add a longer timeout?"
+            ru: "Готово! Я взял стандартный тестовый аккаунт test@example.com / password123. Хм, прогон красный ❌ — вход не сработал. Может, добавить таймаут подлиннее?"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('orders page lists all orders of the customer', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('test@example.com');
+              await page.getByLabel('Password').fill('password123');
+              await page.getByRole('button', { name: 'Log in' }).click();
+              await expect(page).toHaveURL('/account');
+              await page.goto('/orders');
+              await expect(page.getByTestId('orders-summary')).toHaveText('Showing 6 of 6 orders');
+            });
+        - when: [steps, data]
+          message:
+            en: "Done! The test logs in as Anna and opens the orders page. Green ✅"
+            ru: "Готово! Тест входит как Anna и открывает страницу заказов. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('orders page lists all orders of the customer', async ({ page }) => {
+              await page.goto('/login');
+              await page.getByLabel('Email').fill('anna@bloomly.app');
+              await page.getByLabel('Password').fill('bloom123');
+              await page.getByRole('button', { name: 'Log in' }).click();
+              await expect(page).toHaveURL('/account');
+              await page.goto('/orders');
+            });
+        - when: []
+          message:
+            en: "I wasn't sure which account to use, so I opened /orders directly and checked the heading. Hmm, red ❌ — the page shows “Log in” instead."
+            ru: "Я не знал, какой аккаунт взять, поэтому открыл /orders напрямую и проверил заголовок. Хм, красный ❌ — вместо этого страница показывает «Log in»."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('orders page opens', async ({ page }) => {
+              await page.goto('/orders');
+              await expect(page.getByRole('heading', { name: 'My orders' })).toBeVisible();
+            });
+      missing:
+        data:
+          en: "Without test data Petal invented an account: test@example.com. It doesn't exist in Bloomly, so the test is red before it even reaches the orders — and Petal suggests a longer timeout, which wouldn't help."
+          ru: "Без тестовых данных Petal выдумал аккаунт test@example.com. В Bloomly его нет, поэтому тест краснеет, даже не дойдя до заказов, — а Petal предлагает таймаут подлиннее, который не поможет."
+        steps:
+          en: "Without steps Petal skipped the login. /orders needs a logged-in user, so the app redirected to the login page."
+          ru: "Без шагов Petal пропустил вход. Для /orders нужен вошедший пользователь, поэтому приложение перенаправило на страницу входа."
+        expected:
+          en: "Without the expected result the test logs in, opens the page and checks nothing."
+          ru: "Без ожидаемого результата тест входит, открывает страницу и ничего не проверяет."
+      checks:
+        expect: pass
+        static: [hasAssertion, noHardWait]
+      hints:
+        - en: "Which account has exactly 6 orders? Petal can't know that."
+          ru: "У какого аккаунта ровно 6 заказов? Petal этого знать не может."
+        - en: "The compliment block changes nothing in the code."
+          ru: "Блок с комплиментом ничего не меняет в коде."
+        - en: "Steps + data + expected."
+          ru: "Шаги + данные + ожидаемый результат."
+      praise:
+        en: "You named the exact account — that's what made “6 of 6” a real check."
+        ru: "Ты назвал{а|} точный аккаунт — именно это сделало «6 of 6» настоящей проверкой."
+      explain:
+        en: "“6 orders” is only true for anna@bloomly.app. Test data and expected result belong together, and both come from you. Notice how Petal reacted to the red run: it suggested a longer timeout — confidently wrong about the cause."
+        ru: "«6 заказов» верно только для anna@bloomly.app. Тестовые данные и ожидаемый результат связаны, и оба приходят от тебя. Обрати внимание, как Petal отреагировал на красный прогон: предложил таймаут подлиннее — уверенно ошибся в причине."
+
+  - type: task
+    task:
+      id: c2-l2-t5
+      kind: fill
+      keyPoint: kp-prompt-parts
+      prompt:
+        en: "Turn TC-150 into a prompt: fill the gaps from the test case card."
+        ru: "Преврати TC-150 в промпт: заполни пропуски по карточке тест-кейса."
+      testCase:
+        id: TC-150
+        title: Expired promo code is rejected
+        preconditions: ["Cart has 1 Rose Bouquet"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Enter the promo code and click \"Apply\"", data: "SPRING20", expected: "Message \"This promo code has expired.\"; total stays €39.90" }
+      code: |
+        Write a Playwright test for TC-150 "Expired promo code is rejected".
+        ___: the cart has 1 Rose Bouquet.
+        Steps: open /cart, type ___ into "Promo code", click "Apply".
+        Expected: the message "___" is shown and the total stays "€39.90".
+        Rules: getByRole / getByLabel / getByTestId only, no waitForTimeout.
+      blanks:
+        - { answers: [Precondition], options: [Precondition, Expected, Rules] }
+        - { answers: [SPRING20], options: [SPRING20, BLOOM10, "spring 20"] }
+        - { answers: ["This promo code has expired."], options: ["This promo code has expired.", "This promo code is not valid.", "Promo code applied"] }
+      hints:
+        - en: "The first gap names a part of the test case: the start state."
+          ru: "Первый пропуск — название части тест-кейса: стартовое состояние."
+        - en: "Copy the data and the expected text exactly — punctuation included."
+          ru: "Скопируй данные и ожидаемый текст точно — вместе с пунктуацией."
+        - en: "Precondition · SPRING20 · “This promo code has expired.”"
+          ru: "Ответы: Precondition · SPRING20 · «This promo code has expired.»"
+      praise:
+        en: "Exact data, exact text. Petal will assert precisely what the case says."
+        ru: "Точные данные, точный текст. Petal проверит ровно то, что сказано в кейсе."
+      explain:
+        en: "“Not valid” and “expired” are different rules with different messages. If the prompt has the wrong one, the test checks the wrong rule — and it might even pass on a buggy app."
+        ru: "«Not valid» и «expired» — разные правила с разными сообщениями. Если в промпте не то сообщение, тест проверяет не то правило — и может даже пройти на багованном приложении."
+
+  - type: task
+    task:
+      id: c2-l2-t6
+      kind: choice
+      keyPoint: kp-prompt-context
+      prompt:
+        en: "Which prompt for TC-102 will get you *your* test, not just *a* test?"
+        ru: "Какой промпт для TC-102 даст *твой* тест, а не просто *какой-то*?"
+      options:
+        - text: "Test the login."
+          why:
+            en: "Which part of login? Which account? What should happen? All guesses."
+            ru: "Какую часть логина? Какой аккаунт? Что должно произойти? Сплошные догадки."
+        - text: "Test login with wrong data and check that it fails."
+          why:
+            en: "Better, but “fails” how? Which message? The agent will pick something."
+            ru: "Лучше, но «не получается» — как? Какое сообщение? Агент выберет что-нибудь сам."
+        - text: 'TC-102: on /login enter anna@bloomly.app with password nope123 and click "Log in". Expect the alert "Invalid email or password." and the URL to stay /login. Follow tests/login.spec.ts.'
+          correct: true
+          why:
+            en: "Page, data, action, exact expected result and a style example. Nothing left to guess."
+            ru: "Страница, данные, действие, точный ожидаемый результат и образец стиля. Гадать не о чем."
+        - text: "Write the best possible login test, covering everything!"
+          why:
+            en: "“Everything” in one test breaks the one-scenario rule, and “best possible” adds no facts."
+            ru: "«Всё» в одном тесте нарушает правило «один сценарий», а «лучший из возможных» не добавляет фактов."
+      hints:
+        - en: "Which prompt could a new colleague execute without asking you anything?"
+          ru: "Какой промпт новый коллега смог бы выполнить, ничего у тебя не спрашивая?"
+        - en: "Look for the exact expected text."
+          ru: "Ищи точный ожидаемый текст."
+      praise:
+        en: "Specific beats vague — you picked the prompt that reads like a test case."
+        ru: "Конкретика лучше размытости — ты выбрал{а|} промпт, который читается как тест-кейс."
+      explain:
+        en: "The more specific the prompt, the less the agent improvises. Context like “Follow tests/login.spec.ts” also keeps the new test consistent with the old ones."
+        ru: "Чем конкретнее промпт, тем меньше агент импровизирует. Контекст вроде «Follow tests/login.spec.ts» ещё и делает новый тест похожим на старые."
+
+  - type: task
+    task:
+      id: c2-l2-t7
+      kind: predict
+      keyPoint: kp-prompt-context
+      app: { bugs: [search-case-sensitive] }
+      context:
+        en: "Kai asked Petal: “Write a test that search finds roses.” Nothing about letter case. The current build has a bug: search is case-sensitive, so “rose” finds nothing."
+        ru: "Kai попросил Petal: «Напиши тест, что поиск находит розы». Ни слова про регистр. В текущей сборке баг: поиск чувствителен к регистру, и «rose» ничего не находит."
+      prompt:
+        en: "Will Petal's test pass or fail on this build?"
+        ru: "Тест Petal пройдёт или упадёт на этой сборке?"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('search finds roses', async ({ page }) => {
+          await page.goto('/shop');
+          await page.getByLabel('Search').fill('Rose');
+          await expect(page.getByTestId('results-count')).toHaveText('1 product');
+        });
+      outcome: pass
+      reasons:
+        - text:
+            en: "Pass: Petal typed “Rose” exactly like the product name, so the case bug never shows up."
+            ru: "Пройдёт: Petal ввёл «Rose» точно как в названии товара, и баг с регистром не проявился."
+          correct: true
+        - text:
+            en: "Fail: search is broken on this build, so any search test fails."
+            ru: "Упадёт: поиск в этой сборке сломан, значит, любой тест поиска упадёт."
+        - text:
+            en: "Fail: the count text should be “1 products”."
+            ru: "Упадёт: текст счётчика должен быть «1 products»."
+      hints:
+        - en: "The bug breaks lower case. What did Petal type?"
+          ru: "Баг ломает поиск в нижнем регистре. Что ввёл Petal?"
+        - en: "“Rose” matches “Rose Bouquet” even with case-sensitive search."
+          ru: "«Rose» совпадает с «Rose Bouquet» даже при поиске с учётом регистра."
+        - en: "The test passes — and misses the bug."
+          ru: "Тест проходит — и пропускает баг."
+      praise:
+        en: "Right — and you see why: the vague prompt left out the detail that matters."
+        ru: "Верно — и ты видишь почему: в размытом промпте не было важной детали."
+      explain:
+        en: "Real customers type “rose”, lower case. Petal copied the product name, so the bug slipped through. Your test-design instinct (“try lower case”) has to be *in the prompt* — the agent won't add it for you."
+        ru: "Реальные покупатели пишут «rose», с маленькой буквы. Petal скопировал название товара, и баг проскочил. Твоё чутьё тест-дизайнера («попробуй нижний регистр») должно быть *в промпте* — сам агент его не добавит."
+
+  - type: task
+    task:
+      id: c2-l2-t8
+      kind: vocab
+      keyPoint: kp-prompt-context
+      mode: cloze
+      sentence:
+        en: "Give the agent more ___: the page, the account and an existing test to follow."
+        ru: "Дай агенту больше контекста: страницу, аккаунт и существующий тест как образец."
+      answer: context
+      options: [context, hallucination, diff]
+
+  - type: mistakes
+    keyPoint: kp-prompt-context
+    title: { en: "Weak prompt → strong prompt", ru: "Слабый промпт → сильный промпт" }
+    items:
+      - wrong: "Test the login."
+        right: 'TC-102: on /login log in as anna@bloomly.app with password nope123. Expect the alert "Invalid email or password."'
+        why:
+          en: "A vague task gets *a* test, not *your* test."
+          ru: "На размытую задачу получаешь *какой-то* тест, а не *твой*."
+      - wrong: "Make it perfect!!!"
+        right: 'Expected: the header cart counter shows "1".'
+        why:
+          en: "Emotions aren't checks. Name the exact result."
+          ru: "Эмоции — не проверки. Назови точный результат."
+      - wrong: "Use waitForTimeout(5000) to be safe."
+        right: "Wait with expect(...) assertions — no waitForTimeout."
+        why:
+          en: "Hard waits make tests slow and still flaky. Playwright assertions wait by themselves."
+          ru: "Жёсткие ожидания делают тесты медленными и всё равно нестабильными. Проверки Playwright ждут сами."
+      - wrong: "Log in as some user."
+        right: "Log in as anna@bloomly.app / bloom123 (existing test data)."
+        why:
+          en: "Without data the agent invents accounts that don't exist."
+          ru: "Без данных агент выдумывает несуществующие аккаунты."
+
+  - type: explain
+    keyPoint: kp-prompt-parts
+    prompt:
+      en: "In your own words: why is a good test case already a good prompt?"
+      ru: "Своими словами: почему хороший тест-кейс — это уже хороший промпт?"
+    model:
+      en: "Both have to be executed by someone who doesn't know what I know. A test case has a goal, preconditions, steps, data and an expected result — and each of these becomes part of the test: the start state, the actions, the values, the assertions. If a part is missing, the agent guesses, and its guesses become bugs in the test. I add the team's rules and an example file so it writes the test our way."
+      ru: "И то и другое выполняет кто-то, кто не знает того, что знаю я. В тест-кейсе есть цель, предусловия, шаги, данные и ожидаемый результат — и каждая часть становится частью теста: стартовым состоянием, действиями, значениями, проверками. Если части нет, агент гадает, и его догадки становятся багами в тесте. Я добавляю правила команды и файл-образец, чтобы он написал тест так, как принято у нас."
+
+  - type: phrases
+    items:
+      - context: prompt
+        en: "Write a Playwright test for TC-130. Use getByRole and getByLabel locators, no waitForTimeout."
+        ru: "Напиши Playwright-тест для TC-130. Используй локаторы getByRole и getByLabel, без waitForTimeout."
+      - context: prompt
+        en: "Use the existing test account anna@bloomly.app — don't create new users."
+        ru: "Используй существующий тестовый аккаунт anna@bloomly.app — не создавай новых пользователей."
+      - context: prompt
+        en: "Follow the conventions in tests/login.spec.ts."
+        ru: "Следуй соглашениям из tests/login.spec.ts."
+        note:
+          en: "Pointing to an existing file is the fastest way to give context."
+          ru: "Ссылка на существующий файл — самый быстрый способ дать контекст."
+      - context: chat
+        en: "Petal's test was too generic, so I rewrote the prompt with the expected result from the test case."
+        ru: "Тест от Petal получился слишком общим, поэтому я переписал{а|} промпт и добавил{а|} ожидаемый результат из тест-кейса."
+      - context: standup
+        en: "I've turned five checkout test cases into prompts; Petal is generating the tests now."
+        ru: "Я превратил{а|} пять тест-кейсов чекаута в промпты, сейчас Petal генерирует по ним тесты."
+
+checkPool:
+  - id: c2-l2-k1
+    kind: choice
+    keyPoint: kp-prompt-parts
+    placement: true
+    prompt:
+      en: "Your prompt has the goal, the steps and the test data. What's missing, so that the test gets an assertion?"
+      ru: "В твоём промпте есть цель, шаги и тестовые данные. Чего не хватает, чтобы в тесте появилась проверка?"
+    options:
+      - text: { en: "The expected result", ru: "Ожидаемого результата" }
+        correct: true
+        why:
+          en: "The expected result is what becomes `expect(...)`."
+          ru: "Именно ожидаемый результат превращается в `expect(...)`."
+      - text: { en: "A compliment for the agent", ru: "Комплимента агенту" }
+        why:
+          en: "Compliments don't turn into checks."
+          ru: "Комплименты в проверки не превращаются."
+      - text: { en: "The word “please”", ru: "Слова «пожалуйста»" }
+        why:
+          en: "Polite is nice, but it adds no facts."
+          ru: "Вежливость — это приятно, но фактов она не добавляет."
+      - text: { en: "A longer test title", ru: "Более длинного названия теста" }
+        why:
+          en: "The title describes the test; it doesn't check anything."
+          ru: "Название описывает тест, но ничего не проверяет."
+    hints:
+      - en: "Which part of a test case says what should happen?"
+        ru: "Какая часть тест-кейса говорит, что должно произойти?"
+      - en: "No ___ → no assertion."
+        ru: "Нет ___ → нет проверки."
+    explain:
+      en: "Steps become actions, the expected result becomes assertions. Without it the agent writes a test that only clicks."
+      ru: "Шаги становятся действиями, ожидаемый результат — проверками. Без него агент напишет тест, который только кликает."
+
+  - id: c2-l2-k2
+    kind: agent
+    keyPoint: kp-prompt-rules
+    app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+    context:
+      en: "The cart is preset with 1 Rose Bouquet (like a saved browser state). Petal is simulated."
+      ru: "В корзине заранее лежит 1 Rose Bouquet (как сохранённое состояние браузера). Petal симулирован."
+    prompt:
+      en: "Compose the prompt for TC-150 so that Petal's test follows the team rules."
+      ru: "Собери промпт для TC-150 так, чтобы тест Petal соответствовал правилам команды."
+    testCase:
+      id: TC-150
+      title: Expired promo code is rejected
+      preconditions: ["Cart has 1 Rose Bouquet"]
+      steps:
+        - { action: "Open /cart" }
+        - { action: "Enter the promo code and click \"Apply\"", data: "SPRING20", expected: "Message \"This promo code has expired.\"; total stays €39.90" }
+    blocks:
+      - { id: task, locked: true, text: "Write a Playwright test for TC-150: an expired promo code is rejected.", ru: "Напиши Playwright-тест для TC-150: просроченный промокод отклоняется." }
+      - { id: steps, text: 'Steps: open /cart (the cart already has 1 Rose Bouquet), type SPRING20 into "Promo code", click "Apply".', ru: "Шаги: открой /cart (в корзине уже 1 Rose Bouquet), введи SPRING20 в «Promo code», нажми «Apply»." }
+      - { id: expected, text: 'Expected: the message "This promo code has expired." is shown and the total stays "€39.90".', ru: "Ожидаемый результат: показано сообщение «This promo code has expired.», итог остаётся «€39.90»." }
+      - { id: rules, text: "Rules: getByRole, getByLabel or getByTestId. No CSS ids or classes, no waitForTimeout.", ru: "Правила: getByRole, getByLabel или getByTestId. Без CSS-id и классов, без waitForTimeout." }
+      - { id: noise, text: "Add a 2-second pause after clicking Apply, just in case.", ru: "Добавь паузу 2 секунды после нажатия Apply, на всякий случай." }
+    responses:
+      - when: [steps, expected, rules]
+        unless: [noise]
+        best: true
+        message:
+          en: "Done! Label for the field, role for the button, test ids for the message and the total. No pauses. Green ✅"
+          ru: "Готово! Метка для поля, роль для кнопки, test id для сообщения и итога. Без пауз. Зелёный ✅"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('expired promo code is rejected', async ({ page }) => {
+            await page.goto('/cart');
+            await page.getByLabel('Promo code').fill('SPRING20');
+            await page.getByRole('button', { name: 'Apply' }).click();
+            await expect(page.getByTestId('promo-message')).toHaveText('This promo code has expired.');
+            await expect(page.getByTestId('cart-total')).toHaveText('€39.90');
+          });
+      - when: [steps, expected, rules]
+        message:
+          en: "Done! Resilient locators — and the 2-second pause you asked for. Green ✅"
+          ru: "Готово! Устойчивые локаторы — и пауза 2 секунды, как ты просил{а|}. Зелёный ✅"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('expired promo code is rejected', async ({ page }) => {
+            await page.goto('/cart');
+            await page.getByLabel('Promo code').fill('SPRING20');
+            await page.getByRole('button', { name: 'Apply' }).click();
+            await page.waitForTimeout(2000);
+            await expect(page.getByTestId('promo-message')).toHaveText('This promo code has expired.');
+          });
+      - when: [steps, expected]
+        message:
+          en: "Done! I used the element ids — quick and simple — and a short pause to be safe. Green ✅"
+          ru: "Готово! Я взял id элементов — быстро и просто — и короткую паузу на всякий случай. Зелёный ✅"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('expired promo code is rejected', async ({ page }) => {
+            await page.goto('/cart');
+            await page.locator('#promo').fill('SPRING20');
+            await page.locator('#apply-promo').click();
+            await page.waitForTimeout(2000);
+            await expect(page.locator('.promo p')).toHaveText('This promo code has expired.');
+          });
+      - when: []
+        message:
+          en: "I checked that the cart page opens. Green ✅"
+          ru: "Я проверил, что страница корзины открывается. Зелёный ✅"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('cart page opens', async ({ page }) => {
+            await page.goto('/cart');
+            await expect(page.getByRole('heading', { name: 'Your cart' })).toBeVisible();
+          });
+    missing:
+      rules:
+        en: "Without rules Petal used `#promo`, `#apply-promo`, `.promo p` and a fixed pause. It passes today — and breaks when a developer renames an id."
+        ru: "Без правил Petal взял `#promo`, `#apply-promo`, `.promo p` и фиксированную паузу. Сегодня проходит — и сломается, когда разработчик переименует id."
+      expected:
+        en: "Without the expected result Petal only checked that the cart opens."
+        ru: "Без ожидаемого результата Petal проверил только, что открывается корзина."
+      steps:
+        en: "Without steps Petal never entered the promo code."
+        ru: "Без шагов Petal так и не ввёл промокод."
+    checks:
+      expect: pass
+      static: [hasAssertion, noHardWait, noFragile]
+    hints:
+      - en: "Which block keeps ids, classes and pauses out of the code?"
+        ru: "Какой блок не пускает в код id, классы и паузы?"
+      - en: "The pause “just in case” breaks a team rule."
+        ru: "Пауза «на всякий случай» нарушает правило команды."
+      - en: "Steps + expected + rules, without the pause block."
+        ru: "Шаги + ожидаемый результат + правила, без блока с паузой."
+    explain:
+      en: "The rules block is the team's style guide in one line. If you also add “a 2-second pause just in case”, you contradict your own rules — and the agent obeys the last, most specific instruction."
+      ru: "Блок правил — это стайлгайд команды в одной строке. Если добавить ещё и «паузу 2 секунды на всякий случай», ты противоречишь собственным правилам — а агент слушается последней, самой конкретной инструкции."
+
+  - id: c2-l2-k3
+    kind: choice
+    keyPoint: kp-prompt-context
+    prompt:
+      en: "Petal got the prompt “Test the cart.” It wrote a test that opens /cart and checks the heading “Your cart”. What's the root cause of this weak test?"
+      ru: "Petal получил промпт «Test the cart.» Он написал тест, который открывает /cart и проверяет заголовок «Your cart». В чём корневая причина такого слабого теста?"
+    options:
+      - text: { en: "The prompt was vague: no case, no steps, no expected result", ru: "Размытый промпт: ни кейса, ни шагов, ни ожидаемого результата" }
+        correct: true
+        why:
+          en: "The agent did exactly what was asked: something about the cart."
+          ru: "Агент сделал ровно то, что просили: что-то про корзину."
+      - text: { en: "Petal is a bad agent", ru: "Petal — плохой агент" }
+        why:
+          en: "Any agent would guess here. The input decides the output."
+          ru: "Тут гадал бы любой агент. Что на входе — то и на выходе."
+      - text: { en: "The cart page has a bug", ru: "На странице корзины баг" }
+        why:
+          en: "Nothing points to a bug — the test just checks too little."
+          ru: "Ничто не указывает на баг — тест просто проверяет слишком мало."
+      - text: { en: "The heading locator is fragile", ru: "Локатор заголовка хрупкий" }
+        why:
+          en: "`getByRole('heading', ...)` is resilient. The problem is *what* is checked."
+          ru: "`getByRole('heading', ...)` — устойчивый локатор. Проблема в том, *что* проверяется."
+    hints:
+      - en: "Did Petal have any way to know what to check?"
+        ru: "Был ли у Petal хоть какой-то способ узнать, что проверять?"
+      - en: "Garbage in, garbage out."
+        ru: "Что на входе, то и на выходе."
+    explain:
+      en: "A three-word prompt leaves the test design to the agent. It will pick the easiest thing to check, not the riskiest one."
+      ru: "Промпт из трёх слов оставляет тест-дизайн агенту. Он выберет самое простое для проверки, а не самое рискованное."
+
+  - id: c2-l2-k4
+    kind: review
+    keyPoint: kp-prompt-rules
+    context:
+      en: "Petal wrote this test from a prompt that had no rules section."
+      ru: "Petal написал этот тест по промпту без раздела с правилами."
+    prompt:
+      en: "Which lines break Bloomly's rules? Flag them and pick the issue type."
+      ru: "Какие строки нарушают правила Bloomly? Отметь их и выбери тип проблемы."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('adding a product shows a toast', async ({ page }) => {
+        await page.goto('/shop');
+        await page.waitForTimeout(3000);
+        await page.locator('.product-card .btn.small').first().click();
+        await expect(page.getByRole('status')).toHaveText('Rose Bouquet added to cart');
+      });
+    issues:
+      - line: 5
+        type: hard-wait
+        note:
+          en: "A 3-second pause “for the products to load”. The click already waits for the button; the pause only slows every run."
+          ru: "Пауза 3 секунды, «чтобы товары загрузились». Клик и так ждёт кнопку, пауза лишь замедляет каждый прогон."
+      - line: 6
+        type: fragile-locator
+        note:
+          en: "CSS classes plus `.first()`. Use the card by name: `page.getByTestId('product-card').filter({ hasText: 'Rose Bouquet' }).getByRole('button', { name: 'Add to cart' })`."
+          ru: "CSS-классы плюс `.first()`. Ищи карточку по названию: `page.getByTestId('product-card').filter({ hasText: 'Rose Bouquet' }).getByRole('button', { name: 'Add to cart' })`."
+    types: [hard-wait, fragile-locator, no-assertion, wrong-data, hallucination]
+    hints:
+      - en: "Check each line against the rules: locators, waits."
+        ru: "Сверь каждую строку с правилами: локаторы, ожидания."
+      - en: "Line 7 is fine — `getByRole('status')` is the toast."
+        ru: "Строка 7 в порядке — `getByRole('status')` это всплывающее уведомление."
+      - en: "Lines 5 and 6."
+        ru: "Строки 5 и 6."
+    explain:
+      en: "These are the two habits a rules section prevents. Once you've seen them in review, add the rule to the prompt — or to the project's rules file — so you never have to comment on them again."
+      ru: "Это ровно те две привычки, от которых защищает раздел правил. Увидел{а|} их на ревью — добавь правило в промпт или в файл правил проекта, чтобы больше никогда не писать про них комментарии."
+
+  - id: c2-l2-k5
+    kind: fill
+    keyPoint: kp-prompt-parts
+    prompt:
+      en: "Label the parts of this prompt."
+      ru: "Подпиши части этого промпта."
+    code: |
+      Write a Playwright test for TC-160 "Locked user can't log in".
+      ___: the user locked@bloomly.app exists and is locked.
+      Steps: open /login, log in as locked@bloomly.app / bloom123.
+      ___: the alert says "Your account is locked. Please contact support."
+    blanks:
+      - { answers: [Precondition], options: [Precondition, Expected, Rules] }
+      - { answers: [Expected], options: [Precondition, Expected, Rules] }
+    hints:
+      - en: "One line describes the state before the test, the other the result after."
+        ru: "Одна строка описывает состояние до теста, другая — результат после."
+      - en: "Precondition comes before the steps; Expected comes after them."
+        ru: "Предусловие идёт до шагов, ожидаемый результат — после."
+    explain:
+      en: "Same structure as your test cases: Precondition → Steps → Expected. Labels make the prompt easy to review too."
+      ru: "Та же структура, что в твоих тест-кейсах: предусловие → шаги → ожидаемый результат. С подписями промпт ещё и легко проверять."
+
+  - id: c2-l2-k6
+    kind: predict
+    keyPoint: kp-prompt-context
+    context:
+      en: "The prompt said: “Log in as a customer and check the greeting from TC-101.” It didn't say which customer. Petal picked one by itself."
+      ru: "В промпте было: «Войди как покупатель и проверь приветствие из TC-101». Какой покупатель — не сказано. Petal выбрал сам."
+    prompt:
+      en: "Pass or fail?"
+      ru: "Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('customer sees the greeting', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('tom@bloomly.app');
+        await page.getByLabel('Password').fill('tulips42');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "Fail: Tom sees “Welcome back, Tom!”, but the expected text from TC-101 is Anna's."
+          ru: "Упадёт: Tom видит «Welcome back, Tom!», а ожидаемый текст из TC-101 — для Anna."
+        correct: true
+      - text:
+          en: "Pass: both are valid customers."
+          ru: "Пройдёт: оба — настоящие покупатели."
+      - text:
+          en: "Fail: Tom's password is wrong."
+          ru: "Упадёт: у Tom неверный пароль."
+    hints:
+      - en: "Whose greeting does the test expect? Who logs in?"
+        ru: "Чьё приветствие ожидает тест? Кто входит?"
+      - en: "Data and expected result must belong to the same person."
+        ru: "Данные и ожидаемый результат должны относиться к одному человеку."
+    explain:
+      en: "The data came from Petal, the expected result came from the test case — and they don't match. Put the account in the prompt, and data and expectations stay consistent."
+      ru: "Данные пришли от Petal, ожидаемый результат — из тест-кейса, и они не совпадают. Укажи аккаунт в промпте — и данные с ожиданиями будут согласованы."
+
+  - id: c2-l2-k7
+    kind: choice
+    keyPoint: kp-prompt-rules
+    placement: true
+    prompt:
+      en: "Which line in a prompt prevents tests like `page.locator('.btn.small').click()`?"
+      ru: "Какая строка в промпте защищает от тестов вроде `page.locator('.btn.small').click()`?"
+    options:
+      - text: "Locators: getByRole, getByLabel or getByTestId only. No CSS classes."
+        correct: true
+        why:
+          en: "It names the allowed locators and bans the fragile ones."
+          ru: "Она называет разрешённые локаторы и запрещает хрупкие."
+      - text: "Make the test stable."
+        why:
+          en: "Too vague: the agent may think `.btn.small` *is* stable."
+          ru: "Слишком размыто: агент может решить, что `.btn.small` и есть стабильно."
+      - text: "Use waitForTimeout(3000) before every click."
+        why:
+          en: "That's about waiting, and it's an anti-pattern too."
+          ru: "Это про ожидания, и к тому же антипаттерн."
+      - text: "Write the test in English."
+        why:
+          en: "A useful rule, but about titles, not locators."
+          ru: "Полезное правило, но про названия, а не про локаторы."
+    hints:
+      - en: "Look for a rule that names concrete locator methods."
+        ru: "Ищи правило, где названы конкретные методы локаторов."
+      - en: "“Stable” isn't checkable; “getByRole only” is."
+        ru: "«Стабильно» не проверишь, а «только getByRole» — проверишь."
+    explain:
+      en: "Good rules are concrete and checkable. “No CSS classes” is something you (and the agent) can verify line by line."
+      ru: "Хорошие правила конкретны и проверяемы. «No CSS classes» можно проверить построчно — и тебе, и агенту."
+
+  - id: c2-l2-k8
+    kind: choice
+    keyPoint: kp-prompt-context
+    multi: true
+    prompt:
+      en: "You're asking Petal for a test of the orders status filter. Which pieces of context help? Pick all."
+      ru: "Ты просишь Petal написать тест фильтра статусов заказов. Какой контекст поможет? Выбери всё подходящее."
+    options:
+      - text: "Page: /orders"
+        correct: true
+        why:
+          en: "Tells the agent where to start."
+          ru: "Говорит агенту, откуда начинать."
+      - text: "Account: anna@bloomly.app / bloom123 (6 orders, 3 of them Delivered)"
+        correct: true
+        why:
+          en: "Data plus the facts the expected result depends on."
+          ru: "Данные плюс факты, от которых зависит ожидаемый результат."
+      - text: "Follow the style of tests/orders.spec.ts"
+        correct: true
+        why:
+          en: "An existing file shows conventions better than any description."
+          ru: "Существующий файл показывает соглашения лучше любого описания."
+      - text: "You are a genius tester."
+        why:
+          en: "Flattery isn't context."
+          ru: "Лесть — не контекст."
+      - text: "Be creative with the test data."
+        why:
+          en: "Creative data = invented accounts and random values."
+          ru: "Креативные данные = выдуманные аккаунты и случайные значения."
+    hints:
+      - en: "Context is facts the agent can use: where, who, how."
+        ru: "Контекст — это факты, которыми агент может воспользоваться: где, кто, как."
+      - en: "Three options are facts, two are wishes."
+        ru: "Три варианта — факты, два — пожелания."
+    explain:
+      en: "Page, account and an example file are concrete context. Compliments and “be creative” only invite guessing."
+      ru: "Страница, аккаунт и файл-образец — конкретный контекст. Комплименты и «будь креативным» только приглашают гадать."

@@ -1,0 +1,996 @@
+id: c1-l4
+chapter: c1
+title:
+  en: "Run it and read the report"
+  ru: "Запусти и прочитай отчёт"
+goal:
+  en: "Read a test report and a Playwright error, and decide whether a red test means a bug in the app or a broken test."
+  ru: "Читать отчёт о прогоне и ошибку Playwright и решать, что значит красный тест: баг в приложении или сломанный тест."
+minutes: 10
+keyPoints:
+  - id: kp-pass-fail
+    title:
+      en: "The report: passed or failed, per test, with time"
+      ru: "Отчёт: прошёл или упал, по каждому тесту, со временем"
+  - id: kp-read-error
+    title:
+      en: "Read the error: Locator, Expected, Received, the failing line"
+      ru: "Читай ошибку: Locator, Expected, Received, упавшая строка"
+  - id: kp-bug-or-test
+    title:
+      en: "Red means a bug in the app or a broken test — triage it"
+      ru: "Красный — это баг в приложении или сломанный тест: разберись"
+terms: [test-report, pass, fail, timeout, bug, actual-result, test-runner]
+
+steps:
+  - type: story
+    lines:
+      - who: leo
+        text:
+          en: "The nightly run is in: 38 passed, 2 failed. Do we block the release?"
+          ru: "Ночной прогон готов: 38 прошли, 2 упали. Блокируем релиз?"
+      - who: maya
+        text:
+          en: "Red isn't bad news — it's information. Let's read the report like a bug report: what was expected, what actually happened."
+          ru: "Красный — не плохая новость, а информация. Читаем отчёт как баг-репорт: что ожидали и что произошло на самом деле."
+      - who: petal
+        text:
+          en: "I can just rerun them until they're green!"
+          ru: "Я могу просто перезапускать их, пока не позеленеют!"
+      - who: maya
+        text:
+          en: "Please don't, Petal."
+          ru: "Пожалуйста, не надо, Petal."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед началом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c1-l4-p1
+        kind: choice
+        keyPoint: kp-read-error
+        prompt:
+          en: "Part of an error from a failed test. What happened?"
+          ru: "Фрагмент ошибки из упавшего теста. Что произошло?"
+        code: |
+          Expected: "Welcome back, Anna!"
+          Received: "Welcome back, Silva!"
+        options:
+          - text:
+              en: "The page showed \"Welcome back, Silva!\" where \"Welcome back, Anna!\" was expected."
+              ru: "Страница показала «Welcome back, Silva!» там, где ожидалось «Welcome back, Anna!»."
+            correct: true
+            why:
+              en: "Expected is the expected result, Received is the actual one."
+              ru: "Expected — ожидаемый результат, Received — фактический."
+          - text:
+              en: "The test couldn't find the page."
+              ru: "Тест не нашёл страницу."
+            why:
+              en: "It found the page and read a heading from it — that's what Received shows."
+              ru: "Он нашёл страницу и прочитал на ней заголовок — это и показывает Received."
+          - text:
+              en: "The test code has a typo."
+              ru: "В коде теста опечатка."
+            why:
+              en: "Nothing here points to a typo: the test expected exactly what TC-001 says."
+              ru: "Ничто не указывает на опечатку: тест ожидал ровно то, что сказано в TC-001."
+        hints:
+          - en: "\"Received\" = what the test actually got."
+            ru: "«Received» = что тест получил на самом деле."
+          - en: "Compare the two lines word by word."
+            ru: "Сравни две строки слово за словом."
+        explain:
+          en: "Expected vs Received is the same pair as Expected result vs Actual result in your bug reports."
+          ru: "Expected и Received — та же пара, что «ожидаемый» и «фактический результат» в твоих баг-репортах."
+      - id: c1-l4-p2
+        kind: choice
+        keyPoint: kp-bug-or-test
+        prompt:
+          en: "A test turned red. What's your first thought?"
+          ru: "Тест покраснел. О чём ты думаешь первым делом?"
+        options:
+          - text:
+              en: "It's either a bug in the app or a mistake in the test — I need to find out which."
+              ru: "Это либо баг в приложении, либо ошибка в тесте — нужно понять, что именно."
+            correct: true
+            why:
+              en: "Both happen all the time. The error and the test case tell you which."
+              ru: "Бывает и то и другое, постоянно. Какое из двух — подскажут ошибка и тест-кейс."
+          - text:
+              en: "The app is broken — file a bug right away."
+              ru: "Приложение сломано — сразу заводить баг."
+            why:
+              en: "Maybe. But tests break too: a typo, a changed label, wrong data."
+              ru: "Возможно. Но тесты тоже ломаются: опечатка, изменившаяся подпись, неверные данные."
+          - text:
+              en: "The test is unreliable — just rerun it."
+              ru: "Тест ненадёжный — просто перезапустить."
+            why:
+              en: "Rerunning without reading the error hides real bugs."
+              ru: "Перезапуск без чтения ошибки прячет настоящие баги."
+        hints:
+          - en: "Who can be wrong: the app, the test, or both?"
+            ru: "Кто может ошибаться: приложение, тест или оба?"
+          - en: "Think like a tester triaging a report."
+            ru: "Думай как тестировщик, который разбирает отчёт."
+        explain:
+          en: "A red test is a signal, not a verdict. First triage: bug in the app or problem in the test?"
+          ru: "Красный тест — сигнал, а не приговор. Сначала разбор: баг в приложении или проблема в тесте?"
+
+  - type: theory
+    keyPoint: kp-pass-fail
+    title:
+      en: "Green, red, and what the report shows"
+      ru: "Зелёный, красный и что показывает отчёт"
+    figure: red-green
+    body:
+      - en: "After a run the [[test runner|test-runner]] gives a [[test report|test-report]]: one line per test — ✓ [[passed|pass]] or ✘ [[failed|fail]] — with its title and how long it took."
+        ru: "После прогона [[тест-раннер|test-runner]] выдаёт [[отчёт|test-report]]: по строке на тест — ✓ [[прошёл|pass]] или ✘ [[упал|fail]] — с названием и временем выполнения."
+      - en: "A test stops at the first failed step or assertion. The lines after it don't run — like a test case blocked at step 3."
+        ru: "Тест останавливается на первом упавшем шаге или проверке. Строки после неё не выполняются — как тест-кейс, заблокированный на шаге 3."
+      - en: "This is where titles pay off: \"✘ wrong password shows an error\" already tells you where to look."
+        ru: "Вот где окупаются хорошие названия: «✘ wrong password shows an error» уже говорит, куда смотреть."
+    code: |
+      Running 3 tests using 1 worker
+
+        ✓  1 login.spec.js:3:5 › registered user can log in (1.2s)
+        ✘  2 login.spec.js:11:5 › wrong password shows an error (5.4s)
+        ✓  3 login.spec.js:19:5 › locked user sees an error (0.9s)
+
+        1 failed
+          login.spec.js:11:5 › wrong password shows an error
+        2 passed (7.8s)
+    mentor:
+      en: "5.4 seconds for a login test? Suspicious. A failing assertion keeps waiting for the expected result — here up to 5 seconds — before it gives up. That's where the time went."
+      ru: "5,4 секунды на тест логина? Подозрительно. Падающая проверка продолжает ждать ожидаемый результат — здесь до 5 секунд — и только потом сдаётся. Вот куда ушло время."
+
+  - type: theory
+    keyPoint: kp-read-error
+    title:
+      en: "Anatomy of an error"
+      ru: "Анатомия ошибки"
+    body:
+      - en: "Every failed test comes with an error. Read it like a mini bug report, top to bottom."
+        ru: "У каждого упавшего теста есть ошибка. Читай её как мини-баг-репорт, сверху вниз."
+      - en: "**Locator** — which element was checked. **Expected** — what the test expected. **Received** — the [[actual result|actual-result]]. **Timeout** — how long it waited ([[timeout|timeout]])."
+        ru: "**Locator** — какой элемент проверяли. **Expected** — что тест ожидал. **Received** — [[фактический результат|actual-result]]. **Timeout** — сколько он ждал ([[тайм-аут|timeout]])."
+      - en: "Then the **Call log** (what Playwright tried) and the code frame: `>` marks the failing line, `^` the exact spot. `login.spec.js:9:57` means file, line 9, column 57."
+        ru: "Дальше **Call log** (что пробовал Playwright) и фрагмент кода: `>` отмечает упавшую строку, `^` — точное место. `login.spec.js:9:57` — файл, строка 9, столбец 57."
+    code: |
+      Error: expect(locator).toHaveText(expected) failed
+
+      Locator:  getByRole('heading', { level: 1 })
+      Expected: "Welcome back, Anna!"
+      Received: "Welcome back, Silva!"
+      Timeout:  5000ms
+
+      Call log:
+        - Expect "toHaveText" with timeout 5000ms
+        - waiting for getByRole('heading', { level: 1 })
+          9 × locator resolved to <h1>Welcome back, Silva!</h1>
+            - unexpected value "Welcome back, Silva!"
+
+         7 |   await page.getByRole('button', { name: 'Log in' }).click();
+         8 |   await expect(page).toHaveURL('/account');
+      >  9 |   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!');
+           |                                                         ^
+        10 | });
+
+          at login.spec.js:9:57
+    mentor:
+      en: "If there's no Received at all and the call log just says \"waiting for getByLabel('E-mail')\", the element was never found. Usually that's a typo or a changed label — a problem in the test."
+      ru: "Если Received нет вовсе, а в call log только «waiting for getByLabel('E-mail')», элемент так и не нашёлся. Обычно это опечатка или изменившаяся подпись — проблема в тесте."
+
+  - type: theory
+    keyPoint: kp-bug-or-test
+    title:
+      en: "Red: a bug in the app or a broken test?"
+      ru: "Красный: баг в приложении или сломанный тест?"
+    body:
+      - en: "A red test means one of two things: a [[bug|bug]] in the app, or a mistake in the test — a wrong locator, wrong data, an outdated expected result."
+        ru: "Красный тест значит одно из двух: [[баг|bug]] в приложении или ошибку в тесте — неверный локатор, неверные данные, устаревший ожидаемый результат."
+      - en: "Triage it like you always do: compare Expected and Received with the test case. The test expects what the test case says, but the app shows something else → bug. The test expects something else, or can't find an element → check the test first."
+        ru: "Разбирай как обычно: сравни Expected и Received с тест-кейсом. Тест ждёт то, что сказано в тест-кейсе, а приложение показывает другое → баг. Тест ждёт что-то другое или не находит элемент → сначала проверь тест."
+      - en: "If it's a bug, write a bug report in English: steps, expected, actual. The error already gives you most of it."
+        ru: "Если это баг, пиши баг-репорт на английском: шаги, ожидаемый, фактический результат. Большую часть уже даёт ошибка."
+    mentor:
+      en: "Never \"fix\" a test to match a bug. If the app says \"Silva\" and the test case says \"Anna\", the test is right."
+      ru: "Никогда не «чини» тест под баг. Если приложение пишет «Silva», а тест-кейс — «Anna», прав тест."
+
+  - type: example
+    keyPoint: kp-read-error
+    title:
+      en: "See a red report for yourself"
+      ru: "Посмотри на красный отчёт {сама|сам}"
+    intro:
+      en: "This build has a bug switched on, so the test will fail — on purpose. Run it and find Expected, Received and the failing line in the report."
+      ru: "В этой сборке включён баг, поэтому тест упадёт — так и задумано. Запусти его и найди в отчёте Expected, Received и упавшую строку."
+    app: { bugs: [greeting-wrong-name] }
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('registered user can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page).toHaveURL('/account');
+        await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!');
+      });
+    notes:
+      - lines: [4, 5, 6, 7]
+        text:
+          en: "The steps all work: login itself is fine in this build."
+          ru: "Все шаги проходят: сам вход в этой сборке работает."
+      - lines: 8
+        text:
+          en: "Passes: the account page does open."
+          ru: "Проходит: страница аккаунта действительно открывается."
+      - lines: 9
+        text:
+          en: "Fails: Expected \"Welcome back, Anna!\", Received \"Welcome back, Silva!\". The test follows TC-001, so this is a bug in the app."
+          ru: "Падает: Expected «Welcome back, Anna!», Received «Welcome back, Silva!». Тест следует TC-001, значит, это баг в приложении."
+    runnable: true
+
+  - type: task
+    task:
+      id: c1-l4-t1
+      kind: choice
+      keyPoint: kp-pass-fail
+      prompt:
+        en: "Read the nightly report. Which statement is true?"
+        ru: "Прочитай ночной отчёт. Какое утверждение верно?"
+      code: |
+        Running 4 tests using 1 worker
+
+          ✓  1 login.spec.js:3:5 › registered user can log in (1.1s)
+          ✓  2 login.spec.js:12:5 › wrong password shows an error (0.8s)
+          ✘  3 login.spec.js:21:5 › locked user sees an error (5.3s)
+          ✓  4 login.spec.js:30:5 › empty email shows an error (0.5s)
+
+          1 failed
+            login.spec.js:21:5 › locked user sees an error
+          3 passed (8.2s)
+      options:
+        - text:
+            en: "One test failed — \"locked user sees an error\". It starts on line 21 of login.spec.js."
+            ru: "Упал один тест — «locked user sees an error». Он начинается в строке 21 файла login.spec.js."
+          correct: true
+          why:
+            en: "✘ marks the failure, and `login.spec.js:21:5` is where that test is written."
+            ru: "✘ отмечает падение, а `login.spec.js:21:5` — место, где этот тест написан."
+        - text:
+            en: "Login is broken for everyone."
+            ru: "Вход сломан у всех."
+          why:
+            en: "\"registered user can log in\" passed. Only the locked-user case is red."
+            ru: "«registered user can log in» прошёл. Красный только кейс с заблокированным пользователем."
+        - text:
+            en: "There is a bug on line 21 of the Bloomly app."
+            ru: "Баг в строке 21 приложения Bloomly."
+          why:
+            en: "Line 21 is in the test file. Whether the app has a bug — you don't know yet."
+            ru: "Строка 21 — в файле с тестами. Есть ли баг в приложении, ты пока не знаешь."
+        - text:
+            en: "Three tests failed."
+            ru: "Упали три теста."
+          why:
+            en: "✓ means passed. Three passed, one failed."
+            ru: "✓ значит «прошёл». Три прошли, один упал."
+      hints:
+        - en: "Find the ✘."
+          ru: "Найди ✘."
+        - en: "`login.spec.js:21:5` points into the test file, not the app."
+          ru: "`login.spec.js:21:5` указывает в файл с тестами, а не в приложение."
+      praise:
+        en: "You read the report precisely — including what it does not tell you yet."
+        ru: "Ты {прочитала|прочитал} отчёт точно — включая то, чего он пока не говорит."
+      explain:
+        en: "The report says which test failed and where it lives in the test file. It doesn't say why — that's in the error, which we read next."
+        ru: "Отчёт говорит, какой тест упал и где он лежит в файле с тестами. Почему — он не говорит: это в ошибке, её читаем дальше."
+
+  - type: task
+    task:
+      id: c1-l4-t2
+      kind: choice
+      keyPoint: kp-read-error
+      prompt:
+        en: "TC-002 \"Wrong password shows an error\" failed with this error. What does Received tell you?"
+        ru: "TC-002 «Wrong password shows an error» упал с такой ошибкой. Что тебе говорит Received?"
+      code: |
+        Error: expect(locator).toHaveText(expected) failed
+
+        Locator:  getByRole('alert')
+        Expected: "Invalid email or password."
+        Received: "Please enter a valid email address."
+        Timeout:  5000ms
+      options:
+        - text:
+            en: "The app showed a different error: it didn't accept the email as valid, so the password was never checked."
+            ru: "Приложение показало другую ошибку: оно не приняло email как корректный, поэтому до пароля дело не дошло."
+          correct: true
+          why:
+            en: "Received is the actual message. The next step: look at the email in the test — or suspect email validation."
+            ru: "Received — фактическое сообщение. Следующий шаг: посмотреть на email в тесте — или заподозрить проверку email."
+        - text:
+            en: "The test found the correct error."
+            ru: "Тест нашёл правильную ошибку."
+          why:
+            en: "Expected and Received differ — that's why it failed."
+            ru: "Expected и Received различаются — поэтому тест и упал."
+        - text:
+            en: "The error box wasn't found."
+            ru: "Блок с ошибкой не нашёлся."
+          why:
+            en: "It was found — Received shows its text. A missing element has no Received."
+            ru: "Нашёлся — Received показывает его текст. У ненайденного элемента Received нет."
+        - text:
+            en: "The password is wrong."
+            ru: "Пароль неверный."
+          why:
+            en: "That's what the test wanted to check, but the app stopped earlier — at the email."
+            ru: "Это тест и хотел проверить, но приложение остановилось раньше — на email."
+      hints:
+        - en: "Received is the actual result. Read it literally."
+          ru: "Received — фактический результат. Прочитай его буквально."
+        - en: "Which field does \"Please enter a valid email address.\" talk about?"
+          ru: "О каком поле говорит «Please enter a valid email address.»?"
+      praise:
+        en: "You read the actual result, not just \"it's red\". That's how triage starts."
+        ru: "Ты {прочитала|прочитал} фактический результат, а не просто «красное». С этого начинается разбор."
+      explain:
+        en: "Received says the app rejected the email. Either the test typed it wrong (a test problem) or the app rejects a valid email — for example, one with a space at the end that should be trimmed (a bug)."
+        ru: "Received говорит, что приложение отвергло email. Либо тест ввёл его неправильно (проблема теста), либо приложение отвергает корректный email — например, с пробелом в конце, который должен обрезаться (баг)."
+
+  - type: task
+    task:
+      id: c1-l4-t3
+      kind: predict
+      keyPoint: kp-read-error
+      app: { bugs: [login-redirect-home] }
+      context:
+        en: "Today's build has a bug: after logging in, users land on the home page (`/`)."
+        ru: "В сегодняшней сборке баг: после входа пользователь попадает на главную (`/`)."
+      prompt:
+        en: "Will this test pass or fail? If it fails — where?"
+        ru: "Этот тест пройдёт или упадёт? Если упадёт — где?"
+      code: |
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+        });
+      outcome: fail
+      reasons:
+        - text:
+            en: "It fails on line 6: Expected \".../account\", Received \".../\" (the home page). Line 7 never runs."
+            ru: "Упадёт на строке 6: Expected «.../account», Received «.../» (главная). Строка 7 не выполнится."
+          correct: true
+        - text:
+            en: "It fails on line 7, because the heading is missing."
+            ru: "Упадёт на строке 7, потому что нет заголовка."
+          why:
+            en: "The test stops at the first failed assertion — line 6. Line 7 is never reached."
+            ru: "Тест останавливается на первой упавшей проверке — строке 6. До строки 7 он не доходит."
+        - text:
+            en: "It passes: the user is logged in."
+            ru: "Пройдёт: пользователь же вошёл."
+          why:
+            en: "Logged in, yes — but on the wrong page. The URL check catches it."
+            ru: "Вошёл, да, но не на ту страницу. Проверка URL это ловит."
+      hints:
+        - en: "Which assertion runs first?"
+          ru: "Какая проверка выполняется первой?"
+        - en: "What happens to the lines after a failed assertion?"
+          ru: "Что происходит со строками после упавшей проверки?"
+      praise:
+        en: "You predicted the exact failing line. Reading reports will feel easy now."
+        ru: "Ты {предсказала|предсказал} точную упавшую строку. Теперь отчёты будут читаться легко."
+      explain:
+        en: "The first assertion that fails stops the test. The report will show line 6 with Expected `http://localhost:3000/account` and Received `http://localhost:3000/`."
+        ru: "Первая упавшая проверка останавливает тест. В отчёте будет строка 6 с Expected `http://localhost:3000/account` и Received `http://localhost:3000/`."
+
+  - type: task
+    task:
+      id: c1-l4-t4
+      kind: vocab
+      mode: cloze
+      prompt:
+        en: "Pick the word that fits."
+        ru: "Выбери подходящее слово."
+      sentence:
+        en: "The test failed with a ___: the button never appeared."
+        ru: "Тест упал по тайм-ауту: кнопка так и не появилась."
+      answer: timeout
+      options: [timeout, pass, locator]
+
+  - type: task
+    task:
+      id: c1-l4-t5
+      kind: review
+      keyPoint: kp-bug-or-test
+      context:
+        en: "Petal: \"TC-001 was red, so I updated the expected text to match the page. All green now!\""
+        ru: "Petal: «TC-001 был красным, поэтому я обновил ожидаемый текст под страницу. Теперь всё зелёное!»"
+      prompt:
+        en: "Review Petal's \"fix\" against TC-001. Flag the problem line."
+        ru: "Проверь «исправление» Petal по TC-001. Отметь проблемную строку."
+      testCase:
+        id: TC-001
+        title: Registered user can log in
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "anna@bloomly.app"
+          - action: "Enter password"
+            data: "bloom123"
+          - action: "Click \"Log in\""
+            expected: "The account page opens and shows \"Welcome back, Anna!\""
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+          await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Silva!');
+        });
+      issues:
+        - line: 9
+          type: wrong-assertion
+          note:
+            en: "TC-001 expects \"Welcome back, Anna!\". The app was wrong, not the test — Petal turned a bug into the expected behaviour."
+            ru: "TC-001 ожидает «Welcome back, Anna!». Ошибалось приложение, а не тест — Petal превратил баг в ожидаемое поведение."
+      types: [wrong-assertion, weak-assertion, wrong-data, no-assertion]
+      hints:
+        - en: "Compare the expected text in the code with TC-001."
+          ru: "Сравни ожидаемый текст в коде с TC-001."
+        - en: "Who should change here: the test or the app?"
+          ru: "Кто здесь должен измениться: тест или приложение?"
+        - en: "Line 9 now expects the bug."
+          ru: "Строка 9 теперь ожидает баг."
+      praise:
+        en: "You protected the test case from the agent. That's exactly why Bloomly hired a QA."
+        ru: "Ты {защитила|защитил} тест-кейс от агента. Именно для этого Bloomly и нанял QA."
+      explain:
+        en: "The test was red because of a real bug. Changing the expected result to match the app makes the suite green and ships the bug. The right move: restore \"Welcome back, Anna!\" and file a bug report."
+        ru: "Тест был красным из-за настоящего бага. Подогнать ожидаемый результат под приложение — значит сделать набор зелёным и выпустить баг. Правильно: вернуть «Welcome back, Anna!» и завести баг-репорт."
+
+  - type: task
+    task:
+      id: c1-l4-t6
+      kind: fix
+      keyPoint: kp-read-error
+      context:
+        en: |
+          Petal's test failed with this error:
+
+          ```
+          Error: locator.click: Timeout 5000ms exceeded.
+          Call log:
+            - waiting for getByRole('button', { name: 'Login' })
+
+            5 |   await page.getByLabel('Email').fill('anna@bloomly.app');
+            6 |   await page.getByLabel('Password').fill('bloom123');
+          > 7 |   await page.getByRole('button', { name: 'Login' }).click();
+              |                                                     ^
+          ```
+        ru: |
+          Тест Petal упал с такой ошибкой:
+
+          ```
+          Error: locator.click: Timeout 5000ms exceeded.
+          Call log:
+            - waiting for getByRole('button', { name: 'Login' })
+
+            5 |   await page.getByLabel('Email').fill('anna@bloomly.app');
+            6 |   await page.getByLabel('Password').fill('bloom123');
+          > 7 |   await page.getByRole('button', { name: 'Login' }).click();
+              |                                                     ^
+          ```
+      prompt:
+        en: "Read the error, find the cause and fix the test so it passes. The button on the page says \"Log in\"."
+        ru: "Прочитай ошибку, найди причину и исправь тест, чтобы он проходил. На кнопке на странице написано «Log in»."
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Login' }).click();
+          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+        });
+      checks:
+        expect: pass
+        static: [hasAssertion]
+      hints:
+        - en: "There's no Received: the element was never found. Look at the \"waiting for\" line."
+          ru: "Received нет: элемент так и не нашёлся. Посмотри на строку «waiting for»."
+        - en: "Compare the button name in the code with the text on the page, letter by letter."
+          ru: "Сравни название кнопки в коде с текстом на странице буква в букву."
+        - en: "On line 7, change 'Login' to 'Log in'."
+          ru: "В строке 7 замени 'Login' на 'Log in'."
+      praise:
+        en: "From error to fix in one read. That's a test problem solved without bothering a developer."
+        ru: "От ошибки до исправления с одного прочтения. Проблема теста решена без отвлечения разработчиков."
+      explain:
+        en: "\"Timeout … waiting for getByRole('button', { name: 'Login' })\" means no button with that name exists. The page says \"Log in\" with a space — a classic agent slip. This was a broken test, not a bug."
+        ru: "«Timeout … waiting for getByRole('button', { name: 'Login' })» значит, что кнопки с таким названием нет. На странице «Log in» с пробелом — классическая оплошность агента. Это был сломанный тест, а не баг."
+
+  - type: task
+    task:
+      id: c1-l4-t7
+      kind: find-bug
+      keyPoint: kp-bug-or-test
+      app: { bugs: [login-case-sensitive] }
+      context:
+        en: "Sofia: \"Customers whose phones capitalise the first letter say they can't log in.\" Petal's test for TC-007 is green on today's build. Compare its data with the test case."
+        ru: "София: «Клиенты, у которых телефон делает первую букву заглавной, пишут, что не могут войти». Тест Petal для TC-007 зелёный на сегодняшней сборке. Сравни его данные с тест-кейсом."
+      prompt:
+        en: "Make the test follow TC-007 so it catches the bug: red on today's build, green once it's fixed."
+        ru: "Сделай так, чтобы тест следовал TC-007 и поймал баг: красный на сегодняшней сборке, зелёный после исправления."
+      testCase:
+        id: TC-007
+        title: Email is not case-sensitive
+        preconditions: ["User anna@bloomly.app / bloom123 exists"]
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email with capital letters"
+            data: "Anna@Bloomly.app"
+          - action: "Enter password"
+            data: "bloom123"
+          - action: "Click \"Log in\""
+            expected: "The account page opens"
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('email is not case-sensitive', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('email is not case-sensitive', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('Anna@Bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+        });
+      checks:
+        expect: fail
+        also:
+          - app: {}
+            expect: pass
+      hints:
+        - en: "The test passes, but does it test what TC-007 says?"
+          ru: "Тест проходит, но проверяет ли он то, что сказано в TC-007?"
+        - en: "Look at the test data for the email in TC-007 — and in the code."
+          ru: "Посмотри на тестовые данные email в TC-007 — и в коде."
+        - en: "On line 5, use 'Anna@Bloomly.app' exactly as in the test case."
+          ru: "В строке 5 используй 'Anna@Bloomly.app' точно как в тест-кейсе."
+      praise:
+        en: "The test now fails for the right reason — and that red is a bug report waiting to be written."
+        ru: "Теперь тест падает по правильной причине — и этот красный уже готовый повод для баг-репорта."
+      explain:
+        en: "With the data from TC-007 the test fails: Expected `/account`, Received `/login` — Bloomly says \"Invalid email or password.\". The test follows the test case exactly, so this red is a bug in the app. On the fixed build the same test is green."
+        ru: "С данными из TC-007 тест падает: Expected `/account`, Received `/login` — Bloomly пишет «Invalid email or password.». Тест в точности следует тест-кейсу, значит, этот красный — баг в приложении. На исправленной сборке тот же тест зелёный."
+
+  - type: mistakes
+    keyPoint: kp-bug-or-test
+    title:
+      en: "Typical mistakes with red tests"
+      ru: "Типичные ошибки с красными тестами"
+    items:
+      - wrong: "await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Silva!'); // updated to match the app"
+        right: "await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!'); // TC-001, bug filed"
+        why:
+          en: "Changing the expected result to match the app turns a bug into a \"feature\". The test case decides what's right."
+          ru: "Подогнать ожидаемый результат под приложение — значит превратить баг в «фичу». Что правильно, решает тест-кейс."
+      - wrong: "Test is red → rerun it until it's green"
+        right: "Test is red → read Expected vs Received → decide: bug or broken test"
+        why:
+          en: "Rerunning hides information. Read the error first — it usually tells you everything."
+          ru: "Перезапуск прячет информацию. Сначала прочитай ошибку — обычно она говорит всё."
+      - wrong: "Bug: the login test is red"
+        right: "Bug: Account page greets the user by last name (\"Welcome back, Silva!\")"
+        why:
+          en: "A bug report describes the app's behaviour, not the test. Developers need steps, expected and actual."
+          ru: "Баг-репорт описывает поведение приложения, а не теста. Разработчикам нужны шаги, ожидаемый и фактический результат."
+
+  - type: explain
+    keyPoint: kp-bug-or-test
+    prompt:
+      en: "In your own words: a test is red. How do you decide whether it's a bug or a broken test?"
+      ru: "Своими словами: тест красный. Как ты решаешь, баг это или сломанный тест?"
+    model:
+      en: "I read the error: the failing line, Expected and Received. Then I compare with the test case. If the test expects what the test case says and the app shows something else, it's a bug — I write a bug report with steps, expected and actual. If the test expects something different, uses the wrong data, or can't find an element because of a typo or an old label, the test needs fixing."
+      ru: "Я читаю ошибку: упавшую строку, Expected и Received. Потом сравниваю с тест-кейсом. Если тест ждёт то, что сказано в тест-кейсе, а приложение показывает другое, — это баг, и я пишу баг-репорт с шагами, ожидаемым и фактическим результатом. Если тест ждёт что-то другое, использует неверные данные или не находит элемент из-за опечатки или старой подписи — чинить нужно тест."
+
+  - type: phrases
+    items:
+      - context: standup
+        en: "The nightly run had two failures. One is a real bug in the greeting; the other was a broken locator, already fixed."
+        ru: "В ночном прогоне два падения. Одно — настоящий баг в приветствии, второе — сломанный локатор, уже {исправила|исправил}."
+      - context: bug-report
+        en: "Steps: log in as anna@bloomly.app. Expected: \"Welcome back, Anna!\". Actual: \"Welcome back, Silva!\". Found by the automated test for TC-001."
+        ru: "Шаги: войти как anna@bloomly.app. Ожидаемый результат: «Welcome back, Anna!». Фактический: «Welcome back, Silva!». Найдено автотестом для TC-001."
+      - context: code-review
+        en: "Please don't change the expected text to make the test pass — the app is wrong here. I've filed a bug."
+        ru: "Пожалуйста, не меняй ожидаемый текст, чтобы тест прошёл, — здесь ошибается приложение. Я {завела|завёл} баг."
+      - context: chat
+        en: "Is anyone working on the login page? The login tests started failing after this morning's deploy."
+        ru: "Кто-нибудь сейчас трогает страницу логина? Тесты логина начали падать после утреннего деплоя."
+      - context: prompt
+        en: "The test fails with Expected \"Welcome back, Anna!\" and Received \"Welcome back, Silva!\". Don't change the assertion. Tell me whether the problem is in the test or in the app."
+        ru: "Тест падает: Expected «Welcome back, Anna!», Received «Welcome back, Silva!». Не меняй проверку. Скажи, проблема в тесте или в приложении."
+        note:
+          en: "\"Don't change the assertion\" stops the agent from hiding the bug."
+          ru: "«Don't change the assertion» не даёт агенту спрятать баг."
+
+checkPool:
+  - id: c1-l4-k1
+    kind: input
+    keyPoint: kp-read-error
+    placement: true
+    prompt:
+      en: "On which line of the test file did this test fail? Type the number."
+      ru: "На какой строке файла с тестом упал этот тест? Введи номер."
+    code: |
+      Error: expect(page).toHaveURL(expected) failed
+
+      Expected: "http://localhost:3000/account"
+      Received: "http://localhost:3000/"
+      Timeout:  5000ms
+
+        10 |   await page.getByLabel('Password').fill('bloom123');
+        11 |   await page.getByRole('button', { name: 'Log in' }).click();
+      > 12 |   await expect(page).toHaveURL('/account');
+           |                      ^
+        13 |   await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+    answers: ["12"]
+    placeholder: "line"
+    hints:
+      - en: "Look for the `>` sign in the code frame."
+        ru: "Найди знак `>` во фрагменте кода."
+      - en: "The number right after `>` is the line."
+        ru: "Число сразу после `>` — это номер строки."
+    explain:
+      en: "`>` marks the failing line: 12, the URL check. Line 13 never ran."
+      ru: "`>` отмечает упавшую строку: 12, проверку URL. Строка 13 не выполнялась."
+
+  - id: c1-l4-k2
+    kind: choice
+    keyPoint: kp-pass-fail
+    placement: true
+    prompt:
+      en: "Which statement about this report is true?"
+      ru: "Какое утверждение об этом отчёте верно?"
+    code: |
+      Running 4 tests using 1 worker
+
+        ✓  1 cart.spec.js:3:5 › cart shows the added bouquet (1.1s)
+        ✘  2 cart.spec.js:12:5 › promo code BLOOM10 gives 10% off (5.3s)
+        ✓  3 cart.spec.js:22:5 › empty cart shows a message (0.4s)
+        ✘  4 cart.spec.js:30:5 › remove button removes the right item (5.2s)
+
+        2 failed
+        2 passed (12.0s)
+    options:
+      - text:
+          en: "Two tests failed: the promo code test and the remove test."
+          ru: "Упали два теста: про промокод и про удаление."
+        correct: true
+        why:
+          en: "The two ✘ lines."
+          ru: "Две строки с ✘."
+      - text:
+          en: "The whole cart is broken."
+          ru: "Вся корзина сломана."
+        why:
+          en: "Two cart tests passed. Something specific broke."
+          ru: "Два теста корзины прошли. Сломалось что-то конкретное."
+      - text:
+          en: "The app has exactly two bugs."
+          ru: "В приложении ровно два бага."
+        why:
+          en: "Two red tests — but each could be a bug or a broken test. Triage first."
+          ru: "Два красных теста — но каждый может быть и багом, и сломанным тестом. Сначала разбор."
+    hints:
+      - en: "Count the ✘ marks."
+        ru: "Посчитай значки ✘."
+      - en: "A red test isn't automatically a bug."
+        ru: "Красный тест — не автоматически баг."
+    explain:
+      en: "The report tells you what failed. Whether each failure is a bug or a test problem, the errors and test cases will tell."
+      ru: "Отчёт говорит, что упало. Баг это или проблема теста — подскажут ошибки и тест-кейсы."
+
+  - id: c1-l4-k3
+    kind: choice
+    keyPoint: kp-pass-fail
+    prompt:
+      en: "A test has six steps. The assertion after step 3 fails. What happens to steps 4–6?"
+      ru: "В тесте шесть шагов. Проверка после шага 3 падает. Что будет с шагами 4–6?"
+    options:
+      - text:
+          en: "They don't run. The test stops at the first failure and is reported as failed."
+          ru: "Они не выполнятся. Тест останавливается на первом падении и считается упавшим."
+        correct: true
+        why:
+          en: "Like a test case blocked at step 3."
+          ru: "Как тест-кейс, заблокированный на шаге 3."
+      - text:
+          en: "They run, and the report shows 3 of 6 steps passed."
+          ru: "Они выполнятся, и отчёт покажет, что прошли 3 шага из 6."
+        why:
+          en: "A test is all-or-nothing: passed or failed, stopping at the first failure."
+          ru: "Тест — «всё или ничего»: прошёл или упал, остановившись на первом падении."
+      - text:
+          en: "The runner skips the failed assertion and continues."
+          ru: "Раннер пропускает упавшую проверку и идёт дальше."
+        why:
+          en: "A normal assertion stops the test when it fails."
+          ru: "Обычная проверка при падении останавливает тест."
+    hints:
+      - en: "What would you do with a manual case blocked at step 3?"
+        ru: "Что бы ты {сделала|сделал} с ручным кейсом, заблокированным на шаге 3?"
+      - en: "Look at the report: only one line per test."
+        ru: "Посмотри на отчёт: по одной строке на тест."
+    explain:
+      en: "The first failure stops the test. That's why the error always points to one line — the first thing that went wrong."
+      ru: "Первое падение останавливает тест. Поэтому ошибка всегда указывает на одну строку — первое, что пошло не так."
+
+  - id: c1-l4-k4
+    kind: predict
+    keyPoint: kp-pass-fail
+    app: { bugs: [login-no-error] }
+    context:
+      en: "Bug in today's build: a wrong password shows no error at all."
+      ru: "Баг в сегодняшней сборке: при неверном пароле никакой ошибки нет."
+    prompt:
+      en: "Will this test pass or fail on today's build?"
+      ru: "Этот тест пройдёт или упадёт на сегодняшней сборке?"
+    code: |
+      test('wrong password shows an error', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('wrong-pass');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByRole('alert')).toBeVisible();
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "The error never appears; the assertion waits up to the timeout and the test is reported as failed after about 5 seconds."
+          ru: "Ошибка так и не появляется; проверка ждёт до тайм-аута, и примерно через 5 секунд тест считается упавшим."
+        correct: true
+      - text:
+          en: "It passes: the click worked."
+          ru: "Пройдёт: клик же сработал."
+        why:
+          en: "The click worked, but the expected error never showed up."
+          ru: "Клик сработал, но ожидаемая ошибка так и не появилась."
+    hints:
+      - en: "Is the error box ever shown on this build?"
+        ru: "Показывается ли блок с ошибкой на этой сборке вообще?"
+      - en: "How long does an assertion wait before failing?"
+        ru: "Сколько ждёт проверка, прежде чем упасть?"
+    explain:
+      en: "The assertion catches the bug: no error is visible, so after the timeout the test fails. In the report it'll be the slow ✘ line."
+      ru: "Проверка ловит баг: ошибки не видно, и после тайм-аута тест падает. В отчёте это будет медленная строка с ✘."
+
+  - id: c1-l4-k5
+    kind: choice
+    keyPoint: kp-read-error
+    prompt:
+      en: "A test opened `/account` directly and failed with this error. What does Received tell you?"
+      ru: "Тест сразу открыл `/account` и упал с такой ошибкой. Что тебе говорит Received?"
+    code: |
+      Error: expect(page).toHaveURL(expected) failed
+
+      Expected: "http://localhost:3000/account"
+      Received: "http://localhost:3000/login?next=%2Faccount"
+      Timeout:  5000ms
+    options:
+      - text:
+          en: "The test wasn't logged in, so Bloomly redirected it to the login page. The test is missing its precondition."
+          ru: "Тест не был залогинен, поэтому Bloomly перенаправил его на страницу входа. В тесте не хватает предусловия."
+        correct: true
+        why:
+          en: "`/login?next=/account` is Bloomly's normal answer to a logged-out visitor."
+          ru: "`/login?next=/account` — нормальный ответ Bloomly незалогиненному посетителю."
+      - text:
+          en: "The account page is broken."
+          ru: "Страница аккаунта сломана."
+        why:
+          en: "Redirecting a logged-out user to login is correct behaviour, not a bug."
+          ru: "Отправить незалогиненного пользователя на вход — правильное поведение, а не баг."
+      - text:
+          en: "The URL is right; the matcher is wrong."
+          ru: "URL правильный, неправильный метод проверки."
+        why:
+          en: "Received shows a different page — /login, not /account."
+          ru: "Received показывает другую страницу — /login, а не /account."
+    hints:
+      - en: "Read the path in Received: which page is it?"
+        ru: "Прочитай путь в Received: какая это страница?"
+      - en: "What does Bloomly do when a logged-out user opens /account?"
+        ru: "Что делает Bloomly, когда незалогиненный пользователь открывает /account?"
+    explain:
+      en: "Received shows the login page with `next=/account`. The app behaved correctly; the test forgot the precondition \"user is logged in\". A test problem, not a bug."
+      ru: "Received показывает страницу входа с `next=/account`. Приложение повело себя правильно, а тест забыл предусловие «пользователь вошёл». Проблема теста, а не баг."
+
+  - id: c1-l4-k6
+    kind: fix
+    keyPoint: kp-read-error
+    context:
+      en: |
+        The test failed with this error:
+
+        ```
+        Error: expect(locator).toHaveText(expected) failed
+
+        Locator:  getByRole('alert')
+        Expected: "Invalid email or password"
+        Received: "Invalid email or password."
+        Timeout:  5000ms
+
+          5 |   await page.getByRole('button', { name: 'Log in' }).click();
+        > 6 |   await expect(page.getByRole('alert')).toHaveText('Invalid email or password');
+            |                                         ^
+          7 | });
+        ```
+      ru: |
+        Тест упал с такой ошибкой:
+
+        ```
+        Error: expect(locator).toHaveText(expected) failed
+
+        Locator:  getByRole('alert')
+        Expected: "Invalid email or password"
+        Received: "Invalid email or password."
+        Timeout:  5000ms
+
+          5 |   await page.getByRole('button', { name: 'Log in' }).click();
+        > 6 |   await expect(page.getByRole('alert')).toHaveText('Invalid email or password');
+            |                                         ^
+          7 | });
+        ```
+    prompt:
+      en: "TC-002 expects \"Invalid email or password.\". Compare Expected and Received, then fix the test."
+      ru: "TC-002 ожидает «Invalid email or password.». Сравни Expected и Received и исправь тест."
+    starter: |
+      test('wrong password shows an error', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('wrong-pass');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByRole('alert')).toHaveText('Invalid email or password');
+      });
+    solution: |
+      test('wrong password shows an error', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('wrong-pass');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+      });
+    checks:
+      expect: pass
+      static: [hasAssertion]
+    hints:
+      - en: "Expected and Received differ by one character."
+        ru: "Expected и Received отличаются одним символом."
+      - en: "Look at the very end of the two texts."
+        ru: "Посмотри на самый конец двух текстов."
+      - en: "Add the period: 'Invalid email or password.'"
+        ru: "Добавь точку: 'Invalid email or password.'"
+    explain:
+      en: "`toHaveText` compares the whole text, so a missing period is enough to fail. The app matches TC-002 — the test had a typo."
+      ru: "`toHaveText` сравнивает текст целиком, поэтому пропущенной точки достаточно для падения. Приложение соответствует TC-002 — опечатка была в тесте."
+
+  - id: c1-l4-k7
+    kind: choice
+    keyPoint: kp-bug-or-test
+    prompt:
+      en: "TC-012 says: \"The shop shows 6 products.\" The test failed with this error. Bug or test?"
+      ru: "TC-012: «В магазине показано 6 товаров». Тест упал с такой ошибкой. Баг или тест?"
+    code: |
+      Error: expect(locator).toHaveText(expected) failed
+
+      Locator:  getByTestId('results-count')
+      Expected: "5 products"
+      Received: "6 products"
+      Timeout:  5000ms
+    options:
+      - text:
+          en: "A mistake in the test: the app matches TC-012, the test expects the wrong number."
+          ru: "Ошибка в тесте: приложение соответствует TC-012, а тест ждёт не то число."
+        correct: true
+        why:
+          en: "Received equals the test case. Expected doesn't."
+          ru: "Received совпадает с тест-кейсом, а Expected — нет."
+      - text:
+          en: "A bug in the app: one product too many."
+          ru: "Баг в приложении: на один товар больше."
+        why:
+          en: "The test case says 6, and the app shows 6. The app is right."
+          ru: "В тест-кейсе 6, и приложение показывает 6. Приложение право."
+      - text:
+          en: "Can't tell — rerun it."
+          ru: "Непонятно — перезапустить."
+        why:
+          en: "You can tell: compare Expected and Received with the test case."
+          ru: "Понятно: сравни Expected и Received с тест-кейсом."
+    hints:
+      - en: "Which of the two values matches the test case?"
+        ru: "Какое из двух значений совпадает с тест-кейсом?"
+      - en: "If Received matches the test case, who is wrong?"
+        ru: "Если Received совпадает с тест-кейсом, кто ошибается?"
+    explain:
+      en: "Received (the actual result) matches TC-012, so the app is fine. The test's expected value is wrong — fix the test, no bug report needed."
+      ru: "Received (фактический результат) совпадает с TC-012, значит, с приложением всё в порядке. Неверно ожидаемое значение в тесте — чиним тест, баг-репорт не нужен."
+
+  - id: c1-l4-k8
+    kind: review
+    keyPoint: kp-bug-or-test
+    context:
+      en: "Petal: \"The test was red with 'bloom10', so I switched to 'BLOOM10'. Green now!\""
+      ru: "Petal: «Тест был красным с 'bloom10', поэтому я поменял на 'BLOOM10'. Теперь зелёный!»"
+    prompt:
+      en: "Review Petal's change against TC-013. Flag the problem line."
+      ru: "Проверь изменение Petal по TC-013. Отметь проблемную строку."
+    testCase:
+      id: TC-013
+      title: Promo code is not case-sensitive
+      preconditions: ["The cart contains one Rose Bouquet"]
+      steps:
+        - action: "Open the cart"
+        - action: "Enter the promo code in lower case"
+          data: "bloom10"
+        - action: "Click \"Apply\""
+          expected: "\"Promo code BLOOM10 applied: −10%.\" is shown"
+    code: |
+      test('promo code is not case-sensitive', async ({ page }) => {
+        await page.goto('/cart');
+        await page.getByLabel('Promo code').fill('BLOOM10');
+        await page.getByRole('button', { name: 'Apply' }).click();
+        await expect(page.getByTestId('promo-message')).toHaveText('Promo code BLOOM10 applied: −10%.');
+      });
+    issues:
+      - line: 3
+        type: wrong-data
+        note:
+          en: "TC-013 is about lower case: \"bloom10\". With \"BLOOM10\" the test no longer checks case-insensitivity — and the real bug is hidden."
+          ru: "TC-013 — про нижний регистр: «bloom10». С «BLOOM10» тест больше не проверяет нечувствительность к регистру — а настоящий баг спрятан."
+    types: [wrong-data, wrong-assertion, weak-assertion, wrong-step]
+    hints:
+      - en: "What is TC-013 actually about?"
+        ru: "О чём на самом деле TC-013?"
+      - en: "Compare the promo code in the test case and in the code."
+        ru: "Сравни промокод в тест-кейсе и в коде."
+    explain:
+      en: "The red test was right: lower-case codes were rejected — a bug. Petal changed the test data to dodge it. Restore \"bloom10\" and file a bug report."
+      ru: "Красный тест был прав: промокод в нижнем регистре отклонялся — это баг. Petal поменял тестовые данные, чтобы его обойти. Верни «bloom10» и заведи баг-репорт."

@@ -1,0 +1,56 @@
+# Glossary entries owned by chapter 6 (Actions and assertions)
+- id: web-first-assertion
+  en: web-first assertion
+  ipa: /ˌweb ˈfɜːrst əˈsɜːrʃn/
+  ru: web-first проверка (web-first assertion)
+  pos: noun
+  def:
+    en: "An assertion that keeps retrying until the page reaches the expected state or the timeout ends."
+    ru: "Проверка, которая повторяется, пока страница не придёт в ожидаемое состояние или не истечёт тайм-аут."
+  example:
+    en: "Swap `expect(await toast.isVisible()).toBeTruthy()` for a web-first assertion: `await expect(toast).toBeVisible()`."
+    ru: "Замени `expect(await toast.isVisible()).toBeTruthy()` на web-first проверку: `await expect(toast).toBeVisible()`."
+  context: code-review
+  chapter: 6
+
+- id: retry
+  en: retry
+  ipa: /ˌriːˈtraɪ/
+  ru: повтор, повторная попытка (retry)
+  pos: noun, verb
+  def:
+    en: "Trying again automatically: assertions retry until they pass, and the runner can rerun a failed test."
+    ru: "Автоматическая повторная попытка: проверки повторяются, пока не пройдут, а раннер может перезапустить упавший тест."
+  example:
+    en: "It passed only on retry, so it's flaky — let's not call it green at the standup."
+    ru: "Он прошёл только с повторной попытки, значит, он флаки — не будем называть его зелёным на стендапе."
+  context: standup
+  chapter: 6
+
+- id: soft-assertion
+  en: soft assertion
+  ipa: /ˌsɔːft əˈsɜːrʃn/
+  ru: мягкая проверка (soft assertion)
+  pos: noun
+  def:
+    en: "An assertion (expect.soft) that records a failure but lets the test continue to the next check."
+    ru: "Проверка (expect.soft), которая фиксирует падение, но даёт тесту перейти к следующей проверке."
+  example:
+    en: "Use soft assertions for the order summary, so one run shows every wrong number."
+    ru: "Используй мягкие проверки для сводки заказа, чтобы за один прогон увидеть все неверные суммы."
+  context: code-review
+  chapter: 6
+
+- id: actionability
+  en: actionability
+  ipa: /ˌækʃənəˈbɪləti/
+  ru: готовность к действию (actionability)
+  pos: noun
+  def:
+    en: "Whether an element can be acted on right now: attached, visible, stable, enabled and not covered by anything."
+    ru: "Можно ли прямо сейчас совершить действие с элементом: он есть в DOM, видим, неподвижен, активен и ничем не закрыт."
+  example:
+    en: "The click timed out on the actionability check — the cookie banner was covering the button."
+    ru: "Клик упал по тайм-ауту на проверке actionability — кнопку закрывал баннер cookie."
+  context: bug-report
+  chapter: 6

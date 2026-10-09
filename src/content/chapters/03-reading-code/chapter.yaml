@@ -1,0 +1,281 @@
+id: c3
+number: 3
+status: ready
+title: { en: "Reading code without fear", ru: "Читаем код без страха" }
+department: { en: "Engineering", ru: "Разработка" }
+summary:
+  en: "You won't write JavaScript by hand — the agent does. But you'll read every line you approve: test data, helper functions, await, loops. And you'll spot when generated code is wrong."
+  ru: "Писать JavaScript руками не придётся — это делает агент. Но каждую строку, которую ты одобряешь, ты будешь читать: тестовые данные, функции-помощники, await, циклы. И замечать, когда сгенерированный код ошибается."
+color: peach
+lessons: [c3-l1, c3-l2, c3-l3, c3-l4]
+
+intro:
+  - who: petal
+    text:
+      en: "Good morning! While you were asleep, I wrote 30 regression tests. They look great to me."
+      ru: "Доброе утро! Пока все спали, я написал 30 регрессионных тестов. По-моему, они отличные."
+  - who: leo
+    text:
+      en: "Thirty tests in one night! Can we merge them today? The 3.0 regression starts in two weeks."
+      ru: "Тридцать тестов за ночь! Можем смёржить их сегодня? Регресс 3.0 начинается через две недели."
+  - who: you
+    text:
+      en: "I'd love to approve them… but I can't really read code yet."
+      ru: "Я бы с радостью их одобри{ла|л}… но я пока толком не умею читать код."
+  - who: maya
+    text:
+      en: "You don't have to write code. But you must be able to read every line you approve."
+      ru: "Писать код тебе не обязательно. Но каждую строку, которую ты одобряешь, ты {должна|должен} уметь прочитать."
+  - who: kai
+    text:
+      en: "Hi, I'm Kai from frontend. I'll be your code guide this week. No question is too small — I promise."
+      ru: "Привет, я Кай из фронтенда. На этой неделе я твой гид по коду. Глупых вопросов не бывает — обещаю."
+  - who: maya
+    text:
+      en: "By Friday you'll read Petal's PR like a test case: data, steps, checks. Let's start."
+      ru: "К пятнице ты будешь читать PR от Petal как тест-кейс: данные, шаги, проверки. Начинаем."
+
+outro:
+  - who: leo
+    text:
+      en: "Petal's PR is merged — after your review caught three real problems. That's exactly why we hired you."
+      ru: "PR от Petal смёржен — после того как твоё ревью поймало три настоящие проблемы. Ровно за этим мы тебя и наняли."
+  - who: petal
+    text:
+      en: "I've updated my notes: await every step, check the data, assert what the data row expects."
+      ru: "Я обновил свои заметки: await перед каждым шагом, проверять данные, проверять то, что ожидает строка данных."
+  - who: maya
+    text:
+      en: "You read code now. Next stop: Frontend — the land of locators."
+      ru: "Теперь ты читаешь код. Следующая остановка — Фронтенд, страна локаторов."
+  - who: mochi
+    text: { en: "Mrrp!", ru: "Мррп!" }
+
+boss:
+  id: c3-boss
+  title: { en: "Read Petal's overnight PR", ru: "Прочитай ночной PR от Petal" }
+  story:
+    - who: leo
+      text:
+        en: "This is Petal's last PR before the 3.0 freeze. Approve it or request changes — your call."
+        ru: "Это последний PR от Petal перед заморозкой 3.0. Одобрить или запросить изменения — решать тебе."
+    - who: petal
+      text:
+        en: "It's a data-driven test for the orders status filter. Helper function, test data, a loop. I'm confident it's perfect."
+        ru: "Это тест на фильтр заказов по статусу, на наборе данных. Функция-помощник, тестовые данные, цикл. Я уверен, что он идеален."
+    - who: maya
+      text:
+        en: "Read it the way we practised: titles, steps, assertions, data. Then make it honest."
+        ru: "Читай так, как мы тренировались: названия, шаги, проверки, данные. А потом сделай его честным."
+  tasks:
+    - id: c3-boss-t1
+      kind: choice
+      multi: true
+      prompt:
+        en: "First, understand the PR. Which statements about this file are true? Pick all that apply."
+        ru: "Сначала разберись в PR. Какие утверждения об этом файле верны? Выбери все подходящие."
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        // Test data: Anna has 6 orders
+        const email = 'anna@bloomly.app';
+        const password = 'bloom123';
+        const filters = [
+          { status: 'Delivered', count: 3 },
+          { status: 'Shipped', count: 2 },
+          { status: 'Cancelled', count: 1 },
+        ];
+
+        async function logIn(page, email, password) {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill(email);
+          await page.getByLabel('Password').fill(password);
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+        }
+
+        for (const filter of filters) {
+          test(`orders filter ${filter.status} shows ${filter.count}`, async ({ page }) => {
+            await logIn(page, email, password);
+            await page.goto('/orders');
+            page.getByLabel('Status').selectOption(filter.status);
+            await expect(page.getByTestId('orders-table')).toBeVisible();
+          });
+        }
+      options:
+        - text: { en: "The file creates 3 tests — one per row of `filters`", ru: "Файл создаёт 3 теста — по одному на каждую строку `filters`" }
+          correct: true
+          why: { en: "The loop runs once per row, and each round calls `test(...)` once.", ru: "Цикл проходит по разу на строку, и в каждом проходе один раз вызывается `test(...)`." }
+        - text: { en: "Every test first logs in as anna@bloomly.app", ru: "Каждый тест сначала логинится как anna@bloomly.app" }
+          correct: true
+          why: { en: "Line 22 calls `logIn` with the `email` and `password` constants.", ru: "Строка 22 вызывает `logIn` с константами `email` и `password`." }
+        - text: { en: "The logIn helper waits until the account page is open", ru: "Функция logIn ждёт, пока откроется страница аккаунта" }
+          correct: true
+          why: { en: "Line 17: `await expect(page).toHaveURL('/account')`.", ru: "Строка 17: `await expect(page).toHaveURL('/account')`." }
+        - text: { en: "Each test checks that the number of order rows equals `filter.count`", ru: "Каждый тест проверяет, что число строк заказов равно `filter.count`" }
+          why: { en: "Look again: `filter.count` appears only in the test title. The assertion just checks that the table is visible.", ru: "Посмотри ещё раз: `filter.count` встречается только в названии теста. Проверка лишь смотрит, что таблица видна." }
+        - text: { en: "The tests share one browser page, so the 2nd and 3rd tests are already logged in", ru: "Тесты делят одну страницу браузера, поэтому 2-й и 3-й уже залогинены" }
+          why: { en: "Each test gets its own fresh `{ page }` — that's why every test logs in again.", ru: "Каждый тест получает свою новую `{ page }` — поэтому каждый логинится заново." }
+      hints:
+        - { en: "Read in passes: titles (line 21), steps (lines 22–24), assertion (line 25), data (lines 4–10).", ru: "Читай проходами: названия (строка 21), шаги (22–24), проверка (25), данные (4–10)." }
+        - { en: "Search for every place where `filter.count` is used. Is any of them inside `expect`?", ru: "Найди все места, где используется `filter.count`. Есть ли среди них `expect`?" }
+        - { en: "Three statements are true. The false ones are about the assertion and about sharing the page.", ru: "Верны три утверждения. Неверные — про проверку и про общую страницу." }
+      praise:
+        en: "You noticed that the count lives only in the title. Titles promise — assertions prove."
+        ru: "Ты замети{ла|л}, что число живёт только в названии. Название обещает — доказывает проверка."
+      explain:
+        en: "The PR reads well: data on top, a helper, a loop with 3 tests. But the title promises \"shows 3\" and nothing checks it. That's the gap you'll flag in the review."
+        ru: "PR читается гладко: данные сверху, помощник, цикл на 3 теста. Но название обещает «shows 3», а это ничто не проверяет. Именно этот пробел ты отметишь на ревью."
+
+    - id: c3-boss-t2
+      kind: review
+      prompt:
+        en: "Now review the same PR. Flag every problem: there are three, of three different types."
+        ru: "Теперь сделай ревью того же PR. Отметь все проблемы: их три, и все трёх разных типов."
+      testCase:
+        id: TC-040
+        title: Orders can be filtered by status
+        preconditions:
+          - "Logged in as anna@bloomly.app / bloom123"
+          - "Anna's orders: #1042 Delivered, #1041 Shipped, #1040 Processing, #1039 Delivered, #1038 Cancelled, #1037 Delivered"
+        steps:
+          - { action: "Open My orders" }
+          - { action: "Choose a status in the Status filter", data: "Delivered / Shipped / Cancelled" }
+          - { action: "Look at the table", expected: "Only orders with that status are listed: 3 / 1 / 1 rows" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        // Test data: Anna has 6 orders
+        const email = 'anna@bloomly.app';
+        const password = 'bloom123';
+        const filters = [
+          { status: 'Delivered', count: 3 },
+          { status: 'Shipped', count: 2 },
+          { status: 'Cancelled', count: 1 },
+        ];
+
+        async function logIn(page, email, password) {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill(email);
+          await page.getByLabel('Password').fill(password);
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+        }
+
+        for (const filter of filters) {
+          test(`orders filter ${filter.status} shows ${filter.count}`, async ({ page }) => {
+            await logIn(page, email, password);
+            await page.goto('/orders');
+            page.getByLabel('Status').selectOption(filter.status);
+            await expect(page.getByTestId('orders-table')).toBeVisible();
+          });
+        }
+      issues:
+        - line: 8
+          type: wrong-data
+          note:
+            en: "Anna has only one Shipped order (#1041). The row should be `{ status: 'Shipped', count: 1 }`."
+            ru: "У Анны только один заказ Shipped (#1041). Строка должна быть `{ status: 'Shipped', count: 1 }`."
+        - line: 24
+          type: missing-await
+          note:
+            en: "`selectOption` is not awaited — the check may run before the filter is applied (the emulator reports it as not awaited)."
+            ru: "`selectOption` без await — проверка может выполниться до того, как фильтр применится (эмулятор сообщит, что шаг не дождались)."
+        - line: 25
+          type: weak-assertion
+          note:
+            en: "The table is visible with any filter, even a broken one. Check the number of rows: `toHaveCount(filter.count)`."
+            ru: "Таблица видна при любом фильтре, даже сломанном. Проверь число строк: `toHaveCount(filter.count)`."
+      types: [wrong-data, missing-await, weak-assertion, no-assertion, hard-wait, fragile-locator, hallucination, wrong-step]
+      hints:
+        - { en: "Data: count the orders of each status in the precondition and compare with lines 7–9.", ru: "Данные: посчитай заказы каждого статуса в предусловии и сравни со строками 7–9." }
+        - { en: "Steps: does every line that talks to the browser start with `await`?", ru: "Шаги: каждая ли строка, которая обращается к браузеру, начинается с `await`?" }
+        - { en: "Assertion: would line 25 fail if the filter showed all 6 orders?", ru: "Проверка: упадёт ли строка 25, если фильтр покажет все 6 заказов?" }
+      praise:
+        en: "Three issues, three types — a senior-level review. Petal's wrong count was hiding behind the weak assertion, and you found both."
+        ru: "Три проблемы, три типа — ревью уровня senior. Неверное число у Petal пряталось за слабой проверкой, и ты наш{ла|ёл} обе."
+      explain:
+        en: "The bugs protect each other: the weak assertion never uses `filter.count`, so the wrong count on line 8 could never fail. Fixing only one of them isn't enough — you'll see that in the next task."
+        ru: "Ошибки прикрывают друг друга: слабая проверка не использует `filter.count`, поэтому неверное число в строке 8 никогда бы не уронило тест. Исправить только одну мало — это ты увидишь в следующем задании."
+
+    - id: c3-boss-t3
+      kind: fix
+      prompt:
+        en: "Make the PR honest: fix the data, add the missing `await`, and replace the weak assertion with a check of the number of rows from the data. All 3 tests must pass."
+        ru: "Сделай PR честным: исправь данные, добавь недостающий `await` и замени слабую проверку на проверку числа строк из данных. Все 3 теста должны пройти."
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        // Test data: Anna has 6 orders
+        const email = 'anna@bloomly.app';
+        const password = 'bloom123';
+        const filters = [
+          { status: 'Delivered', count: 3 },
+          { status: 'Shipped', count: 2 },
+          { status: 'Cancelled', count: 1 },
+        ];
+
+        async function logIn(page, email, password) {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill(email);
+          await page.getByLabel('Password').fill(password);
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+        }
+
+        for (const filter of filters) {
+          test(`orders filter ${filter.status} shows ${filter.count}`, async ({ page }) => {
+            await logIn(page, email, password);
+            await page.goto('/orders');
+            page.getByLabel('Status').selectOption(filter.status);
+            await expect(page.getByTestId('orders-table')).toBeVisible();
+          });
+        }
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        // Test data: Anna has 6 orders
+        const email = 'anna@bloomly.app';
+        const password = 'bloom123';
+        const filters = [
+          { status: 'Delivered', count: 3 },
+          { status: 'Shipped', count: 1 },
+          { status: 'Cancelled', count: 1 },
+        ];
+
+        async function logIn(page, email, password) {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill(email);
+          await page.getByLabel('Password').fill(password);
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+        }
+
+        for (const filter of filters) {
+          test(`orders filter ${filter.status} shows ${filter.count}`, async ({ page }) => {
+            await logIn(page, email, password);
+            await page.goto('/orders');
+            await page.getByLabel('Status').selectOption(filter.status);
+            await expect(page.getByTestId('order-row')).toHaveCount(filter.count);
+          });
+        }
+      checks:
+        expect: pass
+        minTests: 3
+        static:
+          - awaitsActions
+          - rule: regex
+            value: 'toHaveCount\(filter\.count\)|Showing \$\{filter\.count\} of'
+            message:
+              en: "Check the number of rows using `filter.count` — the expected result from the data row."
+              ru: "Проверь число строк через `filter.count` — ожидаемый результат из строки данных."
+      hints:
+        - { en: "Three edits: line 8 (data), line 24 (await), line 25 (assertion).", ru: "Три правки: строка 8 (данные), строка 24 (await), строка 25 (проверка)." }
+        - { en: "Each order is a row with the test id `order-row`. `toHaveCount(n)` checks how many there are.", ru: "Каждый заказ — строка с test id `order-row`. `toHaveCount(n)` проверяет, сколько их." }
+        - { en: "Line 25 → `await expect(page.getByTestId('order-row')).toHaveCount(filter.count);`", ru: "Строка 25 → `await expect(page.getByTestId('order-row')).toHaveCount(filter.count);`" }
+      praise:
+        en: "Three green tests that actually prove what their titles promise. Request changes → approved. That's the job."
+        ru: "Три зелёных теста, которые действительно доказывают то, что обещают их названия. Запросить изменения → одобрить. Вот это и есть работа."
+      explain:
+        en: "Now the data row drives the check: `toHaveCount(filter.count)` fails if the filter shows the wrong orders — and it would also have caught the wrong \"Shipped: 2\". With `await`, the filter is applied before the check starts."
+        ru: "Теперь проверкой управляет строка данных: `toHaveCount(filter.count)` упадёт, если фильтр покажет не те заказы, — и он же поймал бы неверное «Shipped: 2». С `await` фильтр применяется до начала проверки."

@@ -1,0 +1,836 @@
+id: c1-l2
+chapter: c1
+title:
+  en: "Anatomy of a test: steps become actions"
+  ru: "Анатомия теста: шаги становятся действиями"
+goal:
+  en: "Read a test line by line and match each line to a test-case step: which element, what to do, which data."
+  ru: "Читать тест построчно и сопоставлять каждую строку с шагом тест-кейса: какой элемент, что сделать, какие данные."
+minutes: 9
+keyPoints:
+  - id: kp-test-block
+    title:
+      en: "test('title', ...) is a test case: a title and steps"
+      ru: "test('название', ...) — это тест-кейс: название и шаги"
+  - id: kp-goto
+    title:
+      en: "page.goto('/login') opens the page"
+      ru: "page.goto('/login') открывает страницу"
+  - id: kp-actions
+    title:
+      en: "fill, click, check, selectOption are the step verbs"
+      ru: "fill, click, check, selectOption — глаголы шагов"
+  - id: kp-locator-intro
+    title:
+      en: "A locator says which element: getByLabel, getByRole"
+      ru: "Локатор говорит, какой элемент: getByLabel, getByRole"
+terms: [test-step, action, locator, spec-file, test-data, precondition, test-case]
+
+steps:
+  - type: story
+    lines:
+      - who: maya
+        text:
+          en: "Yesterday you saw a whole test. Today we read it line by line — the same way you read a test case, step by step."
+          ru: "Вчера ты {увидела|увидел} тест целиком. Сегодня читаем его построчно — так же, как ты читаешь тест-кейс, шаг за шагом."
+      - who: petal
+        text:
+          en: "I wrote twelve login tests overnight! Could you check that the steps are right? I'm sure they are."
+          ru: "За ночь я написал двенадцать тестов на логин! Проверишь, что шаги правильные? Я уверен, что да."
+      - who: mochi
+        text:
+          en: "Mrrp!"
+          ru: "Мрр!"
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед началом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c1-l2-p1
+        kind: choice
+        keyPoint: kp-actions
+        prompt:
+          en: "The manual step says: \"Enter email anna@bloomly.app\". Which line of code does that?"
+          ru: "Ручной шаг: «Ввести email anna@bloomly.app». Какая строка кода это делает?"
+        options:
+          - text: "await page.getByLabel('Email').fill('anna@bloomly.app');"
+            correct: true
+            why:
+              en: "`fill` types the value into the field, like you do with the keyboard."
+              ru: "`fill` вводит значение в поле, как ты делаешь это с клавиатуры."
+          - text: "await page.getByLabel('Email').click('anna@bloomly.app');"
+            why:
+              en: "`click` only clicks. It doesn't type anything."
+              ru: "`click` только кликает. Он ничего не вводит."
+          - text: "await page.goto('anna@bloomly.app');"
+            why:
+              en: "`goto` opens a page address, not a field."
+              ru: "`goto` открывает адрес страницы, а не поле."
+        optionsCode: true
+        hints:
+          - en: "Which word means \"type into a field\"?"
+            ru: "Какое слово значит «ввести в поле»?"
+          - en: "In English you \"fill in\" a form."
+            ru: "По-английски форму «fill in» — заполняют."
+        explain:
+          en: "Typing data into a field is `fill`. The field is found by its label: `getByLabel('Email')`."
+          ru: "Ввод данных в поле — это `fill`. Поле находим по его подписи: `getByLabel('Email')`."
+      - id: c1-l2-p2
+        kind: choice
+        keyPoint: kp-locator-intro
+        prompt:
+          en: "In `page.getByLabel('Email')`, what is 'Email'?"
+          ru: "Что такое 'Email' в `page.getByLabel('Email')`?"
+        options:
+          - text:
+              en: "The label of the field — it tells the test which element to use"
+              ru: "Подпись поля — она говорит тесту, с каким элементом работать"
+            correct: true
+            why:
+              en: "Like \"the Email field\" in a test case step."
+              ru: "Как «поле Email» в шаге тест-кейса."
+          - text:
+              en: "The text to type into the field"
+              ru: "Текст, который нужно ввести в поле"
+            why:
+              en: "The text to type goes into `fill(...)`, after the locator."
+              ru: "Текст для ввода идёт в `fill(...)`, после локатора."
+          - text:
+              en: "The name of the test"
+              ru: "Название теста"
+            why:
+              en: "The test name lives in `test('...')`."
+              ru: "Название теста живёт в `test('...')`."
+        hints:
+          - en: "\"getBy\" means \"find by\"."
+            ru: "«getBy» значит «найти по»."
+          - en: "What text is next to the input on the login page?"
+            ru: "Какой текст стоит рядом с полем на странице входа?"
+        explain:
+          en: "`getByLabel('Email')` finds the field whose label is \"Email\". It answers the question \"which element?\"."
+          ru: "`getByLabel('Email')` находит поле с подписью «Email». Это ответ на вопрос «какой элемент?»."
+
+  - type: theory
+    keyPoint: kp-test-block
+    title:
+      en: "The test block is your test case"
+      ru: "Блок test — это твой тест-кейс"
+    figure: test-anatomy
+    body:
+      - en: "A [[spec file|spec-file]] such as `login.spec.js` is like a folder of test cases in your TMS. Each `test(...)` inside it is one [[test case|test-case]]."
+        ru: "[[Spec-файл|spec-file]] вроде `login.spec.js` — как папка тест-кейсов в твоей TMS. Каждый `test(...)` внутри — один [[тест-кейс|test-case]]."
+      - en: "`test('title', async ({ page }) => { ... })` — first the title in quotes, then the steps inside `{ }`. `page` is the browser tab the test controls."
+        ru: "`test('название', async ({ page }) => { ... })` — сначала название в кавычках, потом шаги внутри `{ }`. `page` — вкладка браузера, которой управляет тест."
+      - en: "Titles are in English and describe behaviour: \"registered user can log in\", not \"test 1\". In a report, the title is all people see."
+        ru: "Названия пишут по-английски и описывают поведение: «registered user can log in», а не «test 1». В отчёте люди видят только название."
+    code: |
+      test('registered user can log in', async ({ page }) => {
+        // steps go here, one line per step
+      });
+    mentor:
+      en: "`async`, `=>`, `({ page })` — for now just read them as \"here come the steps\". We'll look closer in chapter 3."
+      ru: "`async`, `=>`, `({ page })` — пока просто читай их как «дальше идут шаги». Подробнее разберём в третьей главе."
+
+  - type: theory
+    keyPoint: kp-goto
+    title:
+      en: "Step 1: open the page"
+      ru: "Шаг 1: открыть страницу"
+    body:
+      - en: "\"Open the login page\" is `await page.goto('/login')`. You write only the path; the runner adds the site address (`http://localhost:3000`)."
+        ru: "«Открыть страницу входа» — это `await page.goto('/login')`. Пишешь только путь, адрес сайта (`http://localhost:3000`) раннер добавит сам."
+      - en: "Every test starts in a fresh, empty browser tab: nobody is logged in, the cart is empty. So the first step is almost always `goto`."
+        ru: "Каждый тест начинается в новой пустой вкладке: никто не вошёл, корзина пуста. Поэтому первый шаг почти всегда `goto`."
+      - en: "`await` at the start of a line means \"finish this step before the next one\". Every step starts with it."
+        ru: "`await` в начале строки значит «закончи этот шаг, прежде чем идти дальше». С него начинается каждый шаг."
+    code: |
+      await page.goto('/login');   // Open the login page
+      await page.goto('/shop');    // Open the shop
+      await page.goto('/cart');    // Open the cart
+
+  - type: theory
+    keyPoint: kp-actions
+    title:
+      en: "Step verbs become actions"
+      ru: "Глаголы шагов становятся действиями"
+    body:
+      - en: "In a test case you write: enter, click, tick, choose. In code these are [[actions|action]]: `fill`, `click`, `check`, `selectOption`."
+        ru: "В тест-кейсе ты пишешь: ввести, нажать, отметить, выбрать. В коде это [[действия|action]]: `fill`, `click`, `check`, `selectOption`."
+      - en: "The value in brackets is your [[test data|test-data]]: `fill('anna@bloomly.app')`, `selectOption('Portugal')`. Same data as in the \"Data\" column of your test case."
+        ru: "Значение в скобках — твои [[тестовые данные|test-data]]: `fill('anna@bloomly.app')`, `selectOption('Portugal')`. Те же данные, что в колонке «Данные» тест-кейса."
+    code: |
+      await page.getByLabel('Email').fill('anna@bloomly.app');     // Enter email
+      await page.getByRole('button', { name: 'Log in' }).click();  // Click "Log in"
+      await page.getByLabel('Remember me').check();                // Tick "Remember me"
+      await page.getByLabel('Country').selectOption('Portugal');   // Choose a country
+
+  - type: theory
+    keyPoint: kp-locator-intro
+    title:
+      en: "A locator says which element"
+      ru: "Локатор говорит, какой элемент"
+    body:
+      - en: "Before the action comes the [[locator|locator]]: *which* element. In a test case you'd write \"the Email field\" or \"the Log in button\". Code says the same."
+        ru: "Перед действием стоит [[локатор|locator]]: *какой* элемент. В тест-кейсе ты пишешь «поле Email» или «кнопка Log in». Код говорит то же самое."
+      - en: "`page.getByLabel('Email')` is the field labelled Email. `page.getByRole('button', { name: 'Log in' })` is the button called \"Log in\"."
+        ru: "`page.getByLabel('Email')` — поле с подписью Email. `page.getByRole('button', { name: 'Log in' })` — кнопка с названием «Log in»."
+      - en: "Use the exact words users see. If the label says \"Email\", a locator for \"E-mail\" finds nothing."
+        ru: "Используй точные слова, которые видит пользователь. Если подпись «Email», локатор для «E-mail» ничего не найдёт."
+    mentor:
+      en: "Why not just `getByText('Log in')`? On the login page that text appears three times: the heading, the menu link and the button. Playwright refuses to guess. `getByRole('button', ...)` points at exactly one."
+      ru: "Почему не просто `getByText('Log in')`? На странице входа этот текст встречается трижды: заголовок, ссылка в меню и кнопка. Playwright не станет угадывать. `getByRole('button', ...)` указывает ровно на одну."
+
+  - type: example
+    keyPoint: kp-actions
+    title:
+      en: "All four step verbs in one test"
+      ru: "Все четыре глагола в одном тесте"
+    intro:
+      en: "A sign-up test: every line is locator + action + data. Read the notes, then run it."
+      ru: "Тест регистрации: каждая строка — локатор + действие + данные. Прочитай пояснения и запусти."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('new customer can create an account', async ({ page }) => {
+        await page.goto('/signup');
+        await page.getByLabel('Full name').fill('Lena Novak');
+        await page.getByLabel('Email').fill('lena@bloomly.app');
+        await page.getByLabel('Password').fill('spring2026');
+        await page.getByLabel('Country').selectOption('Poland');
+        await page.getByLabel('I agree to the Terms of Service').check();
+        await page.getByRole('button', { name: 'Create account' }).click();
+        await expect(page.getByRole('heading', { name: 'Account created!' })).toBeVisible();
+      });
+    notes:
+      - lines: 3
+        text:
+          en: "The test case title: what behaviour we check."
+          ru: "Название тест-кейса: какое поведение проверяем."
+      - lines: 4
+        text:
+          en: "Step 1: open the sign-up page."
+          ru: "Шаг 1: открыть страницу регистрации."
+      - lines: [5, 6, 7]
+        text:
+          en: "Enter name, email and password: locator `getByLabel(...)` + action `fill(...)` + test data."
+          ru: "Ввести имя, email и пароль: локатор `getByLabel(...)` + действие `fill(...)` + тестовые данные."
+      - lines: 8
+        text:
+          en: "Choose Poland in the Country dropdown: `selectOption`."
+          ru: "Выбрать Poland в выпадающем списке Country: `selectOption`."
+      - lines: 9
+        text:
+          en: "Tick the terms checkbox: `check`."
+          ru: "Отметить чекбокс с условиями: `check`."
+      - lines: 10
+        text:
+          en: "Click the \"Create account\" button: `click`."
+          ru: "Нажать кнопку «Create account»: `click`."
+      - lines: 11
+        text:
+          en: "The expected result. That's the next lesson."
+          ru: "Ожидаемый результат. Это тема следующего урока."
+    runnable: true
+
+  - type: task
+    task:
+      id: c1-l2-t1
+      kind: match
+      keyPoint: kp-actions
+      prompt:
+        en: "Match each manual step with its line of code."
+        ru: "Сопоставь каждый ручной шаг со строкой кода."
+      pairs:
+        - left: { en: "Open the sign-up page", ru: "Открыть страницу регистрации" }
+          right: "await page.goto('/signup');"
+        - left: { en: "Enter password bloom123", ru: "Ввести пароль bloom123" }
+          right: "await page.getByLabel('Password').fill('bloom123');"
+        - left: { en: "Click \"Log in\"", ru: "Нажать «Log in»" }
+          right: "await page.getByRole('button', { name: 'Log in' }).click();"
+        - left: { en: "Tick \"Remember me\"", ru: "Отметить «Remember me»" }
+          right: "await page.getByLabel('Remember me').check();"
+        - left: { en: "Choose the country Portugal", ru: "Выбрать страну Portugal" }
+          right: "await page.getByLabel('Country').selectOption('Portugal');"
+      rightCode: true
+      hints:
+        - en: "Look at the verb at the end of each line."
+          ru: "Смотри на глагол в конце каждой строки."
+        - en: "goto = open, fill = enter, click = click, check = tick, selectOption = choose."
+          ru: "goto = открыть, fill = ввести, click = нажать, check = отметить, selectOption = выбрать."
+      praise:
+        en: "Five for five. You already speak both languages: test case and code."
+        ru: "Пять из пяти. Ты уже говоришь на обоих языках: тест-кейсов и кода."
+      explain:
+        en: "Every manual step verb has a code twin. The locator before it says which element; the value inside the brackets is the test data."
+        ru: "У каждого глагола ручного шага есть двойник в коде. Локатор перед ним говорит, какой элемент, а значение в скобках — тестовые данные."
+
+  - type: task
+    task:
+      id: c1-l2-t2
+      kind: fill
+      keyPoint: kp-actions
+      prompt:
+        en: "Fill the gaps so the test follows TC-001 step by step."
+        ru: "Заполни пропуски, чтобы тест шёл по TC-001 шаг за шагом."
+      code: |
+        test('registered user can log in', async ({ page }) => {
+          await page.___('/login');
+          await page.getByLabel('Email').___('anna@bloomly.app');
+          await page.getByLabel('Password').___('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).___();
+          await expect(page).toHaveURL('/account');
+        });
+      blanks:
+        - { answers: [goto], options: [goto, open, navigate] }
+        - { answers: [fill], options: [fill, click, enter] }
+        - { answers: [fill], options: [fill, check, selectOption] }
+        - { answers: [click], options: [click, check, fill] }
+      checks: { expect: pass }
+      hints:
+        - en: "Open → enter → enter → click."
+          ru: "Открыть → ввести → ввести → нажать."
+        - en: "Playwright opens pages with `goto`. `open` and `navigate` don't exist on `page`."
+          ru: "Playwright открывает страницы через `goto`. `open` и `navigate` у `page` нет."
+        - en: "goto, fill, fill, click."
+          ru: "goto, fill, fill, click."
+      praise:
+        en: "Green test, and every word in it is yours."
+        ru: "Зелёный тест, и каждое слово в нём — твоё."
+      explain:
+        en: "`goto` opens the page, `fill` types into the two fields, `click` presses the button. The last line checks that the account page opened."
+        ru: "`goto` открывает страницу, `fill` вводит данные в два поля, `click` нажимает кнопку. Последняя строка проверяет, что открылась страница аккаунта."
+
+  - type: task
+    task:
+      id: c1-l2-t3
+      kind: parsons
+      keyPoint: kp-test-block
+      prompt:
+        en: "Petal's lines got shuffled. Put them in order to build the test for TC-002. One line doesn't belong."
+        ru: "Строки Petal перемешались. Расставь их по порядку, чтобы собрать тест для TC-002. Одна строка лишняя."
+      testCase:
+        id: TC-002
+        title: Wrong password shows an error
+        preconditions: ["User anna@bloomly.app exists", "The user is logged out"]
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "anna@bloomly.app"
+          - action: "Enter password"
+            data: "wrong-pass"
+          - action: "Click \"Log in\""
+            expected: "Error \"Invalid email or password.\" is shown"
+      lines:
+        - "test('wrong password shows an error', async ({ page }) => {"
+        - "  await page.goto('/login');"
+        - "  await page.getByLabel('Email').fill('anna@bloomly.app');"
+        - "  await page.getByLabel('Password').fill('wrong-pass');"
+        - "  await page.getByRole('button', { name: 'Log in' }).click();"
+        - "  await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');"
+        - "});"
+      alt: [[0, 1, 3, 2, 4, 5, 6]]
+      distractors: ["  await page.getByLabel('Password').fill('bloom123');"]
+      checks: { expect: pass }
+      hints:
+        - en: "A test starts with `test(` and ends with `});`. Steps go in the test case order."
+          ru: "Тест начинается с `test(` и заканчивается `});`. Шаги идут в порядке тест-кейса."
+        - en: "Check the test data: which password does TC-002 use?"
+          ru: "Проверь тестовые данные: какой пароль в TC-002?"
+        - en: "The line with `bloom123` is the extra one — it's the real password."
+          ru: "Лишняя — строка с `bloom123`: это настоящий пароль."
+      praise:
+        en: "Right order and right data — you didn't fall for the real password."
+        ru: "Правильный порядок и правильные данные — на настоящий пароль ты не {купилась|купился}."
+      explain:
+        en: "Title first, then the steps in the test case order, then the check, then `});`. Email and password can swap places — both orders work. The `bloom123` line is happy-path data and would break this negative test."
+        ru: "Сначала название, потом шаги в порядке тест-кейса, затем проверка и `});`. Email и пароль можно поменять местами — работают оба порядка. Строка с `bloom123` — данные позитивного сценария, она сломала бы этот негативный тест."
+
+  - type: task
+    task:
+      id: c1-l2-t4
+      kind: fill
+      keyPoint: kp-locator-intro
+      prompt:
+        en: "Fill in the locators — this time without options."
+        ru: "Впиши локаторы — на этот раз без вариантов."
+      context:
+        en: "Email is a field with a label. \"Log in\" is a button."
+        ru: "Email — поле с подписью. «Log in» — кнопка."
+      code: |
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.___('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('___', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+        });
+      blanks:
+        - { answers: [getByLabel] }
+        - { answers: [button] }
+      checks: { expect: pass }
+      hints:
+        - en: "Look at the line with the password — it uses the same kind of locator as the email."
+          ru: "Посмотри на строку с паролем — там такой же локатор, как нужен для email."
+        - en: "`getByRole` needs the type of element: is \"Log in\" a link, a heading or a button?"
+          ru: "`getByRole` нужен тип элемента: «Log in» — это ссылка, заголовок или кнопка?"
+        - en: "getByLabel and button."
+          ru: "getByLabel и button."
+      praise:
+        en: "From memory, no options — the locators are sticking."
+        ru: "По памяти, без подсказок-вариантов — локаторы запоминаются."
+      explain:
+        en: "Form fields are found by their label: `getByLabel('Email')`. Buttons by role and name: `getByRole('button', { name: 'Log in' })`."
+        ru: "Поля формы ищем по подписи: `getByLabel('Email')`. Кнопки — по роли и названию: `getByRole('button', { name: 'Log in' })`."
+
+  - type: task
+    task:
+      id: c1-l2-t5
+      kind: vocab
+      mode: match
+      prompt:
+        en: "Match the terms with their meanings."
+        ru: "Сопоставь термины с их значениями."
+      terms: [test-step, action, locator, test-data]
+
+  - type: task
+    task:
+      id: c1-l2-t6
+      kind: review
+      keyPoint: kp-actions
+      context:
+        en: "Petal: \"TC-003 is ready, all steps included!\""
+        ru: "Petal: «TC-003 готов, все шаги на месте!»"
+      prompt:
+        en: "Compare the code with TC-003. Flag the problems. If a step is missing from the whole test, flag line 0."
+        ru: "Сравни код с TC-003. Отметь проблемы. Если какого-то шага нет во всём тесте, отметь строку 0."
+      testCase:
+        id: TC-003
+        title: User can log in with "Remember me"
+        preconditions: ["User tom@bloomly.app / tulips42 exists", "The user is logged out"]
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "tom@bloomly.app"
+          - action: "Enter password"
+            data: "tulips42"
+          - action: "Tick \"Remember me\""
+          - action: "Click \"Log in\""
+            expected: "The account page shows \"Welcome back, Tom!\""
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('user can log in with remember me', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('tom@bloomly.app');
+          await page.getByLabel('Password').fill('tulips24');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('heading', { name: 'Welcome back, Tom!' })).toBeVisible();
+        });
+      issues:
+        - line: 6
+          type: wrong-data
+          note:
+            en: "Tom's password in TC-003 is \"tulips42\", not \"tulips24\". Swapped digits — a classic."
+            ru: "Пароль Тома в TC-003 — «tulips42», а не «tulips24». Переставленные цифры — классика."
+        - line: 0
+          type: wrong-step
+          note:
+            en: "Step 4 \"Tick Remember me\" is missing. Without it the test doesn't check what its title promises."
+            ru: "Нет шага 4 «Отметить Remember me». Без него тест не проверяет то, что обещает его название."
+      types: [wrong-data, wrong-step, no-assertion, hallucination]
+      hints:
+        - en: "Count the steps in TC-003 and the step lines in the code."
+          ru: "Посчитай шаги в TC-003 и строки-шаги в коде."
+        - en: "One step has no line at all. And look closely at the digits in the data."
+          ru: "Для одного шага строки нет вообще. И присмотрись к цифрам в данных."
+        - en: "Line 6 has the wrong password; the \"Remember me\" step is missing (line 0)."
+          ru: "В строке 6 неверный пароль; шага «Remember me» нет (строка 0)."
+      praise:
+        en: "You caught a missing step — the hardest thing to notice, because there's nothing to look at."
+        ru: "Ты {заметила|заметил} пропущенный шаг — это сложнее всего, ведь смотреть не на что."
+      explain:
+        en: "The title says \"with remember me\", but no line ticks the checkbox — the test checks a plain login. And \"tulips24\" would make login fail. Comparing step by step with the test case catches both."
+        ru: "В названии «with remember me», но ни одна строка не ставит галочку — тест проверяет обычный вход. А с «tulips24» вход не пройдёт. Пошаговое сравнение с тест-кейсом ловит обе проблемы."
+
+  - type: task
+    task:
+      id: c1-l2-t7
+      kind: predict
+      keyPoint: kp-locator-intro
+      context:
+        en: "On the Bloomly login page the field label is \"Email\"."
+        ru: "На странице входа Bloomly подпись поля — «Email»."
+      prompt:
+        en: "Petal wrote this test. Will it pass or fail?"
+        ru: "Petal написал этот тест. Он пройдёт или упадёт?"
+      code: |
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('E-mail').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+        });
+      outcome: fail
+      reasons:
+        - text:
+            en: "No field is labelled \"E-mail\". The runner waits for it, gives up after the timeout and the test fails on line 3."
+            ru: "Поля с подписью «E-mail» нет. Раннер ждёт его, сдаётся по тайм-ауту, и тест падает на строке 3."
+          correct: true
+        - text:
+            en: "It passes: Playwright understands that E-mail and Email are the same."
+            ru: "Пройдёт: Playwright понимает, что E-mail и Email — одно и то же."
+          why:
+            en: "Locators are literal. A hyphen is enough to find nothing."
+            ru: "Локаторы буквальны. Одного дефиса достаточно, чтобы ничего не найти."
+        - text:
+            en: "It fails because the password is wrong."
+            ru: "Упадёт, потому что пароль неверный."
+          why:
+            en: "bloom123 is Anna's real password. The test never gets that far."
+            ru: "bloom123 — настоящий пароль Анны. До него тест даже не дойдёт."
+      hints:
+        - en: "Compare the label in the code with the label on the page."
+          ru: "Сравни подпись в коде с подписью на странице."
+        - en: "Does \"E-mail\" equal \"Email\" letter by letter?"
+          ru: "Совпадает ли «E-mail» с «Email» буква в букву?"
+      praise:
+        en: "Good eye: one hyphen, one failed test."
+        ru: "Зоркий глаз: один дефис — один упавший тест."
+      explain:
+        en: "A locator must match what's on the page. `getByLabel('E-mail')` finds nothing, so `fill` waits and fails with a timeout. Agents often \"normalise\" labels like this — check them against the real page."
+        ru: "Локатор должен совпадать с тем, что на странице. `getByLabel('E-mail')` ничего не находит, `fill` ждёт и падает по тайм-ауту. Агенты часто так «нормализуют» подписи — сверяй их с реальной страницей."
+
+  - type: mistakes
+    keyPoint: kp-actions
+    title:
+      en: "Typical mistakes in steps (agents make them too)"
+      ru: "Типичные ошибки в шагах (агенты их тоже делают)"
+    items:
+      - wrong: "await page.getByLabel('Email').click('anna@bloomly.app');"
+        right: "await page.getByLabel('Email').fill('anna@bloomly.app');"
+        why:
+          en: "`click` only clicks. To type data into a field, use `fill`."
+          ru: "`click` только кликает. Чтобы ввести данные в поле, нужен `fill`."
+      - wrong: "await page.getByText('Log in').click();"
+        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+        why:
+          en: "\"Log in\" appears three times on the page: heading, menu link, button. Say which one: the button."
+          ru: "«Log in» на странице трижды: заголовок, ссылка в меню, кнопка. Скажи, какой именно: кнопка."
+      - wrong: "await page.open('/login');"
+        right: "await page.goto('/login');"
+        why:
+          en: "`page.open` doesn't exist. Agents sometimes invent methods that sound right."
+          ru: "`page.open` не существует. Агенты иногда придумывают методы, которые звучат правдоподобно."
+      - wrong: "await page.getByLabel('Country').fill('Portugal');"
+        right: "await page.getByLabel('Country').selectOption('Portugal');"
+        why:
+          en: "Country is a dropdown. You choose an option, you don't type into it."
+          ru: "Country — выпадающий список. В нём выбирают вариант, а не вводят текст."
+
+  - type: explain
+    keyPoint: kp-locator-intro
+    prompt:
+      en: "In your own words: how does the manual step \"Enter email anna@bloomly.app\" become a line of code?"
+      ru: "Своими словами: как ручной шаг «Ввести email anna@bloomly.app» превращается в строку кода?"
+    model:
+      en: "A step has three parts: which element, what to do, and the data. The locator `page.getByLabel('Email')` is the element, the action `fill` is what to do, and `'anna@bloomly.app'` is the test data. Together: `await page.getByLabel('Email').fill('anna@bloomly.app');` — the same step, written so the runner can do it."
+      ru: "У шага три части: какой элемент, что сделать и какие данные. Локатор `page.getByLabel('Email')` — элемент, действие `fill` — что сделать, `'anna@bloomly.app'` — тестовые данные. Вместе: `await page.getByLabel('Email').fill('anna@bloomly.app');` — тот же шаг, записанный так, чтобы раннер мог его выполнить."
+
+  - type: phrases
+    items:
+      - context: code-review
+        en: "Step 4 from the test case is missing: the test never ticks \"Remember me\"."
+        ru: "Не хватает шага 4 из тест-кейса: тест ни разу не ставит галочку «Remember me»."
+      - context: code-review
+        en: "The password on line 6 doesn't match the test data in TC-003."
+        ru: "Пароль в строке 6 не совпадает с тестовыми данными в TC-003."
+      - context: prompt
+        en: "Use getByLabel for form fields and getByRole for buttons. Use the exact labels from the page."
+        ru: "Используй getByLabel для полей формы и getByRole для кнопок. Бери точные подписи со страницы."
+        note:
+          en: "Short, concrete rules in a prompt work better than \"make it good\"."
+          ru: "Короткие конкретные правила в промпте работают лучше, чем «сделай хорошо»."
+      - context: standup
+        en: "I reviewed Petal's login tests. Two used the wrong test data; I've fixed them."
+        ru: "Я {проверила|проверил} логин-тесты Petal. В двух были неверные тестовые данные, я их {исправила|исправил}."
+      - context: chat
+        en: "Which spec file should the sign-up tests go to — signup.spec.js or account.spec.js?"
+        ru: "В какой spec-файл класть тесты регистрации — signup.spec.js или account.spec.js?"
+
+checkPool:
+  - id: c1-l2-k1
+    kind: choice
+    keyPoint: kp-goto
+    placement: true
+    prompt:
+      en: "Step 1 of a test case: \"Open the shop page\". Which line should start the test?"
+      ru: "Шаг 1 тест-кейса: «Открыть страницу магазина». Какой строкой должен начинаться тест?"
+    options:
+      - text: "await page.goto('/shop');"
+        correct: true
+        why:
+          en: "`goto` opens the page by its path."
+          ru: "`goto` открывает страницу по её пути."
+      - text: "await page.getByRole('link', { name: 'Shop' }).click();"
+        why:
+          en: "A test starts in an empty tab — there's no menu to click yet. Open a page with `goto` first."
+          ru: "Тест начинается в пустой вкладке — меню, по которому можно кликнуть, ещё нет. Сначала открой страницу через `goto`."
+      - text: "await page.open('/shop');"
+        why:
+          en: "There is no `page.open` in Playwright — a typical AI hallucination."
+          ru: "В Playwright нет `page.open` — типичная галлюцинация ИИ."
+    optionsCode: true
+    hints:
+      - en: "What is in the browser tab when a test starts?"
+        ru: "Что во вкладке браузера, когда тест только начинается?"
+      - en: "Which method opens a page by its address?"
+        ru: "Какой метод открывает страницу по адресу?"
+    explain:
+      en: "Every test starts with an empty tab, so the first step opens a page: `await page.goto('/shop')`."
+      ru: "Каждый тест начинается с пустой вкладки, поэтому первый шаг открывает страницу: `await page.goto('/shop')`."
+
+  - id: c1-l2-k2
+    kind: fill
+    keyPoint: kp-actions
+    placement: true
+    prompt:
+      en: "Step: \"Tick 'Remember me'\". Fill the action."
+      ru: "Шаг: «Отметить „Remember me“». Впиши действие."
+    code: |
+      await page.getByLabel('Remember me').___();
+    blanks:
+      - { answers: [check], options: [check, fill, selectOption] }
+    hints:
+      - en: "Ticking a checkbox has its own verb."
+        ru: "У «поставить галочку» свой глагол."
+      - en: "A ticked box is \"checked\"."
+        ru: "Отмеченный чекбокс по-английски — «checked»."
+    explain:
+      en: "`check()` ticks a checkbox. `fill` is for text fields, `selectOption` for dropdowns."
+      ru: "`check()` ставит галочку в чекбоксе. `fill` — для текстовых полей, `selectOption` — для выпадающих списков."
+
+  - id: c1-l2-k3
+    kind: match
+    keyPoint: kp-locator-intro
+    prompt:
+      en: "Match the element from a test case with its locator."
+      ru: "Сопоставь элемент из тест-кейса с его локатором."
+    pairs:
+      - left: { en: "The Password field", ru: "Поле Password" }
+        right: "page.getByLabel('Password')"
+      - left: { en: "The \"Log in\" button", ru: "Кнопка «Log in»" }
+        right: "page.getByRole('button', { name: 'Log in' })"
+      - left: { en: "The \"Create an account\" link", ru: "Ссылка «Create an account»" }
+        right: "page.getByRole('link', { name: 'Create an account' })"
+      - left: { en: "The Country dropdown", ru: "Выпадающий список Country" }
+        right: "page.getByLabel('Country')"
+    rightCode: true
+    hints:
+      - en: "Fields and dropdowns have labels; buttons and links have roles and names."
+        ru: "У полей и списков есть подписи; у кнопок и ссылок — роли и названия."
+      - en: "Look at the first argument of getByRole: button or link?"
+        ru: "Посмотри на первый аргумент getByRole: button или link?"
+    explain:
+      en: "A locator names the element the way a test case does: \"the Password field\" = `getByLabel('Password')`, \"the Log in button\" = `getByRole('button', { name: 'Log in' })`."
+      ru: "Локатор называет элемент так же, как тест-кейс: «поле Password» = `getByLabel('Password')`, «кнопка Log in» = `getByRole('button', { name: 'Log in' })`."
+
+  - id: c1-l2-k4
+    kind: parsons
+    keyPoint: kp-test-block
+    prompt:
+      en: "Build the test \"customer can search for tulips\". One line doesn't belong."
+      ru: "Собери тест «customer can search for tulips». Одна строка лишняя."
+    testCase:
+      id: TC-010
+      title: Customer can search for tulips
+      steps:
+        - action: "Open the shop page"
+        - action: "Type in the search field"
+          data: "tulips"
+          expected: "Results show \"1 product\""
+    lines:
+      - "test('customer can search for tulips', async ({ page }) => {"
+      - "  await page.goto('/shop');"
+      - "  await page.getByLabel('Search').fill('tulips');"
+      - "  await expect(page.getByTestId('results-count')).toHaveText('1 product');"
+      - "});"
+    distractors: ["  await page.getByLabel('Search').click('tulips');"]
+    checks: { expect: pass }
+    hints:
+      - en: "Title line first, `});` last."
+        ru: "Строка с названием — первая, `});` — последняя."
+      - en: "Typing into a field is `fill`, not `click`."
+        ru: "Ввод в поле — это `fill`, а не `click`."
+    explain:
+      en: "The test block wraps the steps: title, open the shop, type \"tulips\", check the result count. `click('tulips')` is not how you type."
+      ru: "Блок test оборачивает шаги: название, открыть магазин, ввести «tulips», проверить количество результатов. `click('tulips')` текст не вводит."
+
+  - id: c1-l2-k5
+    kind: review
+    keyPoint: kp-actions
+    prompt:
+      en: "Petal wrote the sign-up test for TC-006. Flag the lines that don't match the test case."
+      ru: "Petal написал тест регистрации для TC-006. Отметь строки, которые не совпадают с тест-кейсом."
+    testCase:
+      id: TC-006
+      title: New customer can create an account
+      steps:
+        - action: "Open the sign-up page"
+        - action: "Enter full name"
+          data: "Lena Novak"
+        - action: "Enter email"
+          data: "lena@bloomly.app"
+        - action: "Enter password"
+          data: "spring2026"
+        - action: "Choose country"
+          data: "Poland"
+        - action: "Tick \"I agree to the Terms of Service\""
+        - action: "Click \"Create account\""
+          expected: "\"Account created!\" is shown"
+    code: |
+      test('new customer can create an account', async ({ page }) => {
+        await page.goto('/signup');
+        await page.getByLabel('Full name').fill('Lena Novak');
+        await page.getByLabel('Email').fill('lena@bloomly.app');
+        await page.getByLabel('Password').fill('spring2026');
+        await page.getByLabel('Country').selectOption('Portugal');
+        await page.getByLabel('Send me the Bloomly newsletter').check();
+        await page.getByRole('button', { name: 'Create account' }).click();
+        await expect(page.getByRole('heading', { name: 'Account created!' })).toBeVisible();
+      });
+    issues:
+      - line: 6
+        type: wrong-data
+        note:
+          en: "TC-006 says Poland, the code chooses Portugal."
+          ru: "В TC-006 указана Poland, а код выбирает Portugal."
+      - line: 7
+        type: wrong-step
+        note:
+          en: "The step is \"tick the Terms of Service\", but the code ticks the newsletter. Without the terms, sign-up fails."
+          ru: "Шаг — «отметить условия использования», а код отмечает рассылку. Без принятия условий регистрация не пройдёт."
+    types: [wrong-data, wrong-step, no-assertion, hallucination]
+    hints:
+      - en: "Check each data value and each checkbox against the test case."
+        ru: "Сверь каждое значение и каждый чекбокс с тест-кейсом."
+      - en: "Two lines: one has the wrong country, one ticks the wrong box."
+        ru: "Две строки: в одной не та страна, в другой не тот чекбокс."
+    explain:
+      en: "Line 6 has the wrong data, line 7 performs a different step. Both look plausible — only a comparison with the test case reveals them."
+      ru: "В строке 6 неверные данные, строка 7 выполняет другой шаг. Обе выглядят правдоподобно — выдаёт их только сравнение с тест-кейсом."
+
+  - id: c1-l2-k6
+    kind: predict
+    keyPoint: kp-locator-intro
+    prompt:
+      en: "Will this test pass or fail?"
+      ru: "Этот тест пройдёт или упадёт?"
+    context:
+      en: "On the login page, \"Log in\" is the heading, the menu link and the button text."
+      ru: "На странице входа «Log in» — это заголовок, ссылка в меню и текст кнопки."
+    code: |
+      test('registered user can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByText('Log in').click();
+        await expect(page).toHaveURL('/account');
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "`getByText('Log in')` matches three elements. Playwright won't guess which one to click and stops the test."
+          ru: "`getByText('Log in')` находит три элемента. Playwright не станет угадывать, на какой кликнуть, и останавливает тест."
+        correct: true
+      - text:
+          en: "It passes: Playwright clicks the first match."
+          ru: "Пройдёт: Playwright кликнет по первому совпадению."
+        why:
+          en: "Playwright is strict: if a locator matches several elements, an action fails."
+          ru: "Playwright строгий: если локатор находит несколько элементов, действие падает."
+    hints:
+      - en: "How many elements on the page contain the text \"Log in\"?"
+        ru: "Сколько элементов на странице содержат текст «Log in»?"
+      - en: "Would a manual step \"click Log in\" be clear if there were three of them?"
+        ru: "Был бы понятен ручной шаг «нажать Log in», если их три?"
+    explain:
+      en: "The locator is ambiguous: heading, menu link and button all say \"Log in\". Playwright reports a strict mode violation instead of guessing. `getByRole('button', { name: 'Log in' })` points at exactly one."
+      ru: "Локатор неоднозначный: заголовок, ссылка в меню и кнопка — все «Log in». Playwright сообщает о нарушении strict mode вместо того, чтобы угадывать. `getByRole('button', { name: 'Log in' })` указывает ровно на одну."
+
+  - id: c1-l2-k7
+    kind: predict
+    keyPoint: kp-goto
+    prompt:
+      en: "Petal dropped the first line of the test. Will it pass or fail?"
+      ru: "Petal потерял первую строку теста. Он пройдёт или упадёт?"
+    code: |
+      test('registered user can log in', async ({ page }) => {
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page).toHaveURL('/account');
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "No page was opened, so there's no Email field to fill — the first step times out."
+          ru: "Страница не открыта, поэтому поля Email нет — первый шаг падает по тайм-ауту."
+        correct: true
+      - text:
+          en: "It passes: the runner opens the login page by default."
+          ru: "Пройдёт: раннер по умолчанию открывает страницу входа."
+        why:
+          en: "The runner opens nothing by itself. Each test starts in an empty tab."
+          ru: "Раннер сам ничего не открывает. Каждый тест начинается в пустой вкладке."
+    hints:
+      - en: "What is in the tab before the first step?"
+        ru: "Что во вкладке до первого шага?"
+      - en: "Which step from the test case is missing?"
+        ru: "Какого шага из тест-кейса не хватает?"
+    explain:
+      en: "Without `page.goto('/login')` the tab is empty and the Email field never appears. Like a test case that starts with \"Enter email\" without saying where."
+      ru: "Без `page.goto('/login')` вкладка пустая, и поле Email так и не появляется. Как тест-кейс, который начинается с «Ввести email» и не говорит, где."
+
+  - id: c1-l2-k8
+    kind: choice
+    keyPoint: kp-test-block
+    prompt:
+      en: "Petal left the title as '???'. Which title fits this test best?"
+      ru: "Petal оставил вместо названия '???'. Какое название лучше всего подходит этому тесту?"
+    code: |
+      test('???', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('locked@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByRole('alert')).toHaveText('Your account is locked. Please contact support.');
+      });
+    options:
+      - text: "locked user sees an error message"
+        correct: true
+        why:
+          en: "Describes the behaviour: who does what and what should happen."
+          ru: "Описывает поведение: кто что делает и что должно произойти."
+      - text: "test 3"
+        why:
+          en: "Says nothing. In a red report nobody knows what broke."
+          ru: "Ничего не говорит. В красном отчёте никто не поймёт, что сломалось."
+      - text: "login"
+        why:
+          en: "Too vague — there are a dozen login tests."
+          ru: "Слишком размыто — тестов на логин десяток."
+      - text: "check that everything works"
+        why:
+          en: "No test checks \"everything\". Name the specific behaviour."
+          ru: "Ни один тест не проверяет «всё». Назови конкретное поведение."
+    optionsCode: true
+    hints:
+      - en: "Who logs in here, and what is expected?"
+        ru: "Кто здесь входит и что ожидается?"
+      - en: "A good title reads like a test case title."
+        ru: "Хорошее название читается как название тест-кейса."
+    explain:
+      en: "The title is the test case title. \"locked user sees an error message\" tells everyone in the report exactly what this test protects."
+      ru: "Название теста — это название тест-кейса. «locked user sees an error message» сразу говорит всем в отчёте, что защищает этот тест."

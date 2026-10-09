@@ -1,0 +1,818 @@
+id: c1-l3
+chapter: c1
+title:
+  en: "The expected result becomes an assertion"
+  ru: "Ожидаемый результат становится проверкой"
+goal:
+  en: "Turn an expected result into an assertion, spot tests that can't fail, and choose a check that matches the test case."
+  ru: "Превращать ожидаемый результат в проверку, замечать тесты, которые не могут упасть, и выбирать проверку, которая соответствует тест-кейсу."
+minutes: 9
+keyPoints:
+  - id: kp-expect
+    title:
+      en: "await expect(...) checks the expected result"
+      ru: "await expect(...) проверяет ожидаемый результат"
+  - id: kp-no-assertion
+    title:
+      en: "No assertion — no test: it can't fail"
+      ru: "Нет проверки — нет теста: он не может упасть"
+  - id: kp-what-to-assert
+    title:
+      en: "Assert exactly what the test case expects"
+      ru: "Проверяй ровно то, что ожидает тест-кейс"
+terms: [assertion, expected-result, actual-result, bug, pass, fail]
+
+steps:
+  - type: story
+    lines:
+      - who: petal
+        text:
+          en: "Good news: all forty of my login tests are green!"
+          ru: "Хорошие новости: все сорок моих тестов на логин зелёные!"
+      - who: maya
+        text:
+          en: "Hmm. Kai says login was broken for an hour this morning. And all forty stayed green?"
+          ru: "Хм. Кай говорит, что утром логин был сломан целый час. И все сорок остались зелёными?"
+      - who: mochi
+        text:
+          en: "Mrrp?!"
+          ru: "Мрр?!"
+      - who: maya
+        text:
+          en: "Let's find out why. Spoiler: it's about the expected result."
+          ru: "Давай разберёмся почему. Спойлер: всё дело в ожидаемом результате."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед началом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c1-l3-p1
+        kind: predict
+        keyPoint: kp-no-assertion
+        app: { bugs: [login-redirect-home] }
+        context:
+          en: "Today's build has a bug: after logging in, users land on the home page instead of their account."
+          ru: "В сегодняшней сборке баг: после входа пользователь попадает на главную, а не в аккаунт."
+        prompt:
+          en: "Will this test pass or fail on today's build?"
+          ru: "Этот тест пройдёт или упадёт на сегодняшней сборке?"
+        code: |
+          test('registered user can log in', async ({ page }) => {
+            await page.goto('/login');
+            await page.getByLabel('Email').fill('anna@bloomly.app');
+            await page.getByLabel('Password').fill('bloom123');
+            await page.getByRole('button', { name: 'Log in' }).click();
+          });
+        outcome: pass
+        reasons:
+          - text:
+              en: "Every step can be done, and nothing checks where the user lands — so nothing can fail."
+              ru: "Все шаги выполнимы, а куда попал пользователь, никто не проверяет — значит, упасть нечему."
+            correct: true
+          - text:
+              en: "It fails: the runner notices the wrong page."
+              ru: "Упадёт: раннер заметит не ту страницу."
+            why:
+              en: "The runner only notices what the test tells it to check."
+              ru: "Раннер замечает только то, что тест велит проверить."
+        hints:
+          - en: "Find the line that checks the result."
+            ru: "Найди строку, которая проверяет результат."
+          - en: "Is there an `expect` anywhere?"
+            ru: "Есть ли где-нибудь `expect`?"
+        explain:
+          en: "There's no assertion. The test types, clicks and ends — green, even though login is broken. That's how Petal's forty tests stayed green this morning."
+          ru: "Проверки нет. Тест вводит, кликает и заканчивается — зелёный, хотя вход сломан. Вот так сорок тестов Petal и остались зелёными сегодня утром."
+
+  - type: theory
+    keyPoint: kp-expect
+    title:
+      en: "Expected result → assertion"
+      ru: "Ожидаемый результат → проверка"
+    body:
+      - en: "In a test case, a step can have an [[expected result|expected-result]]. You compare it with the [[actual result|actual-result]] and decide: OK or [[bug|bug]]."
+        ru: "В тест-кейсе у шага может быть [[ожидаемый результат|expected-result]]. Ты сравниваешь его с [[фактическим|actual-result]] и решаешь: всё хорошо или [[баг|bug]]."
+      - en: "In code that comparison is an [[assertion|assertion]]: `await expect(what).toSomething(expected)`. If the actual result differs, the test fails."
+        ru: "В коде это сравнение — [[проверка|assertion]] (assertion): `await expect(что).toЧтоТо(ожидаемое)`. Если фактический результат другой, тест падает."
+      - en: "Read it as a sentence: \"I expect the page to have URL /account.\" \"I expect the alert to have text …\"."
+        ru: "Читай как предложение: «Я ожидаю, что у страницы URL /account». «Я ожидаю, что в сообщении об ошибке текст …»."
+    code: |
+      // Expected: the account page opens
+      await expect(page).toHaveURL('/account');
+
+      // Expected: an error is shown
+      await expect(page.getByRole('alert')).toBeVisible();
+
+      // Expected: the error says "Invalid email or password."
+      await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+    mentor:
+      en: "`expect(page)` checks the whole page, like its URL. `expect(page.getBy...)` checks one element — with the same locators you already use for steps."
+      ru: "`expect(page)` проверяет страницу целиком, например её URL. `expect(page.getBy...)` проверяет один элемент — теми же локаторами, что ты уже используешь в шагах."
+
+  - type: theory
+    keyPoint: kp-no-assertion
+    title:
+      en: "No assertion — no test"
+      ru: "Нет проверки — нет теста"
+    figure: red-green
+    body:
+      - en: "A test without an assertion only performs steps. It compares nothing, so it can't [[fail|fail]] — even when login is broken. Its green means nothing."
+        ru: "Тест без проверки только выполняет шаги. Он ничего не сравнивает, поэтому не может [[упасть|fail]] — даже когда вход сломан. Его зелёный цвет ничего не значит."
+      - en: "It's a test case with steps and no expected result. You'd never accept that in a review."
+        ru: "Это тест-кейс с шагами, но без ожидаемого результата. Такой ты бы на ревью не {приняла|принял}."
+      - en: "AI agents forget assertions surprisingly often, or leave a comment like `// should show an error` instead. Always ask: what would make this test red?"
+        ru: "ИИ-агенты на удивление часто забывают проверки или оставляют вместо них комментарий вроде `// should show an error`. Всегда спрашивай: что сделает этот тест красным?"
+    mentor:
+      en: "My rule: before I trust a green test, I imagine the bug it should catch. If I can't imagine it turning red, it's not a test yet."
+      ru: "Моё правило: прежде чем доверять зелёному тесту, я представляю баг, который он должен поймать. Если не могу представить его красным — это ещё не тест."
+
+  - type: theory
+    keyPoint: kp-what-to-assert
+    title:
+      en: "Assert what the test case says — not just anything"
+      ru: "Проверяй то, что сказано в тест-кейсе, а не что-нибудь"
+    body:
+      - en: "The expected result is your spec. \"The account page shows 'Welcome back, Anna!'\" means: check that exact heading, not \"some heading is visible\"."
+        ru: "Ожидаемый результат — твоя спецификация. «На странице аккаунта написано „Welcome back, Anna!“» значит: проверить именно этот заголовок, а не «какой-то заголовок виден»."
+      - en: "Weak checks pass on broken apps: only the URL (while the greeting says \"Silva\"), \"Welcome back\" without the name, \"an error is visible\" without its text."
+        ru: "Слабые проверки проходят на сломанном приложении: только URL (а в приветствии «Silva»), «Welcome back» без имени, «ошибка видна» без её текста."
+      - en: "Pick the matcher from the wording: a text → `toHaveText`, a page opens → `toHaveURL`, something is shown → `toBeVisible`."
+        ru: "Выбирай метод проверки по формулировке: текст → `toHaveText`, открывается страница → `toHaveURL`, что-то показано → `toBeVisible`."
+    code: |
+      // Not enough on its own: passes even if the greeting is wrong
+      await expect(page).toHaveURL('/account');
+
+      // Matches TC-001: the page AND the exact greeting
+      await expect(page).toHaveURL('/account');
+      await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+
+  - type: mapping
+    keyPoint: kp-expect
+    title:
+      en: "TC-002: the expected result in code"
+      ru: "TC-002: ожидаемый результат в коде"
+    intro:
+      en: "The expected result of step 4 has two parts — and each part gets its own assertion."
+      ru: "У ожидаемого результата шага 4 две части — и у каждой своя проверка."
+    testCase:
+      id: TC-002
+      title: Wrong password shows an error
+      preconditions: ["User anna@bloomly.app exists", "The user is logged out"]
+      steps:
+        - action: "Open the login page"
+        - action: "Enter email"
+          data: "anna@bloomly.app"
+        - action: "Enter password"
+          data: "wrong-pass"
+        - action: "Click \"Log in\""
+          expected: "Error \"Invalid email or password.\" is shown; the user stays on the login page"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('wrong password shows an error', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('wrong-pass');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+        await expect(page).toHaveURL('/login');
+      });
+    links:
+      - { from: s1, lines: [4] }
+      - { from: s2, lines: [5] }
+      - { from: s3, lines: [6] }
+      - { from: s4, lines: [7] }
+      - { from: e4, lines: [8, 9] }
+
+  - type: task
+    task:
+      id: c1-l3-t1
+      kind: choice
+      keyPoint: kp-expect
+      prompt:
+        en: "Expected result: \"The error 'Please enter your email.' is shown.\" Which assertion checks it fully?"
+        ru: "Ожидаемый результат: «Показана ошибка „Please enter your email.“». Какая проверка проверяет его полностью?"
+      options:
+        - text: "await expect(page.getByRole('alert')).toHaveText('Please enter your email.');"
+          correct: true
+          why:
+            en: "Checks that the error is there and that it is exactly the expected one."
+            ru: "Проверяет, что ошибка есть и что это именно ожидаемая ошибка."
+        - text: "await expect(page.getByRole('alert')).toBeVisible();"
+          why:
+            en: "Shows that *some* error is visible, not which one. \"Invalid email or password.\" would pass too."
+            ru: "Показывает, что видна *какая-то* ошибка, но не какая. «Invalid email or password.» тоже прошла бы."
+        - text: "await expect(page).toHaveURL('/account');"
+          why:
+            en: "That's the expected result of a successful login — the opposite case."
+            ru: "Это ожидаемый результат успешного входа — противоположный случай."
+        - text: "await page.getByRole('alert').toHaveText('Please enter your email.');"
+          why:
+            en: "An assertion starts with `expect(...)`. Without it, this line isn't a check at all — a typical AI slip."
+            ru: "Проверка начинается с `expect(...)`. Без него эта строка вообще не проверка — типичная оплошность ИИ."
+      optionsCode: true
+      hints:
+        - en: "The expected result names a specific text."
+          ru: "В ожидаемом результате назван конкретный текст."
+        - en: "Which matcher compares text? And does the line start with `expect`?"
+          ru: "Какой метод сравнивает текст? И начинается ли строка с `expect`?"
+        - en: "Almost the answer: `await expect(...).toHaveText('Please enter your email.')`."
+          ru: "Почти ответ: `await expect(...).toHaveText('Please enter your email.')`."
+      praise:
+        en: "Exactly the expected result, nothing weaker. That's precise test design."
+        ru: "Ровно ожидаемый результат и ничего слабее. Это точный тест-дизайн."
+      explain:
+        en: "When the expected result names a text, check the text with `toHaveText`. `toBeVisible` alone would accept any error message."
+        ru: "Когда в ожидаемом результате назван текст, проверяй текст через `toHaveText`. Один `toBeVisible` принял бы любое сообщение об ошибке."
+
+  - type: task
+    task:
+      id: c1-l3-t2
+      kind: match
+      keyPoint: kp-expect
+      prompt:
+        en: "Match each expected result with its assertion."
+        ru: "Сопоставь каждый ожидаемый результат с его проверкой."
+      pairs:
+        - left: { en: "The account page opens", ru: "Открывается страница аккаунта" }
+          right: "await expect(page).toHaveURL('/account');"
+        - left: { en: "An error message is shown", ru: "Показано сообщение об ошибке" }
+          right: "await expect(page.getByRole('alert')).toBeVisible();"
+        - left: { en: "The error says \"Invalid email or password.\"", ru: "Текст ошибки — «Invalid email or password.»" }
+          right: "await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');"
+        - left: { en: "The browser tab title is \"Shop · Bloomly\"", ru: "Заголовок вкладки браузера — «Shop · Bloomly»" }
+          right: "await expect(page).toHaveTitle('Shop · Bloomly');"
+      rightCode: true
+      hints:
+        - en: "Look at the last word of each matcher: URL, Visible, Text, Title."
+          ru: "Смотри на последнее слово в каждом методе: URL, Visible, Text, Title."
+        - en: "\"Is shown\" = visible; \"says\" = text."
+          ru: "«Показано» = visible; «текст — …» = text."
+      praise:
+        en: "You picked the matcher from the wording of the expected result — exactly the right instinct."
+        ru: "Ты {выбрала|выбрал} метод проверки по формулировке ожидаемого результата — правильное чутьё."
+      explain:
+        en: "The wording of the expected result tells you the matcher: a page → `toHaveURL`, shown → `toBeVisible`, a text → `toHaveText`, a tab title → `toHaveTitle`."
+        ru: "Формулировка ожидаемого результата подсказывает метод: страница → `toHaveURL`, показано → `toBeVisible`, текст → `toHaveText`, заголовок вкладки → `toHaveTitle`."
+
+  - type: task
+    task:
+      id: c1-l3-t3
+      kind: fill
+      keyPoint: kp-expect
+      prompt:
+        en: "Complete the assertions for TC-002: the error text is shown and the user stays on /login."
+        ru: "Допиши проверки для TC-002: показан текст ошибки, и пользователь остаётся на /login."
+      code: |
+        test('wrong password shows an error', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('wrong-pass');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await ___(page.getByRole('alert')).___('Invalid email or password.');
+          await expect(page).___('/login');
+        });
+      blanks:
+        - { answers: [expect] }
+        - { answers: [toHaveText], options: [toHaveText, toBeVisible, toHaveURL] }
+        - { answers: [toHaveURL], options: [toHaveURL, toHaveText, toBeVisible] }
+      checks: { expect: pass }
+      hints:
+        - en: "Every assertion starts with the same word. Look at the last line."
+          ru: "Каждая проверка начинается с одного и того же слова. Посмотри на последнюю строку."
+        - en: "A text needs a text matcher; a page address needs a URL matcher."
+          ru: "Для текста нужен метод для текста, для адреса страницы — метод для URL."
+        - en: "In order: expect, toHaveText, toHaveURL."
+          ru: "По порядку: expect, toHaveText, toHaveURL."
+      praise:
+        en: "Two expected results, two precise assertions, and a green run."
+        ru: "Два ожидаемых результата, две точные проверки и зелёный прогон."
+      explain:
+        en: "`expect(...)` opens the check, `toHaveText` compares the error text, `toHaveURL('/login')` confirms the user wasn't logged in."
+        ru: "`expect(...)` начинает проверку, `toHaveText` сравнивает текст ошибки, `toHaveURL('/login')` подтверждает, что вход не произошёл."
+
+  - type: task
+    task:
+      id: c1-l3-t4
+      kind: vocab
+      mode: cloze
+      prompt:
+        en: "Pick the word that fits."
+        ru: "Выбери подходящее слово."
+      sentence:
+        en: "The test is always green because it has no ___ — it never compares anything."
+        ru: "Тест всегда зелёный, потому что в нём нет проверки — он ничего не сравнивает."
+      answer: assertion
+      options: [assertion, locator, action]
+
+  - type: task
+    task:
+      id: c1-l3-t5
+      kind: predict
+      keyPoint: kp-what-to-assert
+      app: { bugs: [greeting-wrong-name] }
+      context:
+        en: "Today's build has a bug: the account page says \"Welcome back, Silva!\" instead of \"Welcome back, Anna!\"."
+        ru: "В сегодняшней сборке баг: на странице аккаунта «Welcome back, Silva!» вместо «Welcome back, Anna!»."
+      prompt:
+        en: "Will this test pass or fail on today's build?"
+        ru: "Этот тест пройдёт или упадёт на сегодняшней сборке?"
+      code: |
+        test('registered user can log in', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page).toHaveURL('/account');
+        });
+      outcome: pass
+      reasons:
+        - text:
+            en: "The account page does open, and the test checks only the URL. The wrong greeting isn't checked, so the bug slips through."
+            ru: "Страница аккаунта действительно открывается, а тест проверяет только URL. Неправильное приветствие никто не проверяет, и баг проскакивает."
+          correct: true
+        - text:
+            en: "It fails: the account page is broken."
+            ru: "Упадёт: страница аккаунта сломана."
+          why:
+            en: "The page opens fine — only the greeting text is wrong, and nothing checks it."
+            ru: "Страница открывается нормально — неправильный только текст приветствия, а его никто не проверяет."
+      hints:
+        - en: "What exactly does the last line check?"
+          ru: "Что именно проверяет последняя строка?"
+        - en: "Is the URL affected by this bug?"
+          ru: "Затрагивает ли этот баг URL?"
+      praise:
+        en: "You saw that a green test can hide a bug. That's the core of reviewing assertions."
+        ru: "Ты {увидела|увидел}, что зелёный тест может прятать баг. В этом суть ревью проверок."
+      explain:
+        en: "The test passes on a buggy app because its only assertion checks the URL. TC-001 also expects the greeting — without that assertion the bug reaches customers."
+        ru: "Тест проходит на приложении с багом, потому что его единственная проверка — URL. TC-001 ожидает ещё и приветствие — без этой проверки баг доберётся до клиентов."
+
+  - type: task
+    task:
+      id: c1-l3-t6
+      kind: review
+      keyPoint: kp-no-assertion
+      context:
+        en: "Petal: \"TC-002 is done! I ran it five times — always green.\""
+        ru: "Petal: «TC-002 готов! Я запустил его пять раз — всегда зелёный»."
+      prompt:
+        en: "Review the test against TC-002. If the problem is in the whole test, flag line 0."
+        ru: "Проверь тест по TC-002. Если проблема во всём тесте, отметь строку 0."
+      testCase:
+        id: TC-002
+        title: Wrong password shows an error
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "anna@bloomly.app"
+          - action: "Enter password"
+            data: "wrong-pass"
+          - action: "Click \"Log in\""
+            expected: "Error \"Invalid email or password.\" is shown"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('wrong password shows an error', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('wrong-pass');
+          await page.getByRole('button', { name: 'Log in' }).click();
+        });
+      issues:
+        - line: 0
+          type: no-assertion
+          note:
+            en: "The error message is never checked. The test is green whether the error appears or not — \"always green\" is the symptom."
+            ru: "Сообщение об ошибке нигде не проверяется. Тест зелёный, появилась ошибка или нет, — «всегда зелёный» как раз симптом."
+      types: [no-assertion, weak-assertion, wrong-data, wrong-step]
+      hints:
+        - en: "The steps and data match TC-002. What about the expected result?"
+          ru: "Шаги и данные совпадают с TC-002. А ожидаемый результат?"
+        - en: "Look for `expect` in the test."
+          ru: "Поищи в тесте `expect`."
+        - en: "No line checks the error — that's a problem of the whole test: line 0, no-assertion."
+          ru: "Ни одна строка не проверяет ошибку — это проблема всего теста: строка 0, no-assertion."
+      praise:
+        en: "\"Always green\" didn't fool you. A healthy suspicion of green is a senior skill."
+        ru: "«Всегда зелёный» тебя не обманул. Здоровое недоверие к зелёному — навык сеньора."
+      explain:
+        en: "Steps and data are perfect, but there's no assertion, so the test can't fail. Running it five times proves nothing: it would be green on a broken app too."
+        ru: "Шаги и данные идеальны, но проверки нет, поэтому тест не может упасть. Пять запусков ничего не доказывают: на сломанном приложении он тоже был бы зелёным."
+
+  - type: task
+    task:
+      id: c1-l3-t7
+      kind: fix
+      keyPoint: kp-no-assertion
+      prompt:
+        en: "Add the missing assertion for TC-002's expected result. We'll also run your test on a build where the error never appears — it must fail there."
+        ru: "Добавь недостающую проверку ожидаемого результата TC-002. Мы ещё запустим твой тест на сборке, где ошибка не появляется, — там он должен упасть."
+      testCase:
+        id: TC-002
+        title: Wrong password shows an error
+        steps:
+          - action: "Open the login page"
+          - action: "Enter email"
+            data: "anna@bloomly.app"
+          - action: "Enter password"
+            data: "wrong-pass"
+          - action: "Click \"Log in\""
+            expected: "Error \"Invalid email or password.\" is shown"
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('wrong password shows an error', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('wrong-pass');
+          await page.getByRole('button', { name: 'Log in' }).click();
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('wrong password shows an error', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('wrong-pass');
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
+        });
+      checks:
+        expect: pass
+        static: [hasAssertion]
+        also:
+          - app: { bugs: [login-no-error] }
+            expect: fail
+      hints:
+        - en: "Add one line after the click: an assertion on the error box."
+          ru: "Добавь одну строку после клика: проверку блока с ошибкой."
+        - en: "The error box is `page.getByRole('alert')`. The expected result names a text."
+          ru: "Блок с ошибкой — `page.getByRole('alert')`. В ожидаемом результате назван текст."
+        - en: "Add this line: `await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');`"
+          ru: "Добавь строку: `await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');`"
+      praise:
+        en: "Now it's a real test: green on a working app, red on a broken one."
+        ru: "Теперь это настоящий тест: зелёный на рабочем приложении и красный на сломанном."
+      explain:
+        en: "With the assertion, the test compares the actual error with the expected one. On the build where the error never appears, it fails — which proves it can catch the bug."
+        ru: "С проверкой тест сравнивает фактическую ошибку с ожидаемой. На сборке, где ошибка не появляется, он падает — а значит, умеет ловить этот баг."
+
+  - type: mistakes
+    keyPoint: kp-what-to-assert
+    title:
+      en: "Weak and missing checks (AI favourites)"
+      ru: "Слабые и пропущенные проверки (любимое у ИИ)"
+    items:
+      - wrong: "// the error message should appear"
+        right: "await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');"
+        why:
+          en: "A comment checks nothing. Agents sometimes leave the expected result as a comment."
+          ru: "Комментарий ничего не проверяет. Агенты иногда оставляют ожидаемый результат в виде комментария."
+      - wrong: "expect(await page.getByRole('alert').isVisible()).toBeTruthy();"
+        right: "await expect(page.getByRole('alert')).toBeVisible();"
+        why:
+          en: "The first version looks only once, immediately. If the error appears a moment later, the test fails for no reason. `await expect(...)` waits and retries. A very common AI habit."
+          ru: "Первый вариант смотрит один раз, сразу. Если ошибка появится чуть позже, тест упадёт без причины. `await expect(...)` ждёт и повторяет попытки. Очень частая привычка ИИ."
+      - wrong: "await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();"
+        right: "await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();"
+        why:
+          en: "Without the name, \"Welcome back, Silva!\" passes too. Assert the exact expected result."
+          ru: "Без имени пройдёт и «Welcome back, Silva!». Проверяй точный ожидаемый результат."
+      - wrong: "await expect(page.getByRole('button', { name: 'Log in' })).toBeVisible();"
+        right: "await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');"
+        why:
+          en: "The button is visible with or without the error. Check the thing the expected result talks about."
+          ru: "Кнопка видна и с ошибкой, и без неё. Проверяй то, о чём говорит ожидаемый результат."
+
+  - type: explain
+    keyPoint: kp-no-assertion
+    prompt:
+      en: "In your own words: why is a test without an assertion not really a test?"
+      ru: "Своими словами: почему тест без проверки — на самом деле не тест?"
+    model:
+      en: "Because it can't fail. It only performs the steps and never compares the actual result with the expected one. If login breaks, it's still green — so its green tells us nothing. It's like a test case without an expected result."
+      ru: "Потому что он не может упасть. Он только выполняет шаги и никогда не сравнивает фактический результат с ожидаемым. Если вход сломается, тест всё равно зелёный — значит, его зелёный цвет ничего не говорит. Это как тест-кейс без ожидаемого результата."
+
+  - type: phrases
+    items:
+      - context: code-review
+        en: "This test has no assertion, so it can't fail. Please add a check for the expected result from TC-002."
+        ru: "В этом тесте нет проверки, поэтому он не может упасть. Добавь, пожалуйста, проверку ожидаемого результата из TC-002."
+      - context: code-review
+        en: "The assertion is too weak: it only checks the URL. TC-001 also expects the greeting \"Welcome back, Anna!\"."
+        ru: "Проверка слишком слабая: она смотрит только на URL. TC-001 ожидает ещё и приветствие «Welcome back, Anna!»."
+      - context: prompt
+        en: "Add an assertion for the expected result: the error \"Invalid email or password.\" is visible. Use toHaveText with the exact text."
+        ru: "Добавь проверку ожидаемого результата: видна ошибка «Invalid email or password.». Используй toHaveText с точным текстом."
+      - context: standup
+        en: "Petal's login tests stayed green during the outage because they had no assertions. I'm adding them today."
+        ru: "Логин-тесты Petal остались зелёными во время сбоя, потому что в них не было проверок. Сегодня добавляю их."
+      - context: bug-report
+        en: "Expected result: the heading shows \"Welcome back, Anna!\". Actual result: it shows \"Welcome back, Silva!\"."
+        ru: "Ожидаемый результат: в заголовке «Welcome back, Anna!». Фактический результат: там «Welcome back, Silva!»."
+        note:
+          en: "In bug reports, \"Expected result / Actual result\" is the standard pair — the same pair an assertion compares."
+          ru: "В баг-репортах «Expected result / Actual result» — стандартная пара, ровно та, которую сравнивает проверка."
+
+checkPool:
+  - id: c1-l3-k1
+    kind: predict
+    keyPoint: kp-no-assertion
+    placement: true
+    app: { bugs: [login-no-error] }
+    context:
+      en: "Bug in today's build: a wrong password shows no error at all."
+      ru: "Баг в сегодняшней сборке: при неверном пароле никакой ошибки не показывается."
+    prompt:
+      en: "Will this test pass or fail on today's build?"
+      ru: "Этот тест пройдёт или упадёт на сегодняшней сборке?"
+    code: |
+      test('wrong password shows an error', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('wrong-pass');
+        await page.getByRole('button', { name: 'Log in' }).click();
+      });
+    outcome: pass
+    reasons:
+      - text:
+          en: "Nothing checks the error, so the missing error goes unnoticed."
+          ru: "Ошибку никто не проверяет, поэтому её отсутствие остаётся незамеченным."
+        correct: true
+      - text:
+          en: "It fails because the error is missing."
+          ru: "Упадёт, потому что ошибки нет."
+        why:
+          en: "Only an assertion can notice a missing error. There is none."
+          ru: "Заметить отсутствие ошибки может только проверка. А её нет."
+    hints:
+      - en: "Which line would notice that the error is missing?"
+        ru: "Какая строка заметила бы, что ошибки нет?"
+      - en: "Look for `expect`."
+        ru: "Поищи `expect`."
+    explain:
+      en: "No assertion — no failure. The test is green on a build where the error message is broken."
+      ru: "Нет проверки — нет падения. Тест зелёный на сборке, где сломано сообщение об ошибке."
+
+  - id: c1-l3-k2
+    kind: choice
+    keyPoint: kp-expect
+    placement: true
+    prompt:
+      en: "Expected result: \"The account page opens.\" Which line checks it?"
+      ru: "Ожидаемый результат: «Открывается страница аккаунта». Какая строка это проверяет?"
+    options:
+      - text: "await expect(page).toHaveURL('/account');"
+        correct: true
+        why:
+          en: "It checks the actual address against the expected one."
+          ru: "Сравнивает фактический адрес с ожидаемым."
+      - text: "await page.goto('/account');"
+        why:
+          en: "That's an action — it opens the page itself instead of checking that login opened it."
+          ru: "Это действие — оно само открывает страницу, вместо того чтобы проверить, что её открыл вход."
+      - text: "await expect(page).toHaveTitle('Log in · Bloomly');"
+        why:
+          en: "That's the title of the login page — the opposite of what we expect."
+          ru: "Это заголовок страницы входа — противоположность ожидаемому."
+      - text: "await expect(page.getByRole('button', { name: 'Log in' })).toBeVisible();"
+        why:
+          en: "The Log in button belongs to the login page, not the account page."
+          ru: "Кнопка Log in — на странице входа, а не аккаунта."
+    optionsCode: true
+    hints:
+      - en: "A check starts with `expect`."
+        ru: "Проверка начинается с `expect`."
+      - en: "\"A page opens\" is about the URL."
+        ru: "«Открывается страница» — это про URL."
+    explain:
+      en: "`toHaveURL('/account')` compares where the browser actually is with where it should be. `goto` would hide the bug by opening the page itself."
+      ru: "`toHaveURL('/account')` сравнивает, где браузер на самом деле, с тем, где он должен быть. `goto` спрятал бы баг, открыв страницу сам."
+
+  - id: c1-l3-k3
+    kind: review
+    keyPoint: kp-what-to-assert
+    context:
+      en: "Fact about Bloomly: under the \"Log in\" heading, the login page says \"Welcome back! Use your Bloomly account.\"."
+      ru: "Факт о Bloomly: под заголовком «Log in» на странице входа написано «Welcome back! Use your Bloomly account.»."
+    prompt:
+      en: "Petal's test for TC-001 expects \"Welcome back, Anna!\". Flag the problem line."
+      ru: "Тест Petal для TC-001 ожидает «Welcome back, Anna!». Отметь проблемную строку."
+    code: |
+      test('registered user can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByText('Welcome back')).toBeVisible();
+      });
+    issues:
+      - line: 6
+        type: weak-assertion
+        note:
+          en: "\"Welcome back\" is already on the login page, so this check can pass before login even happens. Assert the full greeting \"Welcome back, Anna!\"."
+          ru: "«Welcome back» уже есть на странице входа, поэтому проверка может пройти ещё до входа. Проверяй полное приветствие «Welcome back, Anna!»."
+    types: [weak-assertion, no-assertion, wrong-assertion, wrong-data]
+    hints:
+      - en: "Where else on Bloomly does \"Welcome back\" appear?"
+        ru: "Где ещё в Bloomly встречается «Welcome back»?"
+      - en: "Compare the checked text with the full expected result."
+        ru: "Сравни проверяемый текст с полным ожидаемым результатом."
+    explain:
+      en: "The check is weaker than the expected result: it accepts the login page's own subtitle. A precise assertion uses the exact greeting with the name."
+      ru: "Проверка слабее ожидаемого результата: её устраивает подзаголовок самой страницы входа. Точная проверка использует полное приветствие с именем."
+
+  - id: c1-l3-k4
+    kind: fix
+    keyPoint: kp-no-assertion
+    prompt:
+      en: "Petal forgot the assertion. Add the check for TC-008's expected result."
+      ru: "Petal забыл проверку. Добавь проверку ожидаемого результата TC-008."
+    testCase:
+      id: TC-008
+      title: Locked user cannot log in
+      steps:
+        - action: "Open the login page"
+        - action: "Enter email"
+          data: "locked@bloomly.app"
+        - action: "Enter password"
+          data: "bloom123"
+        - action: "Click \"Log in\""
+          expected: "Error \"Your account is locked. Please contact support.\" is shown"
+    starter: |
+      test('locked user cannot log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('locked@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+      });
+    solution: |
+      test('locked user cannot log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('locked@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByRole('alert')).toHaveText('Your account is locked. Please contact support.');
+      });
+    checks:
+      expect: pass
+      static: [hasAssertion]
+    hints:
+      - en: "The error box on the login page is `page.getByRole('alert')`."
+        ru: "Блок с ошибкой на странице входа — `page.getByRole('alert')`."
+      - en: "The expected result is a specific text — use `toHaveText`."
+        ru: "Ожидаемый результат — конкретный текст, используй `toHaveText`."
+      - en: "Add this line: `await expect(page.getByRole('alert')).toHaveText('Your account is locked. Please contact support.');`"
+        ru: "Добавь строку: `await expect(page.getByRole('alert')).toHaveText('Your account is locked. Please contact support.');`"
+    explain:
+      en: "Now the test compares the actual message with the one from TC-008. If the locked user got in or saw another error, it would fail."
+      ru: "Теперь тест сравнивает фактическое сообщение с сообщением из TC-008. Если заблокированный пользователь войдёт или увидит другую ошибку, тест упадёт."
+
+  - id: c1-l3-k5
+    kind: predict
+    keyPoint: kp-what-to-assert
+    app: { bugs: [login-redirect-home] }
+    context:
+      en: "Bug in today's build: after logging in, users land on the home page."
+      ru: "Баг в сегодняшней сборке: после входа пользователь попадает на главную."
+    prompt:
+      en: "Will this test pass or fail on today's build?"
+      ru: "Этот тест пройдёт или упадёт на сегодняшней сборке?"
+    code: |
+      test('registered user can log in', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByLabel('Email').fill('anna@bloomly.app');
+        await page.getByLabel('Password').fill('bloom123');
+        await page.getByRole('button', { name: 'Log in' }).click();
+        await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "The home page has no \"Welcome back, Anna!\" heading, so the assertion waits and fails. The bug is caught."
+          ru: "На главной нет заголовка «Welcome back, Anna!», проверка ждёт и падает. Баг пойман."
+        correct: true
+      - text:
+          en: "It passes: the user is logged in, that's enough."
+          ru: "Пройдёт: пользователь вошёл, этого достаточно."
+        why:
+          en: "The test checks the greeting on the account page, not just that login happened."
+          ru: "Тест проверяет приветствие на странице аккаунта, а не просто факт входа."
+    hints:
+      - en: "Where does the user land with this bug?"
+        ru: "Куда попадает пользователь с этим багом?"
+      - en: "Is the expected heading on that page?"
+        ru: "Есть ли на этой странице ожидаемый заголовок?"
+    explain:
+      en: "A precise assertion of the expected result catches bugs you didn't even plan for: here, a wrong redirect."
+      ru: "Точная проверка ожидаемого результата ловит даже баги, о которых ты не {думала|думал}: здесь — неправильный редирект."
+
+  - id: c1-l3-k6
+    kind: choice
+    keyPoint: kp-what-to-assert
+    prompt:
+      en: "TC-011 expects: \"The cart counter in the header shows 2.\" What's wrong with Petal's assertion?"
+      ru: "TC-011 ожидает: «Счётчик корзины в шапке показывает 2». Что не так с проверкой Petal?"
+    code: |
+      await expect(page.getByTestId('cart-count')).toBeVisible();
+    options:
+      - text:
+          en: "It checks that the counter is shown, not that it shows 2. It should be `toHaveText('2')`."
+          ru: "Она проверяет, что счётчик виден, а не что он показывает 2. Нужно `toHaveText('2')`."
+        correct: true
+        why:
+          en: "The counter is always visible — even when it says 0 or 3."
+          ru: "Счётчик виден всегда — даже когда там 0 или 3."
+      - text:
+          en: "Nothing — visible means correct."
+          ru: "Всё в порядке — виден, значит правильный."
+        why:
+          en: "Visible says nothing about the number."
+          ru: "«Виден» ничего не говорит о числе."
+      - text:
+          en: "It should check the URL instead."
+          ru: "Вместо этого нужно проверять URL."
+        why:
+          en: "The URL doesn't change when you add to cart. The expected result is about the counter."
+          ru: "URL не меняется при добавлении в корзину. Ожидаемый результат — про счётчик."
+    hints:
+      - en: "Does the expected result say \"shown\" or does it name a value?"
+        ru: "Ожидаемый результат говорит «показан» или называет значение?"
+      - en: "A value means a text matcher."
+        ru: "Значение — значит, метод для текста."
+    explain:
+      en: "When the expected result names a value, `toBeVisible` is too weak. `toHaveText('2')` fails if the counter shows anything else."
+      ru: "Когда ожидаемый результат называет значение, `toBeVisible` слишком слабая проверка. `toHaveText('2')` упадёт, если счётчик покажет что-то другое."
+
+  - id: c1-l3-k7
+    kind: fill
+    keyPoint: kp-expect
+    app: { state: { user: anna@bloomly.app } }
+    context:
+      en: "Precondition: Anna is already logged in (set up for you)."
+      ru: "Предусловие: Анна уже вошла (это настроено за тебя)."
+    prompt:
+      en: "Expected result: \"City shows Lisbon.\" Pick the matcher."
+      ru: "Ожидаемый результат: «Город — Lisbon». Выбери метод проверки."
+    code: |
+      test('account page shows the city', async ({ page }) => {
+        await page.goto('/account');
+        await expect(page.getByTestId('account-city')).___('Lisbon');
+      });
+    blanks:
+      - { answers: [toHaveText], options: [toHaveText, toHaveURL, toBeVisible] }
+    checks: { expect: pass }
+    hints:
+      - en: "The expected result names a text."
+        ru: "В ожидаемом результате назван текст."
+      - en: "Text → toHaveText."
+        ru: "Текст → toHaveText."
+    explain:
+      en: "`toHaveText('Lisbon')` compares the city on the page with the expected one."
+      ru: "`toHaveText('Lisbon')` сравнивает город на странице с ожидаемым."
+
+  - id: c1-l3-k8
+    kind: choice
+    keyPoint: kp-expect
+    prompt:
+      en: "Read this assertion aloud. What does it check?"
+      ru: "Прочитай эту проверку вслух. Что она проверяет?"
+    code: |
+      await expect(page.getByRole('alert')).toHaveText('Please enter a valid email address.');
+    options:
+      - text:
+          en: "That the error box shows exactly \"Please enter a valid email address.\""
+          ru: "Что в блоке ошибки ровно текст «Please enter a valid email address.»"
+        correct: true
+        why:
+          en: "Element: the alert. Expected: this exact text."
+          ru: "Элемент — блок ошибки. Ожидание — именно этот текст."
+      - text:
+          en: "That the user typed a valid email"
+          ru: "Что пользователь ввёл корректный email"
+        why:
+          en: "It's the opposite: the app complains that the email is not valid."
+          ru: "Наоборот: приложение жалуется, что email некорректный."
+      - text:
+          en: "That a browser pop-up appears"
+          ru: "Что появляется всплывающее окно браузера"
+        why:
+          en: "`alert` here is the role of the error box on the page, not a browser pop-up."
+          ru: "`alert` здесь — роль блока с ошибкой на странице, а не всплывающее окно браузера."
+      - text:
+          en: "That the email field is visible"
+          ru: "Что поле email видно"
+        why:
+          en: "The locator points to the error box, not to the field."
+          ru: "Локатор указывает на блок с ошибкой, а не на поле."
+    hints:
+      - en: "First read the locator inside `expect(...)`, then the matcher."
+        ru: "Сначала прочитай локатор внутри `expect(...)`, потом метод проверки."
+      - en: "\"I expect the alert to have text …\""
+        ru: "«Я ожидаю, что у блока ошибки текст …»"
+    explain:
+      en: "Assertions read like expected results: \"I expect the alert to have the text 'Please enter a valid email address.'\"."
+      ru: "Проверки читаются как ожидаемые результаты: «Я ожидаю, что в блоке ошибки текст „Please enter a valid email address.“»."

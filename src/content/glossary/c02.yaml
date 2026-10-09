@@ -1,0 +1,210 @@
+# Glossary entries owned by chapter 2 (Your AI pair)
+- id: llm
+  en: LLM (large language model)
+  ipa: /ˌel el ˈem/
+  ru: большая языковая модель (LLM)
+  pos: noun
+  def:
+    en: "A model trained on huge amounts of text that predicts and writes text. It is the “brain” inside AI agents like Claude Code or Copilot."
+    ru: "Модель, обученная на огромном объёме текстов, которая предсказывает и пишет текст. Это «мозг» внутри ИИ-агентов вроде Claude Code или Copilot."
+  example:
+    en: "The LLM doesn't know our requirements — it only knows what we put in the prompt."
+    ru: "LLM не знает наших требований — она знает только то, что мы написали в промпте."
+  context: meeting
+  chapter: 2
+
+- id: ai-agent
+  en: AI agent
+  ipa: /ˌeɪ ˈaɪ ˈeɪdʒənt/
+  ru: ИИ-агент (AI agent)
+  pos: noun
+  def:
+    en: "An LLM with tools: it can read files, run commands and drive a browser to finish a task, not just answer in chat."
+    ru: "LLM с инструментами: он читает файлы, запускает команды и управляет браузером, чтобы довести задачу до конца, а не просто ответить в чате."
+  example:
+    en: "I'll ask the AI agent to draft the checkout tests and review them this afternoon."
+    ru: "Попрошу ИИ-агента набросать тесты на чекаут, а после обеда сделаю ревью."
+  context: standup
+  chapter: 2
+
+- id: prompt
+  en: prompt
+  ipa: /prɑːmpt/
+  ru: промпт, запрос к модели (prompt)
+  pos: noun
+  def:
+    en: "The instruction you give an AI model or agent. For a test, a good prompt has the same parts as a good test case."
+    ru: "Инструкция, которую ты даёшь ИИ-модели или агенту. Для теста хороший промпт состоит из тех же частей, что и хороший тест-кейс."
+  example:
+    en: "The test had no assertion because my prompt had no expected result."
+    ru: "В тесте не было проверки, потому что в моём промпте не было ожидаемого результата."
+  context: prompt
+  chapter: 2
+
+- id: context
+  en: context
+  ipa: /ˈkɑːntekst/
+  ru: контекст (context)
+  pos: noun
+  def:
+    en: "Everything the agent can see while it works: your prompt, project files, existing tests, the page in the browser."
+    ru: "Всё, что агент видит во время работы: твой промпт, файлы проекта, существующие тесты, страницу в браузере."
+  example:
+    en: "Give the agent more context: point it to tests/login.spec.ts as an example."
+    ru: "Дай агенту больше контекста: укажи tests/login.spec.ts как образец."
+  context: prompt
+  chapter: 2
+
+- id: hallucination
+  en: hallucination
+  ipa: /həˌluːsɪˈneɪʃn/
+  ru: галлюцинация (hallucination)
+  pos: noun
+  def:
+    en: "Confident but invented output from an AI: a method, element, text or fact that doesn't exist."
+    ru: "Уверенный, но выдуманный ответ ИИ: метод, элемент, текст или факт, которого не существует."
+  example:
+    en: "`page.open()` is a hallucination — Playwright only has `page.goto()`."
+    ru: "`page.open()` — галлюцинация: в Playwright есть только `page.goto()`."
+  context: code-review
+  chapter: 2
+
+- id: mcp
+  en: MCP (Model Context Protocol)
+  ipa: /ˌem siː ˈpiː/
+  ru: MCP, протокол контекста модели
+  pos: noun
+  def:
+    en: "An open standard that connects AI agents to tools. Playwright MCP is a server that lets an agent drive a real browser."
+    ru: "Открытый стандарт, который подключает ИИ-агентов к инструментам. Playwright MCP — сервер, через который агент управляет настоящим браузером."
+  example:
+    en: "With Playwright MCP the agent opened the cart page and read the snapshot before writing the test."
+    ru: "Через Playwright MCP агент открыл страницу корзины и прочитал снимок, прежде чем писать тест."
+  context: general
+  chapter: 2
+
+- id: accessibility-snapshot
+  en: accessibility snapshot
+  ipa: /əkˌsesəˈbɪləti ˈsnæpʃɑːt/
+  ru: снимок доступности (accessibility snapshot)
+  pos: noun
+  def:
+    en: "A text description of a page as roles and accessible names (`button \"Log in\"`). Agents read it instead of pixels."
+    ru: "Текстовое описание страницы в виде ролей и доступных имён (`button \"Log in\"`). Агенты читают его вместо пикселей."
+  example:
+    en: "The button isn't in the accessibility snapshot, so the agent couldn't find it by role."
+    ru: "Кнопки нет в снимке доступности, поэтому агент не смог найти её по роли."
+  context: chat
+  chapter: 2
+
+- id: code-review
+  en: code review
+  ipa: /ˈkoʊd rɪˌvjuː/
+  ru: код-ревью, проверка кода (code review)
+  pos: noun
+  def:
+    en: "Reading someone's code change before it joins the project: is it correct, readable, safe? AI-generated tests need it too."
+    ru: "Чтение чужого изменения в коде до того, как оно попадёт в проект: правильно ли, понятно ли, безопасно ли? Тестам от ИИ это тоже нужно."
+  example:
+    en: "Can you do a code review of Petal's cart tests before lunch?"
+    ru: "Сможешь сделать код-ревью тестов корзины от Petal до обеда?"
+  context: code-review
+  chapter: 2
+
+- id: diff
+  en: diff
+  ipa: /dɪf/
+  ru: дифф, разница между версиями (diff)
+  pos: noun
+  def:
+    en: "The list of changes between two versions of a file: removed lines and added lines."
+    ru: "Список изменений между двумя версиями файла: удалённые и добавленные строки."
+  example:
+    en: "Look at the diff: the healer changed the expected total from €70.00 to €39.90."
+    ru: "Посмотри на дифф: хилер поменял ожидаемый итог с €70.00 на €39.90."
+  context: code-review
+  chapter: 2
+
+- id: false-positive
+  en: false positive
+  ipa: /ˌfɔːls ˈpɑːzətɪv/
+  ru: ложное срабатывание (false positive)
+  pos: noun
+  def:
+    en: "A test fails, but there is no bug in the app — the problem is in the test or the environment."
+    ru: "Тест падает, но бага в приложении нет — проблема в самом тесте или в окружении."
+  example:
+    en: "It was a false positive: the locator broke after the redesign, the checkout itself works."
+    ru: "Это было ложное срабатывание: после редизайна сломался локатор, а сам чекаут работает."
+  context: chat
+  chapter: 2
+
+- id: false-negative
+  en: false negative
+  ipa: /ˌfɔːls ˈneɡətɪv/
+  ru: пропущенный баг, ложноотрицательный результат (false negative)
+  pos: noun
+  def:
+    en: "A test passes, but the bug is there. The most dangerous result: everyone thinks the feature works."
+    ru: "Тест проходит, а баг есть. Самый опасный результат: все думают, что функция работает."
+  example:
+    en: "The healed test is a false negative — it now expects the wrong total."
+    ru: "«Вылеченный» тест — это false negative: теперь он ожидает неверный итог."
+  context: code-review
+  chapter: 2
+
+- id: request-changes
+  en: request changes
+  ipa: /rɪˈkwest ˈtʃeɪndʒɪz/
+  ru: запросить правки (request changes)
+  pos: verb phrase
+  def:
+    en: "A review decision: the change can't be merged yet, the author must fix the points in your comments."
+    ru: "Решение по итогам ревью: изменение пока нельзя мержить, автор должен исправить то, что указано в комментариях."
+  example:
+    en: "Requesting changes: the second test has no assertion."
+    ru: "Запрашиваю правки: во втором тесте нет проверки."
+  context: code-review
+  chapter: 2
+
+- id: test-coverage
+  en: test coverage
+  ipa: /ˈtest ˌkʌvərɪdʒ/
+  ru: тестовое покрытие (test coverage)
+  pos: noun
+  def:
+    en: "How much of the requirements and risks your tests actually check. Tests with weak assertions add runs, not coverage."
+    ru: "Какую часть требований и рисков на самом деле проверяют твои тесты. Тесты со слабыми проверками добавляют прогоны, а не покрытие."
+  example:
+    en: "We have 40 cart tests, but our coverage of the promo rules is still low."
+    ru: "У нас 40 тестов корзины, но покрытие правил промокодов всё ещё низкое."
+  context: meeting
+  chapter: 2
+
+- id: edge-case
+  en: edge case
+  ipa: /ˈedʒ keɪs/
+  ru: пограничный случай (edge case)
+  pos: noun
+  def:
+    en: "An unusual input or situation at the limits of normal use: exactly €50.00, 200 characters, an email with spaces."
+    ru: "Необычный ввод или ситуация на границе нормального использования: ровно €50.00, 200 символов, email с пробелами."
+  example:
+    en: "Petal covered the happy path; I'm adding the edge cases around the €50 free-delivery limit."
+    ru: "Petal покрыл позитивный сценарий, а я добавляю пограничные случаи вокруг порога бесплатной доставки в €50."
+  context: standup
+  chapter: 2
+
+- id: negative-test
+  en: negative test
+  ipa: /ˈneɡətɪv test/
+  ru: негативный тест (negative test)
+  pos: noun
+  def:
+    en: "A test that checks how the app handles wrong or forbidden input: a wrong password, an expired promo code, a past date."
+    ru: "Тест, который проверяет, как приложение обрабатывает неверный или запрещённый ввод: неверный пароль, просроченный промокод, дату в прошлом."
+  example:
+    en: "Let's add a negative test for the expired promo code SPRING20."
+    ru: "Давай добавим негативный тест на просроченный промокод SPRING20."
+  context: meeting
+  chapter: 2

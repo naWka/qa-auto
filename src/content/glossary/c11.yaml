@@ -1,0 +1,154 @@
+# Glossary entries owned by chapter 11 (The real world)
+- id: ci-cd
+  en: CI/CD
+  ipa: /ˌsiː aɪ ˌsiː ˈdiː/
+  ru: CI/CD (непрерывная интеграция и доставка)
+  pos: noun
+  def:
+    en: "Continuous integration and delivery: every change is built and tested automatically, then shipped."
+    ru: "Непрерывная интеграция и доставка: каждое изменение автоматически собирается, тестируется и выкатывается."
+  example:
+    en: "Our tests run in CI/CD on every pull request, so nobody merges a red build."
+    ru: "Наши тесты запускаются в CI/CD на каждый пул-реквест, поэтому никто не мёржит красную сборку."
+  context: meeting
+  chapter: 11
+
+- id: pipeline
+  en: pipeline
+  ipa: /ˈpaɪplaɪn/
+  ru: пайплайн (pipeline)
+  pos: noun
+  def:
+    en: "The chain of automatic steps that runs on each change: install, build, test, report, deploy."
+    ru: "Цепочка автоматических шагов, которая запускается на каждое изменение: установка, сборка, тесты, отчёт, деплой."
+  example:
+    en: "The pipeline is red on the e2e step — I'm checking the HTML report now."
+    ru: "Пайплайн красный на шаге e2e — сейчас смотрю HTML-отчёт."
+  context: chat
+  chapter: 11
+
+- id: codegen
+  en: codegen
+  ipa: /ˈkoʊd dʒen/
+  ru: codegen (запись кода по действиям)
+  pos: noun
+  def:
+    en: "A Playwright tool (npx playwright codegen) that records your clicks and typing in a browser and writes them as test code."
+    ru: "Инструмент Playwright (npx playwright codegen), который записывает твои клики и ввод в браузере и превращает их в код теста."
+  example:
+    en: "Run codegen on the checkout page to see which locator Playwright suggests for the date field."
+    ru: "Запусти codegen на странице оформления, чтобы увидеть, какой локатор Playwright предлагает для поля даты."
+  context: chat
+  chapter: 11
+
+- id: html-report
+  en: HTML report
+  ipa: /ˌeɪtʃ tiː em ˈel rɪˌpɔːrt/
+  ru: HTML-отчёт (HTML report)
+  pos: noun
+  def:
+    en: "The page Playwright creates after a run, with every test, its steps, errors, screenshots and trace."
+    ru: "Страница, которую Playwright создаёт после прогона: каждый тест, его шаги, ошибки, скриншоты и трейс."
+  example:
+    en: "I'll post the link to last night's HTML report in the release channel."
+    ru: "Я скину ссылку на HTML-отчёт ночного прогона в канал релиза."
+  context: chat
+  chapter: 11
+
+- id: headless
+  en: headless
+  ipa: /ˈhedləs/
+  ru: headless-режим, без окна браузера (headless)
+  pos: adjective
+  def:
+    en: "Running a browser without showing its window; the default for tests and for CI."
+    ru: "Запуск браузера без показа его окна; так по умолчанию работают тесты и CI."
+  example:
+    en: "It passes headed but fails headless — let's compare the two traces."
+    ru: "С окном браузера тест проходит, а в headless падает — давай сравним два трейса."
+  context: chat
+  chapter: 11
+
+- id: cross-browser-testing
+  en: cross-browser testing
+  ipa: /ˌkrɔːs ˈbraʊzər ˌtestɪŋ/
+  ru: кроссбраузерное тестирование (cross-browser testing)
+  pos: noun
+  def:
+    en: "Running the same tests in several browsers, such as Chromium, Firefox and WebKit (the engine behind Safari)."
+    ru: "Запуск одних и тех же тестов в нескольких браузерах, например в Chromium, Firefox и WebKit (движок Safari)."
+  example:
+    en: "Cross-browser testing found it: the date picker breaks only in WebKit."
+    ru: "Это нашлось благодаря кроссбраузерному тестированию: выбор даты ломается только в WebKit."
+  context: standup
+  chapter: 11
+
+- id: pull-request
+  en: pull request
+  ipa: /ˈpʊl rɪˌkwest/
+  ru: пул-реквест (pull request, PR)
+  pos: noun
+  def:
+    en: "A request to merge your changes into the main branch; teammates review the diff and CI runs the tests."
+    ru: "Запрос на слияние твоих изменений с основной веткой: коллеги смотрят дифф, а CI запускает тесты."
+  example:
+    en: "Here's my pull request with six new cart tests — could you review it today?"
+    ru: "Вот мой пул-реквест с шестью новыми тестами корзины — сможешь посмотреть его сегодня?"
+  context: chat
+  chapter: 11
+
+- id: repository
+  en: repository
+  ipa: /rɪˈpɑːzətɔːri/
+  ru: репозиторий (repository, repo)
+  pos: noun
+  def:
+    en: "A project folder with the full history of its changes, stored in Git — for example, on GitHub."
+    ru: "Папка проекта со всей историей изменений, которая хранится в Git, — например, на GitHub."
+  example:
+    en: "The test repository has a README that explains how to run the suite locally."
+    ru: "В репозитории с тестами есть README, где объяснено, как запустить набор локально."
+  context: general
+  chapter: 11
+
+- id: commit
+  en: commit
+  ipa: /kəˈmɪt/
+  ru: коммит (commit)
+  pos: noun, verb
+  def:
+    en: "A saved snapshot of changes in Git, with a short message about what changed and why."
+    ru: "Сохранённый снимок изменений в Git с коротким сообщением о том, что и зачем изменилось."
+  example:
+    en: "Please split this into two commits: one for the page object, one for the new tests."
+    ru: "Пожалуйста, раздели это на два коммита: один для page object, другой для новых тестов."
+  context: code-review
+  chapter: 11
+
+- id: portfolio
+  en: portfolio
+  ipa: /pɔːrtˈfoʊlioʊ/
+  ru: портфолио (portfolio)
+  pos: noun
+  def:
+    en: "A public collection of your work, such as GitHub repositories, that shows employers what you can do."
+    ru: "Публичная подборка твоих работ, например репозиториев на GitHub, которая показывает работодателю, что ты умеешь."
+  example:
+    en: "My portfolio repo has 20 Bloomly tests, a CI badge and a section on how I review AI-written code."
+    ru: "В моём репозитории для портфолио — 20 тестов Bloomly, бейдж CI и раздел о том, как я проверяю код от ИИ."
+  context: meeting
+  chapter: 11
+
+- id: config-file
+  en: config file
+  ipa: /ˈkɑːnfɪɡ faɪl/
+  ru: конфигурационный файл, конфиг (config file)
+  pos: noun
+  def:
+    en: "A file with project settings. In Playwright it's playwright.config, with baseURL, browsers, retries, reporter and trace."
+    ru: "Файл с настройками проекта. В Playwright это playwright.config: baseURL, браузеры, повторы, репортер и трейс."
+  example:
+    en: "Set `trace: 'on-first-retry'` in the config file, so CI keeps a trace for every flaky failure."
+    ru: "Поставь `trace: 'on-first-retry'` в конфиге, чтобы CI сохранял трейс для каждого нестабильного падения."
+  context: code-review
+  chapter: 11

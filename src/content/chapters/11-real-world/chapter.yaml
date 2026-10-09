@@ -1,0 +1,90 @@
+id: c11
+number: 11
+status: planned
+title: { en: "The real world", ru: "Реальный мир" }
+department: { en: "Release Day", ru: "День релиза" }
+color: sky
+summary:
+  en: "Leave the trainer and set up the real toolkit: Playwright on your computer, VS Code with an AI agent, Playwright Test Agents, MCP or CLI, traces, reports and CI on GitHub Actions. Then do the final project: cover Bloomly with tests together with an agent, review them and publish the repository for your portfolio. Start here: https://playwright.dev/docs/intro"
+  ru: "Выходим из тренажёра и собираем настоящий набор инструментов: Playwright на твоём компьютере, VS Code с ИИ-агентом, Playwright Test Agents, MCP или CLI, трейсы, отчёты и CI на GitHub Actions. Затем — финальный проект: покрыть Bloomly тестами вместе с агентом, проверить их и опубликовать репозиторий в портфолио. Начни отсюда: https://playwright.dev/docs/intro"
+intro:
+  - who: leo
+    text:
+      en: "Bloomly 3.0 ships on Friday. Regression used to take three days. Let's see what it takes now."
+      ru: "Bloomly 3.0 выходит в пятницу. Раньше регресс занимал три дня. Посмотрим, сколько он займёт теперь."
+  - who: maya
+    text:
+      en: "From here on it's real tools on your own machine. Everything you've learned works there the same way."
+      ru: "Дальше — настоящие инструменты на твоём компьютере. Всё, чему ты научил{ась|ся}, там работает точно так же."
+  - who: petal
+    text:
+      en: "I'm ready when you are. You lead, I type."
+      ru: "Я готов, когда ты {готова|готов}. Ты ведёшь, я печатаю."
+  - who: mochi
+    text: { en: "Mrrp!", ru: "Мрр!" }
+plan:
+  - title: { en: "Your local setup", ru: "Твоё рабочее место" }
+    goal:
+      en: "Install Playwright with `npm init playwright@latest`, open the project in VS Code with the Playwright extension and run the example test. Guide: https://playwright.dev/docs/intro"
+      ru: "Установить Playwright командой `npm init playwright@latest`, открыть проект в VS Code с расширением Playwright и запустить пример теста. Инструкция: https://playwright.dev/docs/intro"
+    keyPoints:
+      - en: "You need Node.js, VS Code and a terminal; the installer creates playwright.config, a tests/ folder and an example test."
+        ru: "Понадобятся Node.js, VS Code и терминал; установщик создаёт playwright.config, папку tests/ и пример теста."
+      - en: "playwright.config sets baseURL, browsers (projects), retries, the reporter and tracing — settings you've been using without seeing them."
+        ru: "playwright.config задаёт baseURL, браузеры (projects), повторы, репортер и трейсы — настройки, которыми ты пользовал{ась|ся}, не видя их."
+      - en: "Run tests with `npx playwright test` or the green triangle in VS Code; they run headless by default, use `--headed` or `--ui` to watch."
+        ru: "Запускай тесты командой `npx playwright test` или зелёным треугольником в VS Code; по умолчанию они идут без окна браузера (headless), а с `--headed` или `--ui` можно смотреть."
+      - en: "Playwright runs in Chromium, Firefox and WebKit — cross-browser testing is one setting in the config."
+        ru: "Playwright работает в Chromium, Firefox и WebKit — кроссбраузерное тестирование включается одной настройкой в конфиге."
+  - title: { en: "An agent in your editor", ru: "Агент в твоём редакторе" }
+    goal:
+      en: "Connect an agent (Claude Code or GitHub Copilot agent mode) to the browser through Playwright MCP or the Playwright CLI, add project rules and set up Test Agents. Docs: https://playwright.dev/docs/test-agents"
+      ru: "Подключить агента (Claude Code или GitHub Copilot в режиме агента) к браузеру через Playwright MCP или Playwright CLI, добавить правила проекта и настроить Test Agents. Документация: https://playwright.dev/docs/test-agents"
+    keyPoints:
+      - en: "Playwright MCP gives the agent accessibility snapshots of the live page; the Playwright CLI (@playwright/cli with skills) does the same job with fewer tokens."
+        ru: "Playwright MCP даёт агенту снимки доступности живой страницы; Playwright CLI (@playwright/cli со скиллами) делает то же самое, расходуя меньше токенов."
+      - en: "`npx playwright init-agents --loop=claude` (or `--loop=vscode`, `--loop=opencode`) adds the planner, generator and healer to the project."
+        ru: "`npx playwright init-agents --loop=claude` (или `--loop=vscode`, `--loop=opencode`) добавляет в проект планировщика, генератора и хилера."
+      - en: "Put your rules file (CLAUDE.md or .github/copilot-instructions.md) into the repository from day one."
+        ru: "Положи файл правил (CLAUDE.md или .github/copilot-instructions.md) в репозиторий с первого дня."
+      - en: "Codegen (`npx playwright codegen`) records your clicks as code — a quick way to check locators without an agent."
+        ru: "Codegen (`npx playwright codegen`) записывает твои клики в код — быстрый способ проверить локаторы без агента."
+  - title: { en: "Reports, traces and CI", ru: "Отчёты, трейсы и CI" }
+    goal:
+      en: "Open the HTML report and a trace locally, then run the suite on every pull request with GitHub Actions. Docs: https://playwright.dev/docs/trace-viewer and https://playwright.dev/docs/ci-intro"
+      ru: "Открыть HTML-отчёт и трейс локально, а затем запускать набор тестов на каждый pull request через GitHub Actions. Документация: https://playwright.dev/docs/trace-viewer и https://playwright.dev/docs/ci-intro"
+    keyPoints:
+      - en: "`npx playwright show-report` opens the HTML report; failed tests link to their trace, screenshots and errors."
+        ru: "`npx playwright show-report` открывает HTML-отчёт; у упавших тестов есть ссылки на трейс, скриншоты и ошибки."
+      - en: "`trace: 'on-first-retry'` in the config records a trace only when a test is retried — cheap, and usually enough."
+        ru: "`trace: 'on-first-retry'` в конфиге записывает трейс, только когда тест перезапускается, — дёшево и обычно достаточно."
+      - en: "The installer can add a GitHub Actions workflow: every push and pull request runs the tests headless and saves the report."
+        ru: "Установщик может добавить workflow для GitHub Actions: каждый push и pull request запускает тесты в headless-режиме и сохраняет отчёт."
+      - en: "A red CI check on a pull request starts a conversation; it's not a tool for blame."
+        ru: "Красная проверка CI в pull request — повод для разговора, а не поиск виноватых."
+  - title: { en: "Final project: Bloomly with your agent", ru: "Финальный проект: Bloomly вместе с агентом" }
+    goal:
+      en: "Plan, generate, review and stabilize a Bloomly regression suite together with an agent, and publish it as a GitHub repository."
+      ru: "Спланировать, сгенерировать, проверить и стабилизировать регрессионный набор тестов Bloomly вместе с агентом и опубликовать его как репозиторий на GitHub."
+    keyPoints:
+      - en: "Start from your test design: pick 10–15 scenarios by risk — login, search, cart, promo codes, checkout, orders."
+        ru: "Начни с тест-дизайна: выбери 10–15 сценариев по риску — вход, поиск, корзина, промокоды, оформление, заказы."
+      - en: "Let the agent plan and generate; you review every test against your checklist: locators, assertions, waits, isolation."
+        ru: "Пусть агент планирует и генерирует, а ты проверяешь каждый тест по своему чек-листу: локаторы, проверки, ожидания, изоляция."
+      - en: "Prove each test can fail: break the expected value once and watch it turn red."
+        ru: "Докажи, что каждый тест умеет падать: один раз сломай ожидаемое значение и посмотри, как он покраснеет."
+      - en: "Commit in small steps with clear messages, and open pull requests even when you work alone."
+        ru: "Делай коммиты небольшими шагами с понятными сообщениями и открывай pull request'ы, даже если работаешь {одна|один}."
+  - title: { en: "Portfolio and what to learn next", ru: "Портфолио и что изучать дальше" }
+    goal:
+      en: "Write a README that explains your approach, talk about your AI-assisted workflow in an interview, and choose your next topic."
+      ru: "Написать README, который объясняет твой подход, рассказать на собеседовании о работе в паре с ИИ и выбрать следующую тему для изучения."
+    keyPoints:
+      - en: "A good portfolio README: what is tested and why, how to run it, a CI badge, which decisions were yours and what the agent did."
+        ru: "Хороший README для портфолио: что протестировано и почему, как запустить, бейдж CI, что решал{а|} ты и что делал агент."
+      - en: "In interviews, talk about judgment: what you rejected in review, which bug a test caught, how you fixed a flaky test."
+        ru: "На собеседовании рассказывай о своих решениях: что ты отклонил{а|} на ревью, какой баг поймал тест, как ты исправил{а|} флаки-тест."
+      - en: "Next steps: TypeScript basics, CI in more depth, visual testing (toHaveScreenshot), accessibility testing (axe)."
+        ru: "Что дальше: основы TypeScript, CI глубже, визуальное тестирование (toHaveScreenshot), тестирование доступности (axe)."
+      - en: "Keep one habit: read the Playwright release notes — agent features change fast."
+        ru: "Сохрани одну привычку: читай release notes Playwright — возможности агентов меняются быстро."

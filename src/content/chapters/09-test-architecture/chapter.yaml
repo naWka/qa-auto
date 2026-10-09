@@ -1,0 +1,75 @@
+id: c9
+number: 9
+status: planned
+title: { en: "Test architecture", ru: "Архитектура тестов" }
+department: { en: "Architecture", ru: "Архитектура" }
+color: peach
+summary:
+  en: "Organize a growing suite so it stays readable: describe blocks, hooks, isolated tests, Page Objects, fixtures and test data. Agents happily build this structure for you — you will learn to read it, keep it tidy and ask for the right refactoring when it starts to rot."
+  ru: "Наводим порядок в растущем наборе тестов, чтобы его было легко читать: describe-блоки, хуки, изолированные тесты, Page Object, фикстуры и тестовые данные. Агенты охотно построят эту структуру за тебя — ты научишься её читать, поддерживать в порядке и просить правильный рефакторинг, когда она начнёт портиться."
+intro:
+  - who: leo
+    text:
+      en: "We have 180 tests now. Kai renamed one button, and 40 tests went red."
+      ru: "У нас уже 180 тестов. Кай переименовал одну кнопку — и покраснели 40 тестов."
+  - who: kai
+    text:
+      en: "In my defense, \"Log in\" became \"Sign in\" in exactly one place."
+      ru: "В свою защиту: «Log in» стало «Sign in» ровно в одном месте."
+  - who: petal
+    text:
+      en: "And I had copied that login code into all 40 tests. It was faster!"
+      ru: "А я скопировал этот код входа во все 40 тестов. Так было быстрее!"
+  - who: maya
+    text:
+      en: "Faster to write, slower to fix. Let's give the suite an architecture: one place for each thing that can change."
+      ru: "Быстрее написать, дольше чинить. Дадим набору тестов архитектуру: по одному месту для каждой вещи, которая может измениться."
+plan:
+  - title: { en: "describe, hooks and isolation", ru: "describe, хуки и изоляция" }
+    goal:
+      en: "Group tests with test.describe, move shared steps into beforeEach, and spot tests that depend on each other."
+      ru: "Группировать тесты через test.describe, выносить общие шаги в beforeEach и замечать тесты, которые зависят друг от друга."
+    keyPoints:
+      - en: "test.describe groups tests like a section in TestRail or any other test management tool."
+        ru: "test.describe группирует тесты, как раздел в TestRail или любой другой системе управления тестами."
+      - en: "beforeEach and afterEach run around every test: setup and teardown, like preconditions and cleanup."
+        ru: "beforeEach и afterEach выполняются до и после каждого теста: подготовка и очистка, как предусловия и уборка после теста."
+      - en: "Each test gets a fresh browser context; a test that needs another test to run first is a bug in the suite."
+        ru: "Каждый тест получает чистый контекст браузера; тест, которому нужно, чтобы сначала прошёл другой тест, — это баг в наборе."
+  - title: { en: "Page Object Model", ru: "Page Object Model" }
+    goal:
+      en: "Read a LoginPage class the agent built, follow a test through it, and update one locator in one place."
+      ru: "Читать класс LoginPage, который построил агент, прослеживать через него тест и обновлять локатор в одном месте."
+    keyPoints:
+      - en: "A page object keeps a page's locators and actions in one class: loginPage.login(email, password)."
+        ru: "Page object хранит локаторы и действия страницы в одном классе: loginPage.login(email, password)."
+      - en: "Tests read like test cases; when the UI changes, you fix the page object, not 40 tests."
+        ru: "Тесты читаются как тест-кейсы; когда меняется интерфейс, ты правишь page object, а не 40 тестов."
+      - en: "Assertions usually stay in the test, so the page object doesn't hide what is being checked."
+        ru: "Проверки обычно остаются в тесте, чтобы page object не прятал, что именно проверяется."
+      - en: "Agents tend to over-engineer: base classes, a wrapper for every click. Ask for the simplest version that works."
+        ru: "Агенты любят переусложнять: базовые классы, обёртка для каждого клика. Проси самый простой рабочий вариант."
+  - title: { en: "Fixtures", ru: "Фикстуры" }
+    goal:
+      en: "Read a custom fixture, such as a logged-in page, and explain what it prepares and cleans up for each test."
+      ru: "Читать пользовательскую фикстуру, например страницу с выполненным входом, и объяснять, что она готовит и убирает для каждого теста."
+    keyPoints:
+      - en: "page and request are built-in fixtures: Playwright creates them for each test and passes them in."
+        ru: "page и request — встроенные фикстуры: Playwright создаёт их для каждого теста и передаёт в него."
+      - en: "test.extend adds your own fixtures — a logged-in user, a filled cart, a ready page object."
+        ru: "test.extend добавляет свои фикстуры — пользователя с выполненным входом, заполненную корзину, готовый page object."
+      - en: "A fixture is a reusable precondition with built-in cleanup — easier to share than copy-pasted beforeEach blocks."
+        ru: "Фикстура — переиспользуемое предусловие со встроенной уборкой; её проще использовать повторно, чем копировать блоки beforeEach."
+  - title: { en: "Test data, parameterization and refactoring", ru: "Тестовые данные, параметризация и рефакторинг" }
+    goal:
+      en: "Turn five copy-pasted promo code tests into one data-driven test, and write a refactoring request the agent can follow safely."
+      ru: "Превращать пять скопированных тестов промокодов в один тест на данных и писать запрос на рефакторинг, который агент выполнит безопасно."
+    keyPoints:
+      - en: "Parameterization: one test body and a table of inputs and expected results — your equivalence classes and boundary values as data."
+        ru: "Параметризация: одно тело теста и таблица входных данных и ожидаемых результатов — твои классы эквивалентности и граничные значения в виде данных."
+      - en: "Each data row gets its own test title, so the report shows exactly which case failed."
+        ru: "Каждая строка данных получает своё название теста, поэтому в отчёте видно, какой именно случай упал."
+      - en: "Refactoring changes structure, not behavior: the same tests must pass and fail as before."
+        ru: "Рефакторинг меняет структуру, а не поведение: те же тесты должны проходить и падать, как раньше."
+      - en: "Ask the agent for refactoring in small steps and run the suite after each one."
+        ru: "Проси агента делать рефакторинг небольшими шагами и запускай набор тестов после каждого."

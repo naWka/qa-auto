@@ -1,0 +1,75 @@
+id: c8
+number: 8
+status: planned
+title: { en: "Test plans and Playwright agents", ru: "Тест-планы и агенты Playwright" }
+department: { en: "QA Guild", ru: "QA-гильдия" }
+color: rose
+summary:
+  en: "Run the full Playwright Test Agents loop: the planner explores Bloomly and writes a Markdown test plan, the generator turns it into tests, the healer keeps them running. You own the plan, the project rules and every review gate in between — the agent does the typing. Docs: https://playwright.dev/docs/test-agents"
+  ru: "Запускаем полный цикл Playwright Test Agents: планировщик исследует Bloomly и пишет тест-план в Markdown, генератор превращает его в тесты, хилер поддерживает их в рабочем состоянии. За тобой — план, правила проекта и каждая точка проверки между этапами, а код набирает агент. Документация: https://playwright.dev/docs/test-agents"
+intro:
+  - who: maya
+    text:
+      en: "Welcome to the QA Guild. Today you stop prompting test by test and start running a process."
+      ru: "Добро пожаловать в QA-гильдию. Сегодня ты перестаёшь писать промпты на каждый тест и начинаешь управлять процессом."
+  - who: petal
+    text:
+      en: "I can plan, generate and heal tests now! Shall I write 400 test cases for Bloomly by lunch?"
+      ru: "Теперь я умею планировать, генерировать и лечить тесты! Написать к обеду 400 тест-кейсов для Bloomly?"
+  - who: leo
+    text:
+      en: "Please don't. I need 50 that matter, not 400 that someone has to read."
+      ru: "Пожалуйста, не надо. Мне нужны 50 важных, а не 400, которые кому-то придётся читать."
+  - who: maya
+    text:
+      en: "Exactly. A test plan is test design, and test design is your job. Petal explores and drafts; you decide what's worth checking."
+      ru: "Вот именно. Тест-план — это тест-дизайн, а тест-дизайн — твоя работа. Petal исследует и делает черновик, а ты решаешь, что стоит проверять."
+plan:
+  - title: { en: "A Markdown test plan is your test case", ru: "Тест-план в Markdown — это твой тест-кейс" }
+    goal:
+      en: "Read and edit a planner-style Markdown test plan for the Bloomly cart: scenarios, steps, expected results."
+      ru: "Читать и править тест-план в Markdown в стиле планировщика для корзины Bloomly: сценарии, шаги, ожидаемые результаты."
+    keyPoints:
+      - en: "The planner explores the app and saves a plan to specs/ — numbered scenarios with steps and expected results."
+        ru: "Планировщик исследует приложение и сохраняет план в specs/ — пронумерованные сценарии с шагами и ожидаемыми результатами."
+      - en: "It's the same test case you write by hand, just in a file the generator can read."
+        ru: "Это тот же тест-кейс, который ты пишешь руками, только в файле, который может прочитать генератор."
+      - en: "The planner covers the happy path well and misses risks: boundaries, negative cases, the €50 free-delivery threshold."
+        ru: "Планировщик хорошо покрывает позитивный сценарий и пропускает риски: границы, негативные случаи, порог бесплатной доставки в €50."
+      - en: "Editing the plan is the cheapest place to fix the tests — no code exists yet."
+        ru: "Правка плана — самое дешёвое место, чтобы исправить тесты: кода ещё нет."
+  - title: { en: "Planner, generator, healer", ru: "Планировщик, генератор, хилер" }
+    goal:
+      en: "Put the agent workflow in order and name what goes in and what comes out at each step, including the seed test."
+      ru: "Расставлять этапы работы агентов по порядку и называть, что входит и что выходит на каждом шаге, включая seed-тест."
+    keyPoints:
+      - en: "`npx playwright init-agents --loop=claude` (or vscode, opencode) adds the three agent definitions to your project."
+        ru: "`npx playwright init-agents --loop=claude` (или vscode, opencode) добавляет в проект описания трёх агентов."
+      - en: "Planner: app + seed test → Markdown plan. Generator: plan → test files, checking locators on the live app. Healer: failing test → fix or `test.fixme`."
+        ru: "Планировщик: приложение + seed-тест → план в Markdown. Генератор: план → файлы тестов, сверяя локаторы с живым приложением. Хилер: упавший тест → исправление или `test.fixme`."
+      - en: "The seed test sets up the starting point (logged in, cart filled) and shows the agents your style."
+        ru: "Seed-тест готовит стартовую точку (вход выполнен, корзина заполнена) и показывает агентам твой стиль."
+  - title: { en: "Project rules for the agent", ru: "Правила проекта для агента" }
+    goal:
+      en: "Write a short rules file (CLAUDE.md or .github/copilot-instructions.md) with a locator policy, assertion rules and naming conventions."
+      ru: "Написать короткий файл правил (CLAUDE.md или .github/copilot-instructions.md) с политикой локаторов, правилами проверок и соглашениями об именах."
+    keyPoints:
+      - en: "The agent reads the rules file at the start of every session — it's a standing prompt for the whole team."
+        ru: "Агент читает файл правил в начале каждой сессии — это постоянный промпт для всей команды."
+      - en: "Good rules are short and checkable: \"Use getByRole and getByLabel. No waitForTimeout. Every test asserts the expected result.\""
+        ru: "Хорошие правила короткие и проверяемые: «Use getByRole and getByLabel. No waitForTimeout. Every test asserts the expected result.»"
+      - en: "When review finds the same mistake twice, add a rule instead of fixing it by hand forever."
+        ru: "Если ревью находит одну и ту же ошибку дважды, добавь правило, а не исправляй её руками каждый раз."
+  - title: { en: "Iterate and gate", ru: "Итерации и точки контроля" }
+    goal:
+      en: "Run a plan → generate → review → heal loop with clear human review gates, and give the agent precise feedback."
+      ru: "Проводить цикл план → генерация → ревью → лечение с понятными точками ручной проверки и давать агенту точную обратную связь."
+    keyPoints:
+      - en: "Three gates: approve the plan, review the generated code, review every healer diff."
+        ru: "Три точки контроля: утвердить план, проверить сгенерированный код, проверить каждый дифф от хилера."
+      - en: "Give feedback like in a code review: which line, what's wrong, what you expect — not \"make it better\"."
+        ru: "Давай обратную связь как в код-ревью: какая строка, что не так, чего ты ждёшь, — а не «сделай лучше»."
+      - en: "A green run is not the finish line: make sure each test would fail if its bug came back."
+        ru: "Зелёный прогон — не финиш: убедись, что каждый тест упадёт, если его баг вернётся."
+      - en: "You stay accountable for the suite. The agent is a fast pair, not the owner."
+        ru: "Ответственность за набор тестов остаётся на тебе. Агент — быстрый напарник, а не владелец."

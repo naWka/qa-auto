@@ -1,0 +1,69 @@
+id: c6
+number: 6
+status: planned
+title: { en: "Actions and assertions", ru: "Действия и проверки" }
+department: { en: "Checkout", ru: "Оформление заказа" }
+color: butter
+summary:
+  en: "Fill forms, click, tick checkboxes and pick options on the Bloomly checkout — and, most importantly, check the right thing. You will learn web-first assertions, spot the weak checks AI agents like to write, and turn the expected result of a test case into a precise assertion."
+  ru: "Заполняем формы, кликаем, ставим галочки и выбираем варианты на оформлении заказа Bloomly — и, главное, проверяем то, что нужно. Ты освоишь web-first проверки, научишься замечать слабые проверки, которые любят писать ИИ-агенты, и превращать ожидаемый результат тест-кейса в точную проверку."
+intro:
+  - who: sofia
+    text:
+      en: "Checkout is where we make money. If \"Place order\" breaks before the holidays, I want to know before our customers do."
+      ru: "Оформление заказа — это то, где мы зарабатываем. Если «Place order» сломается перед праздниками, я хочу узнать об этом раньше клиентов."
+  - who: petal
+    text:
+      en: "I wrote 12 checkout tests overnight. All green! Each one checks that the page has a button."
+      ru: "За ночь я написал 12 тестов на оформление заказа. Все зелёные! Каждый проверяет, что на странице есть кнопка."
+  - who: maya
+    text:
+      en: "All green and checking almost nothing. The value of a test is in its assertion — and you already know what to assert: it's in your expected results."
+      ru: "Все зелёные и почти ничего не проверяют. Ценность теста — в его проверке, а что проверять, ты уже знаешь: это написано в твоих ожидаемых результатах."
+plan:
+  - title: { en: "Actions: fill, click, check, selectOption", ru: "Действия: fill, click, check, selectOption" }
+    goal:
+      en: "Match checkout steps to the right action: type the address, pick a city, choose a delivery time, tick \"This is a gift\"."
+      ru: "Сопоставлять шаги оформления заказа с нужным действием: ввести адрес, выбрать город, выбрать время доставки, отметить «This is a gift»."
+    keyPoints:
+      - en: "fill types into a field, click presses, check selects a checkbox or a radio button, selectOption picks from a dropdown."
+        ru: "fill вводит текст в поле, click нажимает, check отмечает чекбокс или радиокнопку, selectOption выбирает из выпадающего списка."
+      - en: "Every action needs await — without it the test runs ahead of the browser."
+        ru: "Перед каждым действием нужен await — без него тест убегает вперёд браузера."
+      - en: "Before acting, Playwright checks the element is actionable: visible, enabled, not covered. A disabled \"Add to cart\" can't be clicked."
+        ru: "Перед действием Playwright проверяет, что с элементом можно работать: он видим, активен и ничем не закрыт. По неактивной кнопке «Add to cart» кликнуть нельзя."
+      - en: "Agents sometimes click a select or fill a checkbox — check that the action fits the element."
+        ru: "Агенты иногда кликают по select или вызывают fill на чекбоксе — проверяй, что действие подходит элементу."
+  - title: { en: "Web-first assertions", ru: "Web-first проверки" }
+    goal:
+      en: "Explain why `await expect(locator).toBeVisible()` waits and retries, while `expect(await locator.isVisible()).toBeTruthy()` checks only once."
+      ru: "Объяснять, почему `await expect(locator).toBeVisible()` ждёт и повторяет, а `expect(await locator.isVisible()).toBeTruthy()` проверяет только один раз."
+    keyPoints:
+      - en: "Web-first assertions retry until the condition is true or the timeout ends (5 seconds by default)."
+        ru: "Web-first проверки повторяются, пока условие не выполнится или не истечёт тайм-аут (по умолчанию 5 секунд)."
+      - en: "A one-off check looks at the page once: if the app is a little slow, the test fails at random."
+        ru: "Разовая проверка смотрит на страницу один раз: если приложение чуть притормозит, тест упадёт случайно."
+      - en: "`expect(await x.isVisible()).toBeTruthy()` is a classic AI pattern — rewrite it as `await expect(x).toBeVisible()`."
+        ru: "`expect(await x.isVisible()).toBeTruthy()` — классический шаблон ИИ; переписывай его как `await expect(x).toBeVisible()`."
+  - title: { en: "What exactly to assert", ru: "Что именно проверять" }
+    goal:
+      en: "Turn the expected result of a test case into an assertion that would catch the bug: exact text, value, count or URL."
+      ru: "Превращать ожидаемый результат тест-кейса в проверку, которая поймает баг: точный текст, значение, количество или URL."
+    keyPoints:
+      - en: "Assert the outcome from the expected result, not just that something exists: toHaveText, toHaveValue, toHaveCount, toHaveURL."
+        ru: "Проверяй результат из ожидаемого результата, а не просто наличие элемента: toHaveText, toHaveValue, toHaveCount, toHaveURL."
+      - en: "The weak-assertion test: would this test still pass if the bug were there? If yes, it checks too little."
+        ru: "Тест на слабую проверку: прошёл бы тест, если бы баг был на месте? Если да — он проверяет слишком мало."
+      - en: "AI agents assert what they see on the page right now, bugs included. You assert what should be there."
+        ru: "ИИ-агенты проверяют то, что видят на странице прямо сейчас, — вместе с багами. Ты проверяешь то, что должно там быть."
+  - title: { en: "Soft assertions", ru: "Мягкие проверки" }
+    goal:
+      en: "Use expect.soft to check the whole order summary in one run and see every mismatch at once."
+      ru: "Использовать expect.soft, чтобы проверить всю сводку заказа за один прогон и увидеть все расхождения сразу."
+    keyPoints:
+      - en: "A normal assertion stops the test at the first failure; expect.soft records it and moves on."
+        ru: "Обычная проверка останавливает тест на первом падении; expect.soft записывает его и идёт дальше."
+      - en: "Soft assertions fit a summary with several independent values: subtotal, discount, delivery, total."
+        ru: "Мягкие проверки подходят для сводки с несколькими независимыми значениями: подытог, скидка, доставка, итог."
+      - en: "Don't make a step soft if the rest depends on it: if login fails, the checks after it are just noise."
+        ru: "Не делай мягкой проверку шага, от которого зависят остальные: если не прошёл вход, дальнейшие проверки — просто шум."
