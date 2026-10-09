@@ -39,7 +39,7 @@ errors:
     explain: { en: "`{locator}` exists, but Playwright couldn't act on it: {reason}. Auto-waiting kept retrying until the timeout.", ru: "`{locator}` есть на странице, но Playwright не смог с ним работать: {reason}. Автоожидание повторяло попытки до таймаута." }
   expect-failed:
     title: { en: "Expected ≠ received", ru: "Ожидание ≠ реальность" }
-    explain: { en: "The assertion `{matcher}` failed: expected {expected}, but the page shows {received}. Now triage like a manual tester: is this a bug in the app, or is the test expecting the wrong thing?", ru: "Проверка `{matcher}` не прошла: ожидали {expected}, а на странице {received}. Дальше — как в ручном тестировании: это баг в приложении или тест ждёт не того?" }
+    explain: { en: "The assertion `{matcher}` failed: expected `{expected}`, but the page shows `{received}`. Now triage like a manual tester: is this a bug in the app, or is the test expecting the wrong thing?", ru: "Проверка `{matcher}` не прошла: ожидали `{expected}`, а на странице `{received}`. Дальше — как в ручном тестировании: это баг в приложении или тест ждёт не того?" }
   expect-not-found:
     title: { en: "The element for the check wasn't found", ru: "Элемент для проверки не найден" }
     explain: { en: "The assertion waited for `{locator}`, but no such element appeared. Either the expected text/role is different on the page — or the app really didn't show it (a bug!).", ru: "Проверка ждала `{locator}`, но такой элемент не появился. Либо на странице другой текст/роль — либо приложение действительно его не показало (баг!)." }
@@ -48,10 +48,10 @@ errors:
     explain: { en: "Expected {expected} elements, found {received}. Check filters on the page and what the locator really matches.", ru: "Ожидали {expected} элементов, нашлось {received}. Проверь фильтры на странице и что именно находит локатор." }
   expect-url:
     title: { en: "Wrong page", ru: "Не та страница" }
-    explain: { en: "Expected the URL {expected}, but the browser is at {received}. Did the action really navigate — or did the app redirect somewhere else?", ru: "Ожидали адрес {expected}, а браузер на {received}. Действие действительно перевело на страницу — или приложение увело в другое место?" }
+    explain: { en: "Expected the URL `{expected}`, but the browser is at `{received}`. Did the action really navigate — or did the app redirect somewhere else?", ru: "Ожидали адрес `{expected}`, а браузер на `{received}`. Действие действительно перевело на страницу — или приложение увело в другое место?" }
   expect-generic:
     title: { en: "Values don't match", ru: "Значения не совпали" }
-    explain: { en: "`{matcher}` compared two values: expected {expected}, received {received}. Even one letter, space or case difference counts.", ru: "`{matcher}` сравнил два значения: ожидали {expected}, получили {received}. Считается даже одна буква, пробел или регистр." }
+    explain: { en: "`{matcher}` compared two values: expected `{expected}`, received `{received}`. Even one letter, space or case difference counts.", ru: "`{matcher}` сравнил два значения: ожидали `{expected}`, получили `{received}`. Считается даже одна буква, пробел или регистр." }
   matcher-wrong-target:
     title: { en: "This check needs a locator", ru: "Этой проверке нужен локатор" }
     explain: { en: "`{matcher}` works with a {target}, but it got a plain value. Pass the locator itself: `await expect(page.getByText('…')).{matcher}(…)` — not the text you already read.", ru: "`{matcher}` работает с объектом {target}, а получил обычное значение. Передай сам локатор: `await expect(page.getByText('…')).{matcher}(…)` — а не уже прочитанный текст." }
@@ -66,10 +66,10 @@ errors:
     explain: { en: "`{url}` isn't a valid URL. Use a path starting with a slash: '/login'.", ru: "`{url}` — некорректный адрес. Используй путь со слешем в начале: '/login'." }
   nav-timeout:
     title: { en: "The page didn't load", ru: "Страница не загрузилась" }
-    explain: { en: "Navigation to {url} took too long.", ru: "Переход на {url} занял слишком много времени." }
+    explain: { en: "Navigation to `{url}` took too long.", ru: "Переход на `{url}` занял слишком много времени." }
   wait-url-timeout:
     title: { en: "Navigation didn't happen", ru: "Перехода не случилось" }
-    explain: { en: "The test waited for the URL {url}, but stayed at {actual}.", ru: "Тест ждал адрес {url}, но остался на {actual}." }
+    explain: { en: "The test waited for the URL `{url}`, but stayed at `{actual}`.", ru: "Тест ждал адрес `{url}`, но остался на `{actual}`." }
   wait-timeout:
     title: { en: "Waited too long", ru: "Слишком долгое ожидание" }
     explain: { en: "`{locator}` never became {state}.", ru: "`{locator}` так и не стал {state}." }

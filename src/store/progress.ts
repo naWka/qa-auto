@@ -163,8 +163,8 @@ export const useProgress = create<ProgressStore>()(
 
       const stamp = (d: ProgressData) => {
         const h = new Date().getHours();
-        if (h >= 22) d.stats.night++;
-        if (h < 8) d.stats.early++;
+        if (h >= 22 || h < 4) d.stats.night++;
+        if (h >= 5 && h < 8) d.stats.early++;
       };
 
       return {

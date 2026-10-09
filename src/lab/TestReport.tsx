@@ -56,7 +56,7 @@ function StepTree({ steps, onLine, depth = 0 }: { steps: StepRecord[]; onLine?: 
         <li key={s.id} className={`step step-${s.status}`}>
           <div className="step-row">
             <span className="step-icon">{s.status === 'passed' ? <Icon name="check" size={14} /> : s.status === 'failed' ? <Icon name="x" size={14} /> : <span className="spinner-dot" />}</span>
-            <span className="step-title">{s.title}</span>
+            <span className="step-name">{s.title}</span>
             {s.line && (
               <button type="button" className="step-line" onClick={() => onLine?.(s.line!)} title={s.file || 'example.spec.js'}>
                 {s.file ? `${s.file.split('/').pop()}:` : ''}{s.line}

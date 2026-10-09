@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { IssueType, Task } from '../content/schema';
-import { Bi, BiInline, U } from '../components/Bi';
+import { Bi, BiInline, U, usePrimary } from '../components/Bi';
 import { CodeView } from '../components/CodeView';
 import { Icon } from '../components/Icon';
 import { uiText } from '../content';
@@ -16,6 +16,7 @@ export function ReviewTask({ task, register, phase }: KindProps<Review>) {
   const [testLevel, setTestLevel] = useState<Set<IssueType>>(new Set());
   const [editing, setEditing] = useState<number | null>(null);
   const [verdict, setVerdict] = useState<{ missed: number; extra: Set<number>; wrongType: Set<number>; tlWrong: boolean } | null>(null);
+  const primary = usePrimary();
   const types = task.types?.length ? task.types : ALL_TYPES;
   const lineIssues = useMemo(() => new Map(task.issues.filter((i) => i.line > 0).map((i) => [i.line, i])), [task.id]);
   const tlExpected = useMemo(() => new Set(task.issues.filter((i) => i.line === 0).map((i) => i.type)), [task.id]);
@@ -89,7 +90,7 @@ export function ReviewTask({ task, register, phase }: KindProps<Review>) {
         code={task.code}
         onLineClick={locked ? undefined : (n) => setEditing(editing === n ? null : n)}
         lineClass={lineClass}
-        lineExtra={(n) => flags[n] ? <span className={`flag-chip ${showNotes && lineIssues.get(n)?.type === flags[n] ? 'ok' : ''}`}><Icon name="flag" size={12} /> <BiInline t={uiText(`issue.${flags[n]}`)} stack={false} /></span> : null}
+        lineExtra={(n) => flags[n] ? <span className={`flag-chip ${showNotes && lineIssues.get(n)?.type === flags[n] ? 'ok' : ''}`}><Icon name="flag" size={12} /> {primary(uiText(`issue.${flags[n]}`))}</span> : null}
       />
       {editing !== null && !locked && (
         <div className="issue-picker">

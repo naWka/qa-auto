@@ -358,7 +358,7 @@ button.cv-line:hover { background: var(--code-active); }
 .step-icon { width: 16px; display: inline-grid; place-items: center; flex-shrink: 0; }
 .step-passed > .step-row .step-icon { color: var(--mint-strong); }
 .step-failed > .step-row { color: var(--coral-strong); }
-.step-title { flex: 1; word-break: break-word; }
+.step-name { flex: 1; word-break: break-word; }
 .step-line { border: 0; background: var(--lavender-soft); color: var(--lavender-strong); font: 600 11px var(--font-mono); border-radius: 6px; padding: 1px 6px; cursor: pointer; }
 .step-dur { color: var(--ink-3); font-size: 11px; }
 .report-error { margin-top: 8px; }
@@ -792,10 +792,12 @@ select.blank { appearance: auto; }
 .sticker-cell { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 14px 10px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--line); }
 .sticker-cell:not(.earned) { background: var(--bg-soft); }
 .sticker-name { font-weight: 800; font-family: var(--font-display); font-size: .95rem; }
-.sticker-desc .bi { margin: 0; color: var(--ink-2); }
+.sticker-desc .bi { margin: 0; color: var(--ink-2); font-size: .86rem; }
+.sticker-desc .bi-ru, .finish-card .bi-ru.center { border-left: 0; padding-left: 0; }
+.sticker-name .bil-ru { font-weight: 600; }
 .sticker { position: relative; display: grid; place-items: center; filter: drop-shadow(0 4px 8px rgba(58, 46, 72, .18)); transition: transform var(--t) var(--ease); }
 .sticker-cell.earned .sticker:hover { transform: rotate(0deg) scale(1.06) !important; }
-.sticker svg { position: absolute; inset: 0; }
+.sticker > svg { position: absolute; inset: 0; }
 .sticker-icon { position: relative; display: grid; place-items: center; }
 .sticker-locked { filter: grayscale(1) opacity(.45); }
 .sticker-reveal { display: grid; place-items: center; margin: 8px auto; animation: popIn .6s var(--ease); }

@@ -13,9 +13,16 @@ export function useLang() {
 
 type Vars = Record<string, string | number>;
 
+const FENCE = /```[\s\S]*?```/g;
+
 function prepared(t: TS, gender: 'f' | 'm', vars?: Vars) {
   const v = toT(t);
-  return { en: interpolate(applyGender(v.en, gender), vars), ru: interpolate(applyGender(v.ru, gender), vars) };
+  const en = interpolate(applyGender(v.en, gender), vars);
+  let ru = interpolate(applyGender(v.ru, gender), vars);
+  // Code blocks are the same in both languages: don't print them twice.
+  const enBlocks = new Set((en.match(FENCE) || []).map((b) => b.trim()));
+  if (enBlocks.size) ru = ru.replace(FENCE, (b) => (enBlocks.has(b.trim()) ? '' : b)).replace(/\n{3,}/g, '\n\n').trim();
+  return { en, ru };
 }
 
 /** Block text (markdown). One paragraph pair; EN first, RU under it. */
