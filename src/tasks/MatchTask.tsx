@@ -11,7 +11,8 @@ export interface MatchSpec {
   rightCode?: boolean;
 }
 
-const COLORS = ['lavender', 'rose', 'mint', 'peach', 'sky', 'butter'];
+// Pair tints stay clear of red, green and orange: those read as "wrong" or "right". The number tells repeated tints apart.
+const COLORS = ['lavender', 'sky', 'butter'];
 
 function Item({ t, code }: { t: TS; code?: boolean }) {
   return code && typeof t === 'string' ? <CodeLine code={t} /> : <BiInline t={t} />;
@@ -78,6 +79,7 @@ export function MatchBoard({ spec, register, phase }: { spec: MatchSpec; registe
             const linked = links[l] !== undefined;
             return (
               <button key={l} type="button" className={`match-item ${pick === l ? 'picked' : ''} ${linked ? `linked c-${colorOf(l)}` : ''} ${bad.has(l) && !locked ? 'bad' : ''} ${locked ? 'ok' : ''}`} onClick={() => clickLeft(l)} disabled={locked}>
+                {linked && <span className="match-n">{l + 1}</span>}
                 <Item t={p.left} code={spec.leftCode} />
               </button>
             );
@@ -88,6 +90,7 @@ export function MatchBoard({ spec, register, phase }: { spec: MatchSpec; registe
             const owner = rightOwner(r);
             return (
               <button key={r} type="button" className={`match-item ${owner >= 0 ? `linked c-${colorOf(owner)}` : ''} ${pick !== null && owner < 0 ? 'targetable' : ''} ${owner >= 0 && bad.has(owner) && !locked ? 'bad' : ''} ${locked ? 'ok' : ''}`} onClick={() => clickRight(r)} disabled={locked}>
+                {owner >= 0 && <span className="match-n">{owner + 1}</span>}
                 <Item t={spec.pairs[r].right} code={spec.rightCode} />
               </button>
             );

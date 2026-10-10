@@ -23,7 +23,7 @@ function AgentLoop() {
     <div className="figure fig-flow">
       <Node tone="lavender" icon={<Person who="you" size={36} />} title={{ en: 'You: prompt', ru: 'Ты: промпт' }} sub={{ en: 'goal, steps, data, expected result', ru: 'цель, шаги, данные, ожидаемый результат' }} />
       <Arrow />
-      <Node tone="rose" icon={<Petal size={36} />} title={{ en: 'Agent reads context', ru: 'Агент читает контекст' }} sub={{ en: 'your prompt + project files', ru: 'твой промпт + файлы проекта' }} />
+      <Node tone="butter" icon={<Petal size={36} />} title={{ en: 'Agent reads context', ru: 'Агент читает контекст' }} sub={{ en: 'your prompt + project files', ru: 'твой промпт + файлы проекта' }} />
       <Arrow />
       <Node tone="sky" icon={<Icon name="globe" size={26} />} title={{ en: 'Opens the browser', ru: 'Открывает браузер' }} sub={{ en: 'Playwright MCP / CLI → accessibility snapshot', ru: 'Playwright MCP / CLI → снапшот доступности' }} />
       <Arrow />
@@ -95,8 +95,8 @@ function DomTree() {
         <T tag="h1" tone="lavender"><span className="dom-text">Log in</span></T>
         <T tag="form" attrs='id="login-form"'>
           <T tag="label" attrs='for="email"'><span className="dom-text">Email</span></T>
-          <T tag="input" attrs='id="email" type="text"' tone="mint" />
-          <T tag="button" attrs='type="submit" data-testid="login-button"' tone="rose"><span className="dom-text">Log in</span></T>
+          <T tag="input" attrs='id="email" type="text"' tone="sky" />
+          <T tag="button" attrs='type="submit" data-testid="login-button"' tone="peach"><span className="dom-text">Log in</span></T>
         </T>
       </T>
     </div>
@@ -174,7 +174,7 @@ function Actionability() {
       <div className="fig-flow fig-flow-tight">
         {steps.map(([t, sub], i) => (
           <div key={i} className="fig-step-wrap">
-            <Node tone={i === 4 ? 'rose' : 'mint'} icon={<Icon name="check" size={20} />} title={t} sub={sub} />
+            <Node tone="mint" icon={<Icon name="check" size={20} />} title={t} sub={sub} />
             {i < steps.length - 1 && <Arrow />}
           </div>
         ))}
@@ -213,7 +213,7 @@ function TestAgents() {
       <div className="fig-flow">
         <Node tone="lavender" icon={<Person who="you" size={34} />} title={{ en: 'You', ru: 'Ты' }} sub={{ en: 'request + seed test', ru: 'запрос + seed-тест' }} />
         <Arrow />
-        <Node tone="rose" icon={<Icon name="map" size={24} />} title={{ en: 'Planner', ru: 'Планировщик' }} sub={{ en: 'explores the app → specs/plan.md', ru: 'исследует приложение → specs/plan.md' }} />
+        <Node tone="butter" icon={<Icon name="map" size={24} />} title={{ en: 'Planner', ru: 'Планировщик' }} sub={{ en: 'explores the app → specs/plan.md', ru: 'исследует приложение → specs/plan.md' }} />
         <Arrow />
         <Node tone="sky" icon={<Icon name="code" size={24} />} title={{ en: 'Generator', ru: 'Генератор' }} sub={{ en: 'plan → tests/test_*.py, checks locators live', ru: 'план → tests/test_*.py, сверяет локаторы вживую' }} />
         <Arrow />
