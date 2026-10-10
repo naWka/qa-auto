@@ -1,0 +1,981 @@
+id: c5-l2
+chapter: c5
+title: { en: "Fragile vs resilient", ru: "Хрупкие и устойчивые" }
+goal:
+  en: "Spot fragile CSS and XPath selectors and explain which change in the app will break them."
+  ru: "Замечать хрупкие CSS- и XPath-селекторы и объяснять, какое изменение в приложении их сломает."
+minutes: 11
+keyPoints:
+  - id: kp-layout-breaks
+    title:
+      en: "Selectors tied to layout break on a redesign, not on a bug"
+      ru: "Селекторы, привязанные к вёрстке, ломаются от редизайна, а не от бага"
+  - id: kp-user-facing-resilient
+    title:
+      en: "A resilient locator fails only when the user's experience changes"
+      ru: "Устойчивый локатор падает, только когда меняется опыт пользователя"
+  - id: kp-false-alarms
+    title:
+      en: "False alarms cost the team its trust in the suite"
+      ru: "Ложные тревоги подрывают доверие команды к набору тестов"
+terms: [fragile-selector, resilient-locator, css-selector, xpath, locator, false-positive, flaky-test, test-suite]
+
+steps:
+  - type: story
+    lines:
+      - who: sofia
+        text:
+          en: "Kai's redesign went to staging last night, and now 38 of 120 tests are red. Do we stop the release?"
+          ru: "Вчера вечером редизайн Кая выкатили на стейджинг, а теперь красные 38 тестов из 120. Останавливаем релиз?"
+      - who: petal
+        text:
+          en: "I can regenerate all 38 tests in ten minutes!"
+          ru: "Я могу перегенерировать все 38 тестов за десять минут!"
+      - who: maya
+        text:
+          en: "Nobody stops or regenerates anything yet. Kai says users see the same texts and buttons. So first we find out what broke — the app or the tests."
+          ru: "Пока никто ничего не останавливает и не перегенерирует. Кай говорит, что пользователи видят те же тексты и кнопки. Значит, сначала выясним, что сломалось — приложение или тесты."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед началом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c5-l2-p1
+        kind: predict
+        keyPoint: kp-layout-breaks
+        app: { variant: redesign }
+        context:
+          en: "Kai's redesign renames every CSS class. On screen the login page looks and works the same."
+          ru: "Редизайн Кая переименовывает все CSS-классы. На экране страница входа выглядит и работает так же."
+        prompt:
+          en: "Will Petal's test pass on the redesign build?"
+          ru: "Пройдёт ли тест Petal на сборке с редизайном?"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('registered user can log in', async ({ page }) => {
+            await page.goto('/login');
+            await page.getByLabel('Email').fill('anna@bloomly.app');
+            await page.getByLabel('Password').fill('bloom123');
+            await page.locator('.btn').click();
+            await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+          });
+        outcome: fail
+        reasons:
+          - text:
+              en: "Fail: line 7 looks for the class `btn`, and that class no longer exists — although login itself works."
+              ru: "Упадёт: строка 7 ищет класс `btn`, а такого класса больше нет, — хотя сам вход работает."
+            correct: true
+          - text:
+              en: "Pass: the button is still there and still says “Log in”."
+              ru: "Пройдёт: кнопка на месте, и на ней всё так же написано «Log in»."
+            why:
+              en: "It is — but the test doesn't look for “Log in”. It looks for the class, and the class is gone."
+              ru: "Да, но тест ищет не «Log in». Он ищет класс, а класса больше нет."
+          - text:
+              en: "Fail: the redesign broke the login."
+              ru: "Упадёт: редизайн сломал вход."
+            why:
+              en: "Login works: a user can still fill in the form and click “Log in”. Only the test's way of finding the button broke."
+              ru: "Вход работает: пользователь всё так же заполняет форму и нажимает «Log in». Сломался только способ, которым тест ищет кнопку."
+        hints:
+          - en: "Which line depends on a CSS class?"
+            ru: "Какая строка зависит от CSS-класса?"
+          - en: "After the redesign the button's class is `bl_btn__375kd`. Does `.btn` match it?"
+            ru: "После редизайна у кнопки класс `bl_btn__375kd`. Подходит ли под него `.btn`?"
+        explain:
+          en: "The test fails on the click: `locator('.btn')` waits 5 seconds for an element with the class `btn` and finds none. Nothing is wrong for users, so this red is a false alarm. That's what happened to the 38 tests last night."
+          ru: "Тест падает на клике: `locator('.btn')` 5 секунд ждёт элемент с классом `btn` и не находит. Для пользователей всё в порядке, так что этот красный — ложная тревога. Именно это этой ночью и случилось с 38 тестами."
+
+      - id: c5-l2-p2
+        kind: choice
+        keyPoint: kp-false-alarms
+        prompt:
+          en: "For the third night in a row, 38 tests are red after the redesign — and every time the app turned out to be fine. Tonight the suite is red again. What's the biggest risk?"
+          ru: "Третью ночь подряд после редизайна красные 38 тестов — и каждый раз приложение оказывалось в порядке. Сегодня набор снова красный. Какой риск самый большой?"
+        options:
+          - text: { en: "Nobody looks closely anymore — and tonight one of the red tests is a real bug", ru: "Никто уже не смотрит внимательно, а сегодня один из красных тестов — настоящий баг" }
+            correct: true
+            why:
+              en: "False alarms train people to ignore red. That's how a real bug gets through a fully automated regression."
+              ru: "Ложные тревоги приучают людей не обращать внимания на красный. Так настоящий баг и проходит через полностью автоматизированную регрессию."
+          - text: { en: "The run takes a few minutes longer", ru: "Прогон идёт на несколько минут дольше" }
+            why:
+              en: "True, but minor. What really wears out is the team's attention."
+              ru: "Верно, но это мелочь. По-настоящему изнашивается внимание команды."
+          - text: { en: "The tests will start passing on their own", ru: "Тесты сами начнут проходить" }
+            why:
+              en: "They won't: a selector that matches nothing fails every night until someone changes it."
+              ru: "Не начнут: селектор, который ничего не находит, будет падать каждую ночь, пока его не поменяют."
+        hints:
+          - en: "Think about people, not machines. What does a team learn after three red nights with no bugs?"
+            ru: "Думай о людях, а не о машинах. Чему учится команда после трёх красных ночей без багов?"
+          - en: "Remember the boy who cried wolf."
+            ru: "Вспомни мальчика, который кричал «Волки!»."
+        explain:
+          en: "Each false alarm costs triage time, but the real price is trust: once “red” means “the tests again”, a real red goes unread."
+          ru: "Каждая ложная тревога стоит времени на разбор, но настоящая цена — доверие: когда «красный» значит «опять тесты», настоящий красный никто не читает."
+
+  - type: theory
+    keyPoint: kp-layout-breaks
+    title: { en: "A fragile selector describes the layout", ru: "Хрупкий селектор описывает вёрстку" }
+    body:
+      - en: "Look at what a selector actually says. `#login-form > input:nth-child(3)` means “the third child of the login form, if it's an input”. That's a description of the layout, not of the Email field."
+        ru: "Посмотри, что на самом деле говорит селектор. `#login-form > input:nth-child(3)` значит «третий потомок формы входа, если это input». Это описание вёрстки, а не поля Email."
+      - en: "In a test case you'd never write “click the third button from the left”: one new button, and the step is wrong while the feature still works. A [[fragile selector|fragile-selector]] is that step written in code. It breaks on a redesign, not on a bug."
+        ru: "В тест-кейсе ты бы никогда не написал{а|} «нажми третью кнопку слева»: добавят одну кнопку — и шаг неверен, хотя функция работает. [[Хрупкий селектор|fragile-selector]] — это такой шаг, записанный кодом. Он ломается от редизайна, а не от бага."
+      - en: "The usual suspects in [[CSS|css-selector]] and [[XPath|xpath]]: **position** (`nth-child`, `li[2]`), **long paths** (`nav > a > span`) and **class names** — worst of all generated ones like `bl_btn__375kd`, where the part after `__` is a hash that changes whenever the styles change."
+        ru: "Обычные подозреваемые в [[CSS|css-selector]] и [[XPath|xpath]]: **позиция** (`nth-child`, `li[2]`), **длинные пути** (`nav > a > span`) и **имена классов** — хуже всего сгенерированные, вроде `bl_btn__375kd`: часть после `__` — это хеш, который меняется при любом изменении стилей."
+    code: |
+      // Tied to layout: each one breaks when the page is rebuilt
+      page.locator('li:nth-child(2) .btn');              // position + class
+      page.locator('#login-form > input:nth-child(3)');  // path + position
+      page.locator('.bl_btn__375kd');                    // generated class
+      page.locator('//main/form/input[1]');              // XPath by position
+    mentor:
+      en: "For every selector, ask: “What change would break it?” If the answer is “a designer's change”, it's fragile."
+      ru: "Про каждый селектор спрашивай: «Какое изменение его сломает?» Если ответ — «изменение от дизайнера», он хрупкий."
+
+  - type: example
+    keyPoint: kp-layout-breaks
+    title: { en: "Same check, two ways — run on the redesign", ru: "Одна проверка, два способа — запуск на редизайне" }
+    intro:
+      en: "Petal's old test and a resilient version of the same check. This run uses Kai's redesign build. Run it, then read the notes."
+      ru: "Старый тест Petal и устойчивая версия той же проверки. Этот запуск идёт на сборке с редизайном Кая. Запусти, потом прочитай заметки."
+    app: { variant: redesign }
+    runnable: true
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('fragile: adds Sunny Tulips to the cart', async ({ page }) => {
+        await page.goto('/shop');
+        await page.locator('li:nth-child(2) .btn').click();
+        await expect(page.locator('nav > a:nth-child(3) > .badge')).toHaveText('1');
+      });
+
+      test('resilient: adds Sunny Tulips to the cart', async ({ page }) => {
+        await page.goto('/shop');
+        const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+        await card.getByRole('button', { name: 'Add to cart' }).click();
+        await expect(page.getByTestId('cart-count')).toHaveText('1');
+      });
+    notes:
+      - lines: 5
+        text:
+          en: "`li:nth-child(2)` = “the second product in the list”: it breaks when the sort order or the catalog changes. `.btn` = the button's look: it breaks when classes are renamed. On the redesign the run times out right here — two ways to break, and neither is a bug."
+          ru: "`li:nth-child(2)` = «второй товар в списке»: ломается, когда меняется сортировка или каталог. `.btn` = внешний вид кнопки: ломается, когда переименовывают классы. На редизайне прогон падает по таймауту прямо здесь — два способа сломаться, и ни один из них не баг."
+      - lines: 6
+        text:
+          en: "A path through the menu: `nav` → its third link → the element with the class `badge`. The redesign wrapped the links in a new `div` and renamed the class — two breaks in one line."
+          ru: "Путь через меню: `nav` → его третья ссылка → элемент с классом `badge`. Редизайн завернул ссылки в новый `div` и переименовал класс — две поломки в одной строке."
+      - lines: [11, 12]
+        text:
+          en: "The product card that contains the text “Sunny Tulips”, then the button by role and name inside it. Nothing here depends on order, nesting or styling. (`filter` gets its own lesson next.)"
+          ru: "Карточка товара, в которой есть текст «Sunny Tulips», а внутри неё — кнопка по роли и имени. Здесь ничего не зависит от порядка, вложенности или стилей. (Про `filter` — отдельный следующий урок.)"
+      - lines: 13
+        text:
+          en: "The counter by its test id. Result: test 1 red, test 2 green — on the same app, where nothing changed for users."
+          ru: "Счётчик по его test id. Итог: тест 1 красный, тест 2 зелёный — на одном и том же приложении, где для пользователей ничего не изменилось."
+
+  - type: task
+    task:
+      id: c5-l2-t1
+      kind: match
+      keyPoint: kp-layout-breaks
+      prompt:
+        en: "Match each locator with the change that breaks it."
+        ru: "Сопоставь каждый локатор с изменением, которое его сломает."
+      pairs:
+        - left: "page.locator('.btn')"
+          right: { en: "New design tokens: every CSS class gets a new name", ru: "Новые дизайн-токены: у каждого CSS-класса новое имя" }
+        - left: "page.locator('#login-form > input:nth-child(3)')"
+          right: { en: "Each label and its field get wrapped in a new `div`", ru: "Каждую подпись с её полем заворачивают в новый `div`" }
+        - left: "page.locator('//ul/li[2]//button')"
+          right: { en: "The “Most popular” order in the shop changes", ru: "Меняется порядок «Most popular» в магазине" }
+        - left: "page.locator('article > h2 + p')"
+          right: { en: "The price moves above the product name", ru: "Цена переезжает над названием товара" }
+        - left: "page.getByRole('button', { name: 'Log in' })"
+          right: { en: "The button text changes to “Sign in”", ru: "Текст кнопки меняется на «Sign in»" }
+      leftCode: true
+      hints:
+        - en: "Read what each locator relies on: a class, a path, a position, the order of tags — or the button's name."
+          ru: "Прочитай, на что опирается каждый локатор: на класс, путь, позицию, порядок тегов — или на имя кнопки."
+        - en: "`li[2]` means “the second item”. What can make another product the second one? `h2 + p` means “the paragraph right after the heading”."
+          ru: "`li[2]` значит «второй элемент». Что может сделать вторым другой товар? `h2 + p` значит «абзац сразу после заголовка»."
+        - en: "Only the last locator relies on something users see — so only a change users notice breaks it."
+          ru: "Только последний локатор опирается на то, что видит пользователь, — значит, его ломает только заметное пользователю изменение."
+      praise:
+        en: "You read each selector as a sentence and found the change behind it — that's the review question in one move."
+        ru: "Ты {прочитала|прочитал} каждый селектор как предложение и {нашла|нашёл} изменение, которое за ним стоит, — это и есть вопрос ревью в одно действие."
+      explain:
+        en: "Every fragile selector has its own weak spot: the class, the nesting, the position, the order of tags. Notice the last pair: the role + name locator breaks only on a change users see too. That's the next idea."
+        ru: "У каждого хрупкого селектора своё слабое место: класс, вложенность, позиция, порядок тегов. Обрати внимание на последнюю пару: локатор по роли и имени ломается только от изменения, которое видят и пользователи. Это следующая идея."
+
+  - type: task
+    task:
+      id: c5-l2-t2
+      kind: inspect
+      keyPoint: kp-layout-breaks
+      app: { route: /shop, variant: redesign }
+      prompt:
+        en: "This is the shop after Kai's redesign. Petal's test reads prices with `page.locator('article > h2 + p')` — “the paragraph right after the product name”. Find the price of Sunny Tulips and see where it sits now."
+        ru: "Это магазин после редизайна Кая. Тест Petal читает цены через `page.locator('article > h2 + p')` — «абзац сразу после названия товара». Найди цену Sunny Tulips и посмотри, где она теперь."
+      target: "[data-product-id='sunny-tulips'] [data-testid='product-price']"
+      view: dom
+      show: [attributes]
+      hints:
+        - en: "Scroll the page to the Sunny Tulips card (second in the list) and click its price — or open it in the tree: `<div id=\"results\">` → `<ul>` → the second `<li>` → `<article>`."
+          ru: "Прокрути страницу до карточки Sunny Tulips (вторая в списке) и нажми на её цену — или раскрой её в дереве: `<div id=\"results\">` → `<ul>` → второй `<li>` → `<article>`."
+        - en: "The price is a `<p>` with `data-testid=\"product-price\"`. Check what comes right before and after it."
+          ru: "Цена — это `<p>` с `data-testid=\"product-price\"`. Посмотри, что идёт прямо перед ним и после него."
+        - en: "It's `<p … data-testid=\"product-price\">€24.00</p>` — now above `<h2>Sunny Tulips</h2>`."
+          ru: "Это `<p … data-testid=\"product-price\">€24.00</p>` — теперь он выше `<h2>Sunny Tulips</h2>`."
+      praise:
+        en: "Found it — and you can see exactly why the old selector misses: same price, new place in the tree."
+        ru: "Наш{ла|ёл} — и теперь видно, почему старый селектор промахивается: цена та же, место в дереве новое."
+      explain:
+        en: "In the old build a card went: image, name (`h2`), price (`p`). The redesign puts the price above the name, so for Sunny Tulips the element right after `h2` is the button — “the `p` after `h2`” is gone. Shoppers see the same card and the same €24.00. The class changed too (`bl_price__…`), but the test id `product-price` didn't — that's what a resilient locator uses."
+        ru: "В старой сборке карточка шла так: картинка, название (`h2`), цена (`p`). Редизайн поставил цену над названием, поэтому у Sunny Tulips сразу после `h2` идёт кнопка — «`p` после `h2`» больше нет. Покупатель видит ту же карточку и те же €24.00. Класс тоже поменялся (`bl_price__…`), а test id `product-price` — нет; именно на него и опирается устойчивый локатор."
+
+  - type: theory
+    keyPoint: kp-user-facing-resilient
+    title: { en: "Resilient means red for the right reason", ru: "Устойчивый — значит красный по правильной причине" }
+    body:
+      - en: "A [[resilient locator|resilient-locator]] describes what the user sees: a role and a name, a label, a visible text. `getByRole('button', { name: 'Log in' })` is “the Log in button” — exactly how your test case says it. Kai's redesign changed classes and wrappers, not that."
+        ru: "[[Устойчивый локатор|resilient-locator]] описывает то, что видит пользователь: роль и имя, подпись, видимый текст. `getByRole('button', { name: 'Log in' })` — это «кнопка Log in», ровно как в твоём тест-кейсе. Редизайн Кая поменял классы и обёртки, но не это."
+      - en: "Resilient doesn't mean “never fails”. If the button is renamed to “Sign in”, the test fails — and it should: users see a new button, so the test case changes too. If the button stops being a button for screen readers, it fails — and that's an accessibility bug worth reporting."
+        ru: "Устойчивый не значит «никогда не падает». Если кнопку переименуют в «Sign in», тест упадёт — и правильно: пользователи видят новую кнопку, значит, меняется и тест-кейс. Если кнопка перестанет быть кнопкой для скринридера, тест упадёт — и это баг доступности, о котором стоит сообщить."
+      - en: "So the rule: a good [[locator]] fails **only when the user's experience changes**. New classes and wrappers, which only the code sees → green. A new button text or a lost role, which users notice → red."
+        ru: "Отсюда правило: хороший [[локатор|locator]] падает, **только когда меняется опыт пользователя**. Новые классы и обёртки, которые видит только код, → зелёный. Новый текст кнопки или потерянная роль, которые замечают пользователи, → красный."
+    figure: red-green
+    mentor:
+      en: "`getByTestId` survives a rename too — handy when an element has no good name. But it won't tell you that the button text changed. Choose knowing what you want to catch."
+      ru: "`getByTestId` переживает и переименование — удобно, когда у элемента нет хорошего имени. Но он не скажет тебе, что текст кнопки изменился. Выбирай, понимая, что именно хочешь поймать."
+
+  - type: task
+    task:
+      id: c5-l2-t3
+      kind: predict
+      keyPoint: kp-user-facing-resilient
+      app: { variant: redesign }
+      context:
+        en: "Kai's redesign wrapped each label with its field on the signup form in a new `div` and renamed every class. This form changed more than any other page."
+        ru: "Редизайн Кая завернул каждую подпись вместе с её полем в форме регистрации в новый `div` и переименовал все классы. Эта форма поменялась сильнее любой другой страницы."
+      prompt:
+        en: "Will this test pass on the redesign build?"
+        ru: "Пройдёт ли этот тест на сборке с редизайном?"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('new customer can sign up', async ({ page }) => {
+          await page.goto('/signup');
+          await page.getByLabel('Full name').fill('Lena Ferreira');
+          await page.getByLabel('Email').fill('lena@bloomly.app');
+          await page.getByLabel('Password').fill('sunflower8');
+          await page.getByLabel('Country').selectOption('Portugal');
+          await page.getByLabel('I agree to the Terms of Service').check();
+          await page.getByRole('button', { name: 'Create account' }).click();
+          await expect(page.getByRole('heading', { name: 'Account created!' })).toBeVisible();
+        });
+      outcome: pass
+      reasons:
+        - text:
+            en: "Pass: every locator uses a label, a role or a name — the wrappers and classes changed none of them."
+            ru: "Пройдёт: каждый локатор опирается на подпись, роль или имя — обёртки и классы ничего из этого не поменяли."
+          correct: true
+        - text:
+            en: "Fail: the fields moved into new wrappers, so the locators lose them."
+            ru: "Упадёт: поля переехали в новые обёртки, и локаторы их теряют."
+          why:
+            en: "`getByLabel` follows the link between a label and its field (`for` → `id`), not their position in the tree."
+            ru: "`getByLabel` идёт по связи между подписью и её полем (`for` → `id`), а не по их месту в дереве."
+        - text:
+            en: "Fail: the “Create account” button has a new class."
+            ru: "Упадёт: у кнопки «Create account» новый класс."
+          why:
+            en: "The test never mentions a class. It finds the button by role and name."
+            ru: "Тест нигде не упоминает класс. Он находит кнопку по роли и имени."
+      hints:
+        - en: "Does any locator mention a class, a position or a path?"
+          ru: "Упоминает ли хоть один локатор класс, позицию или путь?"
+        - en: "`getByLabel` finds a field through its label. Did the redesign change any label text?"
+          ru: "`getByLabel` находит поле через его подпись. Поменял ли редизайн текст хоть одной подписи?"
+        - en: "None of these locators depends on the layout."
+          ru: "Ни один из этих локаторов не зависит от вёрстки."
+      praise:
+        en: "You trusted the locators for the right reason: they describe the form the way a customer fills it in."
+        ru: "Ты {доверилась|доверился} локаторам по правильной причине: они описывают форму так, как её заполняет покупатель."
+      explain:
+        en: "The signup form got four new wrappers and new classes everywhere — and the test didn't notice, because it never relied on them. That's what resilient means in practice: green on a change users don't care about."
+        ru: "Форма регистрации получила четыре новые обёртки и новые классы повсюду — а тест ничего не заметил, потому что никогда на них не опирался. Вот что значит «устойчивый» на практике: зелёный при изменении, которое пользователям безразлично."
+
+  - type: task
+    task:
+      id: c5-l2-t4
+      kind: review
+      keyPoint: kp-layout-breaks
+      context:
+        en: "After the redesign Petal “healed” the red promo test: it opened the staging page and copied the new class names. Green on staging ✅"
+        ru: "После редизайна Petal «вылечил» красный тест промокода: открыл страницу на стейджинге и скопировал новые имена классов. На стейджинге зелёный ✅"
+      prompt:
+        en: "Review the healed test. Flag every line that will go red again — or slows down every run."
+        ru: "Сделай ревью «вылеченного» теста. Отметь каждую строку, которая снова покраснеет или замедляет каждый прогон."
+      testCase:
+        id: TC-521
+        title: BLOOM10 gives 10% off
+        preconditions: ["Cart has 1 Rose Bouquet (€35.00)"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Enter the promo code and click \"Apply\"", data: "BLOOM10", expected: "Total is €36.40" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('BLOOM10 gives 10% off', async ({ page }) => {
+          await page.goto('/cart');
+          await page.locator('.bl_promo__33cjx > input').fill('BLOOM10');
+          await page.locator('.bl_promo__33cjx > .bl_btn__375kd').click();
+          await page.waitForTimeout(1000);
+          await expect(page.locator('.bl_summary__vi46o > dd:nth-child(8)')).toHaveText('€36.40');
+        });
+      issues:
+        - line: 5
+          type: fragile-locator
+          note:
+            en: "A generated class plus a path. `bl_promo__33cjx` is today's hash — the next design-system build can rename it again. Use `getByLabel('Promo code')`."
+            ru: "Сгенерированный класс плюс путь. `bl_promo__33cjx` — сегодняшний хеш, следующая сборка дизайн-системы может снова его переименовать. Используй `getByLabel('Promo code')`."
+        - line: 6
+          type: fragile-locator
+          note:
+            en: "The same problem twice: generated classes for the block and for the button. Use `getByRole('button', { name: 'Apply' })`."
+            ru: "Та же проблема дважды: сгенерированные классы у блока и у кнопки. Используй `getByRole('button', { name: 'Apply' })`."
+        - line: 7
+          type: hard-wait
+          note:
+            en: "One extra second on every run, and it guarantees nothing. `toHaveText` waits by itself."
+            ru: "Лишняя секунда на каждом прогоне, и никаких гарантий. `toHaveText` ждёт сам."
+        - line: 8
+          type: fragile-locator
+          note:
+            en: "A generated class plus a position: “the 8th child of the summary”. Add a row like “Gift wrap”, and it reads the wrong value. Use `getByTestId('cart-total')`."
+            ru: "Сгенерированный класс плюс позиция: «восьмой потомок итогового блока». Добавят строку вроде «Gift wrap» — и он прочитает не то значение. Используй `getByTestId('cart-total')`."
+      types: [fragile-locator, hard-wait, wrong-assertion, wrong-data, hallucination]
+      hints:
+        - en: "It's green on staging today. For each line, ask: what will break it next month?"
+          ru: "Сегодня на стейджинге он зелёный. Про каждую строку спроси: что сломает её в следующем месяце?"
+        - en: "Look for `bl_…__xxxxx` names and positions like `nth-child`. One more line costs time, not stability."
+          ru: "Ищи имена вида `bl_…__xxxxx` и позиции вроде `nth-child`. А ещё одна строка бьёт не по стабильности, а по времени."
+        - en: "Lines 5, 6 and 8 are fragile; line 7 is a hard wait."
+          ru: "Строки 5, 6 и 8 хрупкие; строка 7 — жёсткое ожидание."
+      praise:
+        en: "“Green on staging” didn't fool you — you checked what each line depends on."
+        ru: "«Зелёный на стейджинге» тебя не обманул — ты {проверила|проверил}, от чего зависит каждая строка."
+      explain:
+        en: "Petal fixed the symptom (today's red) and kept the cause (locators tied to styling). The generated names will change again, and the suite will cry wolf again. Note what's fine: the steps, the data and the expected €36.40 match TC-521 — only the way of finding elements is wrong."
+        ru: "Petal вылечил симптом (сегодняшний красный) и оставил причину (локаторы, привязанные к стилям). Сгенерированные имена снова поменяются, и набор снова поднимет ложную тревогу. Заметь, что здесь в порядке: шаги, данные и ожидаемые €36.40 совпадают с TC-521 — неправилен только способ искать элементы."
+
+  - type: theory
+    keyPoint: kp-false-alarms
+    title: { en: "A false alarm costs more than one red test", ru: "Ложная тревога стоит дороже одного красного теста" }
+    body:
+      - en: "A test that fails without a bug in the app is a [[false positive|false-positive]] — a false alarm. One costs fifteen minutes of triage. Thirty-eight after a redesign cost the team a day."
+        ru: "Тест, который падает без бага в приложении, — это [[ложное срабатывание|false-positive]], ложная тревога. Одна стоит пятнадцати минут разбора. Тридцать восемь после редизайна стоят команде целого дня."
+      - en: "The bigger cost is trust. After a few red nights the team learns “red means the tests again”: people re-run, skip, stop reading the report. The night a real bug turns a test red, nobody looks. It's the boy who cried wolf — for a whole [[test suite|test-suite]]."
+        ru: "Главная цена — доверие. После нескольких красных ночей команда усваивает: «красный — это опять тесты». Люди перезапускают, пропускают, перестают читать отчёт. А в ночь, когда тест покраснеет из-за настоящего бага, никто не посмотрит. Это мальчик, который кричал «Волки!», — только для целого [[набора тестов|test-suite]]."
+      - en: "Agents tend to treat the symptom. Petal adds waits and retries — but a fragile selector isn't a [[flaky test|flaky-test]]: it fails every single time, so waiting only delays the red. Or Petal copies today's class names — green until the next build. The real fix is a locator a user would recognize."
+        ru: "Агенты обычно лечат симптом. Petal добавляет ожидания и повторные запуски — но хрупкий селектор не [[флаки-тест|flaky-test]]: он падает каждый раз, и ожидание только откладывает красный. Или Petal копирует сегодняшние имена классов — зелёный до следующей сборки. Настоящее исправление — локатор, который узнал бы пользователь."
+    mentor:
+      en: "In the standup, give two numbers: “Red: 38. Real bugs: 0.” That pair is the best argument for resilient locators."
+      ru: "На стендапе называй два числа: «Красных: 38. Настоящих багов: 0». Эта пара — лучший аргумент за устойчивые локаторы."
+
+  - type: task
+    task:
+      id: c5-l2-t5
+      kind: choice
+      keyPoint: kp-false-alarms
+      context:
+        en: "Tuesday's night run on the redesign build: four red tests. These are their error lines from the report."
+        ru: "Ночной прогон во вторник на сборке с редизайном: четыре красных теста. Вот их строки с ошибками из отчёта."
+      prompt:
+        en: "Which failures are false alarms — the app is fine, and the test must change? Pick all that apply."
+        ru: "Какие падения — ложные тревоги: приложение в порядке, а менять нужно тест? Выбери все подходящие."
+      multi: true
+      optionsCode: true
+      options:
+        - text: "locator.click: Timeout 5000ms exceeded — waiting for locator('.btn')"
+          correct: true
+          why:
+            en: "The class `btn` is gone after the redesign. The button is there; the selector is stale."
+            ru: "Класса `btn` после редизайна нет. Кнопка на месте, устарел селектор."
+        - text: "locator.fill: Timeout 5000ms exceeded — waiting for locator('#login-form > input:nth-child(3)')"
+          correct: true
+          why:
+            en: "The Email field moved into a wrapper `div`. The field works; the path doesn't."
+            ru: "Поле Email переехало в обёртку `div`. Поле работает, а путь — нет."
+        - text: "expect(getByTestId('cart-total')).toHaveText failed — Expected: \"€36.40\", Received: \"€31.50\""
+          why:
+            en: "The locator found the total — the value is wrong: €35.00 − €3.50 and no €4.90 delivery. A real bug: report it."
+            ru: "Локатор нашёл итог, а неверно значение: €35.00 − €3.50 и нет доставки за €4.90. Настоящий баг: заводи баг-репорт."
+        - text: "locator.click: Timeout 5000ms exceeded — waiting for getByRole('button', { name: 'Add to cart' })"
+          why:
+            en: "A role + name locator failing after a redesign means “Add to cart” stopped being a button — screen readers can't use it either. An accessibility bug, not a test problem."
+            ru: "Если после редизайна падает локатор по роли и имени, значит, «Add to cart» перестала быть кнопкой — скринридер её тоже не найдёт. Это баг доступности, а не проблема теста."
+      hints:
+        - en: "For each line, ask: did the test find the element and get a wrong value — or not find it at all?"
+          ru: "Про каждую строку спроси: тест нашёл элемент и получил неверное значение — или вообще его не нашёл?"
+        - en: "A missing class or path → the test is stale. A wrong value, or a missing role + name → users are affected."
+          ru: "Пропал класс или путь → устарел тест. Неверное значение или пропавшие роль и имя → это касается пользователей."
+        - en: "The first two are false alarms."
+          ru: "Ложные тревоги — первые две."
+      praise:
+        en: "Two false alarms, one real bug, one accessibility bug — that's the triage the team needs before anyone says “stop the release”."
+        ru: "Две ложные тревоги, один настоящий баг и один баг доступности — именно такой разбор нужен команде, прежде чем кто-то скажет «останавливаем релиз»."
+      explain:
+        en: "Fragile selectors fail with “waiting for locator(…)” on a class or a path — the app is fine. A resilient locator that fails, or an assertion that receives a wrong value, points at something users would see. That's why resilient locators make red worth reading."
+        ru: "Хрупкие селекторы падают с «waiting for locator(…)» на классе или пути — приложение в порядке. Упавший устойчивый локатор или проверка с неверным значением указывают на то, что увидели бы пользователи. Поэтому с устойчивыми локаторами красный стоит читать."
+
+  - type: task
+    task:
+      id: c5-l2-t6
+      kind: agent
+      keyPoint: kp-false-alarms
+      app: { variant: redesign, state: { user: anna@bloomly.app } }
+      context:
+        en: |
+          The night run is red because of 38 tests like this one (tests/orders.spec.ts). The error: `locator.selectOption: Timeout 5000ms exceeded — waiting for locator('.toolbar > select')`.
+          ```js
+          import { test, expect } from '@playwright/test';
+
+          test('Delivered filter shows delivered orders only', async ({ page }) => {
+            await page.goto('/orders');
+            await page.locator('.toolbar > select').selectOption('Delivered');
+            await expect(page.locator('table tbody tr')).toHaveCount(3);
+          });
+          ```
+          Petal is simulated, as everywhere in the trainer.
+        ru: |
+          Ночной прогон красный из-за 38 таких тестов, как этот (tests/orders.spec.ts). Ошибка: `locator.selectOption: Timeout 5000ms exceeded — waiting for locator('.toolbar > select')`.
+          ```js
+          import { test, expect } from '@playwright/test';
+
+          test('Delivered filter shows delivered orders only', async ({ page }) => {
+            await page.goto('/orders');
+            await page.locator('.toolbar > select').selectOption('Delivered');
+            await expect(page.locator('table tbody tr')).toHaveCount(3);
+          });
+          ```
+          Petal, как и везде в тренажёре, симулирован.
+      prompt:
+        en: "Compose a request that fixes the cause, not the symptom. Then run Petal's updated test — it runs on the redesign build."
+        ru: "Собери запрос, который исправляет причину, а не симптом. Потом запусти обновлённый тест Petal — он запускается на сборке с редизайном."
+      testCase:
+        id: TC-522
+        title: Delivered filter shows delivered orders only
+        preconditions: ["Anna is logged in", "Anna has 3 delivered orders: #1042, #1039, #1037"]
+        steps:
+          - { action: "Open /orders" }
+          - { action: "Choose \"Delivered\" in the Status filter", expected: "Only the 3 delivered orders are listed" }
+      blocks:
+        - { id: task, locked: true, text: "38 tests fail after the design-system redesign. The app works: texts, roles, labels and test ids did not change. Start with tests/orders.spec.ts.", ru: "После редизайна дизайн-системы падают 38 тестов. Приложение работает: тексты, роли, подписи и test id не менялись. Начни с tests/orders.spec.ts." }
+        - { id: locators, text: "Replace CSS classes and DOM paths with getByRole, getByLabel or getByTestId. Don't copy the new generated class names (bl_…).", ru: "Замени CSS-классы и пути по DOM на getByRole, getByLabel или getByTestId. Не копируй новые сгенерированные имена классов (bl_…)." }
+        - { id: keep, text: "Keep every assertion and expected value as it is — don't change what the tests check.", ru: "Оставь все проверки и ожидаемые значения как есть — не меняй то, что проверяют тесты." }
+        - { id: fast, text: "Just make the suite green as fast as you can.", ru: "Просто сделай набор зелёным как можно быстрее." }
+      responses:
+        - when: [locators, keep]
+          unless: [fast]
+          best: true
+          message:
+            en: "Updated! The Status filter is found by its label, the rows by their test id. The check is the same: exactly 3 delivered orders. Green on the redesign ✅"
+            ru: "Обновил! Фильтр Status ищется по подписи, строки — по test id. Проверка та же: ровно 3 доставленных заказа. Зелёный на редизайне ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('Delivered filter shows delivered orders only', async ({ page }) => {
+              await page.goto('/orders');
+              await page.getByLabel('Status').selectOption('Delivered');
+              await expect(page.getByTestId('order-row')).toHaveCount(3);
+            });
+        - when: [fast]
+          message:
+            en: "Done in two minutes ✅ I copied the new class names from staging and added a short wait, just in case."
+            ru: "Готово за две минуты ✅ Скопировал новые имена классов со стейджинга и на всякий случай добавил небольшое ожидание."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('Delivered filter shows delivered orders only', async ({ page }) => {
+              await page.goto('/orders');
+              await page.waitForTimeout(2000);
+              await page.locator('.bl_toolbar__xtule > select').selectOption('Delivered');
+              await expect(page.locator('table tbody tr')).toHaveCount(3);
+            });
+        - when: [locators]
+          message:
+            en: "Replaced the locators ✅ I also relaxed the row count to a visibility check — counts are brittle."
+            ru: "Заменил локаторы ✅ А ещё ослабил проверку количества строк до проверки видимости — количество слишком хрупкое."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('Delivered filter shows delivered orders only', async ({ page }) => {
+              await page.goto('/orders');
+              await page.getByLabel('Status').selectOption('Delivered');
+              await expect(page.getByTestId('order-row').first()).toBeVisible();
+            });
+        - when: []
+          message:
+            en: "Fixed ✅ The toolbar class is now `bl_toolbar__xtule`, so I updated the selector."
+            ru: "Исправил ✅ Класс панели теперь `bl_toolbar__xtule`, поэтому я обновил селектор."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('Delivered filter shows delivered orders only', async ({ page }) => {
+              await page.goto('/orders');
+              await page.locator('.bl_toolbar__xtule > select').selectOption('Delivered');
+              await expect(page.locator('table tbody tr')).toHaveCount(3);
+            });
+      missing:
+        locators:
+          en: "Without the locator rule Petal did the quickest thing: copied today's generated class name. Green on staging — and red again after the next design-system build."
+          ru: "Без правила про локаторы Petal сделал самое быстрое: скопировал сегодняшнее сгенерированное имя класса. Зелёный на стейджинге — и снова красный после следующей сборки дизайн-системы."
+        keep:
+          en: "Without “keep the assertions” Petal relaxed the check. Now the test passes even if the Delivered filter shows all 6 orders — it can't catch a broken filter anymore."
+          ru: "Без «оставь проверки как есть» Petal ослабил проверку. Теперь тест проходит, даже если фильтр Delivered покажет все 6 заказов, — сломанный фильтр он больше не поймает."
+      checks:
+        expect: pass
+        static: [noFragile, noHardWait]
+        also:
+          - app: { state: { user: anna@bloomly.app } }
+            expect: pass
+      hints:
+        - en: "Petal needs two things from you: *how* to find elements, and what must *not* change."
+          ru: "От тебя Petal нужны две вещи: *как* искать элементы и что *нельзя* менять."
+        - en: "“As fast as you can” invites shortcuts: copied classes, waits, weaker checks."
+          ru: "«Как можно быстрее» — приглашение срезать углы: скопированные классы, ожидания, ослабленные проверки."
+        - en: "Take the locators block and the keep-assertions block; leave out “fast”."
+          ru: "Возьми блок про локаторы и блок «оставь проверки»; «быстрее» не бери."
+      praise:
+        en: "You fixed the cause and protected the check. One prompt like this, and the 38 false alarms stop coming back."
+        ru: "Ты {исправила|исправил} причину и {защитила|защитил} проверку. Один такой промпт — и 38 ложных тревог перестают возвращаться."
+      explain:
+        en: "A false alarm has two bad “fixes”: make it quiet (copy today's classes, add waits) or make the test weaker (relax the assertion). Both switch the alarm off — and both lose something real. The right fix changes only how elements are found — and passes on the old build and the redesign alike. A real agent's output varies from run to run; a precise prompt makes the good outcome likely."
+        ru: "У ложной тревоги есть два плохих «исправления»: заглушить её (скопировать сегодняшние классы, добавить ожидания) или ослабить тест (смягчить проверку). Оба выключают тревогу — и оба теряют что-то важное. Правильное исправление меняет только способ искать элементы — и проходит и на старой сборке, и на редизайне. Ответы настоящего агента от запуска к запуску разные; точный промпт делает хороший результат вероятным."
+
+  - type: task
+    task:
+      id: c5-l2-t7
+      kind: fix
+      keyPoint: kp-user-facing-resilient
+      app: { variant: redesign }
+      prompt:
+        en: "Make Petal's test resilient. The editor runs it on Kai's redesign; when you check, we also run it on the old build — it must pass on both."
+        ru: "Сделай тест Petal устойчивым. Редактор запускает его на редизайне Кая; при проверке мы запустим его ещё и на старой сборке — он должен пройти на обеих."
+      testCase:
+        id: TC-523
+        title: Registered user logs in with Remember me
+        steps:
+          - { action: "Open /login" }
+          - { action: "Enter email and password", data: "anna@bloomly.app / bloom123" }
+          - { action: "Tick \"Remember me\"" }
+          - { action: "Click \"Log in\"", expected: "Heading \"Welcome back, Anna!\"" }
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('user logs in with Remember me', async ({ page }) => {
+          await page.goto('/login');
+          await page.locator('#login-form > input:nth-child(3)').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.locator('#login-form > label:nth-child(6) > input').check();
+          await page.locator('.btn').click();
+          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('user logs in with Remember me', async ({ page }) => {
+          await page.goto('/login');
+          await page.getByLabel('Email').fill('anna@bloomly.app');
+          await page.getByLabel('Password').fill('bloom123');
+          await page.getByRole('checkbox', { name: 'Remember me' }).check();
+          await page.getByRole('button', { name: 'Log in' }).click();
+          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
+        });
+      checks:
+        expect: pass
+        static: [noFragile]
+        also:
+          - app: {}
+            expect: pass
+      hints:
+        - en: "Three lines find elements by position or class. Line 6 already shows the resilient way."
+          ru: "Три строки ищут элементы по позиции или классу. Строка 6 уже показывает устойчивый способ."
+        - en: "Fields → `getByLabel`. The checkbox and the button have a role and a name."
+          ru: "Поля → `getByLabel`. У чекбокса и кнопки есть роль и имя."
+        - en: "Lines 5, 7 and 8: `page.getByLabel('Email')`, `page.getByRole('checkbox', { name: 'Remember me' })`, `page.getByRole('button', { name: 'Log in' })`."
+          ru: "Строки 5, 7 и 8: `page.getByLabel('Email')`, `page.getByRole('checkbox', { name: 'Remember me' })`, `page.getByRole('button', { name: 'Log in' })`."
+      praise:
+        en: "Green on both builds — and every locator reads like a step of TC-523."
+        ru: "Зелёный на обеих сборках — и каждый локатор читается как шаг TC-523."
+      explain:
+        en: "Your locators describe what Anna sees: the Email field, the Remember me checkbox, the Log in button. The redesign's wrappers and classes touch none of that, so the test passes on both builds — and it will fail only if one of those changes for users too."
+        ru: "Твои локаторы описывают то, что видит Anna: поле Email, чекбокс Remember me, кнопку Log in. Обёртки и классы редизайна ничего из этого не трогают, поэтому тест проходит на обеих сборках — и упадёт, только если что-то из этого изменится и для пользователей."
+
+  - type: mistakes
+    keyPoint: kp-false-alarms
+    title: { en: "Quick “fixes” that keep the false alarms coming", ru: "Быстрые «исправления», после которых ложные тревоги возвращаются" }
+    items:
+      - wrong: "await page.locator('.bl_btn__375kd').click(); // healed"
+        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+        why:
+          en: "A generated class name changes with the styles. Copying it fixes today's red and books the next false alarm."
+          ru: "Сгенерированное имя класса меняется вместе со стилями. Скопировать его — значит убрать сегодняшний красный и заказать следующую ложную тревогу."
+      - wrong: "await page.waitForTimeout(3000);\nawait page.locator('.btn').click();"
+        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+        why:
+          en: "A selector that matches nothing fails every time. A wait — or a retry — only makes the red arrive later. Fragile isn't flaky."
+          ru: "Селектор, который ничего не находит, падает каждый раз. Ожидание или повторный запуск только откладывают красный. Хрупкий — не значит нестабильный."
+      - wrong: "await expect(page.getByTestId('order-row').first()).toBeVisible();"
+        right: "await expect(page.getByTestId('order-row')).toHaveCount(3);"
+        why:
+          en: "Fragile is about *how you find* elements, not *what you check*. Fix the locator; keep the assertion as strict as the test case."
+          ru: "Хрупкость — про то, *как ищешь* элементы, а не про то, *что проверяешь*. Исправь локатор, а проверку оставь такой же строгой, как в тест-кейсе."
+      - wrong: "test.skip('Delivered filter shows delivered orders only', async ({ page }) => {"
+        right: "test('Delivered filter shows delivered orders only', async ({ page }) => {"
+        why:
+          en: "A skipped test raises no alarms at all — false or real. Muting noisy tests is how real bugs slip through after a red week. Fix the locators instead."
+          ru: "Пропущенный тест не поднимает никаких тревог — ни ложных, ни настоящих. Именно так, через отключённые шумные тесты, настоящие баги и проскакивают после красной недели. Лучше исправь локаторы."
+
+  - type: explain
+    keyPoint: kp-user-facing-resilient
+    prompt:
+      en: "In your own words: why did 38 tests go red after Kai's redesign, and what would have kept them green — without making them blind to real bugs?"
+      ru: "Своими словами: почему после редизайна Кая покраснели 38 тестов и что сохранило бы их зелёными — но так, чтобы они не ослепли к настоящим багам?"
+    model:
+      en: "The tests found elements by how the page was built: class names, positions, paths. The redesign changed exactly those things while users saw the same texts and buttons, so the tests failed without a bug — false alarms. Locators that describe what users see — a role and a name, a label, a visible text — or a test id agreed with the developers don't depend on the layout, so they stay green. They still fail when the user's experience changes: a renamed button or a lost role turns them red, and that red is worth reading."
+      ru: "Тесты искали элементы по тому, как устроена страница: по именам классов, позициям, путям. Редизайн поменял именно это, а пользователи видели те же тексты и кнопки, поэтому тесты упали без бага — ложные тревоги. Локаторы, которые описывают то, что видит пользователь, — роль и имя, подпись, видимый текст, — или test id, о котором договорились с разработчиками, не зависят от вёрстки, поэтому остаются зелёными. И всё равно падают, когда меняется опыт пользователя: переименованная кнопка или потерянная роль делают их красными, и такой красный стоит читать."
+
+  - type: phrases
+    items:
+      - context: standup
+        en: "After the redesign 38 tests went red, but all of them are false alarms — the locators were tied to CSS classes. Real bugs: zero."
+        ru: "После редизайна покраснели 38 тестов, но все они — ложные тревоги — локаторы были привязаны к CSS-классам. Настоящих багов — ноль."
+      - context: code-review
+        en: "Line 5 copies a generated class name — it'll break with the next design-system build. Could you use getByLabel('Promo code') instead?"
+        ru: "В строке 5 скопировано сгенерированное имя класса — оно сломается при следующей сборке дизайн-системы. Можешь использовать getByLabel('Promo code')?"
+      - context: chat
+        en: "Heads-up: tonight's red run is a locator issue, not a product issue. No need to stop the release."
+        ru: "К сведению: сегодняшний красный прогон — проблема локаторов, а не продукта. Останавливать релиз не нужно."
+      - context: bug-report
+        en: "Not a test issue: after the redesign “Add to cart” is no longer a button, so screen-reader users can't add products."
+        ru: "Это не проблема теста: после редизайна «Add to cart» больше не кнопка, и пользователи скринридеров не могут добавлять товары."
+        note:
+          en: "When a role + name locator fails, check the app before you touch the test."
+          ru: "Когда падает локатор по роли и имени, сначала проверь приложение, а потом уже трогай тест."
+      - context: prompt
+        en: "Replace CSS classes and nth-child paths with getByRole, getByLabel or getByTestId. Keep every assertion as it is."
+        ru: "Замени CSS-классы и пути с nth-child на getByRole, getByLabel или getByTestId. Все проверки оставь как есть."
+      - context: meeting
+        en: "If we keep CSS selectors, every redesign costs us a day of triage — and the team stops trusting red."
+        ru: "Если оставим CSS-селекторы, каждый редизайн будет стоить нам дня разбора — и команда перестанет доверять красному."
+
+checkPool:
+  - id: c5-l2-k1
+    kind: predict
+    keyPoint: kp-layout-breaks
+    placement: true
+    app: { variant: redesign }
+    context:
+      en: "Kai's redesign: new class names, and every product card now shows the price above the name. Sorting works exactly as before."
+      ru: "Редизайн Кая: новые имена классов, а на каждой карточке товара цена теперь над названием. Сортировка работает точно так же, как раньше."
+    prompt:
+      en: "Will Petal's test pass on the redesign build?"
+      ru: "Пройдёт ли тест Petal на сборке с редизайном?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('cheapest product comes first', async ({ page }) => {
+        await page.goto('/shop');
+        await page.getByLabel('Sort by').selectOption('Price: low to high');
+        await expect(page.locator('li:first-child article > h2 + p')).toHaveText('€12.00');
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "Fail: `h2 + p` means “the paragraph right after the name”, and now the price comes before the name."
+          ru: "Упадёт: `h2 + p` значит «абзац сразу после названия», а цена теперь идёт перед названием."
+        correct: true
+      - text:
+          en: "Pass: Mint Succulent is still first and still costs €12.00."
+          ru: "Пройдёт: Mint Succulent по-прежнему первый и всё так же стоит €12.00."
+        why:
+          en: "True for shoppers — but the locator describes the order of tags, and that changed."
+          ru: "Для покупателя это так, но локатор описывает порядок тегов, а он изменился."
+      - text:
+          en: "Fail: sorting by price is broken."
+          ru: "Упадёт: сортировка по цене сломана."
+        why:
+          en: "Sorting works. The test just can't find the price."
+          ru: "Сортировка работает. Тест просто не может найти цену."
+    hints:
+      - en: "Read `h2 + p` aloud: which element comes first?"
+        ru: "Прочитай `h2 + p` вслух: какой элемент идёт первым?"
+      - en: "In the redesign, what comes right after the product name on Mint Succulent's card?"
+        ru: "Что в редизайне идёт сразу после названия на карточке Mint Succulent?"
+    explain:
+      en: "A false alarm in one line: the shop is right, the selector is stale. A test id inside the first card — `getByTestId('product-price')` — doesn't care which tag comes first."
+      ru: "Ложная тревога в одну строку: магазин прав, селектор устарел. Локатору по test id внутри первой карточки — `getByTestId('product-price')` — всё равно, какой тег идёт первым."
+
+  - id: c5-l2-k2
+    kind: choice
+    keyPoint: kp-user-facing-resilient
+    placement: true
+    prompt:
+      en: "Petal's test clicks `page.getByRole('button', { name: 'Proceed to checkout' })`. After which change *should* this test fail?"
+      ru: "Тест Petal кликает `page.getByRole('button', { name: 'Proceed to checkout' })`. После какого изменения этот тест *должен* упасть?"
+    options:
+      - text: { en: "Sofia renames the button to “Go to checkout”", ru: "София переименовывает кнопку в «Go to checkout»" }
+        correct: true
+        why:
+          en: "Customers see a different button, so the test case changes too. This red is worth reading."
+          ru: "Покупатели видят другую кнопку, значит, меняется и тест-кейс. Такой красный стоит прочитать."
+      - text: { en: "Kai renames the class `btn` to `bl_btn__375kd`", ru: "Кай переименовывает класс `btn` в `bl_btn__375kd`" }
+        why:
+          en: "Customers can't see class names — and neither can this locator."
+          ru: "Покупатели не видят имён классов — и этот локатор тоже."
+      - text: { en: "The button moves from the right side to the left", ru: "Кнопка переезжает справа налево" }
+        why:
+          en: "A place on the screen isn't part of a role or a name."
+          ru: "Место на экране не входит ни в роль, ни в имя."
+      - text: { en: "The cart summary gets wrapped in a new `div`", ru: "Итоговый блок корзины заворачивают в новый `div`" }
+        why:
+          en: "Nesting doesn't change the role or the name."
+          ru: "Вложенность не меняет ни роль, ни имя."
+    hints:
+      - en: "Which change would a customer notice?"
+        ru: "Какое изменение заметит покупатель?"
+      - en: "A role + name locator reads what a user — or a screen reader — reads."
+        ru: "Локатор по роли и имени читает то же, что пользователь или скринридер."
+    explain:
+      en: "A resilient locator stays green on changes only the code sees and goes red on changes users see. A renamed button is a user-facing change — the test should notice it."
+      ru: "Устойчивый локатор остаётся зелёным при изменениях, которые видит только код, и краснеет при изменениях, которые видят пользователи. Переименованная кнопка — изменение для пользователя, и тест должен его заметить."
+
+  - id: c5-l2-k3
+    kind: review
+    keyPoint: kp-layout-breaks
+    context:
+      en: "Kai's redesign lands on Friday: new class names, and every label with its field gets a wrapper `div`. Petal's test is green today."
+      ru: "Редизайн Кая выходит в пятницу: новые имена классов, а каждая подпись с полем получит обёртку `div`. Сегодня тест Petal зелёный."
+    prompt:
+      en: "Flag every line that will go red after the redesign — and only those."
+      ru: "Отметь каждую строку, которая покраснеет после редизайна, — и только их."
+    testCase:
+      id: TC-524
+      title: Gift message counter counts characters
+      preconditions: ["Cart has 1 Rose Bouquet"]
+      steps:
+        - { action: "Open /checkout" }
+        - { action: "Tick \"This is a gift\"" }
+        - { action: "Type a gift message", data: "Happy birthday!", expected: "The counter shows 15/200" }
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('gift message counter counts characters', async ({ page }) => {
+        await page.goto('/checkout');
+        await page.locator('//form/label[5]/input').check();
+        await page.getByLabel('Gift message').fill('Happy birthday!');
+        await expect(page.locator('#checkout-form > div > p.hint')).toHaveText('15/200');
+      });
+    issues:
+      - line: 5
+        type: fragile-locator
+        note:
+          en: "XPath by position: “the 5th label directly inside the form”. After the wrappers the form has only one direct label left. Use `getByRole('checkbox', { name: 'This is a gift' })`."
+          ru: "XPath по позиции: «пятая подпись прямо внутри формы». После обёрток у формы останется только одна прямая подпись. Используй `getByRole('checkbox', { name: 'This is a gift' })`."
+      - line: 7
+        type: fragile-locator
+        note:
+          en: "A path plus a class: `form > div > p.hint`. The class becomes `bl_hint__…`, and the form gets more `div`s. Use `getByTestId('gift-counter')`."
+          ru: "Путь плюс класс: `form > div > p.hint`. Класс станет `bl_hint__…`, а `div` в форме прибавится. Используй `getByTestId('gift-counter')`."
+    types: [fragile-locator, hard-wait, wrong-assertion, wrong-data]
+    hints:
+      - en: "For each locator: does it rely on a position, a path, a class — or on what the user sees?"
+        ru: "Про каждый локатор: опирается он на позицию, путь, класс — или на то, что видит пользователь?"
+      - en: "Two lines rely on the layout: one XPath and one CSS path."
+        ru: "На вёрстку опираются две строки: один XPath и один CSS-путь."
+      - en: "Lines 5 and 7."
+        ru: "Строки 5 и 7."
+    explain:
+      en: "Line 6 survives: `getByLabel('Gift message')` follows the label wherever it sits. Lines 5 and 7 describe the form's structure — exactly what the redesign changes. On Friday both go red with no bug in checkout."
+      ru: "Строка 6 выживет: `getByLabel('Gift message')` идёт за подписью, где бы та ни находилась. Строки 5 и 7 описывают устройство формы — ровно то, что меняет редизайн. В пятницу обе покраснеют, хотя в чекауте не будет ни одного бага."
+
+  - id: c5-l2-k4
+    kind: fix
+    keyPoint: kp-user-facing-resilient
+    app: { variant: redesign, state: { user: anna@bloomly.app } }
+    prompt:
+      en: "Make the test pass on both builds: the editor runs it on Kai's redesign, and the check also runs the old build."
+      ru: "Сделай так, чтобы тест проходил на обеих сборках: редактор запускает его на редизайне Кая, а проверка — ещё и на старой сборке."
+    testCase:
+      id: TC-525
+      title: Account page shows the city and links to orders
+      preconditions: ["Anna is logged in"]
+      steps:
+        - { action: "Open /account", expected: "City shows \"Lisbon\"" }
+        - { action: "Click \"My orders\"", expected: "The orders page opens (/orders)" }
+    starter: |
+      import { test, expect } from '@playwright/test';
+
+      test('account page shows the city and links to orders', async ({ page }) => {
+        await page.goto('/account');
+        await expect(page.locator('dl.details > dd:nth-child(6)')).toHaveText('Lisbon');
+        await page.locator('.row-actions > .btn.secondary').click();
+        await expect(page).toHaveURL('/orders');
+      });
+    solution: |
+      import { test, expect } from '@playwright/test';
+
+      test('account page shows the city and links to orders', async ({ page }) => {
+        await page.goto('/account');
+        await expect(page.getByTestId('account-city')).toHaveText('Lisbon');
+        await page.getByRole('link', { name: 'My orders' }).click();
+        await expect(page).toHaveURL('/orders');
+      });
+    checks:
+      expect: pass
+      static: [noFragile]
+      also:
+        - app: { state: { user: anna@bloomly.app } }
+          expect: pass
+    hints:
+      - en: "Two locators depend on classes and positions."
+        ru: "Два локатора зависят от классов и позиций."
+      - en: "The city has a test id, `account-city`. “My orders” is a link with a name."
+        ru: "У города есть test id — `account-city`. «My orders» — ссылка с именем."
+      - en: "`page.getByTestId('account-city')` and `page.getByRole('link', { name: 'My orders' })`."
+        ru: "`page.getByTestId('account-city')` и `page.getByRole('link', { name: 'My orders' })`."
+    explain:
+      en: "“The 6th child of the details list” and “the secondary button in the actions row” describe the layout. The test id and the link's name describe what's there, so they pass on both builds."
+      ru: "«Шестой потомок списка данных» и «второстепенная кнопка в ряду действий» описывают вёрстку. Test id и имя ссылки описывают то, что там есть, поэтому проходят на обеих сборках."
+
+  - id: c5-l2-k5
+    kind: choice
+    keyPoint: kp-false-alarms
+    context:
+      en: "Night run on the redesign build: three red tests."
+      ru: "Ночной прогон на сборке с редизайном: три красных теста."
+    prompt:
+      en: "Which failure deserves a bug report?"
+      ru: "Какое падение заслуживает баг-репорта?"
+    optionsCode: true
+    options:
+      - text: "locator.click: Timeout 5000ms exceeded — waiting for locator('nav > a:nth-child(2)')"
+        why:
+          en: "A path through the menu, and the redesign wrapped the links. A false alarm."
+          ru: "Путь через меню, а редизайн завернул ссылки в обёртку. Ложная тревога."
+      - text: "expect(getByTestId('orders-summary')).toHaveText failed — Expected: \"Showing 3 of 6 orders\", Received: \"Showing 6 of 6 orders\""
+        correct: true
+        why:
+          en: "The locator found the summary, and the summary is wrong: the filter shows 3 orders, the text says 6. A real bug."
+          ru: "Локатор нашёл сводку, и сводка неверная: фильтр показывает 3 заказа, а текст говорит про 6. Настоящий баг."
+      - text: "locator.fill: Timeout 5000ms exceeded — waiting for locator('.promo input')"
+        why:
+          en: "An old class name; the promo field itself is fine. A false alarm."
+          ru: "Старое имя класса, а само поле промокода в порядке. Ложная тревога."
+    hints:
+      - en: "Which test found its element and got a wrong value?"
+        ru: "Какой тест нашёл свой элемент и получил неверное значение?"
+      - en: "“waiting for locator(…)” on a class or a path usually means a stale selector."
+        ru: "«waiting for locator(…)» на классе или пути обычно значит устаревший селектор."
+    explain:
+      en: "Only the second test reached its element and saw a wrong value — a real bug in the orders summary. The other two fail on a path and a class: noise from the redesign. Reading error lines this way takes seconds and saves “stop the release” for real bugs."
+      ru: "Только второй тест добрался до своего элемента и увидел неверное значение — настоящий баг в сводке заказов. Два других падают на пути и классе: шум от редизайна. Такое чтение строк с ошибками занимает секунды и оставляет «останавливаем релиз» для настоящих багов."
+
+  - id: c5-l2-k6
+    kind: choice
+    keyPoint: kp-false-alarms
+    context:
+      en: "Petal: “To stop the red nights, I'll set retries to 3 and add `waitForTimeout(3000)` before every click.”"
+      ru: "Petal: «Чтобы красные ночи прекратились, я поставлю 3 повторных запуска и добавлю `waitForTimeout(3000)` перед каждым кликом»."
+    prompt:
+      en: "The red tests fail on `.btn` and `nth-child` selectors after the redesign. What do you reply?"
+      ru: "Красные тесты падают на селекторах с `.btn` и `nth-child` после редизайна. Что ты ответишь?"
+    options:
+      - text: { en: "No: these selectors fail every time — no wait or retry finds a class that's gone. Let's replace them with user-facing locators.", ru: "Нет: эти селекторы падают каждый раз — никакое ожидание или повтор не найдёт класс, которого нет. Давай заменим их локаторами, понятными пользователю." }
+        correct: true
+        why:
+          en: "The cause is the locator, so the fix is the locator."
+          ru: "Причина в локаторе — значит, и исправлять нужно локатор."
+      - text: { en: "Yes: retries are how you fix flaky tests.", ru: "Да: повторные запуски — способ лечить нестабильные тесты." }
+        why:
+          en: "These tests aren't flaky: they fail 100% of the time. Retries triple the time to red — and teach the team that red is normal."
+          ru: "Эти тесты не флакают: они падают в 100% случаев. Повторы втрое удлиняют путь к красному — и приучают команду, что красный — это нормально."
+      - text: { en: "Yes, but make it 5 seconds to be safe.", ru: "Да, но лучше 5 секунд, для надёжности." }
+        why:
+          en: "A longer wait for an element that doesn't exist is still a failure — just slower, on every run."
+          ru: "Более долгое ожидание элемента, которого нет, всё равно заканчивается падением — только медленнее, на каждом прогоне."
+      - text: { en: "Delete the 38 tests: they're just noise.", ru: "Удалить эти 38 тестов: это просто шум." }
+        why:
+          en: "That removes the noise and the protection. The checks are fine; only the locators are stale."
+          ru: "Так уйдёт и шум, и защита. Проверки в порядке, устарели только локаторы."
+    hints:
+      - en: "Would the class `btn` appear if you waited longer?"
+        ru: "Появится ли класс `btn`, если подождать подольше?"
+      - en: "Fix the cause: how the test finds elements."
+        ru: "Исправляй причину — то, как тест ищет элементы."
+    explain:
+      en: "Waits and retries are about timing — and even there they only hide the problem. A fragile selector after a redesign isn't a timing problem: it points at something that no longer exists, so it fails every time. Only a resilient locator ends the red nights — without hiding real failures."
+      ru: "Ожидания и повторы — это про время, и даже там они только прячут проблему. Хрупкий селектор после редизайна — не проблема времени: он указывает на то, чего больше нет, поэтому падает каждый раз. Только устойчивый локатор прекращает красные ночи — и не прячет настоящие падения."
+
+  - id: c5-l2-k7
+    kind: pick-locator
+    keyPoint: kp-user-facing-resilient
+    app: { route: /cart, variant: redesign, state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+    target: "[data-testid='checkout-button']"
+    prompt:
+      en: "This is the cart after Kai's redesign. Pick the locator for the highlighted button that survives this redesign — and the next one."
+      ru: "Это корзина после редизайна Кая. Выбери локатор для подсвеченной кнопки, который переживёт этот редизайн — и следующий."
+    options:
+      - text: "page.getByRole('button', { name: 'Proceed to checkout' })"
+        correct: true
+        why:
+          en: "The role and the name are what customers rely on. They didn't change in this redesign and won't change in the next one unless customers see a change too."
+          ru: "На роль и имя опираются покупатели. В этом редизайне они не поменялись — и в следующем не поменяются, если только изменение не увидят сами покупатели."
+      - text: "page.locator('.bl_btn__375kd')"
+        why:
+          en: "Today's generated class — and it matches three elements: “Apply”, “Continue shopping” and this button."
+          ru: "Сегодняшний сгенерированный класс — и под него подходят три элемента: «Apply», «Continue shopping» и эта кнопка."
+      - text: "page.locator('.row-actions > button')"
+        why:
+          en: "The old class name — after the redesign it matches nothing."
+          ru: "Старое имя класса — после редизайна под него ничего не подходит."
+      - text: "page.locator('//main/div[last()]/button')"
+        why:
+          en: "Works today: “the button in the last block of the page”. Add a block below the summary, and it points elsewhere or nowhere."
+          ru: "Сегодня работает: «кнопка в последнем блоке страницы». Добавят блок под итогом — и он укажет на другое или в пустоту."
+    hints:
+      - en: "Two options depend on class names, one on the order of blocks."
+        ru: "Два варианта зависят от имён классов, один — от порядка блоков."
+      - en: "What would a customer call this button?"
+        ru: "Как эту кнопку назвал бы покупатель?"
+    explain:
+      en: "Role + name describes the button the way a customer finds it. The XPath works today by luck — luck runs out at the next layout change."
+      ru: "Роль и имя описывают кнопку так, как её находит покупатель. XPath сегодня работает по везению — а везение кончится при следующем изменении вёрстки."
+
+  - id: c5-l2-k8
+    kind: inspect
+    keyPoint: kp-layout-breaks
+    app: { route: /signup, variant: redesign }
+    prompt:
+      en: "Petal's signup test fills `page.locator('#signup-form > input:nth-child(2)')` and times out on Kai's redesign. Find the field it was meant for and look at its parent."
+      ru: "Тест регистрации от Petal заполняет `page.locator('#signup-form > input:nth-child(2)')` и падает по таймауту на редизайне Кая. Найди поле, которое имелось в виду, и посмотри на его родителя."
+    target: "#fullName"
+    view: dom
+    show: [attributes]
+    hints:
+      - en: "Open `<form id=\"signup-form\">` in the tree."
+        ru: "Раскрой в дереве `<form id=\"signup-form\">`."
+      - en: "The first field of the form is “Full name”. In the redesign its label and input share a new parent."
+        ru: "Первое поле формы — «Full name». В редизайне у его подписи и поля общий новый родитель."
+      - en: "It's `<input id=\"fullName\">` inside the first `<div class=\"bl_field__…\">`."
+        ru: "Это `<input id=\"fullName\">` внутри первого `<div class=\"bl_field__…\">`."
+    explain:
+      en: "In the old build the input was the form's 2nd child, right after its label. Now both sit inside `<div class=\"bl_field__2ty9n\">`, so the form has no direct `input` children at all. The label is still linked to the field (`for=\"fullName\"`), so `getByLabel('Full name')` finds it on both builds."
+      ru: "В старой сборке поле было вторым потомком формы, сразу после подписи. Теперь оба лежат внутри `<div class=\"bl_field__2ty9n\">`, и прямых потомков `input` у формы нет вообще. Подпись по-прежнему связана с полем (`for=\"fullName\"`), поэтому `getByLabel('Full name')` находит его на обеих сборках."

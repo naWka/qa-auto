@@ -19,8 +19,8 @@ steps:
     lines:
       - who: kai
         text:
-          en: "Heads-up: tomorrow I merge the Bloomly 3.0 redesign. New look, new CSS classes everywhere: `.btn` becomes `.button`, `.badge` becomes `.pill`."
-          ru: "Предупреждаю: завтра я вливаю редизайн Bloomly 3.0. Новый вид и новые CSS-классы повсюду: `.btn` станет `.button`, `.badge` — `.pill`."
+          en: "Heads-up: the Bloomly 3.0 redesign is coming. New look, new CSS class names everywhere — `.btn`, `.badge` and all the rest will change."
+          ru: "Предупреждаю: скоро выходит редизайн Bloomly 3.0. Новый вид и новые имена CSS-классов повсюду — `.btn`, `.badge` и все остальные поменяются."
       - who: petal
         text:
           en: "No problem! Most of my tests click `.btn`… oh."
@@ -66,8 +66,8 @@ steps:
               ru: "`data-testid` существует только для тестов, редизайн его не трогает."
           - text: "page.locator('.badge')"
             why:
-              en: "`.badge` is a CSS class — exactly what Kai renames to `.pill`."
-              ru: "`.badge` — это CSS-класс, ровно то, что Кай переименует в `.pill`."
+              en: "`.badge` is a CSS class — exactly what Kai's redesign renames."
+              ru: "`.badge` — это CSS-класс, ровно то, что Кай переименует в редизайне."
           - text: "page.locator('header nav a:nth-child(3) span')"
             why:
               en: "It depends on the order and nesting of elements: one new nav link, and it points somewhere else."
@@ -272,8 +272,8 @@ steps:
       kind: review
       keyPoint: kp-class-vs-testid
       context:
-        en: "Petal's test for TC-420. Kai's redesign lands tomorrow."
-        ru: "Тест Petal для TC-420. Редизайн Кая выходит завтра."
+        en: "Petal's test for TC-420. Kai's redesign is coming."
+        ru: "Тест Petal для TC-420. Скоро выйдет редизайн Кая."
       prompt:
         en: "Review the locators. Flag every line that is fragile or points to something that doesn't exist."
         ru: "Проверь локаторы. Отметь каждую строку, которая хрупкая или указывает на то, чего нет."
@@ -301,8 +301,8 @@ steps:
         - line: 6
           type: fragile-locator
           note:
-            en: "`.btn.small` is two style classes — Kai renames them tomorrow. Use `card.getByRole('button', { name: 'Add to cart' })`."
-            ru: "`.btn.small` — два класса стилей, Кай переименует их завтра. Используй `card.getByRole('button', { name: 'Add to cart' })`."
+            en: "`.btn.small` is two style classes — Kai's redesign renames them. Use `card.getByRole('button', { name: 'Add to cart' })`."
+            ru: "`.btn.small` — два класса стилей, Кай переименует их в редизайне. Используй `card.getByRole('button', { name: 'Add to cart' })`."
         - line: 7
           type: hallucination
           note:
@@ -452,8 +452,8 @@ steps:
         en: "You made Petal test for both audiences: people who see the error and people who hear it."
         ru: "Ты заставил{а|} Petal проверить ошибку для обеих аудиторий: для тех, кто её видит, и для тех, кто её слышит."
       explain:
-        en: "Agents check what's visible and stop there. The `aria-invalid` check appeared only because you asked for it — straight from the test case. And the locator rule kept Petal away from `#signupEmail` and `.field-error`, which Kai may rename tomorrow."
-        ru: "Агенты проверяют видимое и на этом останавливаются. Проверка `aria-invalid` появилась только потому, что ты её попросил{а|}, — прямо из тест-кейса. А правило про локаторы удержало Petal от `#signupEmail` и `.field-error`, которые Кай может завтра переименовать."
+        en: "Agents check what's visible and stop there. The `aria-invalid` check appeared only because you asked for it — straight from the test case. And the locator rule kept Petal away from `#signupEmail` and `.field-error`, which Kai may rename any day."
+        ru: "Агенты проверяют видимое и на этом останавливаются. Проверка `aria-invalid` появилась только потому, что ты её попросил{а|}, — прямо из тест-кейса. А правило про локаторы удержало Petal от `#signupEmail` и `.field-error`, которые Кай может переименовать в любой день."
 
   - type: task
     task:
@@ -507,8 +507,8 @@ steps:
       kind: fix
       keyPoint: kp-class-vs-testid
       context:
-        en: "The cart has one Rose Bouquet. Tomorrow Kai renames `.badge` to `.pill`."
-        ru: "В корзине один Rose Bouquet. Завтра Кай переименует `.badge` в `.pill`."
+        en: "The cart has one Rose Bouquet. Kai's redesign will rename `.badge`."
+        ru: "В корзине один Rose Bouquet. В редизайне Кай переименует `.badge`."
       prompt:
         en: "Change one line so the test no longer depends on a CSS class. It must stay green."
         ru: "Измени одну строку, чтобы тест больше не зависел от CSS-класса. Он должен остаться зелёным."
@@ -558,8 +558,8 @@ steps:
       - wrong: "await page.locator('.btn').click();"
         right: "await page.getByRole('button', { name: 'Proceed to checkout' }).click();"
         why:
-          en: "A class is a style many elements share — three on the cart page alone. And Kai renames it tomorrow."
-          ru: "Класс — это стиль, общий для многих элементов: только в корзине их три. А завтра Кай его переименует."
+          en: "A class is a style many elements share — three on the cart page alone. And Kai's redesign renames it."
+          ru: "Класс — это стиль, общий для многих элементов: только в корзине их три. А Кай переименует его в редизайне."
       - wrong: "await expect(page.getByTestId('cart-counter')).toHaveText('1');"
         right: "await expect(page.getByTestId('cart-count')).toHaveText('1');"
         why:
@@ -782,8 +782,8 @@ checkPool:
           ru: "Создан для тестов, редизайн его не трогает, и он находит ровно один элемент."
       - text: "page.locator('dd.total')"
         why:
-          en: "`total` is only a style (bold text): the “Total” label next to it has the same class, and tomorrow it may be renamed."
-          ru: "`total` — всего лишь стиль (жирный текст): тот же класс есть у соседней подписи «Total», а завтра его могут переименовать."
+          en: "`total` is only a style (bold text): the “Total” label next to it has the same class, and the redesign may rename it."
+          ru: "`total` — всего лишь стиль (жирный текст): тот же класс есть у соседней подписи «Total», а в редизайне его могут переименовать."
       - text: "page.locator('.summary dd:last-child')"
         why:
           en: "Depends on the order of the summary rows: add a “Gift wrap” row, and it points elsewhere."

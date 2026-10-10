@@ -1,0 +1,1069 @@
+id: c5-l4
+chapter: c5
+title: { en: "A locator policy for your agent", ru: "Политика локаторов для агента" }
+goal:
+  en: "Review AI-written locators and write a short locator policy into the prompt and the project rules file."
+  ru: "Проверять локаторы, написанные ИИ, и записывать короткую политику локаторов в промпт и в файл правил проекта."
+minutes: 10
+keyPoints:
+  - id: kp-ai-locator-mistakes
+    title: { en: "Typical AI locator mistakes", ru: "Типичные ошибки ИИ в локаторах" }
+  - id: kp-snapshot-not-memory
+    title: { en: "Names from the live snapshot, not from memory", ru: "Имена — из снимка живой страницы, а не из памяти" }
+  - id: kp-policy-file
+    title: { en: "A policy in the rules file works for every prompt", ru: "Политика в файле правил работает для каждого промпта" }
+terms: [project-rules, prompt, hallucination, accessibility-snapshot, mcp, locator, code-review]
+steps:
+  - type: story
+    lines:
+      - who: leo
+        text:
+          en: "Petal opened twelve pull requests this week. In review you wrote “no CSS classes, please” nine times."
+          ru: "На этой неделе Petal открыл двенадцать пулл-реквестов. На ревью ты написал{а|} «no CSS classes, please» девять раз."
+      - who: petal
+        text:
+          en: "Sorry! Every new session starts fresh for me. Yesterday's review comments aren't in my context."
+          ru: "Простите! Каждая новая сессия для меня начинается с чистого листа. Вчерашних комментариев к ревью в моём контексте нет."
+      - who: maya
+        text:
+          en: "Then let's stop repeating ourselves. We'll write a short locator policy — into today's prompt, and into the file Petal reads every time."
+          ru: "Тогда хватит повторять одно и то же. Напишем короткую политику локаторов — в сегодняшний промпт и в файл, который Petal читает каждый раз."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед стартом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c5-l4-p1
+        kind: choice
+        keyPoint: kp-policy-file
+        prompt:
+          en: "On Monday your prompt told Petal: “No CSS classes.” On Tuesday Kai asks Petal for a test — and gets `page.locator('.btn')` again. What's the most likely reason?"
+          ru: "В понедельник твой промпт сказал Petal: «No CSS classes». Во вторник Кай просит у Petal тест — и снова получает `page.locator('.btn')`. Какая причина вероятнее всего?"
+        options:
+          - text: { en: "The rule lived only in your prompt. Kai's prompt didn't have it, and the new session doesn't know yours.", ru: "Правило жило только в твоём промпте. В промпте Кая его не было, а новая сессия ничего не знает о твоём." }
+            correct: true
+            why:
+              en: "A prompt works for one task. A rule that must apply every time needs a place the agent reads every time."
+              ru: "Промпт работает для одной задачи. Правилу, которое должно действовать всегда, нужно место, которое агент читает всегда."
+          - text: { en: "Petal is broken and needs a restart.", ru: "Petal сломался, его нужно перезапустить." }
+            why:
+              en: "A restart gives Petal an even cleaner start — without your rule."
+              ru: "Перезапуск даст Petal ещё более чистый старт — без твоего правила."
+          - text: { en: "Buttons can only be found by CSS class.", ru: "Кнопки можно найти только по CSS-классу." }
+            why:
+              en: "Buttons have a role and a name: `getByRole('button', { name: 'Log in' })`."
+              ru: "У кнопок есть роль и имя: `getByRole('button', { name: 'Log in' })`."
+        hints:
+          - en: "Whose prompt was Petal answering on Tuesday?"
+            ru: "На чей промпт Petal отвечал во вторник?"
+          - en: "Does a new chat with the agent include what you wrote in an old one?"
+            ru: "Попадает ли в новый чат с агентом то, что ты писал{а|} в старом?"
+        explain:
+          en: "Rules in a prompt are as short-lived as the prompt. Today you'll move them into a file the agent reads by itself."
+          ru: "Правила в промпте живут ровно столько, сколько сам промпт. Сегодня ты перенесёшь их в файл, который агент читает сам."
+      - id: c5-l4-p2
+        kind: choice
+        keyPoint: kp-snapshot-not-memory
+        prompt:
+          en: "Petal has never opened Bloomly's cart. You ask for a test that clicks the checkout button. Which name will Petal most likely put into the locator?"
+          ru: "Petal ни разу не открывал корзину Bloomly. Ты просишь тест, который нажимает кнопку оформления заказа. Какое имя Petal, скорее всего, вставит в локатор?"
+        options:
+          - text: { en: "A typical name from other shops, like “Checkout now” or “Go to checkout”", ru: "Типичное имя с других сайтов, вроде «Checkout now» или «Go to checkout»" }
+            correct: true
+            why:
+              en: "Without looking at the page, the agent fills the gap with the most common words it has seen."
+              ru: "Не посмотрев на страницу, агент заполняет пробел самыми частыми словами, которые встречал."
+          - text: { en: "The real one, “Proceed to checkout”", ru: "Настоящее — «Proceed to checkout»" }
+            why:
+              en: "Only if something gives it the real name: the live page, the test case or you."
+              ru: "Только если кто-то даст ему настоящее имя: живая страница, тест-кейс или ты."
+          - text: { en: "None — an agent can't write getByRole at all without a browser", ru: "Никакое — без браузера агент вообще не может написать getByRole" }
+            why:
+              en: "It can and it will. It just guesses the name."
+              ru: "Может и напишет. Просто имя он угадает."
+        hints:
+          - en: "Where would the real name come from, if nobody shows Petal the page?"
+            ru: "Откуда взяться настоящему имени, если никто не показал Petal страницу?"
+          - en: "Agents learned from thousands of other shops."
+            ru: "Агенты учились на тысячах других магазинов."
+        explain:
+          en: "From memory an agent writes the *typical* name, not the *real* one. In this lesson you'll make it look at the live page first."
+          ru: "По памяти агент пишет *типичное* имя, а не *настоящее*. В этом уроке ты заставишь его сначала посмотреть на живую страницу."
+
+  - type: theory
+    keyPoint: kp-ai-locator-mistakes
+    title: { en: "Four locator mistakes agents make", ru: "Четыре ошибки агентов в локаторах" }
+    body:
+      - en: |-
+          Agents learned from millions of pages and tests — old, fragile ones included. So their [[locator]] mistakes are predictable. Watch for four:
+          - **Invented methods**: `getByButton('Log in')`, `getByCheckbox(...)`. They sound like Playwright but don't exist.
+          - **CSS classes and positions**: `.btn-primary`, `li:nth-child(2)`. The most common style in old code on the internet.
+          - **Names from other sites**: “Sign in”, “Sold out”, “Add to basket”. Common words — but not Bloomly's.
+          - **`.first()` against strict mode**: the error goes away, and the test clicks the wrong card.
+        ru: |-
+          Агенты учились на миллионах страниц и тестов — включая старые и хрупкие. Поэтому их ошибки в [[локаторах|locator]] предсказуемы. Следи за четырьмя:
+          - **Выдуманные методы**: `getByButton('Log in')`, `getByCheckbox(...)`. Звучат как Playwright, но их не существует.
+          - **CSS-классы и позиции**: `.btn-primary`, `li:nth-child(2)`. Самый частый стиль в старом коде в интернете.
+          - **Имена с других сайтов**: «Sign in», «Sold out», «Add to basket». Частые слова — но не те, что в Bloomly.
+          - **`.first()` против строгого режима**: ошибка исчезает, а тест нажимает не на ту карточку.
+      - en: "Invented methods and names are [[hallucinations|hallucination]], and they fail loudly: the test is red on the first run. CSS classes and `.first()` fail quietly: green today, red after Kai's redesign — or green and clicking the wrong product. The quiet ones are what your review must catch."
+        ru: "Выдуманные методы и имена — это [[галлюцинации|hallucination]], и падают они громко: тест красный с первого прогона. CSS-классы и `.first()` падают тихо: зелёные сегодня, красные после редизайна Кая — или зелёные, но нажимают не на тот товар. Именно тихие ошибки и должно ловить твоё ревью."
+      - en: "You've seen this in manual testing: a test case copied from another project. The steps look right, but the button names belong to someone else's app."
+        ru: "Ты видел{а|} такое в ручном тестировании: тест-кейс, скопированный из другого проекта. Шаги выглядят правильно, но названия кнопок — из чужого приложения."
+    mentor:
+      en: "When a locator looks unfamiliar, don't assume you're the one who doesn't know. Check the Playwright docs and the page. Quite often it's the agent."
+      ru: "Если локатор выглядит незнакомо, не думай сразу, что это ты чего-то не знаешь. Проверь документацию Playwright и страницу. Довольно часто ошибается агент."
+
+  - type: theory
+    keyPoint: kp-snapshot-not-memory
+    title: { en: "Snapshot, not memory", ru: "Снимок, а не память" }
+    body:
+      - en: "Why does Petal write “Sold out” or “Checkout now”? It knows thousands of shops — and nothing about Bloomly until it looks. From memory it writes the *typical* name, not the *real* one."
+        ru: "Почему Petal пишет «Sold out» или «Checkout now»? Он знает тысячи магазинов — и ничего не знает о Bloomly, пока не посмотрит. По памяти он пишет *типичное* имя, а не *настоящее*."
+      - en: "Through [[Playwright MCP|mcp]] (or Playwright CLI) the agent can open the live page and read its [[accessibility snapshot|accessibility-snapshot]] — the agent's view you explored in chapter 4. Every role and name in it is real. Locators copied from it can't contain invented names."
+        ru: "Через [[Playwright MCP|mcp]] (или Playwright CLI) агент может открыть живую страницу и прочитать её [[снимок доступности|accessibility-snapshot]] — тот самый взгляд агента, который ты изучал{а|} в главе 4. Каждая роль и каждое имя в нём настоящие. В локаторах, списанных с него, не бывает выдуманных имён."
+      - en: "You don't write test cases for a new build from memory of a similar app — you open the build and copy the exact labels. Ask the agent for the same, in so many words: “Open /cart with Playwright MCP and take every locator from the accessibility snapshot. Don't guess names.”"
+        ru: "Ты не пишешь тест-кейсы к новой сборке по памяти о похожем приложении — ты открываешь сборку и переписываешь точные надписи. Попроси агента о том же прямым текстом: «Open /cart with Playwright MCP and take every locator from the accessibility snapshot. Don't guess names.»"
+    code: |
+      - heading "Your cart" [level=1] [ref=e9]
+      - textbox "Promo code" [ref=e30]:
+        - /placeholder: e.g. BLOOM10
+      - button "Apply" [ref=e31]
+      - link "Continue shopping" [ref=e41]:
+        - /url: /shop
+      - button "Proceed to checkout" [ref=e42]
+    mentor:
+      en: "A fragment of the cart as Petal sees it. The `[ref=…]` markers are temporary handles for clicking in the current session — they can change with the next snapshot. A test takes the role and the name, never the ref."
+      ru: "Фрагмент корзины глазами Petal. Метки `[ref=…]` — временные ссылки для кликов в текущей сессии, со следующим снимком они могут измениться. Тест берёт роль и имя, но никогда не ref."
+
+  - type: theory
+    keyPoint: kp-policy-file
+    title: { en: "Write it down once: the rules file", ru: "Записать один раз: файл правил" }
+    body:
+      - en: "A rule in your [[prompt]] lives for one task. A new session starts without yesterday's chat, and Kai won't copy your rules into his prompts. So teams keep [[project rules|project-rules]] in a file the agent reads by itself."
+        ru: "Правило в [[промпте|prompt]] живёт одну задачу. Новая сессия начинается без вчерашнего чата, а Кай не будет копировать твои правила в свои промпты. Поэтому команды хранят [[правила проекта|project-rules]] в файле, который агент читает сам."
+      - en: "Claude Code reads `CLAUDE.md` in the repository root at the start of every session. GitHub Copilot reads `.github/copilot-instructions.md`. Write the locator policy there once — and it works for every prompt, yours and Kai's."
+        ru: "Claude Code читает `CLAUDE.md` в корне репозитория в начале каждой сессии. GitHub Copilot читает `.github/copilot-instructions.md`. Запиши политику локаторов туда один раз — и она работает для каждого промпта, твоего и Кая."
+      - en: "It's like your team's test design guidelines: nobody repeats them in every test case, but every test case follows them. Keep the policy short and checkable: “No CSS classes” can be verified in a [[code review|code-review]] in seconds; “write good locators” can't."
+        ru: "Это как гайдлайны по тест-дизайну в твоей команде: их не повторяют в каждом тест-кейсе, но каждый тест-кейс им следует. Делай политику короткой и проверяемой: «No CSS classes» на [[код-ревью|code-review]] проверяется за секунды, а «пиши хорошие локаторы» — никак."
+    figure: locator-priority
+    mentor:
+      en: "Today we write only the Locators section. In chapter 8 the same file gets rules for assertions, waits and naming."
+      ru: "Сегодня пишем только раздел Locators. В главе 8 в этот же файл добавятся правила для проверок, ожиданий и названий."
+
+  - type: example
+    keyPoint: kp-policy-file
+    title: { en: "Bloomly's locator policy, line by line", ru: "Политика локаторов Bloomly, строка за строкой" }
+    intro:
+      en: "Maya's Locators section for `CLAUDE.md`. Each line blocks one of the typical mistakes — and each one can be checked in a diff."
+      ru: "Раздел Locators, который Майя написала для `CLAUDE.md`. Каждая строка закрывает одну из типичных ошибок — и каждую можно проверить в диффе."
+    code: |
+      ## Locators
+      - Open the live page first (Playwright MCP or
+        CLI snapshot). Never guess names.
+      - Use `getByRole` with a name,
+        then `getByLabel`, then `getByText` /
+        `getByPlaceholder`, then `getByTestId`.
+      - No CSS classes, no `nth-child`, no XPath.
+      - No `.first()` / `.nth()` to silence strict
+        mode. Filter instead:
+        ```js
+        page.getByTestId('product-card')
+          .filter({ hasText: 'Sunny Tulips' })
+          .getByRole('button', { name: 'Add to cart' })
+        ```
+      - No role, name or test id? Stop and tell me.
+        Don't invent a locator.
+    notes:
+      - lines: 1
+        text:
+          en: "One section, one topic. Later the file gets sections for assertions and waits; the agent reads all of it at the start of every session."
+          ru: "Один раздел — одна тема. Позже в файле появятся разделы про проверки и ожидания; агент читает его целиком в начале каждой сессии."
+      - lines: [2, 3]
+        text:
+          en: "Where names come from: the live page. This one line removes most invented names — “Sold out”, “Sign in”, “Add to basket”."
+          ru: "Откуда берутся имена: с живой страницы. Одна эта строка убирает большую часть выдуманных имён — «Sold out», «Sign in», «Add to basket»."
+      - lines: [4, 5, 6]
+        text:
+          en: "The ladder from lesson 1, in order. Naming real methods also leaves no room for `getByButton`."
+          ru: "Лесенка из урока 1, по порядку. А раз названы настоящие методы, для `getByButton` места не остаётся."
+      - lines: 7
+        text:
+          en: "Bans a reviewer can check in seconds: search the diff for `locator('.` and `nth-child`."
+          ru: "Запреты, которые ревьюер проверяет за секунды: поищи в диффе `locator('.` и `nth-child`."
+      - lines: [8, 9, 10, 11, 12, 13, 14]
+        text:
+          en: "Strict mode: say what to do instead of `.first()` — and give an example to copy. Agents follow examples better than adjectives."
+          ru: "Строгий режим: скажи, что делать вместо `.first()`, — и дай пример, который можно скопировать. Примерам агенты следуют лучше, чем прилагательным."
+      - lines: [15, 16]
+        text:
+          en: "An escape hatch. Without it, the agent invents something to look helpful. An element with no name may be an accessibility bug (chapter 4) — a finding, not a nuisance."
+          ru: "Запасной выход. Без него агент что-нибудь выдумает, чтобы выглядеть полезным. Элемент без имени может оказаться багом доступности (глава 4) — это находка, а не помеха."
+
+  - type: task
+    task:
+      id: c5-l4-t1
+      kind: review
+      keyPoint: kp-ai-locator-mistakes
+      context:
+        en: "Petal wrote this test for TC-560 from memory — it never opened the signup page."
+        ru: "Petal написал этот тест для TC-560 по памяти — страницу регистрации он так и не открыл."
+      prompt:
+        en: "Check every locator for the four typical mistakes. Flag each problem line and pick the issue type."
+        ru: "Проверь каждый локатор на четыре типичные ошибки. Отметь каждую проблемную строку и выбери тип проблемы."
+      testCase:
+        id: TC-560
+        title: New customer can create an account
+        steps:
+          - { action: "Open /signup" }
+          - { action: "Fill in Full name, Email, Password; choose Country", data: "Ines Costa / ines@example.com / spring-roses / Portugal" }
+          - { action: "Tick \"I agree to the Terms of Service\"" }
+          - { action: "Click \"Create account\"", expected: "Heading \"Account created!\" and the text \"Welcome to Bloomly, Ines.\"" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('new customer can create an account', async ({ page }) => {
+          await page.goto('/signup');
+          await page.getByLabel('Full name').fill('Ines Costa');
+          await page.getByLabel('Email').fill('ines@example.com');
+          await page.locator('#signup-form input[type="password"]').fill('spring-roses');
+          await page.getByLabel('Country').selectOption('PT');
+          await page.getByCheckbox('I agree to the Terms of Service').check();
+          await page.locator('form .btn').click();
+          await expect(page.getByRole('heading', { name: 'Welcome aboard!' })).toBeVisible();
+        });
+      issues:
+        - line: 7
+          type: fragile-locator
+          note:
+            en: "A CSS path through the form's markup. Add a “Repeat password” field and it matches two inputs. The field has a label: `getByLabel('Password')`."
+            ru: "CSS-путь по разметке формы. Стоит добавить поле «Repeat password» — и он найдёт два поля. У поля есть метка: `getByLabel('Password')`."
+        - line: 9
+          type: hallucination
+          note:
+            en: "`getByCheckbox` doesn't exist in Playwright. Use `getByRole('checkbox', { name: 'I agree to the Terms of Service' })`."
+            ru: "`getByCheckbox` в Playwright нет. Используй `getByRole('checkbox', { name: 'I agree to the Terms of Service' })`."
+        - line: 10
+          type: fragile-locator
+          note:
+            en: "A CSS class: `.btn` is exactly what Kai's redesign renames. Use `getByRole('button', { name: 'Create account' })`."
+            ru: "CSS-класс: `.btn` — как раз то, что переименует редизайн Кая. Используй `getByRole('button', { name: 'Create account' })`."
+        - line: 11
+          type: hallucination
+          note:
+            en: "There is no heading “Welcome aboard!”. Bloomly shows “Account created!” — exactly what TC-560 expects."
+            ru: "Заголовка «Welcome aboard!» нет. Bloomly показывает «Account created!» — ровно то, что ожидает TC-560."
+      types: [fragile-locator, hallucination, hard-wait, wrong-data, missing-await]
+      hints:
+        - en: "Go line by line with the four mistakes: invented method, CSS or position, a name from another site, `.first()`."
+          ru: "Иди по строкам с четырьмя ошибками: выдуманный метод, CSS или позиция, имя с другого сайта, `.first()`."
+        - en: "Two lines use CSS; one calls a method Playwright doesn't have; one expects a heading the page never shows."
+          ru: "В двух строках CSS; в одной вызван метод, которого в Playwright нет; в одной ожидается заголовок, которого на странице не бывает."
+        - en: "Lines 7 and 10 (CSS), line 9 (method), line 11 (heading)."
+          ru: "Строки 7 и 10 (CSS), строка 9 (метод), строка 11 (заголовок)."
+      praise:
+        en: "Four findings, each with the right label. You can tell a fragile locator from an invented one — that's what makes a review comment precise."
+        ru: "Четыре находки, и у каждой правильный тип. Ты отличаешь хрупкий локатор от выдуманного — именно это делает комментарий к ревью точным."
+      explain:
+        en: "Lines 9 and 11 are loud: the test goes red on the first run. Lines 7 and 10 are quiet: the test may well pass today and break when the markup or the class names change. The quiet ones are the reason a locator policy exists."
+        ru: "Строки 9 и 11 — громкие: тест покраснеет на первом же прогоне. Строки 7 и 10 — тихие: сегодня тест вполне может пройти и сломаться, когда поменяется разметка или имена классов. Именно из-за тихих ошибок и нужна политика локаторов."
+
+  - type: task
+    task:
+      id: c5-l4-t2
+      kind: predict
+      keyPoint: kp-ai-locator-mistakes
+      context:
+        en: "Petal wrote this TC-561 test without opening the shop. It even used the recommended pattern: filter the card, then `getByRole` inside it."
+        ru: "Petal написал этот тест для TC-561, не открывая магазин. Он даже использовал рекомендованный шаблон: отфильтровать карточку, потом `getByRole` внутри неё."
+      prompt:
+        en: "Pass or fail?"
+        ru: "Пройдёт или упадёт?"
+      testCase:
+        id: TC-561
+        title: Out-of-stock product can't be added to the cart
+        steps:
+          - { action: "Open /shop" }
+          - { action: "Look at the White Orchid card", expected: "It says \"Out of stock\"; its \"Add to cart\" button is disabled" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('out-of-stock product cannot be added', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'White Orchid' });
+          await expect(card).toContainText('Out of stock');
+          await expect(card.getByRole('button', { name: 'Sold out' })).toBeDisabled();
+        });
+      outcome: fail
+      reasons:
+        - text:
+            en: "Fail: there's no button named “Sold out”. The button is still “Add to cart”, just disabled — Petal invented the name."
+            ru: "Упадёт: кнопки с именем «Sold out» нет. Кнопка по-прежнему «Add to cart», просто неактивна, — имя Petal выдумал."
+          correct: true
+        - text:
+            en: "Pass: filter + getByRole is the most resilient pattern."
+            ru: "Пройдёт: filter + getByRole — самый устойчивый шаблон."
+        - text:
+            en: "Fail: strict mode violation — there are six product cards."
+            ru: "Упадёт: нарушение строгого режима — карточек товаров шесть."
+      hints:
+        - en: "The pattern is fine. What about the name inside it?"
+          ru: "Шаблон хороший. А что с именем внутри него?"
+        - en: "Does Bloomly rename the button of an out-of-stock product — or only disable it?"
+          ru: "Bloomly переименовывает кнопку у товара, которого нет в наличии, — или только делает её неактивной?"
+        - en: "It fails: no button on the page is called “Sold out”."
+          ru: "Упадёт: ни одна кнопка на странице не называется «Sold out»."
+      praise:
+        en: "Right — a resilient pattern doesn't make an invented name real."
+        ru: "Верно — устойчивый шаблон не делает выдуманное имя настоящим."
+      explain:
+        en: "`filter({ hasText: 'White Orchid' })` narrows six cards to one, so strict mode is fine. Then `getByRole('button', { name: 'Sold out' })` waits 5 seconds for a button that never appears. The style was right; the name came from memory. Only the live page knows the real name."
+        ru: "`filter({ hasText: 'White Orchid' })` сужает шесть карточек до одной, так что со строгим режимом всё в порядке. Дальше `getByRole('button', { name: 'Sold out' })` 5 секунд ждёт кнопку, которая так и не появится. Стиль правильный, а имя взято из памяти. Настоящее имя знает только живая страница."
+
+  - type: task
+    task:
+      id: c5-l4-t3
+      kind: inspect
+      keyPoint: kp-snapshot-not-memory
+      app: { route: /shop }
+      prompt:
+        en: "Petal guessed “Sold out”. Find the real White Orchid button in the agent's snapshot — the line Petal should have copied."
+        ru: "Petal угадал «Sold out». Найди настоящую кнопку White Orchid в снимке агента — ту строку, которую Petal должен был списать."
+      target: "article[data-product-id='white-orchid'] [data-testid='add-to-cart']"
+      view: aria
+      show: [role, name]
+      hints:
+        - en: "The snapshot is a tree. Find the White Orchid card first — look for its heading."
+          ru: "Снимок — это дерево. Сначала найди карточку White Orchid — ищи её заголовок."
+        - en: "Under `heading \"White Orchid\"` there are a price, the “Out of stock” text and one button."
+          ru: "Под `heading \"White Orchid\"` идут цена, текст «Out of stock» и одна кнопка."
+        - en: "Pick the `button \"Add to cart\" [disabled]` line inside the White Orchid card."
+          ru: "Выбери строку `button \"Add to cart\" [disabled]` внутри карточки White Orchid."
+      praise:
+        en: "Found it in the agent's own view. That's the exact line a snapshot-reading agent would turn into a locator."
+        ru: "Наш{ла|ёл} прямо во взгляде агента. Именно эту строку агент, читающий снимок, превратил бы в локатор."
+      explain:
+        en: "The snapshot says it plainly: `button \"Add to cart\" [disabled]`, right after `Out of stock`. So the locator is `card.getByRole('button', { name: 'Add to cart' })` and the assertion is `toBeDisabled()`. All six cards have a button with this name — the card filter decides which one."
+        ru: "Снимок говорит прямо: `button \"Add to cart\" [disabled]`, сразу после `Out of stock`. Значит, локатор — `card.getByRole('button', { name: 'Add to cart' })`, а проверка — `toBeDisabled()`. Кнопка с таким именем есть во всех шести карточках — какую именно, решает фильтр по карточке."
+
+  - type: task
+    task:
+      id: c5-l4-t4
+      kind: fix
+      keyPoint: kp-snapshot-not-memory
+      prompt:
+        en: "Fix Petal's TC-561 test with the name from the snapshot. It must pass now and after Kai's redesign."
+        ru: "Исправь тест Petal для TC-561 именем из снимка. Он должен проходить сейчас и после редизайна Кая."
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('out-of-stock product cannot be added', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'White Orchid' });
+          await expect(card).toContainText('Out of stock');
+          await expect(card.getByRole('button', { name: 'Sold out' })).toBeDisabled();
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('out-of-stock product cannot be added', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'White Orchid' });
+          await expect(card).toContainText('Out of stock');
+          await expect(card.getByRole('button', { name: 'Add to cart' })).toBeDisabled();
+        });
+      checks:
+        expect: pass
+        also:
+          - app: { variant: redesign }
+            expect: pass
+        static: [hasAssertion, noFragile]
+      hints:
+        - en: "Only one name in one line is wrong."
+          ru: "Неверно только одно имя в одной строке."
+        - en: "Take the name from the snapshot line you've just found."
+          ru: "Возьми имя из строки снимка, которую ты только что наш{ла|ёл}."
+        - en: "On line 7 replace 'Sold out' with 'Add to cart'."
+          ru: "В строке 7 замени 'Sold out' на 'Add to cart'."
+      praise:
+        en: "One name, straight from the snapshot — and the test passes on both versions of Bloomly."
+        ru: "Одно имя, прямо из снимка, — и тест проходит на обеих версиях Bloomly."
+      explain:
+        en: "The locator now matches the real page and uses only what a user sees: the card's text, the button's role and name. Nothing in it depends on class names or layout — that's why the redesign run passed too."
+        ru: "Теперь локатор совпадает с настоящей страницей и опирается только на то, что видит пользователь: текст карточки, роль и имя кнопки. Ничего в нём не зависит от имён классов и вёрстки — поэтому и прогон на редизайне прошёл."
+
+  - type: task
+    task:
+      id: c5-l4-t5
+      kind: agent
+      keyPoint: kp-snapshot-not-memory
+      app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+      context:
+        en: "Petal has never opened Bloomly's checkout. Petal is simulated, as everywhere in the trainer — a real agent phrases things differently but makes the same mistakes."
+        ru: "Petal ни разу не открывал оформление заказа в Bloomly. Petal, как и везде в тренажёре, симулирован: настоящий агент выразится иначе, но ошибётся так же."
+      prompt:
+        en: "Compose the prompt for TC-564 with a locator policy. Then run the test. Try leaving out one policy line and compare."
+        ru: "Собери промпт для TC-564 с политикой локаторов. Потом запусти тест. Попробуй убрать одну строку политики и сравни."
+      testCase:
+        id: TC-564
+        title: Gift message shows a character counter
+        preconditions: ["Cart has 1 Rose Bouquet"]
+        steps:
+          - { action: "Open /checkout" }
+          - { action: "Tick \"This is a gift\"" }
+          - { action: "Type the gift message", data: "Happy birthday, Mum!", expected: "The counter shows \"20/200\"" }
+      blocks:
+        - { id: task, locked: true, text: "Write a Playwright test for TC-564: the gift message shows a character counter. The cart already has 1 Rose Bouquet.", ru: "Напиши Playwright-тест для TC-564: у подарочного сообщения есть счётчик символов. В корзине уже лежит 1 Rose Bouquet." }
+        - { id: steps, text: 'Steps: open /checkout, tick "This is a gift", type "Happy birthday, Mum!" into the gift message.', ru: "Шаги: открой /checkout, отметь «This is a gift», введи «Happy birthday, Mum!» в подарочное сообщение." }
+        - { id: expected, text: 'Expected: the counter under the message shows "20/200".', ru: "Ожидаемый результат: счётчик под сообщением показывает «20/200»." }
+        - { id: snapshot, text: "Open /checkout with Playwright MCP first and take every name from the accessibility snapshot. Don't guess.", ru: "Сначала открой /checkout через Playwright MCP и бери каждое имя из снимка доступности. Не угадывай." }
+        - { id: ladder, text: "Locators: getByRole with a name, then getByLabel, then getByTestId. No CSS classes, no nth-child, no XPath.", ru: "Локаторы: getByRole с именем, потом getByLabel, потом getByTestId. Никаких CSS-классов, nth-child и XPath." }
+        - { id: typical, text: "Use the names most online shops use for gift options.", ru: "Используй названия, которые большинство интернет-магазинов дают подарочным опциям." }
+      responses:
+        - when: [steps, expected, snapshot, ladder]
+          unless: [typical]
+          best: true
+          message:
+            en: "Done! I opened /checkout and ticked “This is a gift”. A new snapshot showed `textbox \"Gift message\"`. The counter has no name in the snapshot, so I checked its attributes and used its test id. Green ✅"
+            ru: "Готово! Я открыл /checkout и отметил «This is a gift». Новый снимок показал `textbox \"Gift message\"`. У счётчика в снимке нет имени, поэтому я посмотрел его атрибуты и взял test id. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('gift message shows a character counter', async ({ page }) => {
+              await page.goto('/checkout');
+              await page.getByRole('checkbox', { name: 'This is a gift' }).check();
+              await page.getByLabel('Gift message').fill('Happy birthday, Mum!');
+              await expect(page.getByTestId('gift-counter')).toHaveText('20/200');
+            });
+        - when: [typical]
+          message:
+            en: "Done! I used the names most shops use: “Send as a gift” and “Gift note”. Red ❌ — the checkbox wasn't found. Maybe the page loads slowly?"
+            ru: "Готово! Я взял названия, как в большинстве магазинов: «Send as a gift» и «Gift note». Красный ❌ — чекбокс не найден. Может, страница медленно грузится?"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('gift message shows a character counter', async ({ page }) => {
+              await page.goto('/checkout');
+              await page.getByRole('checkbox', { name: 'Send as a gift' }).check();
+              await page.getByLabel('Gift note').fill('Happy birthday, Mum!');
+              await expect(page.getByText('20/200')).toBeVisible();
+            });
+        - when: [steps, expected, snapshot]
+          message:
+            en: "Done! I read the live page. For the checkbox I used its id `#co-gift`, and the counter is `p.hint` in the DOM. Green ✅"
+            ru: "Готово! Я прочитал живую страницу. Для чекбокса взял его id `#co-gift`, а счётчик в DOM — это `p.hint`. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('gift message shows a character counter', async ({ page }) => {
+              await page.goto('/checkout');
+              await page.locator('#co-gift').check();
+              await page.getByLabel('Gift message').fill('Happy birthday, Mum!');
+              await expect(page.locator('p.hint')).toHaveText('20/200');
+            });
+        - when: [steps, expected, ladder]
+          message:
+            en: "Done! Role and label locators, as you asked: the checkbox “Send as a gift” and the field “Gift note”. Red ❌ — the checkbox isn't on the page. Should I add a wait?"
+            ru: "Готово! Локаторы по роли и метке, как ты просил{а|}: чекбокс «Send as a gift» и поле «Gift note». Красный ❌ — чекбокса на странице нет. Добавить ожидание?"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('gift message shows a character counter', async ({ page }) => {
+              await page.goto('/checkout');
+              await page.getByRole('checkbox', { name: 'Send as a gift' }).check();
+              await page.getByLabel('Gift note').fill('Happy birthday, Mum!');
+              await expect(page.getByText('20/200')).toBeVisible();
+            });
+        - when: [steps, expected]
+          message:
+            en: "Done! I used the usual gift-option selectors. Red ❌ — `input[name=\"gift\"]` wasn't found. I can increase the timeout?"
+            ru: "Готово! Я взял обычные селекторы для подарочной опции. Красный ❌ — `input[name=\"gift\"]` не найден. Увеличить таймаут?"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('gift message shows a character counter', async ({ page }) => {
+              await page.goto('/checkout');
+              await page.locator('input[name="gift"]').check();
+              await page.locator('textarea.gift-message').fill('Happy birthday, Mum!');
+              await expect(page.locator('.char-counter')).toHaveText('20/200');
+            });
+        - when: []
+          message:
+            en: "I checked that the checkout page opens. Green ✅"
+            ru: "Я проверил, что страница оформления заказа открывается. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('checkout page opens', async ({ page }) => {
+              await page.goto('/checkout');
+              await expect(page.getByRole('heading', { name: 'Checkout' })).toBeVisible();
+            });
+      missing:
+        snapshot:
+          en: "No snapshot line: nothing told Petal to look at the live page, so the names came from memory of other shops (“Send as a gift”, “Gift note”). Bloomly says “This is a gift” and “Gift message”."
+          ru: "Нет строки про снимок: ничто не велело Petal посмотреть на живую страницу, и имена пришли из памяти о других магазинах («Send as a gift», «Gift note»). В Bloomly — «This is a gift» и «Gift message»."
+        ladder:
+          en: "No locator line: Petal found the real elements but mixed in an id and a CSS class. `p.hint` is green today and red after Kai's redesign renames the class."
+          ru: "Нет строки про локаторы: Petal нашёл настоящие элементы, но подмешал id и CSS-класс. `p.hint` зелёный сегодня и красный после того, как редизайн Кая переименует класс."
+        expected:
+          en: "No expected result: Petal can't know the counter must say “20/200”, so there is nothing to assert."
+          ru: "Нет ожидаемого результата: Petal не может знать, что счётчик должен показать «20/200», — проверять нечего."
+        steps:
+          en: "No steps: Petal didn't know what to do on the page and only checked that it opens."
+          ru: "Нет шагов: Petal не знал, что делать на странице, и лишь проверил, что она открывается."
+      checks:
+        expect: pass
+        also:
+          - app: { variant: redesign, state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+            expect: pass
+        static: [hasAssertion, noFragile]
+      hints:
+        - en: "Two blocks are about locators: one says *where to look*, the other *which kind of locator to write*. You need both."
+          ru: "Два блока — про локаторы: один говорит, *куда смотреть*, другой — *какие локаторы писать*. Нужны оба."
+        - en: "One block sounds helpful but sends Petal back to other shops' names."
+          ru: "Один блок звучит полезно, но отправляет Petal обратно к названиям из других магазинов."
+        - en: "Steps + expected + the snapshot line + the locator line. Leave out “the names most online shops use”."
+          ru: "Шаги + ожидаемый результат + строка про снимок + строка про локаторы. Без «названий, как в большинстве магазинов»."
+      praise:
+        en: "Real names from the snapshot, the right kind of locators from the policy — a test that passes today and after the redesign."
+        ru: "Настоящие имена из снимка, правильные локаторы из политики — тест, который проходит сегодня и после редизайна."
+      explain:
+        en: "The two policy lines fix different problems. The snapshot line fixes the *names* (no “Send as a gift”). The locator line fixes the *style* (no `p.hint`). Leave out either one and a typical mistake comes back. Notice how Petal found the gift field: it ticked the box and took a new snapshot — hidden elements appear in the snapshot only once they're shown."
+        ru: "Две строки политики решают разные проблемы. Строка про снимок исправляет *имена* (никаких «Send as a gift»). Строка про локаторы исправляет *стиль* (никаких `p.hint`). Убери любую — и типичная ошибка вернётся. Обрати внимание, как Petal нашёл поле для сообщения: отметил чекбокс и сделал новый снимок — скрытые элементы попадают в снимок, только когда их показали."
+
+  - type: task
+    task:
+      id: c5-l4-t6
+      kind: fill
+      keyPoint: kp-policy-file
+      context:
+        en: "You're adding the locator policy to Bloomly's `CLAUDE.md`."
+        ru: "Ты добавляешь политику локаторов в `CLAUDE.md` проекта Bloomly."
+      prompt:
+        en: "Complete the Locators section. Every rule should be something a reviewer can check."
+        ru: "Допиши раздел Locators. Каждое правило должно быть таким, чтобы ревьюер мог его проверить."
+      code: |
+        ## Locators
+        - Before writing a locator, open the live page with Playwright MCP. Never ___ names.
+        - Use `getByRole` with a name, then `___`, then `getByText`, then `getByTestId`.
+        - No CSS ___, no `nth-child`, no XPath.
+        - No `.first()` to silence strict mode — use `___({ hasText })` instead.
+      blanks:
+        - { answers: [guess], options: [guess, check, copy] }
+        - { answers: [getByLabel], options: [getByLabel, locator, getByButton] }
+        - { answers: [classes], options: [classes, roles, labels] }
+        - { answers: [filter], options: [filter, nth, waitForTimeout] }
+      hints:
+        - en: "Each line blocks one of the four typical agent mistakes."
+          ru: "Каждая строка закрывает одну из четырёх типичных ошибок агента."
+        - en: "Blank 2 is the second rung of the ladder — the one for form fields. Blank 4 narrows a list by text."
+          ru: "Пропуск 2 — вторая ступенька лесенки, та, что для полей формы. Пропуск 4 сужает список по тексту."
+        - en: "Answers: guess · getByLabel · classes · filter."
+          ru: "Ответы: guess · getByLabel · classes · filter."
+      praise:
+        en: "Four short rules, each one checkable in a diff. That's a policy Petal can follow and you can enforce."
+        ru: "Четыре коротких правила, каждое проверяется в диффе. Такой политике Petal может следовать, а ты — следить за её выполнением."
+      explain:
+        en: "Each rule closes one door: line 2 — invented names; line 3 — invented methods like `getByButton` (it lists the real ones); line 4 — classes the redesign will rename; line 5 — `.first()` hiding “which one?”. `getByButton` and `locator` were traps: one doesn't exist, the other is the CSS escape route."
+        ru: "Каждое правило закрывает одну дверь: строка 2 — выдуманные имена; строка 3 — выдуманные методы вроде `getByButton` (в ней перечислены настоящие); строка 4 — классы, которые переименует редизайн; строка 5 — `.first()`, прячущий вопрос «какой именно?». `getByButton` и `locator` были ловушками: первого не существует, второй — лазейка для CSS."
+
+  - type: task
+    task:
+      id: c5-l4-t7
+      kind: agent
+      keyPoint: kp-policy-file
+      context:
+        en: "Tomorrow Kai, not you, asks Petal for a test. His prompt is one line (locked). Claude Code reads `CLAUDE.md` at the start of every session, so whatever you put there reaches Petal before Kai's prompt. Choose the lines for `CLAUDE.md`, then send."
+        ru: "Завтра тест у Petal попросит Кай, а не ты. Его промпт — одна строка (заблокирована). Claude Code читает `CLAUDE.md` в начале каждой сессии, поэтому всё, что ты туда запишешь, дойдёт до Petal раньше промпта Кая. Выбери строки для `CLAUDE.md` и отправляй."
+      prompt:
+        en: "Build Bloomly's CLAUDE.md for Kai's request. Then run the test — and try a version without a rules file."
+        ru: "Собери CLAUDE.md Bloomly для запроса Кая. Потом запусти тест — и попробуй вариант без файла правил."
+      testCase:
+        id: TC-566
+        title: Adding a product shows a toast and updates the counter
+        preconditions: ["Cart is empty"]
+        steps:
+          - { action: "Open /shop" }
+          - { action: "Click \"Add to cart\" on the Sunny Tulips card", expected: "Toast \"Sunny Tulips added to cart\"; the cart counter shows 1" }
+      blocks:
+        - { id: r-snapshot, text: "CLAUDE.md: Before writing a locator, open the live page with Playwright MCP. Never guess names.", ru: "CLAUDE.md: Прежде чем писать локатор, открой живую страницу через Playwright MCP. Никогда не угадывай имена." }
+        - { id: r-ladder, text: "CLAUDE.md: Use getByRole with a name, then getByLabel, then getByText, then getByTestId. No CSS classes, no nth-child, no XPath.", ru: "CLAUDE.md: Используй getByRole с именем, потом getByLabel, потом getByText, потом getByTestId. Никаких CSS-классов, nth-child и XPath." }
+        - { id: r-filter, text: "CLAUDE.md: No .first() or .nth() to silence strict mode. Filter by text instead.", ru: "CLAUDE.md: Никаких .first() или .nth(), чтобы заглушить строгий режим. Вместо этого фильтруй по тексту." }
+        - { id: r-first, text: "CLAUDE.md: If a locator matches several elements, add .first() so the test stays green.", ru: "CLAUDE.md: Если локатор находит несколько элементов, добавь .first(), чтобы тест оставался зелёным." }
+        - { id: r-vague, text: "CLAUDE.md: Always write clean, robust, professional locators.", ru: "CLAUDE.md: Всегда пиши чистые, надёжные, профессиональные локаторы." }
+        - { id: kai, locked: true, text: 'Kai''s prompt: Write a test for TC-566 — add Sunny Tulips to the cart from /shop. Expected: the toast says "Sunny Tulips added to cart" and the cart counter shows 1.', ru: "Промпт Кая: Напиши тест для TC-566 — добавить Sunny Tulips в корзину со страницы /shop. Ожидается: уведомление «Sunny Tulips added to cart», счётчик корзины показывает 1." }
+      responses:
+        - when: [r-first]
+          message:
+            en: "Done! Six buttons are called “Add to cart”, so — as CLAUDE.md says — I added `.first()`. Red ❌: the toast says “Rose Bouquet added to cart”. Maybe TC-566 is outdated and I should expect Rose Bouquet?"
+            ru: "Готово! Кнопок «Add to cart» шесть, поэтому — как сказано в CLAUDE.md — я добавил `.first()`. Красный ❌: уведомление говорит «Rose Bouquet added to cart». Может, TC-566 устарел и ожидать надо Rose Bouquet?"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('adding Sunny Tulips updates the cart', async ({ page }) => {
+              await page.goto('/shop');
+              await page.getByRole('button', { name: 'Add to cart' }).first().click();
+              await expect(page.getByRole('status')).toHaveText('Sunny Tulips added to cart');
+              await expect(page.getByTestId('cart-count')).toHaveText('1');
+            });
+        - when: [r-snapshot, r-ladder, r-filter]
+          best: true
+          message:
+            en: "Done! I opened /shop: six cards share the button name “Add to cart”, so I filtered the Sunny Tulips card by its text, as CLAUDE.md says. The toast is `status` in the snapshot. Green ✅"
+            ru: "Готово! Я открыл /shop: у шести карточек одинаковое имя кнопки «Add to cart», поэтому я отфильтровал карточку Sunny Tulips по тексту, как сказано в CLAUDE.md. Уведомление в снимке — это `status`. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('adding Sunny Tulips updates the cart', async ({ page }) => {
+              await page.goto('/shop');
+              const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+              await card.getByRole('button', { name: 'Add to cart' }).click();
+              await expect(page.getByRole('status')).toHaveText('Sunny Tulips added to cart');
+              await expect(page.getByTestId('cart-count')).toHaveText('1');
+            });
+        - when: [r-snapshot, r-ladder]
+          message:
+            en: "Done! Six buttons share the name “Add to cart”, so I took the second one — Sunny Tulips is second in the list. Green ✅"
+            ru: "Готово! У шести кнопок одно имя «Add to cart», поэтому я взял вторую — Sunny Tulips в списке второй. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('adding Sunny Tulips updates the cart', async ({ page }) => {
+              await page.goto('/shop');
+              await page.getByRole('button', { name: 'Add to cart' }).nth(1).click();
+              await expect(page.getByRole('status')).toHaveText('Sunny Tulips added to cart');
+              await expect(page.getByTestId('cart-count')).toHaveText('1');
+            });
+        - when: [r-ladder]
+          message:
+            en: "Done! Role locators, as CLAUDE.md says. Shops usually name these buttons per product, so I used “Add Sunny Tulips to cart”. Red ❌ — the button wasn't found."
+            ru: "Готово! Локаторы по роли, как сказано в CLAUDE.md. Обычно в магазинах такие кнопки называют по товару, поэтому я взял «Add Sunny Tulips to cart». Красный ❌ — кнопка не найдена."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('adding Sunny Tulips updates the cart', async ({ page }) => {
+              await page.goto('/shop');
+              await page.getByRole('button', { name: 'Add Sunny Tulips to cart' }).click();
+              await expect(page.getByRole('status')).toHaveText('Sunny Tulips added to cart');
+              await expect(page.getByTestId('cart-count')).toHaveText('1');
+            });
+        - when: [r-snapshot]
+          message:
+            en: "Done! I opened /shop and used the classes I saw in the DOM: `.product-card`, `.btn`, `.toast`, `.badge`. Green ✅"
+            ru: "Готово! Я открыл /shop и взял классы, которые увидел в DOM: `.product-card`, `.btn`, `.toast`, `.badge`. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('adding Sunny Tulips updates the cart', async ({ page }) => {
+              await page.goto('/shop');
+              await page.locator('.product-card', { hasText: 'Sunny Tulips' }).locator('.btn').click();
+              await expect(page.locator('.toast')).toHaveText('Sunny Tulips added to cart');
+              await expect(page.locator('.badge')).toHaveText('1');
+            });
+        - when: []
+          message:
+            en: "Done! Sunny Tulips is the second product, so I click the button in the second `li`. Green ✅"
+            ru: "Готово! Sunny Tulips — второй товар, поэтому я нажимаю кнопку во втором `li`. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('adding Sunny Tulips updates the cart', async ({ page }) => {
+              await page.goto('/shop');
+              await page.locator('li:nth-child(2) .btn').click();
+              await expect(page.locator('.toast')).toHaveText('Sunny Tulips added to cart');
+              await expect(page.locator('.badge')).toHaveText('1');
+            });
+      missing:
+        r-snapshot:
+          en: "No snapshot rule: nothing tells Petal to look at the live page, so names can come from memory of other shops."
+          ru: "Нет правила про снимок: ничто не велит Petal смотреть на живую страницу, и имена могут прийти из памяти о других магазинах."
+        r-ladder:
+          en: "No locator rule: nothing stops CSS classes and positions like `li:nth-child(2) .btn` — green today, red after Kai's redesign."
+          ru: "Нет правила про локаторы: ничто не мешает CSS-классам и позициям вроде `li:nth-child(2) .btn` — зелёным сегодня и красным после редизайна Кая."
+        r-filter:
+          en: "No filter rule: when six buttons share a name, Petal picks one by position (`.nth(1)`). It breaks as soon as the sort order changes."
+          ru: "Нет правила про фильтр: когда у шести кнопок одно имя, Petal выбирает по позиции (`.nth(1)`). Это сломается, как только поменяется сортировка."
+      checks:
+        expect: pass
+        also:
+          - app: { variant: redesign }
+            expect: pass
+        static: [hasAssertion, noFragile]
+      hints:
+        - en: "Kai's prompt has no rules at all. Everything Petal knows about locators has to come from CLAUDE.md."
+          ru: "В промпте Кая нет вообще никаких правил. Всё, что Petal знает о локаторах, должно прийти из CLAUDE.md."
+        - en: "One line makes the test “green” by clicking the wrong product. One line is too vague to check."
+          ru: "Одна строка делает тест «зелёным», нажимая не на тот товар. Одна строка слишком размытая, чтобы её проверить."
+        - en: "The snapshot, ladder and filter lines. Leave out `.first()` and “clean, robust, professional”."
+          ru: "Строки про снимок, лесенку и фильтр. Без `.first()` и без «чистых, надёжных, профессиональных»."
+      praise:
+        en: "Kai wrote one line without any rules — and still got a test that follows the policy. That's what a rules file is for."
+        ru: "Кай написал одну строку без всяких правил — и всё равно получил тест по политике. Ради этого и нужен файл правил."
+      explain:
+        en: "Compare the runs. With no rules file Petal falls back to `li:nth-child(2) .btn` — green today, fragile. With the `.first()` rule it adds the wrong flower and then offers to change the expected result. With only the vague line nothing changes: “robust” is nothing a reviewer can check. Three short, checkable lines changed the result for a prompt you didn't even write."
+        ru: "Сравни прогоны. Без файла правил Petal возвращается к `li:nth-child(2) .btn` — зелёный сегодня, но хрупкий. С правилом про `.first()` он добавляет не тот цветок, а потом предлагает поменять ожидаемый результат. С одной лишь размытой строкой ничего не меняется: «надёжность» ревьюер проверить не может. Три коротких проверяемых строки изменили результат для промпта, который ты даже не писал{а|}."
+
+  - type: mistakes
+    keyPoint: kp-policy-file
+    title: { en: "Policy mistakes", ru: "Ошибки в политике" }
+    items:
+      - wrong: "- Locators should be robust and high quality."
+        right: "- Use getByRole with a name, then getByLabel, then getByText, then getByTestId. No CSS classes, no nth-child, no XPath."
+        why:
+          en: "A rule nobody can check in a diff is a wish. The agent reads “robust” its own way."
+          ru: "Правило, которое нельзя проверить в диффе, — это пожелание. «Надёжность» агент понимает по-своему."
+      - wrong: "- If a locator matches several elements, add .first()."
+        right: "- If a locator matches several elements, filter by text: .filter({ hasText: 'Sunny Tulips' })."
+        why:
+          en: "`.first()` silences strict mode and answers “which one?” with “whichever is first” — often the wrong product."
+          ru: "`.first()` глушит строгий режим и отвечает на вопрос «какой именно?» словами «какой первый попадётся» — часто не тот товар."
+      - wrong: "Approve: card.getByRole('button', { name: 'Sold out' }) — filter + role, looks resilient."
+        right: "Request changes: the snapshot says button \"Add to cart\" [disabled]. Please take names from the live page."
+        why:
+          en: "A good style doesn't make a name real. Check names against the snapshot, not against how professional the code looks."
+          ru: "Хороший стиль не делает имя настоящим. Сверяй имена со снимком, а не с тем, насколько профессионально выглядит код."
+      - wrong: "Paste “no CSS classes” into every prompt and hope colleagues do the same."
+        right: "Write the policy once in CLAUDE.md (Claude Code) or .github/copilot-instructions.md (Copilot)."
+        why:
+          en: "Prompts are per task and per person. The rules file is read every session, for everyone's prompts."
+          ru: "Промпт — на одну задачу и одного человека. Файл правил читается в каждой сессии, для промптов всех."
+
+  - type: explain
+    keyPoint: kp-policy-file
+    prompt:
+      en: "In your own words: why should the locator policy live in CLAUDE.md (or .github/copilot-instructions.md) and not only in your prompt? Which three rules would you write first?"
+      ru: "Своими словами: почему политика локаторов должна жить в CLAUDE.md (или .github/copilot-instructions.md), а не только в твоём промпте? Какие три правила ты бы записал{а|} первыми?"
+    model:
+      en: "A prompt works for one task: a new session doesn't remember it, and my colleagues won't copy my rules into their prompts. The agent reads the rules file by itself at the start of every session, so the policy applies to every prompt — mine and Kai's. My first three rules: 1) open the live page and take names from the accessibility snapshot, never guess; 2) getByRole with a name → getByLabel → getByText → getByTestId, no CSS classes, nth-child or XPath; 3) no .first() or .nth() to silence strict mode — filter by text. Each one blocks a typical agent mistake, and each one is easy to check in a review."
+      ru: "Промпт работает для одной задачи: новая сессия его не помнит, а коллеги не станут копировать мои правила в свои промпты. Файл правил агент читает сам в начале каждой сессии, поэтому политика действует для каждого промпта — моего и Кая. Мои первые три правила: 1) открыть живую страницу и брать имена из снимка доступности, никогда не угадывать; 2) getByRole с именем → getByLabel → getByText → getByTestId, никаких CSS-классов, nth-child и XPath; 3) никаких .first() и .nth(), чтобы заглушить строгий режим, — фильтровать по тексту. Каждое правило закрывает типичную ошибку агента, и каждое легко проверить на ревью."
+
+  - type: phrases
+    items:
+      - context: code-review
+        en: "Line 7: this name isn't on the page — the snapshot says “Add to cart”. Please take names from the live page, not from memory."
+        ru: "Строка 7: такого имени на странице нет — в снимке написано «Add to cart». Пожалуйста, бери имена с живой страницы, а не из памяти."
+      - context: prompt
+        en: "Open /checkout with Playwright MCP first and take every locator from the accessibility snapshot. Don't guess names."
+        ru: "Сначала открой /checkout через Playwright MCP и бери каждый локатор из снимка доступности. Не угадывай имена."
+      - context: code-review
+        en: "Requesting changes: .first() hides which card we click. Per our locator policy, please filter by the product name."
+        ru: "Запрашиваю правки: .first() скрывает, на какую карточку мы нажимаем. По нашей политике локаторов, пожалуйста, фильтруй по названию товара."
+      - context: standup
+        en: "Yesterday I added a locator policy to CLAUDE.md. Since then Petal's PRs have had no CSS selectors."
+        ru: "Вчера я добавил{а|} политику локаторов в CLAUDE.md. С тех пор в PR от Petal нет CSS-селекторов."
+      - context: meeting
+        en: "Some of us use Copilot. Should we put the same policy into .github/copilot-instructions.md?"
+        ru: "Некоторые из нас работают с Copilot. Может, положим ту же политику в .github/copilot-instructions.md?"
+        note:
+          en: "Two agents, one policy: keep both files in sync."
+          ru: "Два агента — одна политика: держи оба файла синхронными."
+      - context: chat
+        en: "Heads-up: I keep the Locators section short on purpose. If you add a rule, make sure we can check it in a review."
+        ru: "К сведению: раздел Locators я специально держу коротким. Если добавляешь правило, убедись, что его можно проверить на ревью."
+
+checkPool:
+  - id: c5-l4-k1
+    kind: choice
+    keyPoint: kp-ai-locator-mistakes
+    placement: true
+    context:
+      en: "Petal wrote this line for the Bloomly login page without opening it."
+      ru: "Petal написал эту строку для страницы входа Bloomly, не открывая её."
+    code: |
+      await page.getByRole('button', { name: 'Sign in' }).click();
+    prompt:
+      en: "What's wrong with it?"
+      ru: "Что с ней не так?"
+    options:
+      - text: { en: "The name isn't on the page: Bloomly's button says “Log in”.", ru: "Такого имени на странице нет: кнопка Bloomly называется «Log in»." }
+        correct: true
+        why:
+          en: "A name from other sites. The style is right; the name is invented — the click times out."
+          ru: "Имя с других сайтов. Стиль правильный, а имя выдумано — клик упадёт по таймауту."
+      - text: { en: "`getByRole` is an invented method.", ru: "`getByRole` — выдуманный метод." }
+        why:
+          en: "It's real — the top of the locator ladder."
+          ru: "Он настоящий — верхняя ступенька лесенки локаторов."
+      - text: { en: "Nothing — getByRole is the most resilient locator.", ru: "Ничего — getByRole самый устойчивый локатор." }
+        why:
+          en: "Resilient style, wrong name. It finds nothing."
+          ru: "Устойчивый стиль, неверное имя. Он ничего не найдёт."
+      - text: { en: "It's a CSS class and will break on the redesign.", ru: "Это CSS-класс, и он сломается при редизайне." }
+        why:
+          en: "There's no CSS here: role + name."
+          ru: "Здесь нет CSS: роль + имя."
+    hints:
+      - en: "The method is fine. Read the name."
+        ru: "С методом всё в порядке. Прочитай имя."
+      - en: "What does the button on Bloomly's login page say?"
+        ru: "Что написано на кнопке на странице входа Bloomly?"
+    explain:
+      en: "“Sign in” is one of the most common synonyms an agent reaches for. A snapshot of /login would show `button \"Log in\"`."
+      ru: "«Sign in» — один из самых частых синонимов, которые подставляет агент. Снимок /login показал бы `button \"Log in\"`."
+
+  - id: c5-l4-k2
+    kind: review
+    keyPoint: kp-ai-locator-mistakes
+    context:
+      en: "Anna is logged in. Petal wrote this TC-570 test from memory: filtering Anna's orders by “Delivered” should show 3 of 6."
+      ru: "Anna вошла в аккаунт. Petal написал этот тест для TC-570 по памяти: фильтр заказов Anna по «Delivered» должен показать 3 из 6."
+    prompt:
+      en: "Flag every locator problem and pick its type."
+      ru: "Отметь каждую проблему с локаторами и выбери её тип."
+    testCase:
+      id: TC-570
+      title: Status filter shows only delivered orders
+      preconditions: ["Logged in as anna@bloomly.app (6 orders, 3 delivered)"]
+      steps:
+        - { action: "Open /orders" }
+        - { action: "Choose \"Delivered\" in Status", expected: "3 rows, all Delivered; summary \"Showing 3 of 6 orders\"" }
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('status filter shows only delivered orders', async ({ page }) => {
+        await page.goto('/orders');
+        await page.getByDropdown('Status').selectOption('Delivered');
+        await expect(page.locator('table tbody tr')).toHaveCount(3);
+        await expect(page.locator('.status-delivered').first()).toHaveText('Delivered');
+        await expect(page.getByTestId('orders-summary')).toHaveText('Showing 3 of 6 orders');
+      });
+    issues:
+      - line: 5
+        type: hallucination
+        note:
+          en: "`getByDropdown` doesn't exist. The select has a label: `getByLabel('Status')`."
+          ru: "`getByDropdown` не существует. У списка есть метка: `getByLabel('Status')`."
+      - line: 6
+        type: fragile-locator
+        note:
+          en: "A CSS path through the table's markup. The rows have a test id: `getByTestId('order-row')`."
+          ru: "CSS-путь по разметке таблицы. У строк есть test id: `getByTestId('order-row')`."
+      - line: 7
+        type: fragile-locator
+        note:
+          en: "`.status-delivered` is a CSS class — the redesign renames it. And `.first()` looks at one row only."
+          ru: "`.status-delivered` — CSS-класс, редизайн его переименует. А `.first()` смотрит только на одну строку."
+    types: [hallucination, fragile-locator, hard-wait, missing-await, wrong-data]
+    hints:
+      - en: "Three locators, three problems. Check each against Playwright and against the policy."
+        ru: "Три локатора — три проблемы. Сверь каждый с Playwright и с политикой."
+      - en: "One method doesn't exist; two locators depend on markup and class names."
+        ru: "Одного метода не существует; два локатора зависят от разметки и имён классов."
+      - en: "Lines 5, 6 and 7. Line 8 is fine."
+        ru: "Строки 5, 6 и 7. Строка 8 в порядке."
+    explain:
+      en: "Line 5 fails loudly on the first run. Lines 6 and 7 fail quietly — after the next markup change or redesign. The summary check on line 8 follows the policy: a test id and the exact expected text."
+      ru: "Строка 5 упадёт громко, на первом же прогоне. Строки 6 и 7 упадут тихо — после следующей правки разметки или редизайна. Проверка сводки в строке 8 соответствует политике: test id и точный ожидаемый текст."
+
+  - id: c5-l4-k3
+    kind: predict
+    keyPoint: kp-snapshot-not-memory
+    context:
+      en: "Petal wrote this TC-571 test without opening the signup page."
+      ru: "Petal написал этот тест для TC-571, не открывая страницу регистрации."
+    prompt:
+      en: "Pass or fail?"
+      ru: "Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('personal account is the default type', async ({ page }) => {
+        await page.goto('/signup');
+        await expect(page.getByRole('radio', { name: 'Private customer' })).toBeChecked();
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "Fail: the radio is called “Personal”. “Private customer” came from memory, not from the page."
+          ru: "Упадёт: радиокнопка называется «Personal». «Private customer» пришло из памяти, а не со страницы."
+        correct: true
+      - text:
+          en: "Pass: the personal account type is checked by default."
+          ru: "Пройдёт: личный тип аккаунта выбран по умолчанию."
+      - text:
+          en: "Fail: toBeChecked doesn't work for radio buttons."
+          ru: "Упадёт: toBeChecked не работает с радиокнопками."
+    hints:
+      - en: "The app behaves correctly. Is the locator pointing at something real?"
+        ru: "Приложение ведёт себя правильно. А указывает ли локатор на что-то настоящее?"
+      - en: "What are the two options in the “Account type” group called?"
+        ru: "Как называются два варианта в группе «Account type»?"
+    explain:
+      en: "The default is right, but the test never reaches it: no radio is named “Private customer”, so the assertion times out. The snapshot shows `radio \"Personal\" [checked]` — one look would have fixed it."
+      ru: "По умолчанию всё правильно, но тест до этого не доходит: радиокнопки с именем «Private customer» нет, и проверка падает по таймауту. В снимке видно `radio \"Personal\" [checked]` — одного взгляда хватило бы."
+
+  - id: c5-l4-k4
+    kind: inspect
+    keyPoint: kp-snapshot-not-memory
+    app: { route: /signup }
+    prompt:
+      en: "Petal wants to tick the newsletter box and guessed `getByRole('checkbox', { name: 'Subscribe to our newsletter' })`. Find the real checkbox in the agent's snapshot."
+      ru: "Petal хочет отметить подписку на рассылку и угадал `getByRole('checkbox', { name: 'Subscribe to our newsletter' })`. Найди настоящий чекбокс в снимке агента."
+    target: "#newsletter"
+    view: aria
+    show: [role]
+    hints:
+      - en: "Look for `checkbox` lines in the snapshot."
+        ru: "Ищи в снимке строки с `checkbox`."
+      - en: "There are two checkboxes: one for the newsletter, one for the terms."
+        ru: "Чекбоксов два: один для рассылки, другой для условий."
+      - en: "The line `checkbox \"Send me the Bloomly newsletter\"`."
+        ru: "Строка `checkbox \"Send me the Bloomly newsletter\"`."
+    explain:
+      en: "The real name is “Send me the Bloomly newsletter”, so the locator is `getByRole('checkbox', { name: 'Send me the Bloomly newsletter' })`. “Subscribe to our newsletter” is how many other sites say it — which is exactly why Petal guessed it."
+      ru: "Настоящее имя — «Send me the Bloomly newsletter», значит, локатор — `getByRole('checkbox', { name: 'Send me the Bloomly newsletter' })`. «Subscribe to our newsletter» — так пишут на многих других сайтах, потому Petal так и угадал."
+
+  - id: c5-l4-k5
+    kind: fill
+    keyPoint: kp-policy-file
+    placement: true
+    prompt:
+      en: "Where does each agent look for the team's rules? Fill in the file names."
+      ru: "Где каждый агент ищет правила команды? Впиши имена файлов."
+    code: |
+      bloomly-tests/
+      ├── ___                  ← Claude Code reads it at the start of every session
+      ├── .github/
+      │   └── ___              ← GitHub Copilot reads it in this repository
+      ├── tests/
+      │   └── cart.spec.js
+      └── playwright.config.js
+    blanks:
+      - { answers: [CLAUDE.md], options: [CLAUDE.md, README.md, package.json] }
+      - { answers: [copilot-instructions.md], options: [copilot-instructions.md, workflows, CLAUDE.md] }
+    hints:
+      - en: "One file sits in the repository root, the other inside `.github/`."
+        ru: "Один файл лежит в корне репозитория, другой — внутри `.github/`."
+      - en: "Each file is named after its agent."
+        ru: "Каждый файл назван в честь своего агента."
+      - en: "Answers: CLAUDE.md · copilot-instructions.md."
+        ru: "Ответы: CLAUDE.md · copilot-instructions.md."
+    explain:
+      en: "Claude Code reads `CLAUDE.md` in the root (or `.claude/CLAUDE.md`) at the start of every session. Copilot reads `.github/copilot-instructions.md`. Same policy, two files — if your team uses both agents, keep them in sync."
+      ru: "Claude Code читает `CLAUDE.md` в корне (или `.claude/CLAUDE.md`) в начале каждой сессии. Copilot читает `.github/copilot-instructions.md`. Одна политика, два файла — если в команде работают с обоими агентами, держи их синхронными."
+
+  - id: c5-l4-k6
+    kind: choice
+    keyPoint: kp-policy-file
+    multi: true
+    context:
+      en: "Kai drafted a Locators section for CLAUDE.md and asked you to review it."
+      ru: "Кай набросал раздел Locators для CLAUDE.md и попросил тебя сделать ревью."
+    code: |
+      ## Locators
+      - Take names from the live page (Playwright MCP snapshot), never from memory.
+      - Use getByRole with a name, then getByLabel, then getByText, then getByTestId.
+      - If several elements match, add .first() to keep the test green.
+      - Locators should be robust and high quality.
+      - No CSS classes, no nth-child, no XPath.
+    prompt:
+      en: "Which two lines would you ask Kai to change?"
+      ru: "Какие две строки ты попросишь Кая изменить?"
+    options:
+      - text: { en: "Line 4: “add .first() to keep the test green”", ru: "Строка 4: «add .first() to keep the test green»" }
+        correct: true
+        why:
+          en: "It silences strict mode by clicking whatever comes first. The rule should say: filter by text."
+          ru: "Она глушит строгий режим, нажимая на то, что попадётся первым. Правило должно говорить: фильтруй по тексту."
+      - text: { en: "Line 5: “robust and high quality”", ru: "Строка 5: «robust and high quality»" }
+        correct: true
+        why:
+          en: "Nobody can check it in a diff, and the agent reads it any way it likes. Delete it — lines 3 and 6 already say what “robust” means."
+          ru: "Её нельзя проверить в диффе, а агент понимает её как хочет. Удалить — строки 3 и 6 уже объясняют, что значит «надёжно»."
+      - text: { en: "Line 2: the snapshot rule", ru: "Строка 2: правило про снимок" }
+        why:
+          en: "Keep it: it's what stops invented names."
+          ru: "Оставить: именно она останавливает выдуманные имена."
+      - text: { en: "Line 6: no CSS classes, nth-child or XPath", ru: "Строка 6: никаких CSS-классов, nth-child и XPath" }
+        why:
+          en: "Keep it: checkable in seconds, and it's what survives Kai's redesign."
+          ru: "Оставить: проверяется за секунды, и именно благодаря ей тесты переживут редизайн Кая."
+    hints:
+      - en: "Look for one rule that causes a mistake and one rule that can't be checked."
+        ru: "Ищи одно правило, которое вызывает ошибку, и одно, которое невозможно проверить."
+      - en: "What does `.first()` click on the shop page?"
+        ru: "На что нажмёт `.first()` на странице магазина?"
+      - en: "Lines 4 and 5."
+        ru: "Строки 4 и 5."
+    explain:
+      en: "A rules file is reviewed like code: a wrong rule spreads to every test the agent writes, and a vague rule changes nothing. Ask Kai to replace line 4 with “filter by text instead” and delete line 5."
+      ru: "Файл правил ревьюят как код: неправильное правило расползётся по всем тестам агента, а размытое ничего не изменит. Попроси Кая заменить строку 4 на «filter by text instead» и удалить строку 5."
+
+  - id: c5-l4-k7
+    kind: fix
+    keyPoint: kp-ai-locator-mistakes
+    app: { state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] } }
+    context:
+      en: "TC-572: the cart has Rose Bouquet and Sunny Tulips; removing Sunny Tulips should leave only Rose Bouquet."
+      ru: "TC-572: в корзине Rose Bouquet и Sunny Tulips; после удаления Sunny Tulips должен остаться только Rose Bouquet."
+    prompt:
+      en: "Petal's line 5 breaks the locator policy. Rewrite it so the test passes now and after Kai's redesign."
+      ru: "Строка 5 у Petal нарушает политику локаторов. Перепиши её так, чтобы тест проходил сейчас и после редизайна Кая."
+    starter: |
+      import { test, expect } from '@playwright/test';
+
+      test('removing Sunny Tulips keeps Rose Bouquet', async ({ page }) => {
+        await page.goto('/cart');
+        await page.locator('tr:nth-child(2) .link-btn').click();
+        await expect(page.getByTestId('cart-row')).toHaveCount(1);
+        await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');
+      });
+    solution: |
+      import { test, expect } from '@playwright/test';
+
+      test('removing Sunny Tulips keeps Rose Bouquet', async ({ page }) => {
+        await page.goto('/cart');
+        await page.getByRole('row').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Remove' }).click();
+        await expect(page.getByTestId('cart-row')).toHaveCount(1);
+        await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');
+      });
+    checks:
+      expect: pass
+      also:
+        - app: { variant: redesign, state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] } }
+          expect: pass
+      static: [hasAssertion, noFragile]
+    hints:
+      - en: "Describe the row the way a user would — by its product, not by its position."
+        ru: "Опиши строку так, как сказал бы пользователь, — по товару, а не по позиции."
+      - en: "Every row has a “Remove” button: find the row first, then the button inside it."
+        ru: "В каждой строке есть кнопка «Remove»: сначала найди строку, потом кнопку внутри неё."
+      - en: "For example: `page.getByRole('row').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Remove' })`"
+        ru: "Например: `page.getByRole('row').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Remove' })`"
+    explain:
+      en: "The new locator says what a user would say: “the Remove button in the Sunny Tulips row”. It doesn't depend on class names or on the row order, so it also passed on the redesign."
+      ru: "Новый локатор говорит то, что сказал бы пользователь: «кнопка Remove в строке Sunny Tulips». Он не зависит ни от имён классов, ни от порядка строк, поэтому прошёл и на редизайне."
+
+  - id: c5-l4-k8
+    kind: choice
+    keyPoint: kp-snapshot-not-memory
+    prompt:
+      en: "Petal has never seen Bloomly's orders page. Which line in your prompt is most likely to give you correct locators?"
+      ru: "Petal ни разу не видел страницу заказов Bloomly. Какая строка в промпте вероятнее всего даст правильные локаторы?"
+    options:
+      - text: "Open /orders with Playwright MCP and take every locator from the accessibility snapshot. Don't guess names."
+        correct: true
+        why:
+          en: "The names come from the live page, so they're real."
+          ru: "Имена приходят с живой страницы, поэтому они настоящие."
+      - text: "Use the standard names for an orders page."
+        why:
+          en: "“Standard” means “from other sites” — a recipe for invented names."
+          ru: "«Стандартные» значит «с других сайтов» — верный путь к выдуманным именам."
+      - text: "Be careful with locators, they must be correct."
+        why:
+          en: "Nothing to act on: Petal has no idea what “correct” means here."
+          ru: "Тут нечего выполнять: Petal не знает, что здесь значит «правильные»."
+      - text: "Copy the locators from index.html in the repository."
+        why:
+          en: "Bloomly's index.html has an empty `<main>`: JavaScript builds the page. The file doesn't show the real elements — the live page does."
+          ru: "В index.html у Bloomly пустой `<main>`: страницу строит JavaScript. Файл не показывает настоящих элементов — их показывает живая страница."
+    hints:
+      - en: "Which line points Petal to the real page?"
+        ru: "Какая строка отправляет Petal к настоящей странице?"
+      - en: "Remember chapter 4: the HTML file and the live DOM are not the same."
+        ru: "Вспомни главу 4: HTML-файл и живой DOM — не одно и то же."
+    explain:
+      en: "Agents guess when they can't see. Point them at the live page and name the source of truth — the accessibility snapshot — and the guessing stops."
+      ru: "Агенты угадывают, когда не видят. Отправь их на живую страницу и назови источник истины — снимок доступности, — и угадывание прекратится."

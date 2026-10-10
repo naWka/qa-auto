@@ -1,6 +1,6 @@
 id: c5
 number: 5
-status: planned
+status: ready
 title: { en: "Locators", ru: "Локаторы" }
 department: { en: "Design System", ru: "Дизайн-система" }
 color: sky
@@ -10,8 +10,8 @@ summary:
 intro:
   - who: kai
     text:
-      en: "Heads-up: Design System is renaming every CSS class next sprint. New tokens, new names."
-      ru: "Предупреждаю: в следующем спринте дизайн-система переименовывает все CSS-классы. Новые токены, новые имена."
+      en: "Heads-up: the redesign I warned you about lands next sprint. The design system gives every CSS class a new generated name — on every page."
+      ru: "Предупреждаю: редизайн, о котором я говорил, выходит в следующем спринте. Дизайн-система даёт каждому CSS-классу новое сгенерированное имя — на всех страницах."
   - who: petal
     text:
       en: "No problem! I used `.btn-primary-xl` and `div:nth-child(3)` everywhere — I'll just regenerate all the tests."
@@ -24,6 +24,7 @@ intro:
     text:
       en: "So I find elements the way a user does — by what they see on the screen."
       ru: "То есть я ищу элементы так же, как пользователь, — по тому, что видно на экране."
+lessons: [c5-l1, c5-l2, c5-l3, c5-l4]
 plan:
   - title: { en: "getBy* locators: find it like a user", ru: "Локаторы getBy*: ищем как пользователь" }
     goal:
@@ -69,3 +70,393 @@ plan:
         ru: "Проси агента брать локаторы из снимка доступности живой страницы, а не угадывать по памяти."
       - en: "A policy in CLAUDE.md or .github/copilot-instructions.md works for every prompt, not just one."
         ru: "Политика в CLAUDE.md или .github/copilot-instructions.md работает для каждого промпта, а не для одного."
+outro:
+  - who: kai
+    text:
+      en: "The migration is live, the suite didn't even blink — and the Remove bug is fixed too. First redesign in my career without a “tests are broken” thread."
+      ru: "Миграция выкачена, набор тестов даже не моргнул — а баг с Remove уже починен. Первый редизайн в моей карьере без треда «тесты сломались»."
+  - who: petal
+    text:
+      en: "I've read CLAUDE.md. Roles and names first, filter instead of first(), names from the live page. No more regenerating!"
+      ru: "Я прочитал CLAUDE.md. Сначала роли и имена, filter вместо first(), имена — с живой страницы. Больше никакой перегенерации!"
+  - who: maya
+    text:
+      en: "You found elements the way users do, made strict mode ask the right question and wrote the rules down once — for every prompt. That's how a suite outlives a redesign."
+      ru: "Ты {искала|искал} элементы так, как их ищут пользователи, {заставила|заставил} строгий режим задавать правильный вопрос и один раз {записала|записал} правила — для каждого промпта. Так набор тестов и переживает редизайн."
+  - who: leo
+    text:
+      en: "Next stop: Checkout. Locators find the button — now let's check what happens when you press it."
+      ru: "Следующая остановка — оформление заказа. Локаторы находят кнопку — теперь проверим, что происходит, когда её нажимают."
+boss:
+  id: c5-boss
+  title: { en: "Redesign day", ru: "День редизайна" }
+  story:
+    - who: kai
+      text:
+        en: "The design-system migration is live on staging: new components, generated class names. Texts and flows haven't changed at all."
+        ru: "Миграция на новую дизайн-систему уже на стейджинге: новые компоненты, сгенерированные имена классов. Тексты и сценарии не изменились совсем."
+    - who: leo
+      text:
+        en: "And last night's run on staging is red: 14 of Petal's tests failed. Manual smoke testing found zero bugs."
+        ru: "А ночной прогон на стейджинге красный: упали 14 тестов Petal. Ручной смоук не нашёл ни одного бага."
+    - who: petal
+      text:
+        en: "Already fixed! I regenerated all 14 from the new markup overnight. Green again ✅"
+        ru: "Уже починил! За ночь перегенерировал все 14 по новой разметке. Снова зелёные ✅"
+    - who: maya
+      text:
+        en: "Green against today's class names — until the next build. Let's do it properly: review the locators, make the tests survive both builds, and write the rules down so Petal stops guessing."
+        ru: "Зелёные на сегодняшних именах классов — до следующей сборки. Давай сделаем как следует: проверим локаторы, сделаем так, чтобы тесты пережили обе сборки, и запишем правила, чтобы Petal перестал угадывать."
+  tasks:
+    - id: c5-boss-t1
+      kind: review
+      keyPoint: kp-layout-breaks
+      context:
+        en: "Petal's regenerated TC-580, written overnight from Kai's staging build. On staging it's green."
+        ru: "TC-580, перегенерированный Petal за ночь по сборке Кая на стейджинге. Там он зелёный."
+      prompt:
+        en: "Review it before it's merged: will it survive the next build? Flag every problem line and pick its type."
+        ru: "Сделай ревью, пока его не смёржили: переживёт ли он следующую сборку? Отметь каждую проблемную строку и выбери тип проблемы."
+      testCase:
+        id: TC-580
+        title: Customer adds Sunny Tulips to the cart
+        preconditions: ["The cart is empty"]
+        steps:
+          - action: "Open the shop"
+            expected: "The shop shows 6 products"
+          - action: "In the Sunny Tulips card, click \"Add to cart\""
+            expected: "Toast \"Sunny Tulips added to cart\"; the cart count in the header is 1"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer adds Sunny Tulips to the cart', async ({ page }) => {
+          await page.goto('/shop');
+          await expect(page.getByTestId('results-count')).toHaveText('6 products');
+          const card = page.locator('.bl_productCard__lafxr').nth(1);
+          await card.locator('.bl_btn__375kd').click();
+          await page.waitForTimeout(1000); // wait for the new animations
+          await expect(page.getByRole('status')).toHaveText('Sunny Tulips added to cart');
+          await expect(page.locator('nav > div > a:nth-child(3) > span')).toHaveText('1');
+        });
+      issues:
+        - line: 6
+          type: fragile-locator
+          note:
+            en: "Two ties to the layout in one line. `.bl_productCard__lafxr` is a generated class: the part after `__` is a hash made by the build, and it changes when the styles change. `.nth(1)` means “the second card” — change the sort order, and it's another product. Use `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' })`."
+            ru: "Две привязки к вёрстке в одной строке. `.bl_productCard__lafxr` — сгенерированный класс: часть после `__` — хеш, который создаёт сборка, и он меняется, когда меняются стили. `.nth(1)` значит «вторая карточка» — поменяй сортировку, и это будет другой товар. Используй `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' })`."
+        - line: 7
+          type: fragile-locator
+          note:
+            en: "`.bl_btn__375kd` is the same kind of generated class: it describes how the button looks, not what it is. The customer sees a button named “Add to cart”: `card.getByRole('button', { name: 'Add to cart' })`."
+            ru: "`.bl_btn__375kd` — такой же сгенерированный класс: он описывает, как кнопка выглядит, а не что это за кнопка. Покупатель видит кнопку «Add to cart»: `card.getByRole('button', { name: 'Add to cart' })`."
+        - line: 8
+          type: hard-wait
+          note:
+            en: "A fixed pause “for the animations”: every run gets a second slower, and there's still no guarantee. `toHaveText` on the next line waits by itself."
+            ru: "Фиксированная пауза «для анимаций»: каждый прогон на секунду дольше, а гарантии всё равно нет. `toHaveText` в следующей строке ждёт сам."
+        - line: 10
+          type: fragile-locator
+          note:
+            en: "A DOM path: the wrapper `div` appeared only in this migration, and `a:nth-child(3)` depends on the order of the nav links. Move a link, and the test reads the wrong element. Use `page.getByTestId('cart-count')`."
+            ru: "Путь по DOM: обёртка `div` появилась только в этой миграции, а `a:nth-child(3)` зависит от порядка ссылок в навигации. Переставят ссылку — и тест прочитает не тот элемент. Используй `page.getByTestId('cart-count')`."
+      types: [fragile-locator, hard-wait, hallucination, weak-assertion, wrong-step, wrong-data]
+      hints:
+        - en: "For each locator ask: does it describe what a customer sees — a name, a label, a text — or how the page is built today?"
+          ru: "Для каждого локатора спроси себя: он описывает то, что видит покупатель, — имя, подпись, текст — или то, как страница свёрстана сегодня?"
+        - en: "Four lines have problems: three locators are tied to the markup, and one line does nothing a user would do."
+          ru: "Проблемы в четырёх строках: три локатора привязаны к разметке, а одна строка не делает ничего, что сделал бы пользователь."
+        - en: "Lines 6, 7 and 10 use generated classes, a position and a DOM path. Line 8 is a fixed pause. Lines 5 and 9 are fine."
+          ru: "В строках 6, 7 и 10 — сгенерированные классы, позиция и путь по DOM. Строка 8 — фиксированная пауза. Строки 5 и 9 в порядке."
+      praise:
+        en: "Four for four — and you left the test id and the role alone. Telling resilient locators from fragile ones is exactly what this review needed."
+        ru: "Четыре из четырёх — и строки с test id и ролью ты не тронул{а|}. Отличить устойчивые локаторы от хрупких — ровно то, что требовалось от этого ревью."
+      explain:
+        en: "Petal's test is green on staging only because it copies today's markup: generated class names, the card's position, the new wrapper in the navigation. The next design-system build reshuffles them, and the test goes red again — with no bug in sight. Lines 5 and 9 survived the migration untouched: a test id and a role with a name don't care how the page is styled."
+        ru: "Тест Petal зелёный на стейджинге только потому, что копирует сегодняшнюю разметку: сгенерированные имена классов, позицию карточки, новую обёртку в навигации. Следующая сборка дизайн-системы всё это перетасует, и тест снова покраснеет — а бага нет и в помине. Строки 5 и 9 пережили миграцию без единой правки: test id и роли с именем всё равно, как страница оформлена."
+
+    - id: c5-boss-t2
+      kind: fix
+      keyPoint: kp-user-facing-resilient
+      context:
+        en: "Production keeps the old markup until Friday's release, so the suite runs against both builds. Petal's regenerated TC-580 is green on staging and red on production."
+        ru: "До релиза в пятницу на проде остаётся старая разметка, поэтому набор тестов гоняют на обеих сборках. Перегенерированный Petal TC-580 зелёный на стейджинге и красный на проде."
+      prompt:
+        en: "Rewrite the locators so the test passes on both builds: today's production and Kai's redesign. No CSS classes, no positions, no pauses."
+        ru: "Перепиши локаторы так, чтобы тест проходил на обеих сборках: на сегодняшнем проде и на редизайне Кая. Без CSS-классов, без позиций и без пауз."
+      testCase:
+        id: TC-580
+        title: Customer adds Sunny Tulips to the cart
+        preconditions: ["The cart is empty"]
+        steps:
+          - action: "Open the shop"
+            expected: "The shop shows 6 products"
+          - action: "In the Sunny Tulips card, click \"Add to cart\""
+            expected: "Toast \"Sunny Tulips added to cart\"; the cart count in the header is 1"
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer adds Sunny Tulips to the cart', async ({ page }) => {
+          await page.goto('/shop');
+          await expect(page.getByTestId('results-count')).toHaveText('6 products');
+          const card = page.locator('.bl_productCard__lafxr').nth(1);
+          await card.locator('.bl_btn__375kd').click();
+          await page.waitForTimeout(1000); // wait for the new animations
+          await expect(page.getByRole('status')).toHaveText('Sunny Tulips added to cart');
+          await expect(page.locator('nav > div > a:nth-child(3) > span')).toHaveText('1');
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer adds Sunny Tulips to the cart', async ({ page }) => {
+          await page.goto('/shop');
+          await expect(page.getByTestId('results-count')).toHaveText('6 products');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+          await card.getByRole('button', { name: 'Add to cart' }).click();
+          await expect(page.getByRole('status')).toHaveText('Sunny Tulips added to cart');
+          await expect(page.getByTestId('cart-count')).toHaveText('1');
+        });
+      checks:
+        expect: pass
+        static:
+          - noFragile
+          - noHardWait
+          - rule: notRegex
+            value: '\.(first|last|nth)\('
+            message:
+              en: "`first()`, `last()` and `nth()` pick an element by its position. Find the Sunny Tulips card by what the user sees: `filter({ hasText: 'Sunny Tulips' })`."
+              ru: "`first()`, `last()` и `nth()` выбирают элемент по позиции. Найди карточку Sunny Tulips по тому, что видит пользователь: `filter({ hasText: 'Sunny Tulips' })`."
+        also:
+          - app: { variant: redesign }
+            expect: pass
+      hints:
+        - en: "Run it first: it's red on production. Then go line by line — which locators describe what the customer sees, and which describe the markup?"
+          ru: "Сначала запусти: на проде он красный. Потом пройди строку за строкой — какие локаторы описывают то, что видит покупатель, а какие — разметку?"
+        - en: "Replace three locators — the card (line 6), its button (line 7) and the cart count (line 10) — and simply delete the pause."
+          ru: "Замени три локатора — карточку (строка 6), её кнопку (строка 7) и счётчик корзины (строка 10), — а паузу просто удали."
+        - en: "Card: `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' })`. Button: `card.getByRole('button', { name: 'Add to cart' })`. Count: `page.getByTestId('cart-count')`. Delete line 8."
+          ru: "Карточка: `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' })`. Кнопка: `card.getByRole('button', { name: 'Add to cart' })`. Счётчик: `page.getByTestId('cart-count')`. Строку 8 удали."
+      praise:
+        en: "One test, green on both builds. You picked locators that survive this redesign — and the next one."
+        ru: "Один тест — зелёный на обеих сборках. Ты {выбрала|выбрал} локаторы, которые переживут и этот редизайн, и следующий."
+      explain:
+        en: "The rewritten test describes what the customer sees: the Sunny Tulips card, its “Add to cart” button, the toast and the cart count. None of that changed in the migration, so the same test is green on production and on staging. It goes red only when the customer's experience changes — say, the button gets another name or the count stops updating. That's a failure worth investigating."
+        ru: "Переписанный тест описывает то, что видит покупатель: карточку Sunny Tulips, её кнопку «Add to cart», всплывающее сообщение и счётчик корзины. При миграции ничего из этого не изменилось, поэтому один и тот же тест зелёный и на проде, и на стейджинге. Покраснеет он, только когда изменится опыт покупателя, — например, кнопку переименуют или счётчик перестанет обновляться. Вот такое падение стоит расследовать."
+
+    - id: c5-boss-t3
+      kind: find-bug
+      keyPoint: kp-first-nth-red-flag
+      app:
+        bugs: [remove-wrong-item]
+        state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] }
+      context:
+        en: "Sofia: “Two customers say ‘Remove’ deleted the wrong flower from their cart.” This build has that bug — and Petal's TC-581 test is green on it. Last week the test failed with a strict mode violation; lines 5–6 are Petal's fix."
+        ru: "София: «Двое покупателей пишут, что кнопка „Remove“ удалила из корзины не тот цветок». В этой сборке есть этот баг — а тест Petal для TC-581 на ней зелёный. На прошлой неделе тест падал с нарушением строгого режима; строки 5–6 — это исправление Petal."
+      prompt:
+        en: "Make the test honest: remove exactly the Sunny Tulips row and check which product is left. It must fail on this build and pass once the bug is fixed — without `first()`, `last()` or `nth()`."
+        ru: "Сделай тест честным: удали именно строку Sunny Tulips и проверь, какой товар остался. Тест должен падать на этой сборке и проходить, когда баг починят, — без `first()`, `last()` и `nth()`."
+      testCase:
+        id: TC-581
+        title: Customer removes one of two items from the cart
+        preconditions: ["Cart: Rose Bouquet ×1, Sunny Tulips ×1"]
+        steps:
+          - action: "Open the cart"
+          - action: "In the Sunny Tulips row, click \"Remove\""
+            expected: "Sunny Tulips is gone; only Rose Bouquet stays in the cart"
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer removes an item from the cart', async ({ page }) => {
+          await page.goto('/cart');
+          // fix: strict mode violation (2 elements), take the first one
+          await page.getByRole('button', { name: 'Remove' }).first().click();
+          await expect(page.getByTestId('cart-row')).toHaveCount(1);
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer removes an item from the cart', async ({ page }) => {
+          await page.goto('/cart');
+          const tulipsRow = page.getByTestId('cart-row').filter({ hasText: 'Sunny Tulips' });
+          await tulipsRow.getByRole('button', { name: 'Remove' }).click();
+          await expect(page.getByTestId('cart-row')).toHaveCount(1);
+          await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');
+        });
+      checks:
+        expect: fail
+        static:
+          - hasAssertion
+          - rule: notRegex
+            value: '\.(first|last|nth)\('
+            message:
+              en: "Don't pick the row by its position — that's how the test hid the bug. Find the Sunny Tulips row with `filter({ hasText: 'Sunny Tulips' })`."
+              ru: "Не выбирай строку по позиции — именно так тест и спрятал баг. Найди строку Sunny Tulips через `filter({ hasText: 'Sunny Tulips' })`."
+        also:
+          - app: { state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] } }
+            expect: pass
+      hints:
+        - en: "Compare line 6 with TC-581: in which row does `.first()` click “Remove”? Then look at line 7: would it notice if the wrong flower disappeared?"
+          ru: "Сравни строку 6 с TC-581: в какой строке `.first()` нажимает «Remove»? Потом посмотри на строку 7: заметит ли она, если исчезнет не тот цветок?"
+        - en: "Find the row first, then the button inside it. After the click, check which product is left — not just how many rows."
+          ru: "Сначала найди строку, потом кнопку внутри неё. После клика проверь, какой товар остался, — а не только сколько строк."
+        - en: "Line 6 → `await page.getByTestId('cart-row').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Remove' }).click();` Then add `await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');`"
+          ru: "Строка 6 → `await page.getByTestId('cart-row').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Remove' }).click();` Потом добавь `await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');`"
+      praise:
+        en: "Red on the buggy build, green on the fix — and the test now removes exactly what TC-581 says. You turned a silenced error into a caught bug."
+        ru: "Красный на сборке с багом, зелёный после исправления — и тест теперь удаляет ровно то, что сказано в TC-581. Ты {превратила|превратил} заглушённую ошибку в пойманный баг."
+      explain:
+        en: "Strict mode was asking a real question: “which Remove?” Petal answered “whatever is on top” — the Rose Bouquet row, the very row the bug always deletes. So the test clicked the wrong button, the app removed the wrong item, and a count of one row called it success. Narrowing to the Sunny Tulips row answers the question the test case asks, and checking which product is left turns the bug into a red run that points straight at it."
+        ru: "Строгий режим задавал настоящий вопрос: «какой именно Remove?» Petal ответил «тот, что сверху» — строка Rose Bouquet, та самая, которую баг удаляет всегда. Тест нажал не ту кнопку, приложение удалило не тот товар, а проверка «осталась одна строка» назвала это успехом. Сужение до строки Sunny Tulips отвечает на вопрос, который задаёт тест-кейс, а проверка того, какой товар остался, превращает баг в красный прогон, который указывает прямо на него."
+
+    - id: c5-boss-t4
+      kind: agent
+      keyPoint: kp-policy-file
+      context:
+        en: "Leo: “Fixing tests one by one won't scale — 400 to go. Make Petal write the next one right the first time.” Petal's next ticket is TC-582, and your check runs its test on production and on Kai's redesign. (Petal is simulated here; a real agent's output varies.)"
+        ru: "Лео: «Чинить тесты по одному — не вариант, их ещё 400. Сделай так, чтобы Petal с первого раза написал следующий правильно». Следующий тикет Petal — TC-582, и проверка запустит его тест на проде и на редизайне Кая. (Petal здесь симулирован; ответы настоящего агента бывают разными.)"
+      prompt:
+        en: "Compose the prompt for TC-582. The rule blocks you pick go into CLAUDE.md afterwards — so choose only rules you want in every prompt."
+        ru: "Собери промпт для TC-582. Выбранные блоки с правилами потом попадут в CLAUDE.md — так что бери только те правила, которые нужны в каждом промпте."
+      testCase:
+        id: TC-582
+        title: Out-of-stock product can't be added to the cart
+        preconditions: ["White Orchid is out of stock"]
+        steps:
+          - action: "Open the shop"
+          - action: "Find the White Orchid card"
+            expected: "The card shows \"Out of stock\"; its \"Add to cart\" button is disabled"
+      blocks:
+        - { id: task, locked: true, text: "Write a Playwright test for TC-582: an out-of-stock product can't be added to the cart.", ru: "Напиши Playwright-тест для TC-582: товар, которого нет в наличии, нельзя добавить в корзину." }
+        - { id: case, text: 'Steps: open /shop and find the White Orchid card. Expected: the card shows "Out of stock" and its "Add to cart" button is disabled.', ru: "Шаги: открой /shop и найди карточку White Orchid. Ожидаемый результат: в карточке написано «Out of stock», а её кнопка «Add to cart» неактивна." }
+        - { id: classes, text: "Use the class names from Kai's new design system (bl_…): they're brand new, so they won't change soon.", ru: "Используй имена классов из новой дизайн-системы Кая (bl_…): они совсем свежие, так что скоро не поменяются." }
+        - { id: ladder, text: "Locators: getByRole with a name first, then getByLabel, getByText, getByTestId. No CSS classes, no nth-child, no XPath.", ru: "Локаторы: сначала getByRole с именем, затем getByLabel, getByText, getByTestId. Без CSS-классов, без nth-child, без XPath." }
+        - { id: narrow, text: "If a locator matches several elements, narrow it with filter({ hasText }) or search inside a container. Never use first(), last() or nth() to silence strict mode.", ru: "Если локатор находит несколько элементов, сузь его через filter({ hasText }) или ищи внутри контейнера. Никогда не используй first(), last() или nth(), чтобы заглушить строгий режим." }
+        - { id: position, text: "If strict mode complains, pick the element by its position so the test stays green.", ru: "Если строгий режим ругается, выбери элемент по позиции, чтобы тест оставался зелёным." }
+        - { id: snapshot, text: "Before writing a locator, open the live page and take roles and names from its accessibility snapshot. Never guess them from memory.", ru: "Прежде чем писать локатор, открой живую страницу и возьми роли и имена из её снимка доступности. Никогда не угадывай их по памяти." }
+      responses:
+        - when: [classes]
+          message:
+            en: "Done! I used the brand-new design-system classes from staging. Green ✅ on Kai's build!"
+            ru: "Готово! Я взял совсем новые классы дизайн-системы со стейджинга. На сборке Кая — зелёный ✅!"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('out-of-stock product cannot be added to the cart', async ({ page }) => {
+              await page.goto('/shop');
+              const orchid = page.locator('.bl_productCard__lafxr').filter({ hasText: 'White Orchid' });
+              await expect(orchid.locator('.bl_stock__384bo')).toHaveText('Out of stock');
+              await expect(orchid.locator('.bl_btn__375kd')).toBeDisabled();
+            });
+        - when: [position]
+          message:
+            en: "Done! Strict mode found 6 “Add to cart” buttons, so I picked the 6th — White Orchid is the last card. Green ✅"
+            ru: "Готово! Строгий режим нашёл 6 кнопок «Add to cart», и я выбрал шестую — White Orchid идёт последней карточкой. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('out-of-stock product cannot be added to the cart', async ({ page }) => {
+              await page.goto('/shop');
+              await expect(page.getByText('Out of stock')).toBeVisible();
+              await expect(page.getByRole('button', { name: 'Add to cart' }).nth(5)).toBeDisabled();
+            });
+        - when: [case, ladder, narrow, snapshot]
+          unless: [classes, position]
+          best: true
+          message:
+            en: "Done! I opened /shop and read the snapshot: every card has a button named just “Add to cart”, so I narrowed to the White Orchid card first and searched inside it. A test id, a text and a role — no classes, no positions."
+            ru: "Готово! Я открыл /shop и прочитал снимок: в каждой карточке кнопка называется просто «Add to cart», поэтому я сначала сузил поиск до карточки White Orchid и искал уже внутри неё. Test id, текст и роль — никаких классов и позиций."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('out-of-stock product cannot be added to the cart', async ({ page }) => {
+              await page.goto('/shop');
+              const orchid = page.getByTestId('product-card').filter({ hasText: 'White Orchid' });
+              await expect(orchid.getByText('Out of stock')).toBeVisible();
+              await expect(orchid.getByRole('button', { name: 'Add to cart' })).toBeDisabled();
+            });
+        - when: [case, ladder, narrow]
+          message:
+            en: "Done! As far as I remember, Bloomly names every shop button after its product, so the locator is unique — no filter needed."
+            ru: "Готово! Насколько я помню, в Bloomly каждая кнопка в магазине названа по товару, так что локатор уникальный — фильтр не нужен."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('out-of-stock product cannot be added to the cart', async ({ page }) => {
+              await page.goto('/shop');
+              await expect(page.getByText('Out of stock')).toBeVisible();
+              await expect(page.getByRole('button', { name: 'Add White Orchid to cart' })).toBeDisabled();
+            });
+        - when: [case, ladder]
+          message:
+            en: "Done! getByRole found 6 “Add to cart” buttons and strict mode complained, so I added `.last()` — White Orchid is at the bottom. Green ✅"
+            ru: "Готово! getByRole нашёл 6 кнопок «Add to cart», строгий режим заругался, и я добавил `.last()` — White Orchid в самом низу. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('out-of-stock product cannot be added to the cart', async ({ page }) => {
+              await page.goto('/shop');
+              await expect(page.getByText('Out of stock')).toBeVisible();
+              await expect(page.getByRole('button', { name: 'Add to cart' }).last()).toBeDisabled();
+            });
+        - when: [case]
+          message:
+            en: "Done! I used the card classes and the list structure I remember from Bloomly. Green ✅"
+            ru: "Готово! Я взял классы карточек и структуру списка, которые помню по Bloomly. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('out-of-stock product cannot be added to the cart', async ({ page }) => {
+              await page.goto('/shop');
+              await expect(page.locator('.product-card .stock')).toHaveText('Out of stock');
+              await expect(page.locator('li:last-child .btn')).toBeDisabled();
+            });
+        - when: []
+          message:
+            en: "I wasn't sure what to check, so I made sure the shop shows all 6 products. Green ✅"
+            ru: "Я не был уверен, что именно проверять, поэтому убедился, что магазин показывает все 6 товаров. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('shop shows products', async ({ page }) => {
+              await page.goto('/shop');
+              await expect(page.getByTestId('product-card')).toHaveCount(6);
+            });
+      missing:
+        case:
+          en: "Without the test case Petal didn't know which product or which result to check — it only counted the cards."
+          ru: "Без тест-кейса Petal не знал, какой товар и какой результат проверять, — он просто посчитал карточки."
+        ladder:
+          en: "Without the locator ladder Petal fell back on CSS classes and list positions from memory: green on production, red after Kai's redesign."
+          ru: "Без лестницы локаторов Petal вернулся к CSS-классам и позициям в списке, которые помнил: зелёный на проде, красный после редизайна Кая."
+        narrow:
+          en: "Without the rule for several matches Petal silenced strict mode with `.last()`: green today, the wrong product as soon as the sort order or the catalogue changes."
+          ru: "Без правила про несколько совпадений Petal заглушил строгий режим через `.last()`: сегодня зелёный, а при новой сортировке или новом товаре — уже не тот товар."
+        snapshot:
+          en: "Without the snapshot rule Petal guessed the button name from memory. “Add White Orchid to cart” doesn't exist, so the test fails for the wrong reason."
+          ru: "Без правила про снимок Petal угадал имя кнопки по памяти. Кнопки «Add White Orchid to cart» не существует, поэтому тест падает не по той причине."
+      checks:
+        expect: pass
+        static:
+          - hasAssertion
+          - noFragile
+          - noHardWait
+          - rule: notRegex
+            value: '\.(first|last|nth)\('
+            message:
+              en: "The test picks an element by its position. Narrow to the White Orchid card instead."
+              ru: "Тест выбирает элемент по позиции. Вместо этого сузь поиск до карточки White Orchid."
+        also:
+          - app: { variant: redesign }
+            expect: pass
+      hints:
+        - en: "A good prompt has the test case plus the team's locator rules. Two blocks sound helpful but lead straight back to today's problems."
+          ru: "В хорошем промпте есть тест-кейс плюс правила команды про локаторы. Два блока звучат полезно, но ведут прямиком к сегодняшним проблемам."
+        - en: "One trap ties locators to today's markup; the other answers “which one?” with a position. You've fixed both kinds of problem in this boss."
+          ru: "Одна ловушка привязывает локаторы к сегодняшней разметке, другая отвечает на вопрос «какой именно?» позицией. Обе такие проблемы ты уже {исправляла|исправлял} в этом боссе."
+        - en: "Take the test case, the locator ladder, the rule for several matches and the snapshot rule. Leave out the design-system classes and “pick by position”."
+          ru: "Возьми тест-кейс, лестницу локаторов, правило про несколько совпадений и правило про снимок. Блоки про классы дизайн-системы и «выбери по позиции» не бери."
+      praise:
+        en: "You left out both shortcuts and kept every rule that matters. These lines now go into CLAUDE.md — and every next prompt gets them for free."
+        ru: "Ты {обошла|обошёл} обе ловушки и {оставила|оставил} все важные правила. Эти строки теперь отправятся в CLAUDE.md — и каждый следующий промпт получит их бесплатно."
+      explain:
+        en: "The best prompt is TC-582 plus three rules: the locator ladder, “narrow, don't pick by position” and “take names from the live page”. Each rule closes a failure you saw today: CSS from memory breaks on a redesign, positions break on a new sort order, guessed names break on day one. Written into CLAUDE.md (or `.github/copilot-instructions.md` for Copilot), the rules are read at the start of every session — you write the policy once instead of in 400 prompts. Petal's best test passes on production and on Kai's redesign."
+        ru: "Лучший промпт — это TC-582 плюс три правила: лестница локаторов, «сужай, а не выбирай по позиции» и «бери имена с живой страницы». Каждое правило закрывает сбой, который ты сегодня {видела|видел}: CSS по памяти ломается при редизайне, позиции — при новой сортировке, выдуманные имена — в первый же день. Записанные в CLAUDE.md (или в `.github/copilot-instructions.md` для Copilot), правила читаются в начале каждой сессии — политику пишешь один раз, а не в 400 промптах. Лучший тест Petal проходит и на проде, и на редизайне Кая."
