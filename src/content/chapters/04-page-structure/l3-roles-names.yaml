@@ -1,0 +1,1013 @@
+id: c4-l3
+chapter: c4
+title: { en: "Roles and accessible names", ru: "Роли и доступные имена" }
+goal:
+  en: "Name the role and accessible name of any Bloomly element: button \"Log in\", textbox \"Email\", link \"Cart 0\"."
+  ru: "Называть роль и доступное имя любого элемента Bloomly: button «Log in», textbox «Email», link «Cart 0»."
+minutes: 11
+keyPoints:
+  - id: kp-role
+    title: { en: "A role says what an element is", ru: "Роль говорит, что это за элемент" }
+  - id: kp-accessible-name
+    title: { en: "The accessible name comes from text, label, alt or aria-label", ru: "Доступное имя берётся из текста, label, alt или aria-label" }
+  - id: kp-role-name-stable
+    title: { en: "Role + name: how users find things — and the most stable way for tests", ru: "Роль + имя: так ищут пользователи — и так надёжнее всего искать тестам" }
+  - id: kp-a11y-bug
+    title: { en: "An accessibility bug is a real bug — and it confuses the agent too", ru: "Баг доступности — настоящий баг, и он сбивает с толку агента" }
+terms: [role, accessible-name, accessibility, element, tag, locator, bug, accessibility-snapshot]
+
+steps:
+  - type: story
+    lines:
+      - who: kai
+        text:
+          en: "This week I'm redesigning the shop and the cart: new layout, new CSS classes. Petal's tests will survive that, right?"
+          ru: "На этой неделе я переделываю дизайн магазина и корзины: новая вёрстка, новые CSS-классы. Тесты Petal ведь это переживут?"
+      - who: sofia
+        text:
+          en: "And a beta tester who uses a screen reader says the cart on Kai's preview build only announces “minus, button… plus, button”. For which flower?"
+          ru: "А ещё бета-тестировщица, которая пользуется скринридером, говорит, что корзина в превью-сборке Кая произносит только «минус, кнопка… плюс, кнопка». Для какого цветка?"
+      - who: maya
+        text:
+          en: "Two questions, one answer: roles and accessible names. Let's learn to read them the way a screen reader, Playwright and Petal do."
+          ru: "Два вопроса — один ответ: роли и доступные имена. Давай научимся читать их так, как это делают скринридер, Playwright и Petal."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед стартом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c4-l3-p1
+        kind: choice
+        keyPoint: kp-role
+        prompt:
+          en: "On the Bloomly login page a screen reader announces: “Remember me, checkbox, not checked”. Which word is the element's *role*?"
+          ru: "На странице входа Bloomly скринридер произносит: «Remember me, checkbox, not checked». Какое слово здесь — *роль* элемента?"
+        options:
+          - text: "checkbox"
+            correct: true
+            why:
+              en: "The role says what kind of element it is — and what you can do with it: tick it."
+              ru: "Роль говорит, что это за элемент и что с ним можно делать: поставить галочку."
+          - text: "Remember me"
+            why:
+              en: "That's its name: what it's called, not what it is."
+              ru: "Это его имя: как он называется, а не что это такое."
+          - text: "not checked"
+            why:
+              en: "That's its state. The state changes when you click; the role doesn't."
+              ru: "Это его состояние. Состояние меняется от клика, а роль — нет."
+          - text: "input"
+            why:
+              en: "That's the HTML tag. Screen readers don't announce tags — they announce roles."
+              ru: "Это HTML-тег. Скринридер не произносит теги — он произносит роли."
+        hints:
+          - en: "How would you describe it in a test case: “tick the Remember me ___”?"
+            ru: "Как бы ты описал{а|} его в тест-кейсе: «поставить галочку в ___ Remember me»?"
+          - en: "One word is the name, one is the state, one is the tag."
+            ru: "Одно слово — имя, одно — состояние, одно — тег."
+        explain:
+          en: "A screen reader announces the name, the role and the state. `getByRole('checkbox', { name: 'Remember me' })` searches by exactly the first two."
+          ru: "Скринридер произносит имя, роль и состояние. `getByRole('checkbox', { name: 'Remember me' })` ищет ровно по первым двум."
+      - id: c4-l3-p2
+        kind: predict
+        keyPoint: kp-accessible-name
+        app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+        context:
+          en: "The cart has 1 Rose Bouquet. On the screen, the button next to the quantity shows only a “+”."
+          ru: "В корзине 1 Rose Bouquet. На экране кнопка рядом с количеством показывает только «+»."
+        prompt:
+          en: "Pass or fail?"
+          ru: "Пройдёт или упадёт?"
+        code: |
+          import { test, expect } from '@playwright/test';
+
+          test('plus button increases the quantity', async ({ page }) => {
+            await page.goto('/cart');
+            await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+            await expect(page.getByTestId('qty-input')).toHaveValue('2');
+          });
+        outcome: pass
+        reasons:
+          - text:
+              en: "Pass: the button's accessible name is “Increase Rose Bouquet” — the “+” is only what's drawn on screen"
+              ru: "Пройдёт: доступное имя кнопки — «Increase Rose Bouquet», а «+» — только то, что нарисовано на экране"
+            correct: true
+          - text:
+              en: "Fail: there's no button with the text “Increase Rose Bouquet” on the page"
+              ru: "Упадёт: на странице нет кнопки с текстом «Increase Rose Bouquet»"
+            why:
+              en: "There's no such *text* — but there is such a *name*. A name doesn't have to be visible."
+              ru: "Такого *текста* нет — а такое *имя* есть. Имя не обязано быть видимым."
+          - text:
+              en: "Fail: getByRole can't find buttons that show symbols"
+              ru: "Упадёт: getByRole не умеет находить кнопки, на которых нарисованы символы"
+            why:
+              en: "It finds any button by its role and name, whatever is drawn on it."
+              ru: "Он находит любую кнопку по роли и имени, что бы на ней ни было нарисовано."
+        hints:
+          - en: "In lesson 2 you met an attribute that gives an element a name for screen readers."
+            ru: "Во втором уроке ты {познакомилась|познакомился} с атрибутом, который даёт элементу имя для скринридеров."
+          - en: "Kai gave the “+” button an `aria-label`."
+            ru: "Кай добавил кнопке «+» атрибут `aria-label`."
+        explain:
+          en: "The button has `aria-label=\"Increase Rose Bouquet\"`. That's its accessible name: what a screen reader announces and what `getByRole` matches. The “+” on screen doesn't matter. Let's see where names come from."
+          ru: "У кнопки есть `aria-label=\"Increase Rose Bouquet\"`. Это её доступное имя: его произносит скринридер, и с ним сравнивает `getByRole`. «+» на экране тут ни при чём. Давай разберёмся, откуда берутся имена."
+
+  - type: theory
+    keyPoint: kp-role
+    title: { en: "Role: what an element is", ru: "Роль: что это за элемент" }
+    body:
+      - en: "In a bug report you write “the **Log in button**”, “the **Email field**”, “the **Cart link**”. You say what kind of [[element]] it is — that's its [[role]]. A screen reader announces it (“Log in, button”), and `getByRole` searches by it."
+        ru: "В баг-репорте ты пишешь «**кнопка** Log in», «**поле** Email», «**ссылка** Cart». Ты называешь, что это за [[элемент|element]], — это и есть его [[роль|role]]. Скринридер её произносит («Log in, button»), а `getByRole` по ней ищет."
+      - en: "Most [[tags|tag]] have a role built in: `<button>` is a button, `<a href=…>` is a link, `<h1>`–`<h6>` are headings, `<input type=\"checkbox\">` is a checkbox. Some are less obvious: a password field and a text field are both a **textbox**, a number field is a **spinbutton**."
+        ru: "У большинства [[тегов|tag]] роль встроена: `<button>` — это button, `<a href=…>` — link, `<h1>`–`<h6>` — heading, `<input type=\"checkbox\">` — checkbox. Есть и неочевидные: и поле пароля, и обычное текстовое поле — это **textbox**, а числовое поле — **spinbutton**."
+      - en: "A role can also be written by hand: Bloomly's login error box is `<div role=\"alert\">`. And a plain `<div>` or `<span>` has no role at all — it's just a box, whatever it looks like on screen."
+        ru: "Роль можно задать и вручную: блок ошибки на странице входа Bloomly — это `<div role=\"alert\">`. А у обычного `<div>` или `<span>` роли нет вовсе — это просто коробка, как бы она ни выглядела на экране."
+    code: |
+      <button type="submit">Log in</button>   // button
+      <a href="/cart">Cart 0</a>              // link
+      <input type="password">                 // textbox
+      <input type="checkbox">                 // checkbox
+      <h1>Your cart</h1>                      // heading (level 1)
+      <div role="alert">…</div>               // alert (written by hand)
+      <div class="btn">Add to cart</div>      // no role: just a box
+    mentor:
+      en: "You've been reading `getByRole('button', { name: 'Log in' })` since chapter 1. The first part is the role. Now you know where it comes from."
+      ru: "Ты читаешь `getByRole('button', { name: 'Log in' })` с первой главы. Первая часть — это роль. Теперь ты знаешь, откуда она берётся."
+
+  - type: theory
+    keyPoint: kp-accessible-name
+    title: { en: "Accessible name: what it's called", ru: "Доступное имя: как элемент называется" }
+    body:
+      - en: "In a test case you quote the label: click “Proceed to checkout”. For the browser, that quote is the [[accessible name|accessible-name]] — the words a screen reader says before the role: “Proceed to checkout, button”. The `{ name: '…' }` part of `getByRole` is compared with it."
+        ru: "В тест-кейсе ты берёшь надпись в кавычки: нажать «Proceed to checkout». Для браузера эти слова в кавычках — [[доступное имя|accessible-name]]: то, что скринридер произносит перед ролью: «Proceed to checkout, button». С ним и сравнивается часть `{ name: '…' }` в `getByRole`."
+      - en: "Where it comes from: an `aria-label`, if there is one, wins. Otherwise each element has its own source — the text inside for buttons, links and headings; the `<label>` for form fields; `alt` for images; `<caption>` for tables. A `placeholder` is only a weak last resort for fields. Anything marked `aria-hidden=\"true\"` is skipped."
+        ru: "Откуда оно берётся: если есть `aria-label`, побеждает он. Иначе у каждого элемента свой источник: текст внутри — у кнопок, ссылок и заголовков; `<label>` — у полей формы; `alt` — у картинок; `<caption>` — у таблиц. `placeholder` — лишь слабый запасной вариант для полей. Всё, что помечено `aria-hidden=\"true\"`, пропускается."
+      - en: "So the name isn't always what you see. In the cart, the “+” is named “Increase Rose Bouquet”. The header link reads “Cart 1” — the count is part of its name."
+        ru: "Поэтому имя — не всегда то, что видно. В корзине «+» называется «Increase Rose Bouquet». А ссылка в шапке читается как «Cart 1» — количество входит в её имя."
+    mentor:
+      en: "The name is what a screen-reader user hears — and what Petal reads in its [[accessibility snapshot|accessibility-snapshot]]. When a name is empty or vague, both of them are lost."
+      ru: "Имя — это то, что слышит пользователь скринридера и что Petal читает в своём [[снимке доступности|accessibility-snapshot]]. Если имя пустое или невнятное, теряются оба."
+
+  - type: inspect
+    keyPoint: kp-accessible-name
+    title: { en: "Look under the hood of the cart", ru: "Загляни под капот корзины" }
+    intro:
+      en: "This is the live Bloomly cart with one Rose Bouquet. Click elements on the page or in the tree and watch **Role** and **Accessible name** in the panel — the arrow shows where the name comes from. Try the “−” and “+” buttons, the quantity field, “Remove” and the last column header, which looks empty. Then open the **Agent’s view** tab."
+      ru: "Это живая корзина Bloomly с одним Rose Bouquet. Нажимай на элементы на странице или в дереве и смотри на **Роль** и **Доступное имя** на панели — стрелка показывает, откуда взялось имя. Попробуй кнопки «−» и «+», поле количества, «Remove» и заголовок последней колонки, который выглядит пустым. Потом открой вкладку **Взгляд агента**."
+    app: { route: /cart, state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+    focus: "[aria-label='Increase Rose Bouquet']"
+    view: both
+    mentor:
+      en: "The empty-looking header is named “Actions”: the text is hidden from the eye with CSS, but not from screen readers. And in the Agent’s view almost every line is a role followed by a name. That's all Petal gets."
+      ru: "Пустой на вид заголовок называется «Actions»: текст спрятан от глаз с помощью CSS, но не от скринридера. А во «Взгляде агента» почти каждая строка — это роль, а за ней имя. Больше Petal ничего не получает."
+
+  - type: task
+    task:
+      id: c4-l3-t1
+      kind: match
+      keyPoint: kp-role
+      prompt:
+        en: "Match each piece of Bloomly HTML with the role Playwright gives it."
+        ru: "Сопоставь каждый фрагмент HTML Bloomly с ролью, которую ему даёт Playwright."
+      pairs:
+        - { left: '<button type="submit">Log in</button>', right: "button" }
+        - { left: '<a href="/orders">Orders</a>', right: "link" }
+        - { left: '<input type="password" id="password">', right: "textbox" }
+        - { left: '<input type="checkbox" id="remember">', right: "checkbox" }
+        - { left: '<h1>Your cart</h1>', right: "heading" }
+        - { left: '<div role="alert">…</div>', right: "alert" }
+      leftCode: true
+      rightCode: true
+      hints:
+        - en: "Read each one aloud the way a screen reader would: “Orders, …?”"
+          ru: "Прочитай каждый вслух, как скринридер: «Orders, …?»"
+        - en: "A password field is still a field you type text into."
+          ru: "Поле пароля — всё равно поле, в которое вводят текст."
+        - en: "Only one element has its role written by hand, as an attribute."
+          ru: "Только у одного элемента роль задана вручную — атрибутом."
+      praise:
+        en: "Six for six — including the password field, which trips up many people (and agents)."
+        ru: "Шесть из шести — включая поле пароля, на котором спотыкаются многие (и агенты тоже)."
+      explain:
+        en: "Five roles come built into the tags; `alert` is written by hand with `role=\"alert\"`. The tricky one: there's no role “password”. A password input is a textbox, so `getByRole('textbox')` on /login finds two fields — Email and Password."
+        ru: "Пять ролей встроены в теги, а `alert` задан вручную через `role=\"alert\"`. Подвох в другом: роли «password» не существует. Поле пароля — это textbox, поэтому `getByRole('textbox')` на /login находит два поля — Email и Password."
+
+  - type: task
+    task:
+      id: c4-l3-t2
+      kind: inspect
+      keyPoint: kp-accessible-name
+      app: { route: /cart, state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 2 }] } }
+      prompt:
+        en: "Both rows show the same “−” sign. Find the button a screen reader announces as “Decrease Sunny Tulips, button”."
+        ru: "В обеих строках один и тот же знак «−». Найди кнопку, которую скринридер объявляет как «Decrease Sunny Tulips, button»."
+      target: "[aria-label='Decrease Sunny Tulips']"
+      view: both
+      show: [role, name]
+      hints:
+        - en: "Click a “−” and read the Accessible name in the panel."
+          ru: "Нажми на «−» и прочитай Доступное имя на панели."
+        - en: "The name comes from an `aria-label`, and each row has its own."
+          ru: "Имя берётся из `aria-label`, и у каждой строки он свой."
+        - en: "It's the “−” in the Sunny Tulips row — the second row of the table."
+          ru: "Это «−» в строке Sunny Tulips — второй строке таблицы."
+      praise:
+        en: "You looked past the “−” to the name. That's exactly how getByRole sees the page."
+        ru: "Ты {посмотрела|посмотрел} сквозь «−» на имя. Ровно так страницу видит getByRole."
+      explain:
+        en: "Every “−” looks the same, but each has its own `aria-label`: “Decrease Rose Bouquet”, “Decrease Sunny Tulips”. That's what a screen reader announces — and why `getByRole('button', { name: 'Decrease Sunny Tulips' })` finds exactly one button, wherever the row is."
+        ru: "Все «−» выглядят одинаково, но у каждого свой `aria-label`: «Decrease Rose Bouquet», «Decrease Sunny Tulips». Именно это произносит скринридер — и поэтому `getByRole('button', { name: 'Decrease Sunny Tulips' })` находит ровно одну кнопку, где бы ни стояла строка."
+
+  - type: task
+    task:
+      id: c4-l3-t3
+      kind: choice
+      keyPoint: kp-accessible-name
+      prompt:
+        en: "This is Bloomly's logo link from the header. What is its accessible name?"
+        ru: "Это ссылка-логотип из шапки Bloomly. Какое у неё доступное имя?"
+      code: |
+        <a href="/" class="logo" aria-label="Bloomly home">
+          <span class="logo-mark" aria-hidden="true">✿</span> Bloomly
+        </a>
+      options:
+        - text: "Bloomly home"
+          correct: true
+          why:
+            en: "`aria-label` wins over the text inside."
+            ru: "`aria-label` побеждает текст внутри."
+        - text: "✿ Bloomly"
+          why:
+            en: "That's what's drawn. The flower is `aria-hidden`, and the `aria-label` replaces the text anyway."
+            ru: "Это то, что нарисовано. Цветок помечен `aria-hidden`, а текст всё равно заменяет `aria-label`."
+        - text: "Bloomly"
+          why:
+            en: "That's the visible text — but when an element has an `aria-label`, the text inside isn't used for the name."
+            ru: "Это видимый текст, но если у элемента есть `aria-label`, текст внутри для имени не используется."
+        - text: "logo"
+          why:
+            en: "That's a CSS class. Classes are for styling and never become names."
+            ru: "Это CSS-класс. Классы нужны для стилей и именами не становятся."
+      hints:
+        - en: "Which source wins when an element has an `aria-label`?"
+          ru: "Какой источник побеждает, если у элемента есть `aria-label`?"
+        - en: "`aria-hidden=\"true\"` hides the flower from screen readers; `class` is only for styling."
+          ru: "`aria-hidden=\"true\"` прячет цветок от скринридеров, а `class` нужен только для стилей."
+      praise:
+        en: "Right — you read the markup the way a screen reader does, not the way the screen looks."
+        ru: "Верно — ты {прочитала|прочитал} разметку так, как её читает скринридер, а не так, как выглядит экран."
+      explain:
+        en: "The link is announced as “Bloomly home, link”, so its locator is `getByRole('link', { name: 'Bloomly home' })`. Good to know: by default Playwright matches part of the name, so `{ name: 'Bloomly' }` would find it too — but now you know the full name."
+        ru: "Ссылку объявляют как «Bloomly home, link», поэтому её локатор — `getByRole('link', { name: 'Bloomly home' })`. Полезно знать: по умолчанию Playwright сравнивает и часть имени, так что `{ name: 'Bloomly' }` её тоже найдёт, — но теперь ты знаешь полное имя."
+
+  - type: theory
+    keyPoint: kp-role-name-stable
+    title: { en: "Role + name: find things the way users do", ru: "Роль + имя: искать так, как ищут пользователи" }
+    body:
+      - en: "Nobody writes “click the third blue box in the form”. Users — and screen readers — find things by what they are and what they're called. A [[locator]] like `getByRole('button', { name: 'Log in' })` says exactly that."
+        ru: "Никто не пишет «нажми на третий синий прямоугольник в форме». Пользователи — и скринридеры — находят элементы по тому, что это и как оно называется. [[Локатор|locator]] вида `getByRole('button', { name: 'Log in' })` говорит ровно это."
+      - en: "That's why it's stable. Kai's redesign changes classes, colors, layout and the order of `<div>`s — users don't notice, and a role + name locator doesn't either. It breaks only when users would notice too: the button got a new name or stopped being a button. Then the test *should* fail."
+        ru: "Поэтому он устойчивый. Редизайн Кая меняет классы, цвета, вёрстку и порядок `<div>` — пользователи этого не замечают, и локатор по роли и имени тоже. Он ломается, только когда изменение заметили бы и пользователи: у кнопки новое имя или она перестала быть кнопкой. Тогда тест *и должен* упасть."
+      - en: "Petal's snapshot is made of roles and names, so it writes `getByRole` naturally — when the page gives it real names. Where a name is missing, or Petal reads it off a screenshot (“+”), it guesses: an invented name or a CSS path. (Chapter 5 ranks all the locator types.)"
+        ru: "Снимок Petal состоит из ролей и имён, поэтому `getByRole` получается у него естественно — если страница даёт настоящие имена. Где имени нет или Petal читает его со скриншота («+»), он угадывает: выдумывает имя или строит CSS-путь. (Все виды локаторов мы разложим по полочкам в главе 5.)"
+    code: |
+      // Breaks when Kai renames a class or moves the button:
+      await page.locator('.qty > button:nth-child(3)').click();
+
+      // Survives the redesign: this is how a user finds it
+      await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+    mentor:
+      en: "If a role + name test fails after a redesign, read the change first. Did the visible name change on purpose? Then the test case and the test get updated together — users will notice that change too."
+      ru: "Если тест по роли и имени упал после редизайна, сначала посмотри на изменение. Видимое имя поменяли намеренно? Тогда вместе обновляются и тест-кейс, и тест — пользователи это изменение тоже заметят."
+
+  - type: task
+    task:
+      id: c4-l3-t4
+      kind: review
+      keyPoint: kp-role-name-stable
+      app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+      context:
+        en: "Petal wrote this test for TC-441 from a screenshot of the cart, before Kai's redesign."
+        ru: "Petal написал этот тест для TC-441 по скриншоту корзины, ещё до редизайна Кая."
+      prompt:
+        en: "Kai's redesign lands next week. Flag every line that won't survive it — or never worked — and pick the issue type."
+        ru: "Редизайн Кая выходит на следующей неделе. Отметь каждую строку, которая его не переживёт или не работала с самого начала, и выбери тип проблемы."
+      testCase:
+        id: TC-441
+        title: Quantity of a cart item can be increased
+        preconditions: ["Cart has 1 Rose Bouquet"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Click \"+\" next to Rose Bouquet", expected: "Quantity is 2; the row subtotal is €70.00" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('quantity can be increased', async ({ page }) => {
+          await page.goto('/cart');
+          await page.getByRole('button', { name: 'Plus' }).click();
+          await expect(page.locator('div.qty > input')).toHaveValue('2');
+          await expect(page.locator('//table/tbody/tr[1]/td[4]')).toHaveText('€70.00');
+        });
+      issues:
+        - line: 5
+          type: hallucination
+          note:
+            en: "“Plus” is invented from the “+” on the screenshot. The button's accessible name is “Increase Rose Bouquet”: `getByRole('button', { name: 'Increase Rose Bouquet' })`."
+            ru: "«Plus» придуман по «+» на скриншоте. Доступное имя кнопки — «Increase Rose Bouquet»: `getByRole('button', { name: 'Increase Rose Bouquet' })`."
+        - line: 6
+          type: fragile-locator
+          note:
+            en: "A CSS path through Kai's class names and nesting — the redesign breaks it. The field has a role and a name: `getByRole('spinbutton', { name: 'Quantity of Rose Bouquet' })`."
+            ru: "CSS-путь через имена классов Кая и вложенность — редизайн его сломает. У поля есть роль и имя: `getByRole('spinbutton', { name: 'Quantity of Rose Bouquet' })`."
+        - line: 7
+          type: fragile-locator
+          note:
+            en: "An XPath down the table: row 1, column 4. Add a column or another product, and it reads the wrong cell. A cell has no unique role and name here, so use the test id Kai added: `getByTestId('row-subtotal')`."
+            ru: "XPath по структуре таблицы: строка 1, колонка 4. Добавь колонку или ещё один товар — и он прочитает не ту ячейку. У ячейки здесь нет уникальной роли и имени, поэтому используй test id, который добавил Кай: `getByTestId('row-subtotal')`."
+      types: [hallucination, fragile-locator, wrong-assertion, hard-wait, missing-await, wrong-data]
+      hints:
+        - en: "For each locator ask: does this name really exist on the page? Would it survive new class names and a new layout?"
+          ru: "Про каждый локатор спроси: есть ли такое имя на странице на самом деле? Переживёт ли он новые имена классов и новую вёрстку?"
+        - en: "One name was read off the screen, not from the page's markup."
+          ru: "Одно имя прочитано с экрана, а не из разметки страницы."
+        - en: "Line 5 — an invented name; lines 6 and 7 — paths through classes and table structure."
+          ru: "Строка 5 — выдуманное имя; строки 6 и 7 — пути через классы и структуру таблицы."
+      praise:
+        en: "You caught the invented name *and* the two locators that would break next week — before anyone saw them red."
+        ru: "Ты {поймала|поймал} и выдуманное имя, *и* два локатора, которые сломались бы на следующей неделе, — ещё до того, как кто-то увидел их красными."
+      explain:
+        en: "Line 5 fails today: no button is named “Plus”. Lines 6 and 7 pass today and break with the redesign — the worst kind, because nobody notices until release week. Role + name (or a test id for a cell with no name of its own) survives, because it doesn't depend on how the page is built inside."
+        ru: "Строка 5 падает уже сегодня: кнопки с именем «Plus» нет. Строки 6 и 7 сегодня проходят и сломаются с редизайном — это самое неприятное, потому что до недели релиза никто этого не заметит. Роль + имя (или test id для ячейки без собственного имени) переживают редизайн, потому что не зависят от того, как страница устроена внутри."
+
+  - type: task
+    task:
+      id: c4-l3-t5
+      kind: predict
+      keyPoint: kp-role-name-stable
+      app: { bugs: [a11y-add-to-cart-div] }
+      context:
+        en: "Kai's preview build. On the shop page nothing looks different — but under the hood “Add to cart” is now a `<div class=\"btn small\">` with the same text."
+        ru: "Превью-сборка Кая. На странице магазина внешне ничего не изменилось — но внутри «Add to cart» теперь `<div class=\"btn small\">` с тем же текстом."
+      prompt:
+        en: "Pass or fail on this build?"
+        ru: "Пройдёт или упадёт на этой сборке?"
+      testCase:
+        id: TC-443
+        title: Customer can add a product to the cart
+        steps:
+          - { action: "Open /shop" }
+          - { action: "Click \"Add to cart\" on the Sunny Tulips card", expected: "The cart count in the header is 1" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer can add Sunny Tulips to the cart', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+          await card.getByText('Add to cart').click();
+          await expect(page.getByTestId('cart-count')).toHaveText('1');
+        });
+      outcome: pass
+      reasons:
+        - text:
+            en: "Pass: getByText finds the words in the `<div>`, and a mouse click still works — the test doesn't notice the missing button role"
+            ru: "Пройдёт: getByText находит слова в `<div>`, а клик мышью всё ещё работает — отсутствие роли кнопки тест не замечает"
+          correct: true
+        - text:
+            en: "Fail: a `<div>` can't be clicked"
+            ru: "Упадёт: по `<div>` нельзя кликнуть"
+          why:
+            en: "It can — with a mouse. Only keyboard and screen-reader users are stuck."
+            ru: "Можно — мышью. В тупике только те, кто пользуется клавиатурой и скринридером."
+        - text:
+            en: "Fail: the cart count doesn't update on this build"
+            ru: "Упадёт: на этой сборке счётчик корзины не обновляется"
+          why:
+            en: "It does: the click handler is the same, only the tag changed."
+            ru: "Обновляется: обработчик клика тот же, поменялся только тег."
+      hints:
+        - en: "What does `getByText` look for — a role, or just words?"
+          ru: "Что ищет `getByText` — роль или просто слова?"
+        - en: "Can a mouse click a `<div>`?"
+          ru: "Можно ли кликнуть мышью по `<div>`?"
+      praise:
+        en: "Exactly: green, and blind to the change. You saw what the test can't."
+        ru: "Именно: зелёный — и слепой к изменению. Ты {увидела|увидел} то, чего не видит тест."
+      explain:
+        en: "Green — while an accessibility bug ships. `getByText` looks for words, not for a button, and a mouse click works on a `<div>`. The test doesn't find “Add to cart” the way a screen-reader user does — as a button with that name — so it can't notice the button is gone."
+        ru: "Зелёный — а тем временем в релиз уходит баг доступности. `getByText` ищет слова, а не кнопку, и клик мышью по `<div>` работает. Тест ищет «Add to cart» не так, как пользователь скринридера, — не как кнопку с этим именем, — поэтому и не может заметить, что кнопки больше нет."
+
+  - type: theory
+    keyPoint: kp-a11y-bug
+    title: { en: "An accessibility bug is a real bug", ru: "Баг доступности — настоящий баг" }
+    body:
+      - en: "On Kai's preview build, “Add to cart” is a `<div>` styled like a button. With a mouse, everything works. But a `<div>` has no role: the Tab key never reaches it, Enter does nothing, and a screen reader doesn't announce a button. For keyboard and screen-reader users, the shop has no “Add to cart” at all."
+        ru: "В превью-сборке Кая «Add to cart» — это `<div>`, оформленный как кнопка. Мышкой всё работает. Но у `<div>` нет роли: клавиша Tab до него не доходит, Enter ничего не делает, скринридер не объявляет кнопку. Для тех, кто пользуется клавиатурой или скринридером, кнопки «Add to cart» в магазине просто нет."
+      - en: "That's an [[accessibility]] [[bug]] — as real as a wrong total. There's a standard rule for exactly this, WCAG 4.1.2 “Name, Role, Value”. And in the EU, the European Accessibility Act has made accessibility a legal requirement for most online shops since June 2025."
+        ru: "Это [[баг|bug]] [[доступности|accessibility]] — такой же настоящий, как неверная сумма. Для него есть отдельное правило стандарта — WCAG 4.1.2 «Name, Role, Value». А в ЕС Европейский акт о доступности (European Accessibility Act) с июня 2025 года сделал доступность обязательной для большинства интернет-магазинов."
+      - en: "A test that finds things by role and name fails on this build — it has caught the bug. A test with `getByText` or a CSS class stays green and hides it. And Petal? In its snapshot the `<div>` is a nameless `generic` — clickable, but with no role and no name — so for the test it guesses a locator, usually that CSS class."
+        ru: "Тест, который ищет по роли и имени, на этой сборке падает — он поймал баг. Тест с `getByText` или CSS-классом остаётся зелёным и баг прячет. А Petal? В его снимке `<div>` — безымянный `generic`: по нему можно кликнуть, но ни роли, ни имени нет, поэтому для теста он угадывает локатор — обычно тот самый CSS-класс."
+    code: |
+      # Normal build, in Petal's snapshot (Playwright MCP):
+      - button "Add to cart" [ref=e6]
+      # Kai's preview build: clickable, but no role and no name
+      - generic [ref=e6] [cursor=pointer]: Add to cart
+    mentor:
+      en: "When a role + name locator can't find something you can see, don't rush to “fix” the locator. Inspect the element first — maybe the test has just found a bug."
+      ru: "Если локатор по роли и имени не находит то, что ты видишь, не спеши «чинить» локатор. Сначала проинспектируй элемент — возможно, тест только что нашёл баг."
+
+  - type: task
+    task:
+      id: c4-l3-t6
+      kind: find-bug
+      keyPoint: kp-a11y-bug
+      app: { bugs: [a11y-add-to-cart-div] }
+      context:
+        en: "The same test on the same preview build: “Add to cart” is a `<div>` without a button role, and the test is green."
+        ru: "Тот же тест на той же превью-сборке: «Add to cart» — это `<div>` без роли кнопки, а тест зелёный."
+      prompt:
+        en: "Add one assertion before the click so the test fails on this build — and still passes once Kai brings the real button back."
+        ru: "Добавь одну проверку перед кликом, чтобы тест падал на этой сборке — и проходил, когда Кай вернёт настоящую кнопку."
+      testCase:
+        id: TC-443
+        title: Customer can add a product to the cart
+        steps:
+          - { action: "Open /shop" }
+          - { action: "Click \"Add to cart\" on the Sunny Tulips card", expected: "The cart count in the header is 1" }
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer can add Sunny Tulips to the cart', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+          // TODO: check that "Add to cart" is a real button with this name
+          await card.getByText('Add to cart').click();
+          await expect(page.getByTestId('cart-count')).toHaveText('1');
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer can add Sunny Tulips to the cart', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+          await expect(card.getByRole('button', { name: 'Add to cart' })).toBeVisible();
+          await card.getByRole('button', { name: 'Add to cart' }).click();
+          await expect(page.getByTestId('cart-count')).toHaveText('1');
+        });
+      checks:
+        expect: fail
+        also:
+          - app: {}
+            expect: pass
+      hints:
+        - en: "What does a screen-reader user look for in the card: an element with which role and which name?"
+          ru: "Что ищет в карточке пользователь скринридера: элемент с какой ролью и каким именем?"
+        - en: "Assert that the card has a *button* named “Add to cart”: `await expect(card.getByRole(...)).toBeVisible();`"
+          ru: "Проверь, что в карточке есть *кнопка* с именем «Add to cart»: `await expect(card.getByRole(...)).toBeVisible();`"
+        - en: "Replace the TODO line with `await expect(card.getByRole('button', { name: 'Add to cart' })).toBeVisible();`"
+          ru: "Замени строку TODO на `await expect(card.getByRole('button', { name: 'Add to cart' })).toBeVisible();`"
+      praise:
+        en: "One line, and the test now guards keyboard and screen-reader users too."
+        ru: "Одна строка — и тест теперь охраняет ещё и тех, кто пользуется клавиатурой и скринридером."
+      explain:
+        en: "On the preview build no element has the role button and the name “Add to cart”, so the assertion fails — exactly what a screen-reader user runs into. On the fixed build it passes. The assertion also states the requirement out loud: “this must be a button called Add to cart”. You can then click by role too, as in the reference solution."
+        ru: "В превью-сборке нет элемента с ролью button и именем «Add to cart», поэтому проверка падает — ровно в это упирается пользователь скринридера. На исправленной сборке она проходит. К тому же проверка проговаривает требование вслух: «это должна быть кнопка с названием Add to cart». После неё можно и кликать по роли, как в эталонном решении."
+
+  - type: task
+    task:
+      id: c4-l3-t7
+      kind: agent
+      keyPoint: kp-a11y-bug
+      app:
+        bugs: [a11y-qty-unnamed]
+        state: { cart: [{ id: rose-bouquet, qty: 1 }] }
+      context:
+        en: |
+          Kai's preview build. Petal's test for TC-445 is red: `getByRole('spinbutton', { name: 'Quantity of Rose Bouquet' })` finds nothing. Petal suggests: “The field is right there! Shall I switch to `.qty input` and `.qty button` so it goes green?”
+
+          You inspected the cart: on this build the −/+ buttons are named just “−” and “+”, and the quantity field has no name at all. Petal is simulated, as everywhere in the trainer.
+        ru: |
+          Превью-сборка Кая. Тест Petal для TC-445 красный: `getByRole('spinbutton', { name: 'Quantity of Rose Bouquet' })` ничего не находит. Petal предлагает: «Поле же вот оно! Может, переключиться на `.qty input` и `.qty button`, чтобы тест позеленел?»
+
+          Ты {проинспектировала|проинспектировал} корзину: в этой сборке кнопки −/+ называются просто «−» и «+», а у поля количества имени нет вообще. Petal, как и везде в тренажёре, симулирован.
+      prompt:
+        en: "Compose your reply to Petal from the blocks. Then look at what Petal does with it."
+        ru: "Собери ответ для Petal из блоков. Потом посмотри, что Petal с ним сделает."
+      testCase:
+        id: TC-445
+        title: Quantity buttons change the quantity
+        preconditions: ["Cart has 1 Rose Bouquet"]
+        steps:
+          - { action: "Open /cart", expected: "Quantity of Rose Bouquet is 1" }
+          - { action: "Click \"Increase Rose Bouquet\" (+)", expected: "Quantity is 2; the row subtotal is €70.00" }
+      blocks:
+        - { id: task, locked: true, text: "About the red TC-445 test on Kai's preview build:", ru: "Насчёт красного теста TC-445 на превью-сборке Кая:" }
+        - { id: keep, text: "Don't change the locators. The test is right: it found a real bug.", ru: "Не меняй локаторы. Тест прав: он нашёл настоящий баг." }
+        - { id: cause, text: "Cause: on this build the −/+ buttons and the quantity field lost their aria-label, so their accessible names are \"−\", \"+\" and empty.", ru: "Причина: в этой сборке кнопки −/+ и поле количества потеряли aria-label, поэтому их доступные имена — «−», «+» и пустое." }
+        - { id: report, text: "Draft a bug report for Kai: steps, expected and actual accessible names, and who is affected.", ru: "Набросай баг-репорт для Кая: шаги, ожидаемые и фактические доступные имена и кого это затрагивает." }
+        - { id: green, text: "Use any locator that works, so the test goes green.", ru: "Используй любой работающий локатор, чтобы тест позеленел." }
+        - { id: noise, text: "Hurry, the release is on Friday!", ru: "Поторопись, релиз в пятницу!" }
+      responses:
+        - when: [keep, cause, report]
+          unless: [green]
+          best: true
+          message:
+            en: |
+              Got it — the test stays as it is: it's red for the right reason. Here's a draft for Kai:
+              - **Title:** Cart: −/+ buttons and quantity field have no accessible names (preview build)
+              - **Steps:** add Rose Bouquet to the cart, open /cart, inspect the quantity controls.
+              - **Expected:** button “Decrease Rose Bouquet”, spinbutton “Quantity of Rose Bouquet”, button “Increase Rose Bouquet”.
+              - **Actual:** button “−”, spinbutton with no name, button “+”. The aria-label attributes are missing.
+              - **Impact:** screen-reader users can't tell which product a button changes; TC-445 fails.
+            ru: |
+              Понял — тест остаётся как есть: он красный по правильной причине. Вот черновик для Кая (на английском, как принято в команде):
+              - **Title:** Cart: −/+ buttons and quantity field have no accessible names (preview build)
+              - **Steps:** add Rose Bouquet to the cart, open /cart, inspect the quantity controls.
+              - **Expected:** button “Decrease Rose Bouquet”, spinbutton “Quantity of Rose Bouquet”, button “Increase Rose Bouquet”.
+              - **Actual:** button “−”, spinbutton with no name, button “+”. The aria-label attributes are missing.
+              - **Impact:** screen-reader users can't tell which product a button changes; TC-445 fails.
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('quantity buttons change the quantity', async ({ page }) => {
+              await page.goto('/cart');
+              const quantity = page.getByRole('spinbutton', { name: 'Quantity of Rose Bouquet' });
+              await expect(quantity).toHaveValue('1');
+              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+              await expect(quantity).toHaveValue('2');
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+            });
+        - when: [green]
+          message:
+            en: "Done! I switched to `.qty input` and `.qty button`. Green ✅ Shall I do the same in the other cart tests?"
+            ru: "Готово! Переключился на `.qty input` и `.qty button`. Зелёный ✅ Сделать так же в остальных тестах корзины?"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('quantity buttons change the quantity', async ({ page }) => {
+              await page.goto('/cart');
+              const quantity = page.locator('.qty input');
+              await expect(quantity).toHaveValue('1');
+              await page.locator('.qty button').last().click();
+              await expect(quantity).toHaveValue('2');
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+            });
+        - when: [cause, report]
+          message:
+            en: "Here's the bug report for Kai: the −/+ buttons and the quantity field lost their aria-labels. And so we're not blocked, I made the test green meanwhile by switching to `.qty input` and `.qty button` ✅"
+            ru: "Вот баг-репорт для Кая: кнопки −/+ и поле количества потеряли aria-label. А чтобы мы не стояли, я пока сделал тест зелёным — переключился на `.qty input` и `.qty button` ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('quantity buttons change the quantity', async ({ page }) => {
+              await page.goto('/cart');
+              const quantity = page.locator('.qty input');
+              await expect(quantity).toHaveValue('1');
+              await page.locator('.qty button').last().click();
+              await expect(quantity).toHaveValue('2');
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+            });
+        - when: [keep, report]
+          message:
+            en: "I kept the test. Bug report draft: **Title:** Increase button is missing in the cart. **Actual:** the button can't be found. Red ❌ as expected."
+            ru: "Тест оставил. Черновик баг-репорта: **Title:** Increase button is missing in the cart. **Actual:** the button can't be found. Красный ❌, как и ожидалось."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('quantity buttons change the quantity', async ({ page }) => {
+              await page.goto('/cart');
+              const quantity = page.getByRole('spinbutton', { name: 'Quantity of Rose Bouquet' });
+              await expect(quantity).toHaveValue('1');
+              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+              await expect(quantity).toHaveValue('2');
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+            });
+        - when: [keep, cause]
+          message:
+            en: "Understood: the build lost the aria-labels, and the test is right to stay red ❌. Should I mention it to someone?"
+            ru: "Понял: сборка потеряла aria-label, и тест правильно остаётся красным ❌. Мне кому-нибудь об этом сказать?"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('quantity buttons change the quantity', async ({ page }) => {
+              await page.goto('/cart');
+              const quantity = page.getByRole('spinbutton', { name: 'Quantity of Rose Bouquet' });
+              await expect(quantity).toHaveValue('1');
+              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+              await expect(quantity).toHaveValue('2');
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+            });
+        - when: [keep]
+          message:
+            en: "OK, I kept the locators. Still red ❌. Maybe the preview build is just slow? I added a 3-second wait to be safe."
+            ru: "Хорошо, локаторы оставил. Всё ещё красный ❌. Может, превью-сборка просто медленная? Я на всякий случай добавил ожидание в 3 секунды."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('quantity buttons change the quantity', async ({ page }) => {
+              await page.goto('/cart');
+              await page.waitForTimeout(3000);
+              const quantity = page.getByRole('spinbutton', { name: 'Quantity of Rose Bouquet' });
+              await expect(quantity).toHaveValue('1');
+              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+              await expect(quantity).toHaveValue('2');
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+            });
+        - when: []
+          message:
+            en: "I'm not sure what you'd like me to do, so I went with my idea: `.qty input` and `.qty button`. Green ✅"
+            ru: "Не совсем понял, что ты хочешь, поэтому сделал по-своему: `.qty input` и `.qty button`. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('quantity buttons change the quantity', async ({ page }) => {
+              await page.goto('/cart');
+              const quantity = page.locator('.qty input');
+              await expect(quantity).toHaveValue('1');
+              await page.locator('.qty button').last().click();
+              await expect(quantity).toHaveValue('2');
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+            });
+      missing:
+        keep:
+          en: "Without “don't change the locators”, Petal “helpfully” made the test green with CSS. Now the suite can't notice the missing names — on this build or ever again."
+          ru: "Без «не меняй локаторы» Petal «услужливо» сделал тест зелёным через CSS. Теперь набор тестов не заметит пропавшие имена — ни в этой сборке, ни потом."
+        cause:
+          en: "Without the cause, Petal's report says the button is “missing”. Kai will open the cart, see the “+”, and close the ticket as “works for me”."
+          ru: "Без причины в отчёте Petal написано, что кнопка «отсутствует». Кай откроет корзину, увидит «+» и закроет тикет с пометкой «у меня работает»."
+        report:
+          en: "Without asking for a bug report, the finding stays in this chat — Kai never hears about it, and the bug ships."
+          ru: "Без просьбы о баг-репорте находка остаётся в этом чате — Кай о ней не узнает, и баг уйдёт в релиз."
+      checks:
+        expect: fail
+        static: [hasAssertion, noHardWait, noFragile]
+        also:
+          - app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+            expect: pass
+      hints:
+        - en: "Petal needs three things from you: what to do with the test, why it's red, and what happens next."
+          ru: "Petal нужны от тебя три вещи: что делать с тестом, почему он красный и что дальше."
+        - en: "“Any locator that works” turns a found bug into a hidden one."
+          ru: "«Любой работающий локатор» превращает найденный баг в спрятанный."
+        - en: "Pick keep, cause and report — and leave out “goes green”."
+          ru: "Выбери «не меняй локаторы», «причина» и «баг-репорт» — а «чтобы позеленел» не бери."
+      praise:
+        en: "The test stays honest, and Kai gets a report he can act on. That's how a QA lead talks to an agent."
+        ru: "Тест остался честным, а Кай получит отчёт, с которым можно работать. Так с агентом разговаривает QA-лид."
+      explain:
+        en: "A red role + name test on a build that *looks* fine is often the most valuable test in the suite. Your reply kept it, named the cause and turned it into a report with expected and actual accessible names. Petal on its own aims for green — it can't tell a test problem from a product bug. You can."
+        ru: "Красный тест по роли и имени на сборке, которая *выглядит* нормально, — часто самый ценный тест в наборе. Твой ответ его сохранил, назвал причину и превратил находку в баг-репорт с ожидаемыми и фактическими доступными именами. Сам по себе Petal стремится к зелёному — он не отличает проблему теста от бага продукта. А ты отличаешь."
+
+  - type: mistakes
+    keyPoint: kp-accessible-name
+    title: { en: "Role and name mistakes agents make", ru: "Ошибки с ролями и именами, которые делают агенты" }
+    items:
+      - wrong: "await page.getByRole('button', { name: '+' }).click();"
+        right: "await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();"
+        why:
+          en: "The name isn't what's drawn on screen. Inspect the element: the “+” is named by its aria-label."
+          ru: "Имя — это не то, что нарисовано на экране. Проинспектируй элемент: «+» получает имя из aria-label."
+      - wrong: "await page.getByRole('password', { name: 'Password' }).fill('bloom123');"
+        right: "await page.getByRole('textbox', { name: 'Password' }).fill('bloom123');"
+        why:
+          en: "“password” is an input type, not a role. A password field is a textbox."
+          ru: "«password» — это тип поля, а не роль. Поле пароля — это textbox."
+      - wrong: "await page.getByRole('link', { name: 'Cart', exact: true }).click();"
+        right: "await page.getByRole('link', { name: 'Cart' }).click();"
+        why:
+          en: "The link's full name includes the count: “Cart 0”. `exact: true` needs the whole name, so it finds nothing."
+          ru: "Полное имя ссылки включает количество: «Cart 0». `exact: true` требует имя целиком, поэтому ничего не находит."
+      - wrong: "Can't find the Add to cart button by role — switching to page.locator('div.btn.small')."
+        right: "Bug: \"Add to cart\" is a <div> with no button role. Keep getByRole('button', { name: 'Add to cart' }) and report it."
+        why:
+          en: "A workaround makes the test green and hides an accessibility bug from everyone."
+          ru: "Обходной путь делает тест зелёным и прячет баг доступности от всех."
+
+  - type: explain
+    keyPoint: kp-role-name-stable
+    prompt:
+      en: "In your own words: what are a role and an accessible name, and why is `getByRole` with a name such a stable way to find an element?"
+      ru: "Своими словами: что такое роль и доступное имя и почему `getByRole` с именем — такой устойчивый способ найти элемент?"
+    model:
+      en: "A role says what an element is: button, link, textbox, heading. Most tags have one built in; a plain div has none. The accessible name is what a screen reader announces — it comes from an aria-label, a label, alt text or the text inside, so it isn't always what I see on screen. Users find things by exactly these two: “the Log in button”. So a role + name locator breaks only when users would notice a change too, while classes and layout can change in a redesign without anyone noticing. And when a role + name locator can't find an element I can see, I inspect it first: it may be an accessibility bug, not a broken test."
+      ru: "Роль говорит, что это за элемент: button, link, textbox, heading. У большинства тегов она встроена, у обычного div её нет. Доступное имя — то, что произносит скринридер; оно берётся из aria-label, label, alt или текста внутри, поэтому не всегда совпадает с тем, что я вижу на экране. Пользователи находят элементы именно по этим двум вещам: «кнопка Log in». Поэтому локатор по роли и имени ломается, только когда изменение заметили бы и пользователи, а классы и вёрстка могут поменяться при редизайне так, что никто и не заметит. А если локатор по роли и имени не находит элемент, который я вижу, я сначала его инспектирую: возможно, это баг доступности, а не сломанный тест."
+
+  - type: phrases
+    items:
+      - context: bug-report
+        en: "Accessibility: \"Add to cart\" is a div, not a button — you can't reach it with Tab, and screen readers don't announce it."
+        ru: "Доступность: «Add to cart» — это div, а не кнопка: до него не дойти клавишей Tab, и скринридеры его не объявляют."
+        note:
+          en: "Name the user impact, not just the markup. WCAG 4.1.2 is a good reference for the ticket."
+          ru: "Называй, как это влияет на пользователей, а не только разметку. Хорошая ссылка для тикета — WCAG 4.1.2."
+      - context: code-review
+        en: "Could we use getByRole('button', { name: 'Increase Rose Bouquet' }) instead of the CSS path? It'll survive the redesign."
+        ru: "Может, используем getByRole('button', { name: 'Increase Rose Bouquet' }) вместо CSS-пути? Он переживёт редизайн."
+      - context: chat
+        en: "Kai, the −/+ buttons lost their aria-labels in the preview build — screen readers just say “plus, button”."
+        ru: "Кай, в превью-сборке кнопки −/+ потеряли aria-label — скринридеры говорят просто «плюс, кнопка»."
+      - context: standup
+        en: "The cart test is red on the preview build, and that's correct: it caught an accessibility bug. I've filed it for Kai."
+        ru: "Тест корзины на превью-сборке красный, и это правильно: он поймал баг доступности. Я {завела|завёл} его на Кая."
+      - context: prompt
+        en: "Use the role and accessible name from the page, not what the icon looks like. If an element has no name, tell me instead of guessing."
+        ru: "Бери роль и доступное имя со страницы, а не то, как выглядит иконка. Если у элемента нет имени, скажи мне, а не угадывай."
+        note:
+          en: "The last sentence matters most: it turns a silent guess into a finding."
+          ru: "Главное — последнее предложение: оно превращает молчаливую догадку в находку."
+
+checkPool:
+  - id: c4-l3-k1
+    kind: predict
+    keyPoint: kp-role
+    placement: true
+    prompt:
+      en: "Pass or fail?"
+      ru: "Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('Anna types her email', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByRole('textbox').fill('anna@bloomly.app');
+        await expect(page.getByLabel('Email')).toHaveValue('anna@bloomly.app');
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "Fail: the password field is a textbox too — two elements match, and Playwright refuses to guess"
+          ru: "Упадёт: поле пароля — тоже textbox; подходят два элемента, и Playwright не станет угадывать"
+        correct: true
+      - text:
+          en: "Pass: the email field is the only text field on the page"
+          ru: "Пройдёт: поле email — единственное текстовое поле на странице"
+        why:
+          en: "A password input also has the role textbox."
+          ru: "У поля пароля тоже роль textbox."
+      - text:
+          en: "Fail: an email field has the role “email”, not textbox"
+          ru: "Упадёт: у поля email роль «email», а не textbox"
+        why:
+          en: "There's no role “email”. It's a textbox."
+          ru: "Роли «email» не существует. Это textbox."
+    hints:
+      - en: "How many fields on /login can you type text into?"
+        ru: "В сколько полей на /login можно ввести текст?"
+      - en: "What role does a password field have?"
+        ru: "Какая роль у поля пароля?"
+    explain:
+      en: "A role narrows the search to a *kind* of element. With two textboxes on the form you also need the name: `getByRole('textbox', { name: 'Email' })`."
+      ru: "Роль сужает поиск до *вида* элемента. Когда в форме два textbox, нужно ещё и имя: `getByRole('textbox', { name: 'Email' })`."
+
+  - id: c4-l3-k2
+    kind: fill
+    keyPoint: kp-role
+    prompt:
+      en: "Fill in the role for each step of Anna's login."
+      ru: "Впиши роль для каждого шага входа Анны."
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('Anna logs in and is remembered', async ({ page }) => {
+        await page.goto('/login');
+        await page.getByRole('___', { name: 'Email' }).fill('anna@bloomly.app');
+        await page.getByRole('___', { name: 'Password' }).fill('bloom123');
+        await page.getByRole('___', { name: 'Remember me' }).check();
+        await page.getByRole('___', { name: 'Log in' }).click();
+        await expect(page.getByRole('___', { name: 'Welcome back, Anna!' })).toBeVisible();
+      });
+    blanks:
+      - { answers: [textbox], options: [textbox, email, input] }
+      - { answers: [textbox], options: [textbox, password, input] }
+      - { answers: [checkbox], options: [checkbox, label, button] }
+      - { answers: [button], options: [button, link, submit] }
+      - { answers: [heading], options: [heading, h1, text] }
+    checks: { expect: pass }
+    hints:
+      - en: "Roles describe *what* an element is, not its HTML tag or input type."
+        ru: "Роль описывает, *что* это за элемент, а не HTML-тег и не тип поля."
+      - en: "Both fields you type into share one role. “Log in” is a link in the header but a button in the form."
+        ru: "У обоих полей для ввода одна и та же роль. «Log in» в шапке — ссылка, а в форме — кнопка."
+      - en: "In order: textbox, textbox, checkbox, button, heading."
+        ru: "По порядку: textbox, textbox, checkbox, button, heading."
+    explain:
+      en: "`email`, `password`, `submit`, `h1` and `input` are types and tags, not roles. Playwright speaks roles: textbox, checkbox, button, heading."
+      ru: "`email`, `password`, `submit`, `h1` и `input` — это типы и теги, а не роли. Playwright говорит на языке ролей: textbox, checkbox, button, heading."
+
+  - id: c4-l3-k3
+    kind: inspect
+    keyPoint: kp-accessible-name
+    app: { route: /shop }
+    prompt:
+      en: "Find the element whose accessible name is “Bunch of yellow tulips”."
+      ru: "Найди элемент, чьё доступное имя — «Bunch of yellow tulips»."
+    target: "[data-product-id='sunny-tulips'] img"
+    view: dom
+    show: [attributes]
+    hints:
+      - en: "This text isn't written anywhere on the page. Which kind of element gets its name from an attribute you can't see?"
+        ru: "Этот текст нигде на странице не написан. Какой элемент получает имя из атрибута, которого не видно?"
+      - en: "Look for `alt=…` in the Attributes."
+        ru: "Ищи `alt=…` в Атрибутах."
+      - en: "It's the picture on the Sunny Tulips card."
+        ru: "Это картинка в карточке Sunny Tulips."
+    explain:
+      en: "An image's accessible name comes from its `alt` text: a screen reader says “Bunch of yellow tulips, image”. A test can find it with `getByRole('img', { name: 'Bunch of yellow tulips' })`."
+      ru: "Доступное имя картинки берётся из `alt`: скринридер говорит «Bunch of yellow tulips, image». Тест найдёт её так: `getByRole('img', { name: 'Bunch of yellow tulips' })`."
+
+  - id: c4-l3-k4
+    kind: predict
+    keyPoint: kp-accessible-name
+    context:
+      en: "A fresh browser context: the cart is empty."
+      ru: "Чистый контекст браузера: корзина пуста."
+    prompt:
+      en: "Pass or fail?"
+      ru: "Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('header has a link to the cart', async ({ page }) => {
+        await page.goto('/');
+        await expect(page.getByRole('link', { name: 'Cart', exact: true })).toBeVisible();
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "Fail: the link's accessible name is “Cart 0” — the count is part of it, and `exact: true` needs the whole name"
+          ru: "Упадёт: доступное имя ссылки — «Cart 0»: количество входит в него, а `exact: true` требует имя целиком"
+        correct: true
+      - text:
+          en: "Pass: the link says “Cart”"
+          ru: "Пройдёт: на ссылке написано «Cart»"
+        why:
+          en: "It also shows the count badge, and the badge text is part of the name."
+          ru: "На ней есть ещё и значок с количеством, и его текст входит в имя."
+      - text:
+          en: "Fail: there are no links in the header on the home page"
+          ru: "Упадёт: на главной в шапке нет ссылок"
+        why:
+          en: "The header is the same on every page: Shop, Orders, Cart, Log in."
+          ru: "Шапка на всех страницах одинаковая: Shop, Orders, Cart, Log in."
+    hints:
+      - en: "Look at the header link to the cart. Is “Cart” all it says?"
+        ru: "Посмотри на ссылку на корзину в шапке. Там написано только «Cart»?"
+      - en: "`exact: true` compares the whole name, character by character."
+        ru: "`exact: true` сравнивает имя целиком, символ за символом."
+    explain:
+      en: "The name is built from all the text inside the link: “Cart” plus the badge “0”. Without `exact`, Playwright matches part of the name and `{ name: 'Cart' }` would work."
+      ru: "Имя собирается из всего текста внутри ссылки: «Cart» плюс значок «0». Без `exact` Playwright ищет по части имени, и `{ name: 'Cart' }` сработал бы."
+
+  - id: c4-l3-k5
+    kind: choice
+    keyPoint: kp-role-name-stable
+    placement: true
+    multi: true
+    context:
+      en: "Kai's redesign changes the login button like this:"
+      ru: "Редизайн Кая меняет кнопку входа вот так:"
+    diff:
+      before: |
+        <button type="submit" class="btn" data-testid="login-button">Log in</button>
+      after: |
+        <button type="submit" class="button button--primary" data-testid="login-button">Log in</button>
+    prompt:
+      en: "Which locators still find the button after the change? Pick all that apply."
+      ru: "Какие локаторы всё ещё найдут кнопку после изменения? Выбери все подходящие."
+    optionsCode: true
+    options:
+      - text: "page.getByRole('button', { name: 'Log in' })"
+        correct: true
+        why:
+          en: "Still a button, still named “Log in” — nothing a user would notice has changed."
+          ru: "Всё ещё кнопка и всё ещё называется «Log in» — ничего заметного для пользователя не изменилось."
+      - text: "page.getByTestId('login-button')"
+        correct: true
+        why:
+          en: "Kai kept the test id. It exists for tests, so it doesn't change with the design."
+          ru: "Кай сохранил test id. Он существует для тестов, поэтому не меняется вместе с дизайном."
+      - text: "page.locator('.btn')"
+        why:
+          en: "The class is gone. Classes are for styling and change with every redesign."
+          ru: "Класса больше нет. Классы нужны для стилей и меняются при каждом редизайне."
+      - text: "page.locator('#login-form > button.btn')"
+        why:
+          en: "The same class plus the form structure — two reasons to break."
+          ru: "Тот же класс плюс структура формы — две причины сломаться."
+    hints:
+      - en: "Compare before and after: what changed, and what stayed the same?"
+        ru: "Сравни «до» и «после»: что изменилось, а что осталось прежним?"
+      - en: "Only the class changed. Which locators depend on it?"
+        ru: "Изменился только класс. Какие локаторы от него зависят?"
+    explain:
+      en: "Role + name and test ids survive a redesign; classes and DOM paths don't. Role + name has a bonus: it also checks what users rely on, so it would fail if the button stopped being a button."
+      ru: "Роль + имя и test id переживают редизайн, а классы и пути по DOM — нет. У роли + имени есть бонус: такой локатор проверяет ещё и то, на что опираются пользователи, — он упадёт, если кнопка перестанет быть кнопкой."
+
+  - id: c4-l3-k6
+    kind: pick-locator
+    keyPoint: kp-role-name-stable
+    app: { route: /cart, state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] } }
+    target: "[aria-label='Increase Sunny Tulips']"
+    prompt:
+      en: "Pick the locator for the highlighted “+” that will survive Kai's redesign of the cart."
+      ru: "Выбери локатор для выделенного «+», который переживёт редизайн корзины от Кая."
+    options:
+      - text: "page.getByRole('button', { name: 'Increase Sunny Tulips' })"
+        correct: true
+        why:
+          en: "Role + name: exactly one button, found the way a screen-reader user finds it."
+          ru: "Роль + имя: ровно одна кнопка, найденная так же, как её находит пользователь скринридера."
+      - text: "page.locator('tbody tr:nth-child(2) .qty button:last-child')"
+        why:
+          en: "Row number, class name and button order — any of them can change in a redesign."
+          ru: "Номер строки, имя класса и порядок кнопок — в редизайне может поменяться любое из них."
+      - text: "page.getByText('+').last()"
+        why:
+          en: "Depends on the order of rows: add a product, and `.last()` is a different button. And “+” doesn't say which product."
+          ru: "Зависит от порядка строк: добавь товар — и `.last()` укажет на другую кнопку. А «+» не говорит, к какому товару она относится."
+      - text: "page.getByRole('button', { name: 'Plus' })"
+        why:
+          en: "Invented: no button is named “Plus”. The “+” is only what's drawn."
+          ru: "Выдумано: кнопки с именем «Plus» нет. «+» — только то, что нарисовано."
+    hints:
+      - en: "What does a screen reader announce for this button?"
+        ru: "Что скринридер произносит для этой кнопки?"
+      - en: "Avoid anything that depends on position or class names."
+        ru: "Избегай всего, что зависит от позиции или имён классов."
+    explain:
+      en: "`aria-label=\"Increase Sunny Tulips\"` gives the button a unique, meaningful name. Rows can move and classes can change — the name stays as long as the button does the same thing."
+      ru: "`aria-label=\"Increase Sunny Tulips\"` даёт кнопке уникальное и понятное имя. Строки могут переставляться, классы — меняться, а имя остаётся, пока кнопка делает то же самое."
+
+  - id: c4-l3-k7
+    kind: inspect
+    keyPoint: kp-a11y-bug
+    app:
+      route: /cart
+      bugs: [a11y-qty-unnamed]
+      state: { cart: [{ id: rose-bouquet, qty: 1 }] }
+    prompt:
+      en: "Kai's preview build: the cart as Petal sees it. Find the control — a button or a field — that has no accessible name at all."
+      ru: "Превью-сборка Кая: корзина такой, какой её видит Petal. Найди элемент управления — кнопку или поле, — у которого вообще нет доступного имени."
+    target: "[data-testid='qty-input']"
+    view: aria
+    show: []
+    hints:
+      - en: "Look for a line with a role but no name in quotes after it."
+        ru: "Ищи строку, где есть роль, но после неё нет имени в кавычках."
+      - en: "The −/+ buttons have names — useless ones (“−”, “+”), but names."
+        ru: "У кнопок −/+ имена есть — бесполезные («−», «+»), но есть."
+      - en: "It's the `spinbutton` in the Rose Bouquet row."
+        ru: "Это `spinbutton` в строке Rose Bouquet."
+    praise:
+      en: "You found the blind spot in Petal's view — exactly where an agent starts guessing."
+      ru: "Ты {нашла|нашёл} слепое пятно во взгляде Petal — ровно там, где агент начинает угадывать."
+    explain:
+      en: "The quantity field lost its `aria-label`, and there's no `<label>` either, so the snapshot shows only `spinbutton` and its value. A screen reader says “spin button, 1” — 1 of what? Petal can't write `getByRole('spinbutton', { name: … })` here, so it will guess. That's a bug to report, not a locator to work around."
+      ru: "Поле количества потеряло `aria-label`, а `<label>` у него тоже нет, поэтому в снимке видны только `spinbutton` и значение. Скринридер скажет «spin button, 1» — один чего? Petal не сможет написать здесь `getByRole('spinbutton', { name: … })` и начнёт угадывать. Это баг, о котором надо сообщить, а не повод искать обходной локатор."
+
+  - id: c4-l3-k8
+    kind: choice
+    keyPoint: kp-a11y-bug
+    context:
+      en: "Kai's preview build. Petal's search test is red: `getByLabel('Search')` finds nothing. You inspect the field and see this — the `<label>` that used to be next to it is gone. Petal: “Shall I switch to getByPlaceholder('Search flowers')? Then it's green.”"
+      ru: "Превью-сборка Кая. Тест поиска от Petal красный: `getByLabel('Search')` ничего не находит. Ты инспектируешь поле и видишь вот это — `<label>`, который раньше стоял рядом, пропал. Petal: «Переключиться на getByPlaceholder('Search flowers')? Тогда будет зелёный»."
+    code: |
+      <input id="search" type="search" placeholder="Search flowers">
+    prompt:
+      en: "What do you do?"
+      ru: "Что ты сделаешь?"
+    options:
+      - text:
+          en: "Keep the test and report an accessibility bug: the search field lost its label, and the placeholder is only a weak fallback name that disappears as soon as you type"
+          ru: "Оставить тест и завести баг доступности: поле поиска потеряло подпись, а placeholder — лишь слабое запасное имя, которое исчезает, как только начинаешь печатать"
+        correct: true
+        why:
+          en: "The test noticed a real regression. Your job is to make sure Kai hears about it."
+          ru: "Тест заметил настоящую регрессию. Твоя задача — чтобы Кай о ней узнал."
+      - text:
+          en: "Approve Petal's change: the test goes green"
+          ru: "Одобрить правку Petal: тест станет зелёным"
+        why:
+          en: "Green, and the bug ships. The test would stop checking what users rely on."
+          ru: "Зелёный — и баг уходит в релиз. Тест перестанет проверять то, на что опираются пользователи."
+      - text:
+          en: "Re-run it: it's probably flaky"
+          ru: "Перезапустить: наверное, он нестабильный"
+        why:
+          en: "It fails the same way every time. Nothing random here — the label is gone."
+          ru: "Он каждый раз падает одинаково. Ничего случайного — подписи просто нет."
+      - text:
+          en: "Ask Petal to fix the test: it invented the label “Search”"
+          ru: "Попросить Petal исправить тест: он выдумал подпись «Search»"
+        why:
+          en: "No — on the normal build the field has the label “Search”. The build changed, not the test."
+          ru: "Нет — в обычной сборке у поля есть подпись «Search». Изменилась сборка, а не тест."
+    hints:
+      - en: "Did the test change, or the page?"
+        ru: "Что изменилось — тест или страница?"
+      - en: "Where does this field's name come from now? Is that a good source?"
+        ru: "Откуда теперь берётся имя этого поля? Хороший ли это источник?"
+    explain:
+      en: "A missing label is an accessibility bug: screen readers fall back to the placeholder, and sighted users lose the hint as soon as they start typing. Switching the locator would hide it. Keep the test red, report the bug, and let the test go green when Kai puts the label back."
+      ru: "Пропавшая подпись — баг доступности: скринридеры берут вместо неё placeholder, а зрячие пользователи теряют подсказку, как только начинают печатать. Смена локатора баг спрячет. Оставь тест красным, заведи баг — и пусть тест позеленеет, когда Кай вернёт подпись."

@@ -1,6 +1,6 @@
 id: c4
 number: 4
-status: planned
+status: ready
 title: { en: "How a page is built", ru: "Как устроена страница" }
 department: { en: "Frontend", ru: "Фронтенд" }
 color: mint
@@ -20,6 +20,7 @@ intro:
     text:
       en: "Which means: if a button has no proper name, Petal has to guess what it is. Let's learn to see the page through both pairs of eyes."
       ru: "А значит, если у кнопки нет нормального имени, Petal приходится угадывать, что это. Давай научимся видеть страницу глазами обоих."
+lessons: [c4-l1, c4-l2, c4-l3, c4-l4]
 plan:
   - title: { en: "The page as a tree: the DOM", ru: "Страница как дерево: DOM" }
     goal:
@@ -69,3 +70,243 @@ plan:
         ru: "Если элемента нет в снимке или у него нет имени, агент будет угадывать — жди выдуманных локаторов."
       - en: "Check the agent's locators against the real page in DevTools before you trust them."
         ru: "Сверяй локаторы агента с реальной страницей в DevTools, прежде чем им доверять."
+outro:
+  - who: maya
+    text:
+      en: "You looked under the pixels — DOM, attributes, roles, the agent's snapshot — and caught a regression nobody could see on the screen."
+      ru: "Ты {заглянула|заглянул} под пиксели — DOM, атрибуты, роли, снимок агента — и {поймала|поймал} регрессию, которую никто не видел на экране."
+  - who: kai
+    text:
+      en: "Good catch. The buttons are real buttons again, and their names are back. Next time I'll check the Accessibility pane before I open a PR."
+      ru: "Хорошо подмечено. Кнопки снова настоящие кнопки, и имена к ним вернулись. В следующий раз загляну во вкладку Accessibility, прежде чем открывать PR."
+  - who: petal
+    text:
+      en: "Note to self: open the page before writing locators. Memory is not a snapshot."
+      ru: "Заметка себе: сначала открыть страницу, потом писать локаторы. Память — не снимок."
+  - who: leo
+    text:
+      en: "Next stop: Design System. Time to choose locators that survive a redesign."
+      ru: "Следующая остановка — дизайн-система. Пора выбирать локаторы, которые переживут редизайн."
+
+boss:
+  id: c4-boss
+  title: { en: "Same pixels, different page", ru: "Пиксели те же, страница другая" }
+  story:
+    - who: kai
+      text:
+        en: "My refactor of the shop and the cart is ready: new components, cleaner markup. Pixel for pixel, nothing changed on the screen."
+        ru: "Мой рефакторинг магазина и корзины готов: новые компоненты, разметка чище. На экране — ни одного изменённого пикселя."
+    - who: petal
+      text:
+        en: "And I've already written the regression test for it — from memory! I know Bloomly by heart, no need to open the page."
+        ru: "А я уже написал для него регрессионный тест — по памяти! Я знаю Bloomly наизусть, страницу можно не открывать."
+    - who: maya
+      text:
+        en: "Let's open it anyway. First the real page, then the agent's snapshot, then Petal's locators. And our test must notice if the refactor broke accessibility."
+        ru: "А мы всё-таки откроем. Сначала реальная страница, потом снимок агента, потом локаторы Petal. И наш тест должен заметить, если рефакторинг сломал доступность."
+  tasks:
+    - id: c4-boss-t1
+      kind: inspect
+      keyPoint: kp-dom-not-pixels
+      app: { route: /shop, bugs: [a11y-add-to-cart-div, a11y-qty-unnamed] }
+      context:
+        en: "This is Kai's build of the shop. On the screen everything looks the same as before. Time to look at the DOM."
+        ru: "Это сборка Кая, страница магазина. На экране всё выглядит как раньше. Пора заглянуть в DOM."
+      prompt:
+        en: "Find the “Add to cart” control in the Sunny Tulips card. Before you answer, look at its tag and attributes."
+        ru: "Найди элемент «Add to cart» в карточке Sunny Tulips. Прежде чем ответить, посмотри на его тег и атрибуты."
+      target: "[data-testid='add-to-cart'][data-id='sunny-tulips']"
+      view: both
+      show: [attributes]
+      hints:
+        - en: "Click the control on the page, or open the Sunny Tulips card (`article`) in the Elements tree."
+          ru: "Нажми на элемент на странице или раскрой карточку Sunny Tulips (`article`) в дереве Elements."
+        - en: "It's the last element inside the Sunny Tulips card, right after the price."
+          ru: "Это последний элемент внутри карточки Sunny Tulips, сразу после цены."
+        - en: "Pick the element with `data-testid=\"add-to-cart\"` and `data-id=\"sunny-tulips\"`."
+          ru: "Выбери элемент с `data-testid=\"add-to-cart\"` и `data-id=\"sunny-tulips\"`."
+      praise:
+        en: "Found it — and you saw what the pixels hide: a `<div>` dressed up as a button."
+        ru: "Наш{ла|ёл} — и {увидела|увидел} то, что прячут пиксели: `<div>`, переодетый в кнопку."
+      explain:
+        en: "Kai's refactor turned the button into `<div class=\"btn small\">`. The class keeps the look and the test id is still there, so the screen is pixel-identical. But a `div` has no role: in the agent's snapshot it's a nameless `generic [cursor=pointer]: Add to cart`, keyboard users can't reach it with Tab, and `getByRole('button', { name: 'Add to cart' })` finds nothing. Tests, screen readers and agents all read the DOM, not the pixels."
+        ru: "Рефакторинг Кая превратил кнопку в `<div class=\"btn small\">`. Класс сохранил внешний вид, test id тоже на месте, поэтому на экране всё до пикселя как было. Но у `div` нет роли: в снимке агента это безымянный `generic [cursor=pointer]: Add to cart`, с клавиатуры до него не дойти клавишей Tab, а `getByRole('button', { name: 'Add to cart' })` ничего не находит. Тесты, скринридеры и агенты читают DOM, а не пиксели."
+
+    - id: c4-boss-t2
+      kind: inspect
+      keyPoint: kp-snapshot-gaps
+      app:
+        route: /cart
+        bugs: [a11y-add-to-cart-div, a11y-qty-unnamed]
+        state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] }
+      context:
+        en: "Now Kai's cart, the way Petal sees it through Playwright MCP: the accessibility snapshot. The cart has Rose Bouquet and Sunny Tulips."
+        ru: "Теперь корзина в сборке Кая — такая, какой её видит Petal через Playwright MCP: снимок доступности. В корзине Rose Bouquet и Sunny Tulips."
+      prompt:
+        en: "Our test needs one more Sunny Tulips. Find the button that increases its quantity — use the agent's snapshot."
+        ru: "Нашему тесту нужен ещё один Sunny Tulips. Найди кнопку, которая увеличивает его количество, — используй снимок агента."
+      target: "tr[data-id='sunny-tulips'] button[data-qty='1']"
+      view: aria
+      show: [role, name]
+      hints:
+        - en: "On the fixed build this button is called “Increase Sunny Tulips”. Look for it in the snapshot — what is there instead?"
+          ru: "В исправленной сборке эта кнопка называется «Increase Sunny Tulips». Поищи её в снимке — что там вместо неё?"
+        - en: "There are two `button \"+\"` lines. The snapshot is a tree: check which row each of them belongs to."
+          ru: "В снимке две строки `button \"+\"`. Снимок — это дерево: посмотри, к какой строке таблицы относится каждая."
+        - en: "Pick the `button \"+\"` inside the row that starts with “Sunny Tulips”."
+          ru: "Выбери `button \"+\"` внутри строки, которая начинается с «Sunny Tulips»."
+      praise:
+        en: "Right row, right button — you read the tree, not just the labels. Petal would have had to guess."
+        ru: "Нужная строка, нужная кнопка — ты {прочитала|прочитал} дерево, а не только надписи. Petal пришлось бы угадывать."
+      explain:
+        en: "In Kai's build the −/+ buttons lost their `aria-label`, so their names are just “−” and “+”, and the quantity field has no name at all. Both rows end with the same `button \"+\"` line: the agent can only tell them apart by position, and `getByRole('button', { name: '+' })` matches two buttons. A screen-reader user hears “plus, button” twice and can't tell which product it changes. The `[ref=…]` markers don't help either: they are short-lived handles for the agent's current session, not locators for a test."
+        ru: "В сборке Кая кнопки −/+ потеряли `aria-label`, поэтому их имена — просто «−» и «+», а у поля количества имени нет вообще. В обеих строках таблицы одинаковая строчка `button \"+\"`: агент может различить их только по положению, а `getByRole('button', { name: '+' })` находит две кнопки. Пользователь скринридера дважды слышит «плюс, кнопка» и не понимает, какой товар он меняет. Метки `[ref=…]` тоже не спасут: это временные ссылки для текущей сессии агента, а не локаторы для теста."
+
+    - id: c4-boss-t3
+      kind: review
+      keyPoint: kp-verify-locators
+      context:
+        en: "Here is Petal's draft of TC-480 — written from memory, before anyone opened Kai's build."
+        ru: "Вот черновик Petal для TC-480 — написанный по памяти, до того как кто-то открыл сборку Кая."
+      prompt:
+        en: "Check every locator against the real page you've just inspected. Flag each problem line and pick its type."
+        ru: "Сверь каждый локатор с реальной страницей, которую ты только что {изучила|изучил}. Отметь каждую проблемную строку и выбери тип проблемы."
+      testCase:
+        id: TC-480
+        title: Customer can add Sunny Tulips and change the quantity
+        preconditions: ["The cart is empty"]
+        steps:
+          - action: "Open the shop"
+          - action: "In the Sunny Tulips card, click the button \"Add to cart\""
+          - action: "Open the cart"
+          - action: "Change the quantity of Sunny Tulips"
+            data: "2"
+            expected: "The row subtotal is €48.00"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer can add tulips and change quantity', async ({ page }) => {
+          await page.goto('/shop');
+          await page.getByRole('button', { name: 'Add Sunny Tulips to cart' }).click();
+          await page.getByRole('link', { name: 'Cart' }).click();
+          await page.locator('#qty-sunny-tulips').fill('2');
+          await page.waitForTimeout(1000);
+          await expect(page.locator('tbody td:nth-child(4)')).toHaveText('€48.00');
+        });
+      issues:
+        - line: 5
+          type: hallucination
+          note:
+            en: "There is no button named “Add Sunny Tulips to cart”: on every card the button is just “Add to cart”. Petal made the name up. Use `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' })`."
+            ru: "Кнопки с именем «Add Sunny Tulips to cart» нет: в каждой карточке кнопка называется просто «Add to cart». Petal выдумал имя. Используй `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' })`."
+        - line: 7
+          type: hallucination
+          note:
+            en: "The quantity field has no id at all — `#qty-sunny-tulips` is invented. Its accessible name is “Quantity of Sunny Tulips”: `page.getByLabel('Quantity of Sunny Tulips')`."
+            ru: "У поля количества вообще нет id — `#qty-sunny-tulips` выдуман. Его доступное имя — «Quantity of Sunny Tulips»: `page.getByLabel('Quantity of Sunny Tulips')`."
+        - line: 8
+          type: hard-wait
+          note:
+            en: "A fixed 1-second pause: every run gets slower, and there is still no guarantee. `toHaveText` on the next line waits by itself."
+            ru: "Фиксированная пауза в 1 секунду: каждый прогон медленнее, а гарантии всё равно нет. `toHaveText` в следующей строке ждёт сам."
+        - line: 9
+          type: fragile-locator
+          note:
+            en: "`tbody td:nth-child(4)` depends on the column order: add or move a column, and it reads the wrong cell. Use `page.getByTestId('row-subtotal')`."
+            ru: "`tbody td:nth-child(4)` зависит от порядка колонок: стоит добавить или переставить колонку — и он прочитает не ту ячейку. Используй `page.getByTestId('row-subtotal')`."
+      types: [hallucination, fragile-locator, hard-wait, weak-assertion, wrong-data, missing-await, no-assertion]
+      hints:
+        - en: "For every locator ask: does an element with exactly this name or id exist on the page you inspected?"
+          ru: "Для каждого локатора спроси себя: есть ли на изученной странице элемент именно с таким именем или id?"
+        - en: "Four lines have problems: two locators are invented, one depends on the table layout, and one line just waits."
+          ru: "Проблемы в четырёх строках: два локатора выдуманы, один зависит от устройства таблицы, а одна строка просто ждёт."
+        - en: "Lines 5 and 7: an invented name and an invented id. Line 8: a fixed pause. Line 9: a column position."
+          ru: "Строки 5 и 7 — выдуманные имя и id. Строка 8 — фиксированная пауза. Строка 9 — позиция колонки."
+      praise:
+        en: "Four for four. Two of those lines looked perfectly reasonable — that's exactly why invented locators are dangerous, and why you check them against the page."
+        ru: "Четыре из четырёх. Две из этих строк выглядели вполне разумно — именно поэтому выдуманные локаторы опасны и именно поэтому ты сверяешь их со страницей."
+      explain:
+        en: "Petal never opened the page, so it filled the gaps with plausible guesses: a button name with the product in it (the cart uses that pattern, the shop doesn't) and an id nobody wrote. In a PR such lines read fine — only the real page shows they're wrong. A minute in DevTools or in the snapshot catches them before the first red run."
+        ru: "Petal не открывал страницу и заполнил пробелы правдоподобными догадками: имя кнопки с названием товара (в корзине так и сделано, а в магазине — нет) и id, которого никто не писал. В PR такие строки читаются гладко — что они неверны, покажет только реальная страница. Минута в DevTools или в снимке ловит их ещё до первого красного прогона."
+
+    - id: c4-boss-t4
+      kind: find-bug
+      keyPoint: kp-a11y-bug
+      app: { bugs: [a11y-add-to-cart-div, a11y-qty-unnamed] }
+      context:
+        en: "Petal's second version, after your review: test ids for everything. It's green on Kai's build — and that's the problem. This build has both of Kai's changes: the `<div>` “button” and the unnamed quantity controls."
+        ru: "Вторая версия Petal после твоего ревью: test id для всего. На сборке Кая она зелёная — и в этом проблема. В этой сборке обе правки Кая: «кнопка»-`<div>` и безымянные элементы количества."
+      prompt:
+        en: "Make the test catch both accessibility regressions: it must fail on Kai's build and pass once Kai fixes them. Each of the two changes alone should be enough to turn it red."
+        ru: "Сделай так, чтобы тест ловил обе регрессии доступности: он должен падать на сборке Кая и проходить, когда Кай их исправит. Каждой из двух правок по отдельности должно хватать, чтобы тест покраснел."
+      testCase:
+        id: TC-480
+        title: Customer can add Sunny Tulips and change the quantity
+        preconditions: ["The cart is empty"]
+        steps:
+          - action: "Open the shop"
+          - action: "In the Sunny Tulips card, click the button \"Add to cart\""
+          - action: "Open the cart"
+          - action: "Change the quantity of Sunny Tulips"
+            data: "2"
+            expected: "The row subtotal is €48.00"
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer can add tulips and change quantity', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+          const addButton = card.getByTestId('add-to-cart');
+          await expect(addButton).toBeVisible();
+          await addButton.click();
+          await page.getByRole('link', { name: 'Cart' }).click();
+          const quantity = page.getByTestId('qty-input');
+          await expect(quantity).toBeVisible();
+          await quantity.fill('2');
+          await expect(page.getByTestId('row-subtotal')).toHaveText('€48.00');
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('customer can add tulips and change quantity', async ({ page }) => {
+          await page.goto('/shop');
+          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+          const addButton = card.getByRole('button', { name: 'Add to cart' });
+          await expect(addButton).toBeVisible();
+          await addButton.click();
+          await page.getByRole('link', { name: 'Cart' }).click();
+          const quantity = page.getByLabel('Quantity of Sunny Tulips');
+          await expect(quantity).toBeVisible();
+          await quantity.fill('2');
+          await expect(page.getByTestId('row-subtotal')).toHaveText('€48.00');
+        });
+      checks:
+        expect: fail
+        static:
+          - noHardWait
+          - rule: notRegex
+            value: "getByTestId\\(['\"]add-to-cart['\"]\\)"
+            message:
+              en: "`getByTestId('add-to-cart')` finds the control whether it's a button or a `<div>`, so it can't catch the first regression. Find it by role and name."
+              ru: "`getByTestId('add-to-cart')` находит элемент, будь то кнопка или `<div>`, поэтому первую регрессию он не поймает. Найди его по роли и имени."
+          - rule: notRegex
+            value: "getByTestId\\(['\"]qty-input['\"]\\)"
+            message:
+              en: "`getByTestId('qty-input')` finds the field with or without a name, so it can't catch the second regression. Find it by its accessible name."
+              ru: "`getByTestId('qty-input')` находит поле и с именем, и без него, поэтому вторую регрессию он не поймает. Найди его по доступному имени."
+        also:
+          - app: {}
+            expect: pass
+      hints:
+        - en: "Run the starter: it's green on Kai's build. Which locators don't care whether a control is a real button with a name?"
+          ru: "Запусти исходный тест: на сборке Кая он зелёный. Каким локаторам всё равно, настоящая ли это кнопка с именем?"
+        - en: "Kai kept every test id, so lines 6 and 10 still find the controls. Find them the way a screen-reader user does: by role and accessible name."
+          ru: "Кай сохранил все test id, поэтому строки 6 и 10 по-прежнему находят элементы. Найди их так, как это делает пользователь скринридера: по роли и доступному имени."
+        - en: "Line 6 → `card.getByRole('button', { name: 'Add to cart' })`; line 10 → `page.getByLabel('Quantity of Sunny Tulips')`."
+          ru: "Строка 6 → `card.getByRole('button', { name: 'Add to cart' })`; строка 10 → `page.getByLabel('Quantity of Sunny Tulips')`."
+      praise:
+        en: "Red on each of Kai's regressions, green on the fix. Your functional test now guards accessibility too — at no extra cost."
+        ru: "Красный на каждой регрессии Кая, зелёный после исправления. Твой функциональный тест теперь заодно охраняет доступность — и это ничего не стоит."
+      explain:
+        en: "`data-testid` is great for things users never name, like the card and the subtotal. But it's blind to roles and names: Kai kept every test id, so the old test stayed green while the shop broke for keyboard and screen-reader users. Role + name locators find controls the way those users do. Now the test fails on each regression because the button or the field can't be found — a bug you can report as WCAG 4.1.2 “Name, Role, Value” — and passes once the `<button>` and the `aria-label`s are back."
+        ru: "`data-testid` отлично подходит для того, чему пользователь не даёт имени, — карточке, сумме строки. Но он слеп к ролям и именам: Кай сохранил все test id, поэтому старый тест оставался зелёным, хотя магазин сломался для тех, кто пользуется клавиатурой и скринридером. Локаторы по роли и имени находят элементы так же, как эти пользователи. Теперь тест падает на каждой регрессии, потому что кнопку или поле не удаётся найти, — такой баг можно завести со ссылкой на WCAG 4.1.2 «Name, Role, Value», — и проходит, когда `<button>` и `aria-label` вернутся."

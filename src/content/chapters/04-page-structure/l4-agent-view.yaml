@@ -1,0 +1,993 @@
+id: c4-l4
+chapter: c4
+title: { en: "DevTools and the agent's view", ru: "DevTools и взгляд агента" }
+goal:
+  en: "Inspect an element in DevTools, then find the same element in a Playwright MCP accessibility snapshot."
+  ru: "Исследовать элемент в DevTools, а затем найти тот же элемент в снимке доступности из Playwright MCP."
+minutes: 10
+keyPoints:
+  - id: kp-devtools-inspect
+    title: { en: "Right-click → Inspect; the Accessibility pane shows role and name", ru: "Правый клик → «Просмотреть код»; вкладка Accessibility показывает роль и имя" }
+  - id: kp-mcp-snapshot
+    title: { en: "Through Playwright MCP the agent gets a snapshot of roles, names and refs", ru: "Через Playwright MCP агент получает снимок из ролей, имён и ref" }
+  - id: kp-snapshot-gaps
+    title: { en: "Missing or unnamed in the snapshot → the agent guesses", ru: "Нет в снимке или нет имени → агент угадывает" }
+  - id: kp-verify-locators
+    title: { en: "Check the agent's locators against the real page", ru: "Сверяй локаторы агента с реальной страницей" }
+terms: [devtools, inspect, accessibility-snapshot, mcp, hallucination, locator, role, accessible-name]
+
+steps:
+  - type: story
+    lines:
+      - who: kai
+        text:
+          en: "I shipped the new quantity buttons in the cart this morning. Petal's tests for them are all red: “element not found”."
+          ru: "Утром я выкатил новые кнопки количества в корзине. Тесты Petal на них все красные: «element not found»."
+      - who: petal
+        text:
+          en: "Strange. I wrote `getByRole('button', { name: 'Increase quantity' })` — that's what these buttons are called in most shops. I didn't even need to open the page."
+          ru: "Странно. Я написал `getByRole('button', { name: 'Increase quantity' })` — так эти кнопки называются в большинстве магазинов. Мне даже не понадобилось открывать страницу."
+      - who: maya
+        text:
+          en: "Most shops aren't Bloomly. Today we look at the page twice: in DevTools, the way Kai sees it, and in the snapshot, the way Petal sees it. Then you'll know how to catch a guess."
+          ru: "Большинство магазинов — не Bloomly. Сегодня посмотрим на страницу дважды: в DevTools, как её видит Кай, и в снимке, как её видит Petal. Тогда ты сможешь ловить догадки."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед стартом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c4-l4-p1
+        kind: choice
+        keyPoint: kp-devtools-inspect
+        prompt:
+          en: "You want to know what Chrome thinks a button is: its role and its accessible name. Where do you look?"
+          ru: "Ты хочешь узнать, чем Chrome считает кнопку: её роль и доступное имя. Где это посмотреть?"
+        options:
+          - text: { en: "Right-click the button → Inspect → the Accessibility pane in DevTools", ru: "Правый клик по кнопке → «Просмотреть код» → вкладка Accessibility в DevTools" }
+            correct: true
+            why:
+              en: "Yes: Elements shows the element itself, and the Accessibility pane shows its computed role and name."
+              ru: "Да: Elements показывает сам элемент, а вкладка Accessibility — его вычисленные роль и имя."
+          - text: { en: "View page source", ru: "«Просмотр кода страницы» (View page source)" }
+            why:
+              en: "That's the HTML the server sent. In Bloomly's source `<main>` is empty — JavaScript builds the page later. And no computed names there."
+              ru: "Это HTML, который прислал сервер. В исходнике Bloomly `<main>` пустой — страницу потом строит JavaScript. И вычисленных имён там нет."
+          - text: { en: "The Network tab in DevTools", ru: "Вкладка Network в DevTools" }
+            why:
+              en: "Network shows requests and responses, not elements."
+              ru: "Network показывает запросы и ответы, а не элементы."
+          - text: { en: "Hover the button and read the tooltip", ru: "Навести курсор на кнопку и прочитать подсказку" }
+            why:
+              en: "Most buttons have no tooltip, and a tooltip never tells you the role."
+              ru: "У большинства кнопок подсказки нет, и роль она никогда не показывает."
+        hints:
+          - en: "You need the element itself — not the page's source and not its network traffic."
+            ru: "Нужен сам элемент — не исходник страницы и не её сетевой трафик."
+          - en: "One DevTools pane answers the question “what is this element for a screen reader?”"
+            ru: "Одна вкладка DevTools отвечает на вопрос «что это за элемент для скринридера?»"
+        explain:
+          en: "Inspect opens the live element in the Elements panel; its Accessibility pane shows the Name and Role the browser computed. That's exactly what `getByRole` works with."
+          ru: "«Просмотреть код» открывает живой элемент на панели Elements; её вкладка Accessibility показывает имя и роль, которые вычислил браузер. Ровно с ними работает `getByRole`."
+      - id: c4-l4-p2
+        kind: choice
+        keyPoint: kp-mcp-snapshot
+        prompt:
+          en: "The “Proceed to checkout” button is big, green and at the bottom of the cart. What does Petal learn about it from a Playwright MCP snapshot?"
+          ru: "Кнопка «Proceed to checkout» большая, зелёная и стоит внизу корзины. Что Petal узнает о ней из снимка Playwright MCP?"
+        options:
+          - text: { en: "Its role and name — `button \"Proceed to checkout\"` — plus a ref to click it with", ru: "Её роль и имя — `button \"Proceed to checkout\"` — плюс ref, чтобы по ней кликнуть" }
+            correct: true
+            why:
+              en: "Right: a snapshot line is a role, a name, states and a ref."
+              ru: "Верно: строка снимка — это роль, имя, состояния и ref."
+          - text: { en: "That it's green and at the bottom of the page", ru: "Что она зелёная и стоит внизу страницы" }
+            why:
+              en: "No colours and no layout in a snapshot — that's what screenshots have."
+              ru: "В снимке нет цветов и расположения — это есть на скриншотах."
+          - text: { en: "Its CSS class `btn`", ru: "Её CSS-класс `btn`" }
+            why:
+              en: "Classes are for styling. The snapshot drops them."
+              ru: "Классы нужны для стилей. Снимок их отбрасывает."
+          - text: { en: "Nothing — a snapshot contains only plain text", ru: "Ничего — в снимке только обычный текст" }
+            why:
+              en: "Buttons are there, with their role and name. That's the whole point of the snapshot."
+              ru: "Кнопки там есть — с ролью и именем. В этом весь смысл снимка."
+        hints:
+          - en: "The snapshot describes the page for a screen reader, not for the eyes."
+            ru: "Снимок описывает страницу для скринридера, а не для глаз."
+          - en: "Would a screen reader say “green”?"
+            ru: "Скажет ли скринридер «зелёная»?"
+        explain:
+          en: "Petal gets roles, names, states and refs. Everything visual — colour, size, position — stays on your screen only."
+          ru: "Petal получает роли, имена, состояния и ref. Всё визуальное — цвет, размер, положение — остаётся только на твоём экране."
+
+  - type: theory
+    keyPoint: kp-devtools-inspect
+    title: { en: "Inspect: look under the hood", ru: "«Просмотреть код»: заглянуть под капот" }
+    body:
+      - en: "Right-click any element → [[Inspect|inspect]]. [[DevTools|devtools]] opens on the **Elements** panel with that element selected in the live DOM. Shortcut: F12, or Cmd+Option+I on a Mac."
+        ru: "Правый клик по любому элементу → [[«Просмотреть код»|inspect]] (в английском Chrome — Inspect). Откроются [[DevTools|devtools]] на панели **Elements**, и этот элемент будет выделен в живом DOM. Горячие клавиши: F12 или Cmd+Option+I на Mac."
+      - en: "In the Elements side pane, next to **Styles**, open the **Accessibility** tab. Under *Computed Properties* it shows the element's **Name** and **Role** — the browser's own answer to “what is this?”. That's the [[role]] and the [[accessible name|accessible-name]] that `getByRole` uses."
+        ru: "В боковой панели Elements, рядом со **Styles**, открой вкладку **Accessibility**. В разделе *Computed Properties* видны **Name** и **Role** элемента — ответ самого браузера на вопрос «что это?». Это и есть [[роль|role]] и [[доступное имя|accessible-name]], с которыми работает `getByRole`."
+      - en: "You've probably opened DevTools before — for the Network tab, to attach a failed request to a bug report. Same tool, another tab: today it tells you what the element *is*, not just what it looks like."
+        ru: "Скорее всего, ты уже открывал{а|} DevTools — ради вкладки Network, чтобы приложить упавший запрос к баг-репорту. Тот же инструмент, другая вкладка: сегодня он говорит, чем элемент *является*, а не только как он выглядит."
+    mentor:
+      en: "Try it on our cart: the button shows a plain “+”. DevTools says role `button`, name “Increase Rose Bouquet”. Guess which of the two Playwright — and Petal — work with."
+      ru: "Попробуй на нашей корзине: на кнопке просто «+». DevTools говорит: роль `button`, имя «Increase Rose Bouquet». Угадай, с чем из этого работают Playwright и Petal."
+
+  - type: theory
+    keyPoint: kp-mcp-snapshot
+    title: { en: "The agent's eyes: the accessibility snapshot", ru: "Глаза агента: снимок доступности" }
+    body:
+      - en: "Petal doesn't look at the screen. Through [[Playwright MCP|mcp]] it gets an [[accessibility snapshot|accessibility-snapshot]] — the page as text. One line per element: a role, the name in quotes, states in brackets (`[level=1]`, `[checked]`, `[disabled]`). Indentation shows what's inside what."
+        ru: "Petal не смотрит на экран. Через [[Playwright MCP|mcp]] он получает [[снимок доступности|accessibility-snapshot]] — страницу в виде текста. Одна строка на элемент: роль, имя в кавычках, состояния в скобках (`[level=1]`, `[checked]`, `[disabled]`). Отступы показывают, что внутри чего."
+      - en: "`[ref=e14]` is Petal's handle for “this element in this snapshot”: while exploring it clicks `e14`. Refs aren't in the page's HTML, so they never go into a test. There Petal must turn the line into a [[locator]]: `getByRole('button', { name: 'Log in' })`."
+        ru: "`[ref=e14]` — это ярлык Petal для «вот этого элемента в этом снимке»: исследуя страницу, он кликает по `e14`. В HTML страницы никаких ref нет, поэтому в тест они не попадают. Там Petal должен превратить строку в [[локатор|locator]]: `getByRole('button', { name: 'Log in' })`."
+      - en: "No colours, no sizes, no layout, no CSS classes. Think of guiding a colleague over the phone: “click the button called Log in”. They can't see your screen — only what you name."
+        ru: "Ни цветов, ни размеров, ни расположения, ни CSS-классов. Представь, что ведёшь коллегу по телефону: «нажми кнопку Log in». Твоего экрана он не видит — только то, что ты называешь."
+    code: |
+      - heading "Log in" [level=1] [ref=e9]
+      - paragraph [ref=e10]: Welcome back! Use your Bloomly account.
+      - text: Email
+      - textbox "Email" [ref=e11]:
+        - /placeholder: you@example.com
+      - text: Password
+      - textbox "Password" [ref=e12]:
+        - /placeholder: Your password
+      - checkbox "Remember me" [ref=e13]
+      - text: Remember me
+      - button "Log in" [ref=e14]
+    mentor:
+      en: "Setting it up in Claude Code is one line: `claude mcp add playwright npx @playwright/mcp@latest`. The Playwright CLI (`playwright-cli snapshot`) saves the same kind of snapshot to a `.yml` file and costs fewer tokens."
+      ru: "В Claude Code это настраивается одной строкой: `claude mcp add playwright npx @playwright/mcp@latest`. Playwright CLI (`playwright-cli snapshot`) сохраняет такой же снимок в `.yml`-файл и тратит меньше токенов."
+
+  - type: inspect
+    keyPoint: kp-mcp-snapshot
+    title: { en: "Live: the cart through Petal's eyes", ru: "Вживую: корзина глазами Petal" }
+    intro:
+      en: "This is Bloomly's cart as Petal gets it. Click any line of the snapshot or any element on the page: it lights up on both sides, and the panel shows its role, accessible name, where the name comes from and the locator Playwright would suggest. Try the “+” and “−” buttons, both “Remove” buttons and the total."
+      ru: "Это корзина Bloomly такой, какой её получает Petal. Нажми на любую строку снимка или на любой элемент страницы: он подсветится с обеих сторон, а панель покажет роль, доступное имя, откуда оно взялось, и локатор, который предложил бы Playwright. Попробуй кнопки «+» и «−», обе кнопки «Remove» и итог."
+    app:
+      route: /cart
+      state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 2 }] }
+    focus: "[aria-label='Increase Rose Bouquet']"
+    view: aria
+    mentor:
+      en: "On screen “+”, in the snapshot `button \"Increase Rose Bouquet\"` — that's the name a test needs. And look at the two `button \"Remove\"` lines: same name, two rows. Petal will need the row to tell them apart."
+      ru: "На экране «+», в снимке — `button \"Increase Rose Bouquet\"`: это имя и нужно тесту. И посмотри на две строки `button \"Remove\"`: одно имя, две строки таблицы. Чтобы их различить, Petal понадобится строка."
+
+  - type: theory
+    keyPoint: kp-snapshot-gaps
+    title: { en: "A gap in the snapshot = a guess", ru: "Дыра в снимке = догадка" }
+    body:
+      - en: "Petal can only use what's in the snapshot. If an element has no role — a `<div>` styled as a button — it shows up as `generic [cursor=pointer]: Add to cart`. Petal can still click it by its ref while exploring, but there is no role and no name to build a test locator from. If an element has no name, the line is just `spinbutton`, or `button \"+\"` with nothing more."
+        ru: "Petal может пользоваться только тем, что есть в снимке. Если у элемента нет роли — например, `<div>`, оформленный как кнопка, — он виден как `generic [cursor=pointer]: Add to cart`. Исследуя страницу, Petal всё равно может кликнуть по нему через ref, но роли и имени, из которых строится локатор для теста, нет. Если нет имени, строка — просто `spinbutton` или `button \"+\"` и всё."
+      - en: "The agent rarely says “I don't know”. It fills the gap with a guess: a CSS class it imagines (`.add-to-cart-btn`) or a name it saw on other sites (`getByRole('button', { name: 'Increase quantity' })`, `getByLabel('Quantity')`). Confident and invented — a [[hallucination]]."
+        ru: "Агент редко говорит «не знаю». Он заполняет дыру догадкой: придумывает CSS-класс (`.add-to-cart-btn`) или берёт имя, которое видел на других сайтах (`getByRole('button', { name: 'Increase quantity' })`, `getByLabel('Quantity')`). Уверенно и выдуманно — это [[галлюцинация|hallucination]]."
+      - en: "It's like a test case step “click the icon on the right”: a new colleague will click *something*. And a missing name is a real accessibility bug (lesson 3) — report it, don't hide it inside the test."
+        ru: "Это как шаг тест-кейса «нажми на иконку справа»: новый коллега на *что-нибудь* нажмёт. А отсутствие имени — настоящий баг доступности (урок 3): о нём сообщают, а не прячут его в тесте."
+    code: |
+      - article [ref=e22]:
+        - img "Bouquet of pink roses" [ref=e23]
+        - heading "Rose Bouquet" [level=2] [ref=e24]
+        - paragraph [ref=e25]: €35.00
+        - generic [ref=e26] [cursor=pointer]: Add to cart
+
+      - cell "−+" [ref=e23]:
+        - button "−" [disabled] [ref=e24]
+        - spinbutton [ref=e25]: "1"
+        - button "+" [ref=e26]
+    mentor:
+      en: "Two builds with accessibility bugs: “Add to cart” became a `<div>` (no button role), and the quantity controls lost their labels. When you see gaps like these, expect invented [[locators|locator]] in Petal's next test."
+      ru: "Две сборки с багами доступности: «Add to cart» стал `<div>` (роли button нет), а у кнопок количества пропали метки. Видишь такие дыры — жди выдуманных [[локаторов|locator]] в следующем тесте Petal."
+
+  - type: theory
+    keyPoint: kp-verify-locators
+    title: { en: "Trust, but inspect", ru: "Доверяй, но проверяй в DevTools" }
+    body:
+      - en: "Petal says “I checked the page ✅”. You don't close a bug because a developer wrote “fixed” — you retest it. Same here: before you trust a [[locator]], [[inspect]] the element it should point to."
+        ru: "Petal говорит: «Я проверил страницу ✅». Ты же не закрываешь баг, потому что разработчик написал «fixed», — ты его перепроверяешь. Здесь так же: прежде чем доверять [[локатору|locator]], [[проинспектируй|inspect]] элемент, на который он должен указывать."
+      - en: "Three questions per locator. **Role:** is it really a button, or a link that only looks like one? **Name:** the exact words from DevTools or the snapshot — not a synonym? **One match:** or is it on every row, like “Remove”?"
+        ru: "Три вопроса к каждому локатору. **Роль:** это правда кнопка или ссылка, которая только выглядит как кнопка? **Имя:** точные слова из DevTools или снимка, а не синоним? **Одно совпадение:** или такой элемент есть в каждой строке, как «Remove»?"
+      - en: "Helpers: “Pick locator” in the Playwright extension for VS Code (and in `npx playwright codegen`) shows the locator Playwright itself would use. And if a locator finds nothing, suspect the name first — not a slow page."
+        ru: "Помощники: «Pick locator» в расширении Playwright для VS Code (и в `npx playwright codegen`) показывает локатор, который выбрал бы сам Playwright. А если локатор ничего не находит, сначала подозревай имя — а не медленную страницу."
+    code: |
+      // Petal: "Verified ✅"
+      page.getByRole('button', { name: 'Continue shopping' }); // role? it's a link
+      page.getByRole('button', { name: 'Increase quantity' }); // name? no such button
+      page.getByRole('button', { name: 'Remove' });            // one match? one per row
+    mentor:
+      en: "Keep DevTools open next to the pull request. Ten seconds per locator is cheaper than a red nightly run."
+      ru: "Держи DevTools открытыми рядом с пулл-реквестом. Десять секунд на локатор — дешевле, чем красный ночной прогон."
+
+  - type: task
+    task:
+      id: c4-l4-t1
+      kind: inspect
+      keyPoint: kp-devtools-inspect
+      app: { route: / }
+      prompt:
+        en: "On screen the logo reads “✿ Bloomly”. In Petal's snapshot it's `link \"Bloomly home\"`. Inspect the logo and select the element that carries this name."
+        ru: "На экране логотип выглядит как «✿ Bloomly». В снимке Petal это `link \"Bloomly home\"`. Проинспектируй логотип и выбери элемент, у которого это имя."
+      target: "[aria-label='Bloomly home']"
+      view: dom
+      show: [attributes, role, name]
+      hints:
+        - en: "Click the logo on the page, then look at what is selected in the Elements tree."
+          ru: "Нажми на логотип на странице и посмотри, что выделилось в дереве Elements."
+        - en: "The ✿ is a separate `<span>` inside the link. The name belongs to the element around it."
+          ru: "✿ — отдельный `<span>` внутри ссылки. Имя принадлежит элементу вокруг него."
+        - en: "Select the `<a>` with `aria-label=\"Bloomly home\"` — click the word “Bloomly” or the `<a>` row in the tree."
+          ru: "Выбери `<a>` с `aria-label=\"Bloomly home\"` — нажми на слово «Bloomly» или на строку `<a>` в дереве."
+      praise:
+        en: "You went from the picture on screen to the element that matters — exactly what Inspect is for."
+        ru: "Ты переш{ла|ёл} от картинки на экране к элементу, который действительно важен, — ровно для этого и нужен «Просмотреть код»."
+      explain:
+        en: "The link's name comes from its `aria-label`, not from the visible text. Inspecting shows both: what users see and what the browser — and Petal — calls it. The ✿ `<span>` has `aria-hidden=\"true\"`, so it isn't in the snapshot at all."
+        ru: "Имя ссылки берётся из `aria-label`, а не из видимого текста. Инспектор показывает и то и другое: что видит пользователь и как это называет браузер — и Petal. У `<span>` с ✿ стоит `aria-hidden=\"true\"`, поэтому в снимке его нет вовсе."
+
+  - type: task
+    task:
+      id: c4-l4-t2
+      kind: choice
+      keyPoint: kp-mcp-snapshot
+      context:
+        en: "TC-460: the promo code BLOOM10 gives 10% off. Petal got this part of the /cart snapshot:"
+        ru: "TC-460: промокод BLOOM10 даёт скидку 10%. Petal получил вот эту часть снимка /cart:"
+      prompt:
+        en: "Which line should Petal write to type the code?"
+        ru: "Какую строку Petal должен написать, чтобы ввести код?"
+      code: |
+        - text: Promo code
+        - textbox "Promo code" [ref=e40]:
+          - /placeholder: e.g. BLOOM10
+        - button "Apply" [ref=e41]
+        - status [ref=e42]
+      optionsCode: true
+      options:
+        - text: "await page.getByRole('textbox', { name: 'Promo code' }).fill('BLOOM10');"
+          correct: true
+          why:
+            en: "Role and name straight from the line `textbox \"Promo code\"`. One element, unambiguous."
+            ru: "Роль и имя прямо из строки `textbox \"Promo code\"`. Один элемент, без двусмысленности."
+        - text: "await page.getByRole('textbox', { name: 'e.g. BLOOM10' }).fill('BLOOM10');"
+          why:
+            en: "`/placeholder:` is an extra detail under the line, not the name. The name is in the quotes: “Promo code”. Nothing matches “e.g. BLOOM10”."
+            ru: "`/placeholder:` — дополнительная деталь под строкой, а не имя. Имя — в кавычках: «Promo code». С «e.g. BLOOM10» ничего не совпадёт."
+        - text: "await page.locator('[ref=e40]').fill('BLOOM10');"
+          why:
+            en: "`e40` is Petal's label inside this snapshot. The page's HTML has no `ref` attribute, so a test finds nothing."
+            ru: "`e40` — ярлык Petal внутри этого снимка. В HTML страницы атрибута `ref` нет, тест ничего не найдёт."
+        - text: "await page.getByPlaceholder('Promo code').fill('BLOOM10');"
+          why:
+            en: "The placeholder is “e.g. BLOOM10”. “Promo code” is the label — the `text:` line above the field. This finds nothing."
+            ru: "Плейсхолдер — «e.g. BLOOM10». «Promo code» — это метка, строка `text:` над полем. Локатор ничего не найдёт."
+      hints:
+        - en: "A snapshot line reads: role, then the name in quotes. Lines under it only add details."
+          ru: "Строка снимка читается так: роль, потом имя в кавычках. Строки под ней лишь добавляют детали."
+        - en: "Neither `/placeholder:` nor `text:` is the name of the textbox."
+          ru: "Ни `/placeholder:`, ни `text:` не являются именем поля."
+        - en: "Use the role `textbox` and the name from the quotes on the same line."
+          ru: "Возьми роль `textbox` и имя из кавычек в той же строке."
+      praise:
+        en: "You translated a snapshot line into a locator — the very step Petal does for every test."
+        ru: "Ты перев{ела|ёл} строку снимка в локатор — тот самый шаг, который Petal делает в каждом тесте."
+      explain:
+        en: "`textbox \"Promo code\"` gives you both halves of `getByRole`: the role and the accessible name. The `text: Promo code` line is the visible label the name comes from (so `getByLabel('Promo code')` works too), `/placeholder` is the grey hint inside the field, and the ref is Petal's handle. Only role and name go into the test."
+        ru: "`textbox \"Promo code\"` даёт обе половины `getByRole`: роль и доступное имя. Строка `text: Promo code` — видимая метка, из которой берётся имя (поэтому `getByLabel('Promo code')` тоже сработает), `/placeholder` — серая подсказка внутри поля, а ref — ярлык Petal. В тест попадают только роль и имя."
+
+  - type: task
+    task:
+      id: c4-l4-t3
+      kind: predict
+      keyPoint: kp-snapshot-gaps
+      app:
+        bugs: [a11y-qty-unnamed]
+        state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] }
+      context:
+        en: |
+          Kai's newest build lost the `aria-label`s on the quantity controls. Petal: “I used a fresh snapshot this time! `button "+"` is right there.” The snapshot (shortened):
+          ```
+          - row "Rose Bouquet €35.00 −+ €35.00 Remove" [ref=e20]:
+            - cell "−+" [ref=e23]:
+              - button "−" [disabled] [ref=e24]
+              - spinbutton [ref=e25]: "1"
+              - button "+" [ref=e26]
+          - row "Sunny Tulips €24.00 −+ €24.00 Remove" [ref=e30]:
+            - cell "−+" [ref=e33]:
+              - button "−" [disabled] [ref=e34]
+              - spinbutton [ref=e35]: "1"
+              - button "+" [ref=e36]
+          ```
+        ru: |
+          В новой сборке Кая у кнопок количества пропали `aria-label`. Petal: «В этот раз я взял свежий снимок! `button "+"` прямо там». Снимок (сокращённо):
+          ```
+          - row "Rose Bouquet €35.00 −+ €35.00 Remove" [ref=e20]:
+            - cell "−+" [ref=e23]:
+              - button "−" [disabled] [ref=e24]
+              - spinbutton [ref=e25]: "1"
+              - button "+" [ref=e26]
+          - row "Sunny Tulips €24.00 −+ €24.00 Remove" [ref=e30]:
+            - cell "−+" [ref=e33]:
+              - button "−" [disabled] [ref=e34]
+              - spinbutton [ref=e35]: "1"
+              - button "+" [ref=e36]
+          ```
+      prompt:
+        en: "Petal's test is below. Pass or fail?"
+        ru: "Ниже тест Petal. Пройдёт или упадёт?"
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('plus adds one more Rose Bouquet', async ({ page }) => {
+          await page.goto('/cart');
+          await page.getByRole('button', { name: '+' }).click();
+          await expect(page.getByTestId('row-subtotal').first()).toHaveText('€70.00');
+        });
+      outcome: fail
+      reasons:
+        - text:
+            en: "Fail: two buttons are named “+”, one per row. Without a real name, the locator can't say which one it means."
+            ru: "Упадёт: две кнопки называются «+», по одной в каждой строке. Без настоящего имени локатор не может сказать, какую из них он имеет в виду."
+          correct: true
+        - text:
+            en: "Pass: `button \"+\"` is right there in the snapshot."
+            ru: "Пройдёт: `button \"+\"` прямо есть в снимке."
+        - text:
+            en: "Fail: the “+” button is disabled."
+            ru: "Упадёт: кнопка «+» неактивна."
+      hints:
+        - en: "Count the `button \"+\"` lines in the snapshot."
+          ru: "Посчитай строки `button \"+\"` в снимке."
+        - en: "What does Playwright do when a locator for a click matches two elements?"
+          ru: "Что делает Playwright, если локатор для клика совпал с двумя элементами?"
+        - en: "Two matches → a strict mode violation → red."
+          ru: "Два совпадения → strict mode violation → красный."
+      praise:
+        en: "You counted the matches instead of trusting “it's in the snapshot”. That's the habit."
+        ru: "Ты посчитал{а|} совпадения, а не поверил{а|} фразе «оно есть в снимке». Это и есть нужная привычка."
+      explain:
+        en: "The snapshot didn't lie: there *are* two buttons called “+”. The gap is the missing name — with “Increase Rose Bouquet” each button would be unique. An unnamed element pushes the agent to a locator that matches several elements or none. And a screen reader user hears the same “+” twice — report it as an accessibility bug."
+        ru: "Снимок не соврал: кнопок с именем «+» действительно две. Дыра — в отсутствии имени: с «Increase Rose Bouquet» каждая кнопка была бы уникальной. Элемент без имени толкает агента к локатору, который находит несколько элементов или ни одного. А пользователь скринридера дважды слышит одинаковый «+» — это стоит завести как баг доступности."
+
+  - type: task
+    task:
+      id: c4-l4-t4
+      kind: review
+      keyPoint: kp-verify-locators
+      context:
+        en: |
+          Petal wrote this test from memory — it never opened /signup. You took the real snapshot of the form (shortened):
+          ```
+          - textbox "Full name" [ref=e10]
+          - textbox "Email" [ref=e11]
+          - textbox "Password" [ref=e12]
+          - combobox "Country" [ref=e13]
+          - group "Account type" [ref=e20]:
+            - radio "Personal" [checked] [ref=e21]
+            - radio "Business" [ref=e22]
+          - checkbox "Send me the Bloomly newsletter" [ref=e23]
+          - checkbox "I agree to the Terms of Service" [ref=e24]
+          - button "Create account" [ref=e25]
+          ```
+        ru: |
+          Petal написал этот тест по памяти — он ни разу не открывал /signup. Ты снял{а|} настоящий снимок формы (сокращённо):
+          ```
+          - textbox "Full name" [ref=e10]
+          - textbox "Email" [ref=e11]
+          - textbox "Password" [ref=e12]
+          - combobox "Country" [ref=e13]
+          - group "Account type" [ref=e20]:
+            - radio "Personal" [checked] [ref=e21]
+            - radio "Business" [ref=e22]
+          - checkbox "Send me the Bloomly newsletter" [ref=e23]
+          - checkbox "I agree to the Terms of Service" [ref=e24]
+          - button "Create account" [ref=e25]
+          ```
+      prompt:
+        en: "Check every locator against the snapshot. Flag the lines that point to something that doesn't exist."
+        ru: "Сверь каждый локатор со снимком. Отметь строки, которые указывают на то, чего нет."
+      testCase:
+        id: TC-461
+        title: Business customer can create an account
+        steps:
+          - { action: "Open /signup" }
+          - { action: "Fill in name, email, password and country", data: "Lena Novak / lena@bloomly.app / flowers2026 / Portugal" }
+          - { action: "Choose \"Business\" and accept the Terms of Service" }
+          - { action: "Click \"Create account\"", expected: "Heading \"Account created!\" is shown" }
+      code: |
+        import { test, expect } from '@playwright/test';
+
+        test('business customer can sign up', async ({ page }) => {
+          await page.goto('/signup');
+          await page.getByLabel('Full name').fill('Lena Novak');
+          await page.getByLabel('Email address').fill('lena@bloomly.app');
+          await page.getByLabel('Password').fill('flowers2026');
+          await page.getByLabel('Country').selectOption('Portugal');
+          await page.getByRole('radio', { name: 'Business' }).check();
+          await page.getByRole('checkbox', { name: 'I accept the terms' }).check();
+          await page.getByRole('button', { name: 'Sign up' }).click();
+          await expect(page.getByRole('heading', { name: 'Account created!' })).toBeVisible();
+        });
+      issues:
+        - line: 6
+          type: hallucination
+          note:
+            en: "The field is labelled “Email”, not “Email address”. `getByLabel` matches part of a label, but “Email address” isn't part of “Email” — nothing is found."
+            ru: "У поля метка «Email», а не «Email address». `getByLabel` находит и по части метки, но «Email address» — не часть «Email»: ничего не найдётся."
+        - line: 10
+          type: hallucination
+          note:
+            en: "The checkbox is “I agree to the Terms of Service”. “I accept the terms” is a common wording from other sites."
+            ru: "Чекбокс называется «I agree to the Terms of Service». «I accept the terms» — частая формулировка с других сайтов."
+        - line: 11
+          type: hallucination
+          note:
+            en: "The button is “Create account” — the test case even says so. “Sign up” is a guess."
+            ru: "Кнопка называется «Create account» — это написано даже в тест-кейсе. «Sign up» — догадка."
+      types: [hallucination, fragile-locator, wrong-data, wrong-assertion, no-assertion]
+      hints:
+        - en: "Take the locators one by one and look for the same role and name in the snapshot."
+          ru: "Бери локаторы по одному и ищи такую же роль и имя в снимке."
+        - en: "Three names don't appear in the snapshot at all. Lines 5, 7, 8 and 9 are fine."
+          ru: "Трёх имён в снимке нет совсем. Строки 5, 7, 8 и 9 в порядке."
+        - en: "Lines 6, 10 and 11."
+          ru: "Строки 6, 10 и 11."
+      praise:
+        en: "Three invented names caught — and you didn't flag the lines that only looked unfamiliar. Precise review."
+        ru: "Три выдуманных имени пойманы — и ты не отметил{а|} строки, которые только казались незнакомыми. Точное ревью."
+      explain:
+        en: "Each invented name is the most common wording on other signup forms — that's why it sounds right. The snapshot is the source of truth: if a role and name aren't there, the locator is a guess. Lines 5, 7–9 and 12 match the snapshot and the page, so they stay."
+        ru: "Каждое выдуманное имя — самая частая формулировка в других формах регистрации, поэтому оно звучит правильно. Источник истины — снимок: если такой роли и имени там нет, локатор — догадка. Строки 5, 7–9 и 12 совпадают со снимком и страницей, их оставляем."
+
+  - type: task
+    task:
+      id: c4-l4-t5
+      kind: agent
+      keyPoint: kp-mcp-snapshot
+      context:
+        en: "Back to Kai's quantity buttons. Petal is simulated, as everywhere in the trainer: a real agent's words differ from run to run — its habit of guessing names doesn't."
+        ru: "Возвращаемся к кнопкам количества, которые сделал Кай. Petal, как и везде в тренажёре, симулирован: настоящий агент отвечает каждый раз по-разному, а привычка угадывать имена у него та же."
+      prompt:
+        en: "Build a prompt from the blocks so that Petal's test for TC-462 uses real names. Then run what Petal writes."
+        ru: "Собери промпт из блоков так, чтобы тест Petal для TC-462 использовал настоящие имена. Потом запусти то, что напишет Petal."
+      app:
+        state: { cart: [{ id: rose-bouquet, qty: 1 }] }
+      testCase:
+        id: TC-462
+        title: "\"+\" increases the quantity in the cart"
+        preconditions: ["Cart has 1 Rose Bouquet"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Click \"+\" in the Rose Bouquet row", expected: "Quantity is 2; row subtotal is €70.00" }
+      blocks:
+        - { id: task, locked: true, text: "Write a Playwright test for TC-462: the \"+\" button increases the Rose Bouquet quantity. The cart is preset with 1 Rose Bouquet.", ru: "Напиши Playwright-тест для TC-462: кнопка «+» увеличивает количество Rose Bouquet. В корзине заранее лежит 1 Rose Bouquet." }
+        - { id: case, text: "Steps: open /cart, click \"+\" in the Rose Bouquet row. Expected: the quantity is 2 and the row subtotal is €70.00.", ru: "Шаги: открой /cart, нажми «+» в строке Rose Bouquet. Ожидаемый результат: количество 2, сумма по строке €70.00." }
+        - { id: snapshot, text: "Before you write any locator, open /cart with Playwright MCP and take a snapshot. Use roles and names exactly as they appear there — don't guess.", ru: "Прежде чем писать локаторы, открой /cart через Playwright MCP и сними снимок. Используй роли и имена ровно так, как они там записаны, — не угадывай." }
+        - { id: speed, text: "You know how carts work — no need to open the page, just be quick.", ru: "Ты знаешь, как устроены корзины, — страницу открывать не нужно, просто сделай быстро." }
+      responses:
+        - when: [case, snapshot]
+          unless: [speed]
+          best: true
+          message:
+            en: "I opened /cart through Playwright MCP. The snapshot has `button \"Increase Rose Bouquet\" [ref=e26]` — on screen it's just “+”. I used that name, and `spinbutton \"Quantity of Rose Bouquet\"` for the check. Ran it: green ✅"
+            ru: "Я открыл /cart через Playwright MCP. В снимке есть `button \"Increase Rose Bouquet\" [ref=e26]` — на экране это просто «+». Я взял это имя, а для проверки — `spinbutton \"Quantity of Rose Bouquet\"`. Запустил: зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('plus increases the Rose Bouquet quantity', async ({ page }) => {
+              await page.goto('/cart');
+              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+              await expect(page.getByRole('spinbutton', { name: 'Quantity of Rose Bouquet' })).toHaveValue('2');
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+            });
+        - when: [case]
+          message:
+            en: "Done quickly, without opening the page: most carts call this button “Increase quantity”. Ran it: red ❌ — the element wasn't found. Maybe the page loads slowly? I could add a wait."
+            ru: "Сделал быстро, не открывая страницу: в большинстве корзин эта кнопка называется «Increase quantity». Запустил: красный ❌ — элемент не найден. Может, страница медленно грузится? Могу добавить ожидание."
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('plus increases the quantity', async ({ page }) => {
+              await page.goto('/cart');
+              await page.getByRole('button', { name: 'Increase quantity' }).click();
+              await expect(page.getByRole('spinbutton', { name: 'Quantity' })).toHaveValue('2');
+              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
+            });
+        - when: [snapshot]
+          unless: [speed]
+          message:
+            en: "I took a snapshot of /cart and clicked `button \"Increase Rose Bouquet\"`. I wasn't sure what to check, so the test just clicks. Green ✅"
+            ru: "Я снял снимок /cart и нажал `button \"Increase Rose Bouquet\"`. Не был уверен, что проверять, поэтому тест просто кликает. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('plus button works', async ({ page }) => {
+              await page.goto('/cart');
+              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
+            });
+        - when: []
+          message:
+            en: "I wasn't sure what to test, so I checked that the cart page opens. Green ✅"
+            ru: "Я не понял, что именно проверять, поэтому проверил, что открывается корзина. Зелёный ✅"
+          code: |
+            import { test, expect } from '@playwright/test';
+
+            test('cart page opens', async ({ page }) => {
+              await page.goto('/cart');
+              await expect(page.getByRole('heading', { name: 'Your cart' })).toBeVisible();
+            });
+      missing:
+        snapshot:
+          en: "Without the snapshot instruction Petal took the name from memory — “Increase quantity” — and the test can't find the button. Note its next idea: “add a wait”. The page isn't slow; the name is invented."
+          ru: "Без указания про снимок Petal взял имя из памяти — «Increase quantity», — и тест не находит кнопку. Обрати внимание на следующую идею Petal: «добавить ожидание». Страница не медленная — имя выдумано."
+        case:
+          en: "Without the steps and the expected result Petal had nothing to check: the test clicks and stops, or only opens the cart."
+          ru: "Без шагов и ожидаемого результата Petal нечего было проверять: тест кликает и останавливается или только открывает корзину."
+      checks:
+        expect: pass
+        static: [hasAssertion, noHardWait, noFragile]
+      hints:
+        - en: "Petal needs two things from you: what to check, and where to get the names."
+          ru: "От тебя Petal нужно две вещи: что проверять и откуда брать имена."
+        - en: "“Be quick, don't open the page” is exactly how the story's red tests were born."
+          ru: "«Быстро, не открывая страницу» — именно так появились красные тесты из истории."
+        - en: "Take the steps block and the snapshot block. Leave out “be quick”."
+          ru: "Возьми блок с шагами и блок про снимок. «Сделай быстро» не бери."
+      praise:
+        en: "You sent Petal to the live page instead of its memory — and got real names on the first try."
+        ru: "Ты отправил{а|} Petal на живую страницу, а не в его память, — и получил{а|} настоящие имена с первой попытки."
+      explain:
+        en: "An agent with a browser can look — but it doesn't always do it unless you ask. “Take a snapshot and use the names exactly” turns a guess into a fact from the page. The test case still matters: the snapshot gives names, only TC-462 gives the expected result."
+        ru: "Агент с браузером может посмотреть на страницу — но не всегда делает это без просьбы. «Сними снимок и используй имена точно» превращает догадку в факт со страницы. Тест-кейс по-прежнему важен: снимок даёт имена, а ожидаемый результат даёт только TC-462."
+
+  - type: task
+    task:
+      id: c4-l4-t6
+      kind: fix
+      keyPoint: kp-verify-locators
+      app:
+        state: { user: anna@bloomly.app }
+      context:
+        en: |
+          TC-463: on /orders, the “Delivered” filter shows Anna's 3 delivered orders. Petal's test fails: the status filter is never found. The real snapshot of /orders:
+          ```
+          - heading "My orders" [level=1] [ref=e9]
+          - text: Status
+          - combobox "Status" [ref=e10]:
+            - option "All" [selected] [ref=e11]
+            - option "Processing" [ref=e12]
+            - option "Shipped" [ref=e13]
+            - option "Delivered" [ref=e14]
+            - option "Cancelled" [ref=e15]
+          - text: Search orders
+          - searchbox "Search orders" [ref=e16]:
+            - /placeholder: Order number or product
+          ```
+        ru: |
+          TC-463: на /orders фильтр «Delivered» показывает 3 доставленных заказа Anna. Тест Petal падает: фильтр статуса не находится. Настоящий снимок /orders:
+          ```
+          - heading "My orders" [level=1] [ref=e9]
+          - text: Status
+          - combobox "Status" [ref=e10]:
+            - option "All" [selected] [ref=e11]
+            - option "Processing" [ref=e12]
+            - option "Shipped" [ref=e13]
+            - option "Delivered" [ref=e14]
+            - option "Cancelled" [ref=e15]
+          - text: Search orders
+          - searchbox "Search orders" [ref=e16]:
+            - /placeholder: Order number or product
+          ```
+      prompt:
+        en: "Fix the one locator Petal guessed, using the snapshot. Then run the test."
+        ru: "Исправь единственный локатор, который Petal угадал, — по снимку. Потом запусти тест."
+      starter: |
+        import { test, expect } from '@playwright/test';
+
+        test('Delivered filter shows delivered orders only', async ({ page }) => {
+          await page.goto('/orders');
+          await page.getByRole('combobox', { name: 'Filter by status' }).selectOption('Delivered');
+          await expect(page.getByTestId('orders-summary')).toHaveText('Showing 3 of 6 orders');
+        });
+      solution: |
+        import { test, expect } from '@playwright/test';
+
+        test('Delivered filter shows delivered orders only', async ({ page }) => {
+          await page.goto('/orders');
+          await page.getByRole('combobox', { name: 'Status' }).selectOption('Delivered');
+          await expect(page.getByTestId('orders-summary')).toHaveText('Showing 3 of 6 orders');
+        });
+      checks:
+        expect: pass
+        static:
+          - hasAssertion
+          - noHardWait
+          - rule: notRegex
+            value: "Filter by status"
+            message:
+              en: "There is no element named “Filter by status” — take the name from the snapshot."
+              ru: "Элемента с именем «Filter by status» нет — возьми имя из снимка."
+      hints:
+        - en: "Find the `combobox` line in the snapshot. What's in the quotes?"
+          ru: "Найди в снимке строку `combobox`. Что стоит в кавычках?"
+        - en: "Keep the role, change only the name."
+          ru: "Роль оставь, поменяй только имя."
+        - en: "`page.getByRole('combobox', { name: 'Status' })`"
+          ru: "Вот так: `page.getByRole('combobox', { name: 'Status' })`"
+      praise:
+        en: "One word changed, and the test now points at the real filter. That's a fix based on evidence, not on a hunch."
+        ru: "Одно слово — и тест указывает на настоящий фильтр. Это исправление на основе фактов, а не догадки."
+      explain:
+        en: "The role was right; the name was a description of what the control *does* (“Filter by status”) instead of what it's *called* (“Status”, from its `<label>`). Snapshot or DevTools tell you the name in seconds — adding a wait would never have helped."
+        ru: "Роль была верной, а имя описывало, что элемент *делает* («Filter by status»), а не как он *называется* («Status», из его `<label>`). Снимок или DevTools подскажут имя за секунды — а ожидание здесь не помогло бы никогда."
+
+  - type: mistakes
+    keyPoint: kp-snapshot-gaps
+    title: { en: "Typical mistakes with the agent's view", ru: "Типичные ошибки со взглядом агента" }
+    items:
+      - wrong: "await page.getByRole('button', { name: 'Increase quantity' }).click();"
+        right: "await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();"
+        why:
+          en: "The name was guessed from other shops. Take names from the snapshot or DevTools, not from memory."
+          ru: "Имя угадано по другим магазинам. Бери имена из снимка или DevTools, а не из памяти."
+      - wrong: "await page.locator('[ref=e41]').click();"
+        right: "await page.getByRole('button', { name: 'Apply' }).click();"
+        why:
+          en: "A ref lives only inside one snapshot. Turn the snapshot line into role + name."
+          ru: "Ref живёт только внутри одного снимка. Превращай строку снимка в роль + имя."
+      - wrong: "// getByLabel('Search') fails → switch to getByPlaceholder('Search flowers'). Green ✅"
+        right: "// getByLabel('Search') fails → inspect: the <label> is gone → report an accessibility bug"
+        why:
+          en: "A gap in the snapshot is often a real bug. Don't let the agent work around it and hide it."
+          ru: "Дыра в снимке — часто настоящий баг. Не давай агенту обойти его и спрятать."
+      - wrong: "// Petal: \"Verified ✅\" → approve"
+        right: "// Inspect each locator: role, exact name, exactly one match"
+        why:
+          en: "“Verified” is a claim, not evidence. Ten seconds in DevTools is evidence."
+          ru: "«Проверено» — это заявление, а не доказательство. Десять секунд в DevTools — доказательство."
+
+  - type: explain
+    keyPoint: kp-mcp-snapshot
+    prompt:
+      en: "In your own words: how does Petal “see” Bloomly, and what happens when an element has no name in that view?"
+      ru: "Своими словами: как Petal «видит» Bloomly и что происходит, если у элемента в этом представлении нет имени?"
+    model:
+      en: "Through Playwright MCP Petal gets an accessibility snapshot: a text tree of roles, names, states and refs — no colours, no layout. It writes locators from those roles and names. If an element has no role or no name, the snapshot has a gap, and Petal fills it with a guess from other sites — a locator that finds nothing or the wrong element. So I inspect the element in DevTools: role, exact name, one match. And if the name is really missing, I report an accessibility bug instead of letting the test work around it."
+      ru: "Через Playwright MCP Petal получает снимок доступности — текстовое дерево из ролей, имён, состояний и ref, без цветов и вёрстки. Локаторы он пишет по этим ролям и именам. Если у элемента нет роли или имени, в снимке дыра, и Petal заполняет её догадкой с других сайтов — локатором, который ничего не находит или находит не то. Поэтому я проверяю элемент в DevTools: роль, точное имя, одно совпадение. А если имени действительно нет, я завожу баг доступности, а не даю тесту его обойти."
+
+  - type: phrases
+    items:
+      - context: prompt
+        en: "Before writing locators, open /cart with Playwright MCP and take a snapshot. Use roles and names exactly as they appear there — don't guess."
+        ru: "Прежде чем писать локаторы, открой /cart через Playwright MCP и сними снимок. Используй роли и имена ровно так, как они там записаны, — не угадывай."
+        note:
+          en: "Add this line to any prompt that touches a page the agent hasn't seen yet."
+          ru: "Добавляй эту строку в любой промпт о странице, которую агент ещё не видел."
+      - context: code-review
+        en: "Line 6: there's no button named “Increase quantity”. I inspected it — the accessible name is “Increase Rose Bouquet”."
+        ru: "Строка 6: кнопки с именем «Increase quantity» нет. Я проверил{а|} в DevTools — доступное имя «Increase Rose Bouquet»."
+      - context: code-review
+        en: "This locator matches two elements — there's a “Remove” button in every row. Please filter by the row first."
+        ru: "Этот локатор находит два элемента — кнопка «Remove» есть в каждой строке. Пожалуйста, сначала отфильтруй по строке."
+      - context: bug-report
+        en: "Accessibility: the search field on /shop has no label. Its accessible name comes only from the placeholder, and getByLabel('Search') finds nothing."
+        ru: "Доступность: у поля поиска на /shop нет метки. Доступное имя берётся только из плейсхолдера, и getByLabel('Search') ничего не находит."
+      - context: chat
+        en: "Kai, quick one: in the latest build “Add to cart” is a div, so it has no button role. Was that intended?"
+        ru: "Кай, быстрый вопрос: в последней сборке «Add to cart» — это div, поэтому у него нет роли button. Так и задумано?"
+      - context: standup
+        en: "Yesterday I checked Petal's locators in DevTools — three names were invented. Today I'm reviewing the fixes."
+        ru: "Вчера я сверил{а|} локаторы Petal в DevTools — три имени были выдуманы. Сегодня проверяю исправления."
+
+checkPool:
+  - id: c4-l4-k1
+    kind: choice
+    keyPoint: kp-devtools-inspect
+    placement: true
+    prompt:
+      en: "You right-click the “−” button in the cart and choose Inspect. The Elements panel shows the tag below. What does the Accessibility pane show?"
+      ru: "Ты нажимаешь правой кнопкой на «−» в корзине и выбираешь «Просмотреть код». Панель Elements показывает тег ниже. Что покажет вкладка Accessibility?"
+    code: |
+      <button type="button" data-qty="-1" data-idx="0" aria-label="Decrease Rose Bouquet" disabled>−</button>
+    options:
+      - text: { en: "Role: button · Name: “Decrease Rose Bouquet”", ru: "Роль: button · имя: «Decrease Rose Bouquet»" }
+        correct: true
+        why:
+          en: "A `<button>` has the button role, and `aria-label` gives the name — it wins over the “−” inside."
+          ru: "У `<button>` роль button, а имя даёт `aria-label` — он важнее, чем «−» внутри."
+      - text: { en: "Role: button · Name: “−”", ru: "Роль: button · имя: «−»" }
+        why:
+          en: "“−” is the visible text, but `aria-label` replaces it as the name."
+          ru: "«−» — видимый текст, но имя заменяет `aria-label`."
+      - text: { en: "Role: link · Name: “Decrease Rose Bouquet”", ru: "Роль: link · имя: «Decrease Rose Bouquet»" }
+        why:
+          en: "The tag is `<button>`, so the role is button. Links are `<a href>`."
+          ru: "Тег — `<button>`, значит, роль button. Ссылки — это `<a href>`."
+      - text: { en: "No name — the button is disabled", ru: "Имени нет — кнопка неактивна" }
+        why:
+          en: "Disabled elements keep their name; the snapshot just adds `[disabled]`."
+          ru: "У неактивных элементов имя сохраняется; снимок просто добавляет `[disabled]`."
+    hints:
+      - en: "The tag gives the role; look for the attribute that gives the name."
+        ru: "Тег даёт роль; найди атрибут, который даёт имя."
+      - en: "`aria-label` beats the text inside."
+        ru: "`aria-label` важнее текста внутри."
+    explain:
+      en: "Role from the tag, name from `aria-label`. That's what Playwright's `getByRole` and Petal's snapshot both use: `button \"Decrease Rose Bouquet\" [disabled]`."
+      ru: "Роль — из тега, имя — из `aria-label`. Ровно это используют и `getByRole` в Playwright, и снимок Petal: `button \"Decrease Rose Bouquet\" [disabled]`."
+
+  - id: c4-l4-k2
+    kind: inspect
+    keyPoint: kp-devtools-inspect
+    app:
+      route: /cart
+      state: { cart: [{ id: rose-bouquet, qty: 1 }] }
+    prompt:
+      en: "The last column of the cart table has no visible header, yet Petal's snapshot lists `columnheader \"Actions\"`. Find where “Actions” lives: select it in the Elements tree or on the page."
+      ru: "У последней колонки таблицы корзины нет видимого заголовка, но в снимке Petal есть `columnheader \"Actions\"`. Найди, где живёт «Actions»: выбери его в дереве Elements или на странице."
+    target: "thead th:last-child, .sr-only"
+    view: dom
+    show: [attributes]
+    hints:
+      - en: "Column headers live in `<thead>`, inside `<table>`."
+        ru: "Заголовки колонок живут в `<thead>`, внутри `<table>`."
+      - en: "Open the last `<th>`: something is inside it that you can't see on screen."
+        ru: "Раскрой последний `<th>`: внутри есть что-то, чего не видно на экране."
+      - en: "Select `<span class=\"sr-only\">Actions</span>` (or its `<th>`)."
+        ru: "Выбери `<span class=\"sr-only\">Actions</span>` (или его `<th>`)."
+    explain:
+      en: "The header holds `<span class=\"sr-only\">Actions</span>`: text hidden from the eyes with CSS but kept for screen readers. You can't see it; DevTools and the snapshot can. So when the agent “knows” a name you don't see — inspect before you call it a hallucination."
+      ru: "В заголовке лежит `<span class=\"sr-only\">Actions</span>` — текст, спрятанный от глаз с помощью CSS, но оставленный для скринридеров. Ты его не видишь, а DevTools и снимок — видят. Поэтому, если агент «знает» имя, которого ты не видишь, — проверь в DevTools, прежде чем называть это галлюцинацией."
+
+  - id: c4-l4-k3
+    kind: predict
+    keyPoint: kp-mcp-snapshot
+    context:
+      en: "Petal explored /cart through Playwright MCP, saw the line `- heading \"Your cart\" [level=1] [ref=e9]` and pasted the ref straight into the test."
+      ru: "Petal исследовал /cart через Playwright MCP, увидел строку `- heading \"Your cart\" [level=1] [ref=e9]` и вставил ref прямо в тест."
+    prompt:
+      en: "Pass or fail?"
+      ru: "Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('cart page has a heading', async ({ page }) => {
+        await page.goto('/cart');
+        await expect(page.locator('[ref=e9]')).toHaveText('Your cart');
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "Fail: refs exist only inside the snapshot. The page's HTML has no `ref` attribute, so nothing matches."
+          ru: "Упадёт: ref существуют только внутри снимка. В HTML страницы атрибута `ref` нет, совпадений не будет."
+        correct: true
+      - text:
+          en: "Pass: e9 is the heading, the snapshot says so."
+          ru: "Пройдёт: e9 — это заголовок, так написано в снимке."
+      - text:
+          en: "Fail: the heading on an empty cart is “Cart”, not “Your cart”."
+          ru: "Упадёт: на пустой корзине заголовок «Cart», а не «Your cart»."
+    hints:
+      - en: "Where does `[ref=e9]` come from — the page's HTML or the snapshot?"
+        ru: "Откуда берётся `[ref=e9]` — из HTML страницы или из снимка?"
+      - en: "`page.locator('[ref=e9]')` looks for an HTML attribute called `ref`."
+        ru: "`page.locator('[ref=e9]')` ищет HTML-атрибут с именем `ref`."
+    explain:
+      en: "Refs are handles the agent uses while exploring; the page never has them. The test should use the line's role and name: `getByRole('heading', { name: 'Your cart' })`."
+      ru: "Ref — это ярлыки, которыми агент пользуется при исследовании; на самой странице их нет. В тесте нужны роль и имя из строки: `getByRole('heading', { name: 'Your cart' })`."
+
+  - id: c4-l4-k4
+    kind: choice
+    keyPoint: kp-mcp-snapshot
+    context:
+      en: "Part of Petal's /signup snapshot:"
+      ru: "Часть снимка /signup, который получил Petal:"
+    code: |
+      - group "Account type" [ref=e20]:
+        - text: Account type
+        - radio "Personal" [checked] [ref=e21]
+        - text: Personal
+        - radio "Business" [ref=e22]
+        - text: Business
+    prompt:
+      en: "The test needs a Business account. Which line should Petal write?"
+      ru: "Тесту нужен аккаунт типа Business. Какую строку должен написать Petal?"
+    optionsCode: true
+    options:
+      - text: "await page.getByRole('radio', { name: 'Business' }).check();"
+        correct: true
+        why:
+          en: "Role `radio`, name “Business” — straight from the snapshot line."
+          ru: "Роль `radio`, имя «Business» — прямо из строки снимка."
+      - text: "await page.getByRole('button', { name: 'Business' }).click();"
+        why:
+          en: "It looks like a choice button, but the snapshot says `radio`."
+          ru: "Похоже на кнопку выбора, но в снимке написано `radio`."
+      - text: "await page.locator('[ref=e22]').check();"
+        why:
+          en: "Refs are only in the snapshot, never in the page."
+          ru: "Ref есть только в снимке, на странице их нет."
+      - text: "await page.getByRole('radio', { name: 'Business account' }).check();"
+        why:
+          en: "The name is “Business”. “Business account” is an invented, longer name — nothing matches it."
+          ru: "Имя — «Business». «Business account» — выдуманное, более длинное имя, с ним ничего не совпадёт."
+    hints:
+      - en: "Read the line: role first, name in quotes."
+        ru: "Прочитай строку: сначала роль, потом имя в кавычках."
+      - en: "`[checked]` on Personal shows the default; you need the other radio."
+        ru: "`[checked]` у Personal показывает выбор по умолчанию; тебе нужна другая радиокнопка."
+    explain:
+      en: "`radio \"Business\"` → `getByRole('radio', { name: 'Business' })`. The snapshot also tells Petal that Personal is checked by default — useful when you write test cases."
+      ru: "`radio \"Business\"` → `getByRole('radio', { name: 'Business' })`. А ещё снимок сообщает Petal, что по умолчанию выбран Personal, — это пригодится, когда пишешь тест-кейсы."
+
+  - id: c4-l4-k5
+    kind: review
+    keyPoint: kp-snapshot-gaps
+    app:
+      bugs: [a11y-add-to-cart-div]
+    context:
+      en: |
+        In this build “Add to cart” is a `<div>`. Petal's snapshot of the Sunny Tulips card:
+        ```
+        - article [ref=e28]:
+          - img "Bunch of yellow tulips" [ref=e29]
+          - heading "Sunny Tulips" [level=2] [ref=e30]
+          - paragraph [ref=e31]: €24.00
+          - generic [ref=e32] [cursor=pointer]: Add to cart
+        ```
+        Petal clicked `e32` while exploring — it worked. Then it wrote the test.
+      ru: |
+        В этой сборке «Add to cart» — это `<div>`. Снимок карточки Sunny Tulips, который получил Petal:
+        ```
+        - article [ref=e28]:
+          - img "Bunch of yellow tulips" [ref=e29]
+          - heading "Sunny Tulips" [level=2] [ref=e30]
+          - paragraph [ref=e31]: €24.00
+          - generic [ref=e32] [cursor=pointer]: Add to cart
+        ```
+        Исследуя страницу, Petal кликнул по `e32` — сработало. Потом он написал тест.
+    prompt:
+      en: "Petal had to fill gaps to write this test. Flag the invented parts."
+      ru: "Чтобы написать этот тест, Petal пришлось заполнять дыры. Отметь выдуманные места."
+    testCase:
+      id: TC-465
+      title: Product can be added to the cart from the shop
+      steps:
+        - { action: "Open /shop" }
+        - { action: "Click \"Add to cart\" on the Sunny Tulips card", expected: "The header link shows \"Cart 1\"" }
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('Sunny Tulips can be added to the cart', async ({ page }) => {
+        await page.goto('/shop');
+        const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
+        await card.locator('.add-to-cart-btn').click();
+        await expect(page.getByRole('link', { name: 'Cart (1)' })).toBeVisible();
+      });
+    issues:
+      - line: 6
+        type: hallucination
+        note:
+          en: "A snapshot never shows CSS classes, and the div has no role or name — so Petal invented `.add-to-cart-btn`. No element has this class. Report the missing button role instead."
+          ru: "Снимок никогда не показывает CSS-классы, а у div нет ни роли, ни имени, — поэтому Petal выдумал `.add-to-cart-btn`. Элемента с таким классом нет. Вместо этого сообщи о пропавшей роли кнопки."
+      - line: 7
+        type: hallucination
+        note:
+          en: "The cart link is named “Cart 1”, not “Cart (1)”. Petal never looked at the header after the click and guessed a common format."
+          ru: "Ссылка корзины называется «Cart 1», а не «Cart (1)». Petal не посмотрел на шапку после клика и угадал распространённый формат."
+    types: [hallucination, wrong-assertion, wrong-data, hard-wait, no-assertion]
+    hints:
+      - en: "Compare each locator with the snapshot: does that class or that name appear anywhere?"
+        ru: "Сравни каждый локатор со снимком: встречается ли там такой класс или такое имя?"
+      - en: "One locator fills the gap left by the div; one name is a plain guess."
+        ru: "Один локатор закрывает дыру, оставленную div; одно имя — просто догадка."
+      - en: "Lines 6 and 7."
+        ru: "Строки 6 и 7."
+    explain:
+      en: "The ref let Petal click during exploration, but a test needs a role and a name — and the div has neither, so Petal made up a class. Line 5 is fine. The honest fix is a bug report: once “Add to cart” is a button again, `card.getByRole('button', { name: 'Add to cart' })` works, and until then that test stays red for the right reason."
+      ru: "Ref позволил Petal кликнуть при исследовании, но тесту нужны роль и имя, а у div нет ни того, ни другого, — вот Petal и придумал класс. Строка 5 в порядке. Честное исправление — баг-репорт: когда «Add to cart» снова станет кнопкой, сработает `card.getByRole('button', { name: 'Add to cart' })`, а до тех пор такой тест будет красным по правильной причине."
+
+  - id: c4-l4-k6
+    kind: choice
+    keyPoint: kp-snapshot-gaps
+    context:
+      en: "After Kai's latest build, Petal's search test fails at `getByLabel('Search')`. Petal took a snapshot — it now shows `searchbox \"Search flowers\"` with no `text: Search` before it — and pushed this change: “Green again ✅”."
+      ru: "После свежей сборки Кая тест поиска от Petal падает на `getByLabel('Search')`. Petal снял снимок — теперь там `searchbox \"Search flowers\"` и нет `text: Search` перед ним — и прислал такое изменение: «Снова зелёный ✅»."
+    diff:
+      before: |
+        await page.getByLabel('Search').fill('rose');
+      after: |
+        await page.getByPlaceholder('Search flowers').fill('rose');
+    prompt:
+      en: "What do you do?"
+      ru: "Что ты сделаешь?"
+    options:
+      - text: { en: "Request changes and report a bug: the search field lost its `<label>`. Keep `getByLabel('Search')`.", ru: "Запросить правки и завести баг: поле поиска потеряло `<label>`. Оставить `getByLabel('Search')`." }
+        correct: true
+        why:
+          en: "The test caught a real accessibility regression. The fix belongs in the app, not in the test."
+          ru: "Тест поймал настоящую регрессию доступности. Чинить нужно приложение, а не тест."
+      - text: { en: "Approve: the test is green again", ru: "Одобрить: тест снова зелёный" }
+        why:
+          en: "It's green because it adapted to the bug. Now nothing will notice that the label is gone."
+          ru: "Он зелёный, потому что подстроился под баг. Теперь никто не заметит, что метки нет."
+      - text: { en: "Approve, but use `page.locator('#search')` — ids are more stable", ru: "Одобрить, но использовать `page.locator('#search')` — id надёжнее" }
+        why:
+          en: "Another workaround: the bug stays hidden, and screen reader users still get a field without a label."
+          ru: "Ещё один обходной путь: баг остаётся скрытым, а пользователи скринридеров всё так же получают поле без метки."
+      - text: { en: "Ask Petal to add `waitForTimeout(2000)` — the label may load late", ru: "Попросить Petal добавить `waitForTimeout(2000)` — метка может грузиться позже" }
+        why:
+          en: "The label isn't late, it's gone — the snapshot shows that. There's nothing to wait for."
+          ru: "Метка не опаздывает — её нет, это видно по снимку. Ждать нечего."
+    hints:
+      - en: "Why did `getByLabel('Search')` start failing? Is it the test or the app that changed?"
+        ru: "Почему `getByLabel('Search')` начал падать? Что изменилось — тест или приложение?"
+      - en: "A missing label is an accessibility bug (lesson 3)."
+        ru: "Пропавшая метка — это баг доступности (урок 3)."
+    explain:
+      en: "When the snapshot shows a gap that wasn't there before, ask “is this a bug?” before “how do we get green?”. A test that keeps the user-facing locator is your early warning for accessibility regressions."
+      ru: "Если в снимке появилась дыра, которой раньше не было, сначала спроси «это баг?», а потом «как сделать зелёным?». Тест с локатором, ориентированным на пользователя, — твоё раннее предупреждение о регрессиях доступности."
+
+  - id: c4-l4-k7
+    kind: inspect
+    keyPoint: kp-verify-locators
+    app:
+      route: /cart
+      state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 2 }] }
+    prompt:
+      en: "Petal's test clicks `page.getByRole('button', { name: 'Increase Sunny Tulips' })`. Before you approve it, find the element this locator points to — in the snapshot or on the page."
+      ru: "Тест Petal кликает `page.getByRole('button', { name: 'Increase Sunny Tulips' })`. Прежде чем одобрить, найди элемент, на который указывает этот локатор, — в снимке или на странице."
+    target: "[aria-label='Increase Sunny Tulips']"
+    view: aria
+    show: []
+    hints:
+      - en: "Look for a `button` line with exactly that name."
+        ru: "Ищи строку `button` ровно с этим именем."
+      - en: "It's in the Sunny Tulips row, in the quantity cell."
+        ru: "Она в строке Sunny Tulips, в ячейке с количеством."
+      - en: "The “+” of the second row: `button \"Increase Sunny Tulips\"`."
+        ru: "«+» во второй строке: `button \"Increase Sunny Tulips\"`."
+    explain:
+      en: "Role ✓ (button), name ✓ (“Increase Sunny Tulips”), one match ✓ — the “+” in the Sunny Tulips row. That's a verified locator, not a claimed one."
+      ru: "Роль ✓ (button), имя ✓ («Increase Sunny Tulips»), одно совпадение ✓ — «+» в строке Sunny Tulips. Это проверенный локатор, а не заявленный."
+
+  - id: c4-l4-k8
+    kind: predict
+    keyPoint: kp-verify-locators
+    placement: true
+    context:
+      en: "Petal: “The home page has a big green ‘Shop now’ button. Verified ✅”"
+      ru: "Petal: «На главной есть большая зелёная кнопка ‘Shop now’. Проверено ✅»"
+    prompt:
+      en: "Pass or fail?"
+      ru: "Пройдёт или упадёт?"
+    code: |
+      import { test, expect } from '@playwright/test';
+
+      test('Shop now opens the shop', async ({ page }) => {
+        await page.goto('/');
+        await page.getByRole('button', { name: 'Shop now' }).click();
+        await expect(page).toHaveURL('/shop');
+      });
+    outcome: fail
+    reasons:
+      - text:
+          en: "Fail: it looks like a button, but it's a link — `link \"Shop now\"` in the snapshot. No button has this name."
+          ru: "Упадёт: выглядит как кнопка, но это ссылка — в снимке `link \"Shop now\"`. Кнопки с таким именем нет."
+        correct: true
+      - text:
+          en: "Pass: the text “Shop now” is on the page."
+          ru: "Пройдёт: текст «Shop now» есть на странице."
+      - text:
+          en: "Fail: the shop loads its products too slowly."
+          ru: "Упадёт: магазин слишком медленно загружает товары."
+    hints:
+      - en: "Where does “Shop now” take you? What tag does that usually mean?"
+        ru: "Куда ведёт «Shop now»? Какой тег это обычно означает?"
+      - en: "Role first: is it `button` or `link`?"
+        ru: "Сначала роль: это `button` или `link`?"
+    explain:
+      en: "Styling says “button”, the role says “link”: it's an `<a href=\"/shop\">`. `getByRole` checks the role, not the looks. One look in DevTools — or at the snapshot line — would have caught it."
+      ru: "По стилю это «кнопка», по роли — «ссылка»: это `<a href=\"/shop\">`. `getByRole` проверяет роль, а не внешний вид. Один взгляд в DevTools — или на строку снимка — и ошибка была бы поймана."
