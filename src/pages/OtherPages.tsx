@@ -7,8 +7,10 @@ import { Mentor } from '../components/Mentor';
 import { Sticker } from '../components/Sticker';
 import { speak } from '../components/TermLayer';
 import { placementVars } from '../engine/plan';
-import { useProgress, progressSnapshot, emptyProgress, type ProgressData } from '../store/progress';
-import { useSettings, settingsSnapshot, type Settings } from '../store/settings';
+import { useProgress, progressSnapshot } from '../store/progress';
+import { useSettings, type Settings } from '../store/settings';
+import { PLAYGROUND_KEY, applyBackup, backupCode, downloadBackup, hasProgress, parseBackup, summarize, type Backup, type Summary } from '../store/backup';
+import { formatDay, today } from '../lib/dates';
 import { CodeLab } from '../lab/CodeLab';
 import { navigate } from '../lib/router';
 
@@ -121,32 +123,102 @@ export function InterviewPage() {
   );
 }
 
+type Msg = { ok: boolean; k: string; vars?: Record<string, string | number> };
+
+/** Copies a code that is still being built: Safari only allows clipboard writes started inside the click. */
+async function copyLater(code: Promise<string>): Promise<void> {
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+    await navigator.clipboard.write([new ClipboardItem({ 'text/plain': code.then((c) => new Blob([c], { type: 'text/plain' })) })]);
+  } else {
+    await navigator.clipboard.writeText(await code);
+  }
+}
+
+function ImportConfirm({ backup, onDone, onCancel }: { backup: Backup; onDone: (m: Msg) => void; onCancel: () => void }) {
+  const copy = summarize(backup.progress);
+  const here = summarize(progressSnapshot());
+  const rows: { k: string; v: (x: Summary) => number | string | null }[] = [
+    { k: 'common.xp', v: (x) => x.xp },
+    { k: 'settings.statLessons', v: (x) => x.lessons },
+    { k: 'settings.statTasks', v: (x) => x.tasks },
+    { k: 'settings.statLast', v: (x) => x.lastDay },
+  ];
+  const apply = (mode: 'replace' | 'merge') => {
+    applyBackup(backup, mode);
+    onDone({ ok: true, k: mode === 'merge' ? 'settings.merged' : 'settings.imported' });
+  };
+  return (
+    <div className="import-box" role="dialog" aria-label="Import">
+      <h3><U k="settings.importTitle" stack={false} /></h3>
+      <table className="import-cmp">
+        <thead><tr><th /><th><U k="settings.inCopy" stack={false} /></th><th><U k="settings.inBrowser" stack={false} /></th></tr></thead>
+        <tbody>
+          {rows.map((r) => {
+            const a = r.v(copy);
+            const b = r.v(here);
+            return (
+              <tr key={r.k}>
+                <th scope="row"><U k={r.k} stack={false} /></th>
+                <td className={a !== null && (b === null || a > b) ? 'more' : ''}>{typeof a === 'string' ? formatDay(a) : a ?? '—'}</td>
+                <td className={b !== null && (a === null || b > a) ? 'more' : ''}>{typeof b === 'string' ? formatDay(b) : b ?? '—'}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      {backup.exportedAt && <div className="muted small"><U k="settings.copyMade" stack={false} />: {formatDay(today(new Date(backup.exportedAt)))}</div>}
+      <div className="import-choice">
+        <button className="btn btn-primary btn-sm" onClick={() => apply('merge')}><Icon name="check" size={14} /> <U k="settings.merge" stack={false} /></button>
+        <span className="muted small"><U k="settings.mergeDesc" stack={false} /></span>
+      </div>
+      <div className="import-choice">
+        <button className="btn btn-coral btn-sm" onClick={() => apply('replace')}><Icon name="repeat" size={14} /> <U k="settings.replace" stack={false} /></button>
+        <span className="muted small"><U k="settings.replaceDesc" stack={false} /></span>
+      </div>
+      <button className="btn btn-ghost btn-sm" onClick={onCancel}><U k="common.cancel" stack={false} /></button>
+    </div>
+  );
+}
+
 export function SettingsPage() {
   const st = useSettings();
-  const replaceAll = useProgress((s) => s.replaceAll);
   const reset = useProgress((s) => s.reset);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [msg, setMsg] = useState<{ ok: boolean; k: string } | null>(null);
+  const s = useUiString();
+  const [msg, setMsg] = useState<Msg | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [pending, setPending] = useState<Backup | null>(null);
+  const [codeOut, setCodeOut] = useState<string | null>(null);
+  const [pasteOpen, setPasteOpen] = useState(false);
+  const [pasted, setPasted] = useState('');
 
-  const exportJson = () => {
-    const data = { app: 'bloom-qa', version: 1, exportedAt: new Date().toISOString(), settings: settingsSnapshot(), progress: progressSnapshot() };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `bloom-qa-progress-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  };
-  const importJson = async (f: File) => {
+  const receive = async (text: string) => {
+    setMsg(null);
+    setCodeOut(null);
     try {
-      const data = JSON.parse(await f.text()) as { app?: string; settings?: Partial<Settings>; progress?: ProgressData };
-      if (data.app !== 'bloom-qa' || !data.progress || typeof data.progress.xp !== 'number') throw new Error('bad');
-      replaceAll({ ...emptyProgress(), ...data.progress });
-      if (data.settings) st.update(data.settings);
-      setMsg({ ok: true, k: 'settings.imported' });
+      const b = await parseBackup(text);
+      if (hasProgress(progressSnapshot())) setPending(b);
+      else {
+        applyBackup(b, 'replace');
+        setMsg({ ok: true, k: 'settings.imported' });
+      }
+      setPasteOpen(false);
+      setPasted('');
     } catch {
       setMsg({ ok: false, k: 'settings.importError' });
+    }
+  };
+  const copyCode = async () => {
+    setMsg(null);
+    setPending(null);
+    const code = backupCode();
+    try {
+      await copyLater(code);
+      setCodeOut(null);
+      setMsg({ ok: true, k: 'settings.codeCopied', vars: { n: (await code).length } });
+    } catch {
+      setCodeOut(await code.catch(() => null));
+      setMsg({ ok: false, k: 'settings.codeCopyManual' });
     }
   };
 
@@ -187,13 +259,29 @@ export function SettingsPage() {
       <section className="card set-card">
         <h2><Icon name="download" size={18} /> <U k="settings.progress" stack={false} /></h2>
         <p className="muted small"><U k="settings.progressDesc" stack={false} /></p>
-        <div className="row gap wrap">
-          <button className="btn btn-soft" onClick={exportJson}><Icon name="download" size={16} /> <U k="settings.export" stack={false} /></button>
-          <button className="btn btn-soft" onClick={() => fileRef.current?.click()}><Icon name="upload" size={16} /> <U k="settings.import" stack={false} /></button>
-          <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => e.target.files?.[0] && importJson(e.target.files[0])} />
-          <button className="btn btn-soft" onClick={() => navigate('/placement')}><Icon name="compass" size={16} /> <U k="settings.placementRetake" stack={false} /></button>
+        <div className={`chip ${st.backupAt ? 'chip-mint' : 'chip-butter'}`}>
+          <Icon name="shield" size={14} /> {st.backupAt ? <U k="settings.lastBackup" vars={{ date: formatDay(st.backupAt) }} stack={false} /> : <U k="settings.noBackup" stack={false} />}
         </div>
-        {msg && <div className={`notice ${msg.ok ? 'ok' : 'bad'}`}><U k={msg.k} stack={false} /></div>}
+        <div className="row gap wrap">
+          <button className="btn btn-soft" onClick={downloadBackup}><Icon name="download" size={16} /> <U k="settings.export" stack={false} /></button>
+          <button className="btn btn-soft" onClick={() => fileRef.current?.click()}><Icon name="upload" size={16} /> <U k="settings.import" stack={false} /></button>
+          <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={async (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) await receive(await f.text()); }} />
+        </div>
+        <div className="row gap wrap">
+          <button className="btn btn-soft" onClick={copyCode}><Icon name="send" size={16} /> <U k="settings.copyCode" stack={false} /></button>
+          <button className="btn btn-soft" onClick={() => { setPasteOpen(!pasteOpen); setMsg(null); }} aria-expanded={pasteOpen}><Icon name="code" size={16} /> <U k="settings.pasteCode" stack={false} /></button>
+        </div>
+        <p className="muted small"><U k="settings.codeHint" stack={false} /></p>
+        {codeOut && <textarea className="code-box" readOnly value={codeOut} rows={4} onFocus={(e) => e.currentTarget.select()} aria-label={s('settings.copyCode')} />}
+        {pasteOpen && (
+          <div className="paste-box">
+            <textarea className="code-box" value={pasted} onChange={(e) => setPasted(e.target.value)} rows={4} placeholder={s('settings.codePlaceholder')} aria-label={s('settings.pasteCode')} autoFocus />
+            <button className="btn btn-primary btn-sm" disabled={!pasted.trim()} onClick={() => receive(pasted)}><Icon name="upload" size={14} /> <U k="settings.codeLoad" stack={false} /></button>
+          </div>
+        )}
+        {pending && <ImportConfirm backup={pending} onDone={(m) => { setPending(null); setMsg(m); }} onCancel={() => setPending(null)} />}
+        {msg && <div className={`notice ${msg.ok ? 'ok' : 'bad'}`} role="status"><U k={msg.k} vars={msg.vars} stack={false} /></div>}
+        <button className="btn btn-soft" onClick={() => navigate('/placement')}><Icon name="compass" size={16} /> <U k="settings.placementRetake" stack={false} /></button>
         <div className="danger-zone">
           {!confirmReset ? (
             <button className="btn btn-ghost danger" onClick={() => setConfirmReset(true)}><Icon name="trash" size={16} /> <U k="settings.reset" stack={false} /></button>
@@ -228,11 +316,11 @@ test('customer can add tulips to the cart', async ({ page }) => {
 const BUGS = ['login-trim', 'login-no-error', 'greeting-wrong-name', 'signup-terms-ignored', 'search-case-sensitive', 'sort-by-name', 'add-to-cart-double', 'cart-count-stale', 'cart-total-ignores-qty', 'remove-wrong-item', 'promo-case-sensitive', 'promo-stacks', 'free-delivery-boundary', 'checkout-past-date', 'orders-filter-wrong', 'orders-summary-wrong', 'a11y-add-to-cart-div', 'a11y-qty-unnamed', 'a11y-search-no-label'];
 
 export function PlaygroundPage() {
-  const [code, setCode] = useState(() => { try { return localStorage.getItem('bloomqa-playground') || PLAYGROUND_CODE; } catch { return PLAYGROUND_CODE; } });
+  const [code, setCode] = useState(() => { try { return localStorage.getItem(PLAYGROUND_KEY) || PLAYGROUND_CODE; } catch { return PLAYGROUND_CODE; } });
   const [bugs, setBugs] = useState<string[]>([]);
   const [cookie, setCookie] = useState(false);
   const [slow, setSlow] = useState(false);
-  const save = (c: string) => { setCode(c); try { localStorage.setItem('bloomqa-playground', c); } catch { /* ignore */ } };
+  const save = (c: string) => { setCode(c); try { localStorage.setItem(PLAYGROUND_KEY, c); } catch { /* ignore */ } };
   return (
     <div className="page page-wide">
       <h1 className="page-title"><Icon name="code" size={24} /> <U k="playground.title" /></h1>

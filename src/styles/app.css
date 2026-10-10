@@ -814,6 +814,20 @@ select.blank { appearance: auto; }
 .range-row { display: flex; align-items: center; gap: 10px; width: 100%; font-size: .86rem; color: var(--ink-2); }
 .range-row input { flex: 1; accent-color: var(--lavender-strong); }
 .danger-zone { border-top: 1px dashed var(--line-2); padding-top: 12px; width: 100%; }
+.code-box { width: 100%; font: .78rem/1.4 var(--font-mono, ui-monospace, monospace); padding: 10px 12px; border-radius: var(--r-s); border: 1px solid var(--line-2); background: var(--bg-soft); color: var(--ink); resize: vertical; word-break: break-all; }
+.paste-box { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; width: 100%; }
+.import-box { width: 100%; background: var(--bg-soft); border-radius: var(--r-s); padding: 14px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.import-box h3 { margin: 0; font-size: 1rem; }
+.import-cmp { border-collapse: collapse; font-size: .9rem; }
+.import-cmp th, .import-cmp td { padding: 4px 14px 4px 0; text-align: left; }
+.import-cmp thead th { font-size: .78rem; color: var(--ink-2); font-weight: 700; }
+.import-cmp tbody th { font-weight: 500; color: var(--ink-2); }
+.import-cmp td { font-variant-numeric: tabular-nums; font-weight: 600; }
+.import-cmp td.more { color: var(--mint-strong); font-weight: 800; }
+.import-choice { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.backup-card { background: var(--sky-soft); border-color: transparent; display: flex; flex-direction: column; gap: 8px; }
+.backup-card .bi { margin: 0; }
+.backup-note { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; font-size: .9rem; color: var(--ink-2); }
 .bug-panel { margin-bottom: 12px; }
 .bug-panel summary { cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 

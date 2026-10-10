@@ -13,6 +13,10 @@ export interface Settings {
   speed: number;
   celebrations: boolean;
   onboarded: boolean;
+  /** Day of the last saved copy of progress (file or code); not part of the copy itself. */
+  backupAt?: string;
+  /** Day the "save a copy" reminder was last dismissed. */
+  backupNudgedAt?: string;
 }
 
 interface SettingsStore extends Settings {

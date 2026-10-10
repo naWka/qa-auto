@@ -4,6 +4,7 @@ import { Bi, BiInline, P, U } from '../components/Bi';
 import { Icon } from '../components/Icon';
 import { Mentor } from '../components/Mentor';
 import { Mochi } from '../components/Characters';
+import { BackupNudge } from '../components/BackupNudge';
 import { chapterMastered, chapterUnlocked, currentStreak, lessonDone, termsLearned, useProgress } from '../store/progress';
 import { dueCount, lessonProgressRatio, nextBoss, nextLesson, weakTopics, placementVars } from '../engine/plan';
 import { levelFor } from '../engine/xp';
@@ -100,6 +101,7 @@ export function HomePage() {
               </button>
             )}
           </div>
+          <BackupNudge />
           {weak.length > 0 && (
             <div className="card weak-card">
               <div className="small-card-head"><Icon name="target" size={18} /> <U k="home.weakTitle" stack={false} /></div>

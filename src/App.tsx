@@ -5,6 +5,8 @@ import { Icon } from './components/Icon';
 import { Mentor } from './components/Mentor';
 import { Sticker } from './components/Sticker';
 import { TermLayer } from './components/TermLayer';
+import { BackupNote } from './components/BackupNudge';
+import { keepStorage } from './store/backup';
 import { useRoute, navigate } from './lib/router';
 import { useSettings } from './store/settings';
 import { currentStreak, useProgress } from './store/progress';
@@ -146,6 +148,7 @@ function CelebrationLayer() {
                   <div className="sticker-reveal"><Sticker icon="trophy" color={ch?.color || 'butter'} size={130} tilt={4} /></div>
                   {ch && <h2><BiInline t={ch.department} /></h2>}
                   <Mentor t={pickPhrase('chapterDone')} vars={{ chapter: ch?.title.en || '' }} mood="celebrate" compact />
+                  <BackupNote />
                 </>
               );
             })()}
@@ -181,8 +184,10 @@ export function App() {
   const route = useRoute();
   const onboarded = useSettings((s) => s.onboarded);
   const touchDay = useProgress((s) => s.touchDay);
+  const learning = useProgress((s) => Object.values(s.lessons).some((l) => l.status === 'done'));
   useTheme();
   useEffect(() => { touchDay(); }, [route.path]);
+  useEffect(() => { if (learning) keepStorage(); }, [learning]);
 
   const [a, b, c] = route.parts;
   let page: React.ReactNode;

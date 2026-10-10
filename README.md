@@ -21,7 +21,8 @@ automation. The AI agent writes the code; the student learns to understand, dire
   variant of Bloomly to prove locators resilient, and "Run ×N" for flaky tests.
 - **Spaced repetition** (SM-2) for terms and topics, "I know this" checks with practical task pools,
   an entry check, XP, levels, sticker badges, streaks, a glossary with pronunciation, interview prep.
-- Everything is static; progress lives in `localStorage` (export/import/reset in Settings).
+- Everything is static; progress lives in `localStorage`. Settings can save a copy as a file or a one-line code
+  and load it back (replace, or merge with what this browser has); Home reminds to save a copy weekly.
 
 ## Develop
 

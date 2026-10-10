@@ -297,15 +297,44 @@ settings:
   fast: { en: "Fast", ru: "Быстро" }
   motion: { en: "Celebrations (confetti, hearts)", ru: "Праздничные анимации (конфетти, сердечки)" }
   progress: { en: "Your progress", ru: "Твой прогресс" }
-  progressDesc: { en: "Everything is stored only in this browser. Export a backup to move it to another device.", ru: "Всё хранится только в этом браузере. Сделай экспорт, чтобы перенести прогресс на другое устройство." }
-  export: { en: "Export progress (JSON)", ru: "Экспорт прогресса (JSON)" }
-  import: { en: "Import progress", ru: "Импорт прогресса" }
+  progressDesc: { en: "Everything is stored only in this browser. Save a copy now and then: browsers sometimes clear site data on their own, and a copy moves your progress to another browser or device.", ru: "Всё хранится только в этом браузере. Время от времени сохраняй копию: браузеры иногда сами очищают данные сайтов, а с копией прогресс легко перенести в другой браузер или на другое устройство." }
+  export: { en: "Download a copy (file)", ru: "Скачать копию (файл)" }
+  import: { en: "Load a copy (file)", ru: "Загрузить копию (файл)" }
+  copyCode: { en: "Copy as code", ru: "Скопировать код прогресса" }
+  pasteCode: { en: "Paste a code", ru: "Вставить код" }
+  codeHint: { en: "One line of text with all your progress. Send it to yourself (notes, email, a messenger) and paste it here in the other browser.", ru: "Одна строка текста со всем прогрессом. Отправь её себе (в заметки, почту, мессенджер) и вставь здесь в другом браузере." }
+  codeCopied: { en: "Code copied ({n} characters).", ru: "Код скопирован ({n} символов)." }
+  codeCopyManual: { en: "Couldn't copy automatically. Select the code below and copy it.", ru: "Не получилось скопировать автоматически. Выдели код ниже и скопируй." }
+  codePlaceholder: { en: "Paste the code that starts with BQA1.", ru: "Вставь код, который начинается с BQA1." }
+  codeLoad: { en: "Load", ru: "Загрузить" }
+  lastBackup: { en: "Last copy: {date}", ru: "Последняя копия: {date}" }
+  noBackup: { en: "No copy saved yet", ru: "Копию ещё не сохраняли" }
+  importTitle: { en: "What to do with this copy?", ru: "Что сделать с копией?" }
+  inCopy: { en: "In the copy", ru: "В копии" }
+  inBrowser: { en: "In this browser", ru: "В этом браузере" }
+  statLessons: { en: "Lessons done", ru: "Уроков пройдено" }
+  statTasks: { en: "Tasks solved", ru: "Задач решено" }
+  statLast: { en: "Last activity", ru: "Последний день" }
+  copyMade: { en: "Copy made", ru: "Копия сделана" }
+  merge: { en: "Merge", ru: "Объединить" }
+  mergeDesc: { en: "Keeps the best of both: solved tasks, finished lessons and streak days from each.", ru: "Останется лучшее из обоих: решённые задачи, пройденные уроки и дни серии." }
+  replace: { en: "Replace", ru: "Заменить" }
+  replaceDesc: { en: "Progress in this browser is deleted and replaced by the copy.", ru: "Прогресс в этом браузере удалится и заменится копией." }
   reset: { en: "Reset all progress", ru: "Сбросить весь прогресс" }
-  resetConfirm: { en: "Delete all progress, XP and stickers? This can't be undone. Export a backup first if you might need it.", ru: "Удалить весь прогресс, XP и стикеры? Отменить будет нельзя. Если может пригодиться — сначала сделай экспорт." }
-  imported: { en: "Progress imported", ru: "Прогресс импортирован" }
-  importError: { en: "This file doesn't look like a Bloom QA backup", ru: "Этот файл не похож на резервную копию Bloom QA" }
+  resetConfirm: { en: "Delete all progress, XP and stickers? This can't be undone. Save a copy first if you might need it.", ru: "Удалить весь прогресс, XP и стикеры? Отменить будет нельзя. Если может пригодиться — сначала сохрани копию." }
+  imported: { en: "Progress loaded", ru: "Прогресс загружен" }
+  merged: { en: "Progress merged", ru: "Прогресс объединён" }
+  importError: { en: "This doesn't look like a Bloom QA copy", ru: "Это не похоже на копию прогресса Bloom QA" }
   placement: { en: "Entry check", ru: "Входная проверка" }
   placementRetake: { en: "Take the entry check", ru: "Пройти входную проверку" }
+backup:
+  title: { en: "Save a copy of your progress", ru: "Сохрани копию прогресса" }
+  desc: { en: "Progress lives only in this browser, and browsers sometimes clear site data. A copy takes a second, and with it you can continue in another browser.", ru: "Прогресс живёт только в этом браузере, а браузеры иногда сами очищают данные сайтов. Копия занимает секунду, и с ней можно продолжить в другом браузере." }
+  download: { en: "Download a copy", ru: "Скачать копию" }
+  later: { en: "Later", ru: "Позже" }
+  more: { en: "Other ways", ru: "Другие способы" }
+  chapterNote: { en: "A good moment to save a copy of your progress.", ru: "Хороший момент сохранить копию прогресса." }
+  saved: { en: "Copy saved", ru: "Копия сохранена" }
 onboarding:
   hello: { en: "Hi! I'm Maya, Senior QA at Bloomly.", ru: "Привет! Я Майя, Senior QA в Bloomly." }
   pitch: { en: "You already know how to test. Here you'll learn to automate it with Playwright — together with an AI agent that writes the code while you decide what's worth checking.", ru: "Тестировать ты уже умеешь. Здесь научишься автоматизировать это на Playwright — вместе с ИИ-агентом, который пишет код, пока ты решаешь, что стоит проверить." }
