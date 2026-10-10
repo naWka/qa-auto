@@ -13,7 +13,7 @@ const glossaryFiles = import.meta.glob('./glossary/*.yaml', { eager: true, impor
 export const chapters: Chapter[] = Object.values(chapterFiles).sort((a, b) => a.number - b.number);
 
 export const lessons = new Map<string, Lesson>();
-for (const l of Object.values(lessonFiles)) lessons.set(l.id, l);
+for (const l of Object.values(lessonFiles)) if (l?.id) lessons.set(l.id, l);
 
 export const glossary = new Map<string, GlossaryEntry>();
 for (const list of Object.values(glossaryFiles)) for (const e of list || []) glossary.set(e.id, e);

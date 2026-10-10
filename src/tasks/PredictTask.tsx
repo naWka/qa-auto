@@ -7,6 +7,7 @@ import { CodeLab, type LabHandle } from '../lab/CodeLab';
 import type { RunResult } from '../emulator';
 import { useProgress } from '../store/progress';
 import { OptionList } from './ChoiceTask';
+import { FilesView } from '../lab/CodeLab';
 import type { KindProps } from './types';
 
 type Predict = Extract<Task, { kind: 'predict' }>;
@@ -45,7 +46,8 @@ export function PredictTask({ task, register, phase }: KindProps<Predict>) {
 
   return (
     <div className="task-predict">
-      {!answered && <CodeView code={task.code} />}
+      {!answered && <FilesView files={task.files} />}
+      {!answered && <CodeView code={task.code} label={task.files ? 'example.spec.js' : undefined} />}
       <div className="predict-q">
         <U k="task.predictQuestion" />
         <div className="predict-buttons">
@@ -73,7 +75,7 @@ export function PredictTask({ task, register, phase }: KindProps<Predict>) {
               </span>
             )}
           </div>
-          <CodeLab code={task.code} readOnly app={task.app} labRef={lab} onResult={setReal} browserHeight={340} />
+          <CodeLab code={task.code} readOnly app={task.app} files={task.files} labRef={lab} onResult={setReal} browserHeight={340} />
         </div>
       )}
     </div>

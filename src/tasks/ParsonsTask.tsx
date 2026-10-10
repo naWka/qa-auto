@@ -137,7 +137,7 @@ export function ParsonsTask({ task, register, phase, exam }: KindProps<Parsons>)
           </DndContext>
         </div>
       </div>
-      {task.checks && isCode && (phase === 'correct' || phase === 'revealed') && !exam && <RunCompleted code={assembled} app={task.app} />}
+      {task.checks && isCode && (phase === 'correct' || phase === 'revealed') && !exam && <RunCompleted code={assembled} app={task.app} files={task.files} />}
     </div>
   );
 }

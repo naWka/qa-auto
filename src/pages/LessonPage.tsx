@@ -5,7 +5,7 @@ import { Bi, BiInline, U } from '../components/Bi';
 import { Icon } from '../components/Icon';
 import { Mentor } from '../components/Mentor';
 import { TaskShell, type TaskOutcome } from '../tasks/TaskShell';
-import { ExampleStep, ExplainStep, MappingStep, MistakesStep, PhrasesStep, StepLabel, StoryStep, TheoryStep, VocabStep } from '../lesson/Steps';
+import { ExampleStep, ExplainStep, InspectStep, TraceStep, MappingStep, MistakesStep, PhrasesStep, StepLabel, StoryStep, TheoryStep, VocabStep } from '../lesson/Steps';
 import { useProgress } from '../store/progress';
 import { pickPhrase } from '../engine/phrases';
 import { dueCount } from '../engine/plan';
@@ -41,16 +41,16 @@ function PretestStep({ step, onDone }: { step: Extract<Step, { type: 'pretest' }
   );
 }
 
-export function LessonPage({ id, focus }: { id: string; focus: string[] | null }) {
+export function LessonPage({ id, focus, startStep }: { id: string; focus: string[] | null; startStep?: number }) {
   const lesson = lessons.get(id);
   const p = useProgress();
   const saved = p.lessons[id];
   const items = useMemo(() => (lesson ? buildItems(lesson, focus) : []), [id, focus?.join(',')]);
-  const startAt = !focus && saved?.status === 'in-progress' && saved.step && saved.step < items.length ? saved.step : 0;
+  const startAt = startStep !== undefined && startStep < items.length ? startStep : !focus && saved?.status === 'in-progress' && saved.step && saved.step < items.length ? saved.step : 0;
   const [i, setI] = useState(startAt);
   const [gate, setGate] = useState<Record<number, boolean>>({});
   const [finished, setFinished] = useState(false);
-  const [offerWarmup, setOfferWarmup] = useState(() => !focus && startAt === 0 && dueCount(p) > 0 && p.lastWarmup !== today());
+  const [offerWarmup, setOfferWarmup] = useState(() => !focus && startStep === undefined && startAt === 0 && dueCount(p) > 0 && p.lastWarmup !== today());
   const sessionXp = useRef(0);
   const hintsUsed = useRef(0);
   const top = useRef<HTMLDivElement>(null);
@@ -133,6 +133,8 @@ export function LessonPage({ id, focus }: { id: string; focus: string[] | null }
       case 'story': body = <StoryStep step={s} />; break;
       case 'theory': body = <TheoryStep step={s} />; break;
       case 'example': body = <ExampleStep step={s} />; break;
+      case 'inspect': body = <InspectStep step={s} />; break;
+      case 'trace': body = <TraceStep step={s} />; break;
       case 'mapping': body = <MappingStep step={s} />; break;
       case 'mistakes': body = <MistakesStep step={s} />; break;
       case 'phrases': body = <PhrasesStep step={s} />; break;
@@ -144,7 +146,8 @@ export function LessonPage({ id, focus }: { id: string; focus: string[] | null }
   const isTask = item.kind === 'step' && (item.step.type === 'task' || item.step.type === 'pretest');
   const solvedBefore = item.kind === 'step' && item.step.type === 'task' && !!p.tasks[item.step.task.id]?.solved && !gate[i];
   const kind = item.kind === 'step' && item.step.type === 'task' ? item.step.task.kind : '';
-  const wide = ['fix', 'find-bug', 'code'].includes(kind) ? 'lesson-wide' : ['predict', 'agent'].includes(kind) ? 'lesson-mid' : '';
+  const stepType = item.kind === 'step' ? item.step.type : '';
+  const wide = ['fix', 'find-bug', 'code', 'inspect', 'trace'].includes(kind) || stepType === 'inspect' || stepType === 'trace' ? 'lesson-wide' : ['predict', 'agent'].includes(kind) ? 'lesson-mid' : '';
 
   return (
     <div className={`page lesson ${wide}`} ref={top}>

@@ -14,6 +14,7 @@ export interface AppSetup {
   bugs?: string[];
   latency?: Record<string, number | [number, number]>;
   cookieBanner?: boolean;
+  variant?: string;
   state?: { user?: string; cart?: { id: string; qty: number }[]; promo?: string };
 }
 
@@ -301,6 +302,9 @@ async function doRun(opts: RunOptions): Promise<RunResult> {
       const instances = new Map<string, unknown>();
       const teardowns: Array<() => Promise<void>> = [];
       let page: Page | null = null;
+      // One "server" per test: orders and users created through the API are visible in the UI and vice versa.
+      let shared: BloomlyCtx | null = null;
+      const sharedCtx = () => (shared ??= makeCtx(opts.app));
 
       const getFixture = async (name: string, layers: Layer[], from = layers.length - 1, kind = 'test'): Promise<unknown> => {
         let idx = from;
@@ -332,13 +336,13 @@ async function doRun(opts: RunOptions): Promise<RunResult> {
         if (name === 'browserName') return 'chromium';
         if (name === 'request') {
           if (!data) throw new EmuError('unknown', 'Error: could not load Bloomly data', {});
-          return new APIRequestContext(rt, data, opts.app?.bugs ?? []);
+          return new APIRequestContext(rt, data, opts.app?.bugs ?? [], sharedCtx().storage);
         }
         if (name === 'page') {
           if (!opts.frame) throw new EmuError('no-browser', 'Error: this task has no browser window', {}, { emulatorNote: true });
           await blankFrame(opts.frame);
           opts.onUrl?.('about:blank');
-          page = new Page(rt, { frame: opts.frame, autUrl: opts.autDir + 'index.html', ctx: makeCtx(opts.app), onUrl: (u) => { opts.onUrl?.(u); ctl.emit({ type: 'navigate', url: u }); } });
+          page = new Page(rt, { frame: opts.frame, autUrl: opts.autDir + 'index.html', ctx: sharedCtx(), onUrl: (u) => { opts.onUrl?.(u); ctl.emit({ type: 'navigate', url: u }); } });
           return page;
         }
         return undefined;
@@ -492,7 +496,7 @@ export function makeCtx(app?: AppSetup): BloomlyCtx {
   if (st?.cart) storage.cart = JSON.stringify(st.cart);
   if (st?.promo) storage.promo = JSON.stringify({ code: st.promo, times: 1 });
   return {
-    config: { bugs: [...(app?.bugs ?? [])], latency: { ...(app?.latency ?? {}) }, cookieBanner: !!app?.cookieBanner },
+    config: { bugs: [...(app?.bugs ?? [])], latency: { ...(app?.latency ?? {}) }, cookieBanner: !!app?.cookieBanner, variant: app?.variant },
     storage,
   };
 }

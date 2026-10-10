@@ -63,12 +63,15 @@ export function transform(src: string, file: string, isModule: boolean): { code:
         if (d.type === 'VariableDeclaration') for (const v of d.declarations as AstNode[]) { if (v.id.type === 'Identifier') exported.push(v.id.name); }
         else if (d.id) exported.push(d.id.name);
       } else {
+        // export { a, b as c } — or a re-export: export { expect } from '@playwright/test'
+        const from = node.source ? `__import(${JSON.stringify(node.source.value)})` : null;
         const assigns = (node.specifiers as AstNode[]).map((s) => {
-          const local = s.local.name;
+          const local = s.local.type === 'Identifier' ? s.local.name : s.local.value;
           const name = s.exported.type === 'Identifier' ? s.exported.name : s.exported.value;
-          return `__exports[${JSON.stringify(name)}] = ${local};`;
+          return `__exports[${JSON.stringify(name)}] = ${from ? `${from}[${JSON.stringify(local)}]` : local};`;
         });
-        edits.push({ start: node.start, end: node.end, text: assigns.join(' ') });
+        const newlines = (src.slice(node.start, node.end).match(/\n/g) || []).length;
+        edits.push({ start: node.start, end: node.end, text: assigns.join(' ') + '\n'.repeat(newlines) });
       }
     } else if (node.type === 'ExportDefaultDeclaration') {
       const d = node.declaration as AstNode;

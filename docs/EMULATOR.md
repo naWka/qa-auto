@@ -56,13 +56,27 @@ Generic (no retry): `toBe`, `toEqual`, `toStrictEqual`, `toBeTruthy`, `toBeFalsy
 
 ## request (fake Bloomly REST API)
 `request.get/post/put/patch/delete(url, { data, params, headers })` → `status()`, `ok()`, `json()`, `text()`, `headers()`.
-Endpoints: `GET /api/health`, `GET /api/products`, `GET /api/products/:id`, `POST /api/login`,
-`GET /api/orders` (Bearer token), `POST /api/orders`.
+Endpoints and responses: see docs/AUT.md "REST API". Within one test, `request` and `page` share one server state
+(created orders/users and cancellations are visible in both).
+
+## Virtual files
+Tasks can ship extra files next to the spec (`files: { 'pages/LoginPage.js': '…' }`); the spec imports them with
+`import { LoginPage } from './pages/LoginPage';`. Files are plain JavaScript modules (`export class …`, `export const …`,
+`export function …`); TypeScript type annotations are not supported. A fixtures file can re-export an extended test:
+`export const test = base.extend({ … }); export { expect } from '@playwright/test';` → `import { test, expect } from './fixtures';`.
+
+## Trace viewer and inspector (simplified)
+- `trace` steps/tasks run the test once and record a DOM snapshot before and after every action/assertion
+  (the acted-on element is outlined). Panels: Actions, Before/After, Call, Errors, Console, Source. No network panel,
+  no screenshots film strip.
+- `inspect` steps/tasks show the live page with an Elements tree, an accessibility snapshot in the Playwright
+  `ariaSnapshot()` format with MCP-like `[ref=eN]` markers, and details of the selected element (attributes, role,
+  accessible name and where it comes from, suggested locator).
 
 ## Simplifications (shown as "Emulator note")
 - one browser (Chromium-like), no `projects`, no parallel workers;
 - timeouts: actions 5 s, assertions 5 s, test 20 s (real defaults: test 30 s, actions unlimited);
 - accessible names are computed in a simplified way;
-- no network interception, screenshots, video, trace;
+- no network interception, screenshots, video; the trace viewer is a simplified DOM-snapshot version;
 - `page.goto` only reaches the Bloomly app (`http://localhost:3000`);
 - a test that forgets `await` is reported explicitly (real Playwright may silently pass or fail randomly).

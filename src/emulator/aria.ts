@@ -5,11 +5,11 @@ import { normalizeWhitespace } from './format';
 const tag = (el: Element) => el.tagName.toLowerCase();
 const style = (el: Element) => el.ownerDocument.defaultView!.getComputedStyle(el);
 
+// Same mapping as Playwright's roleUtils: unknown types (password, date, …) fall back to textbox.
 const INPUT_ROLES: Record<string, string | null> = {
-  button: 'button', submit: 'button', reset: 'button', image: 'button',
+  button: 'button', submit: 'button', reset: 'button', image: 'button', file: 'button',
   checkbox: 'checkbox', radio: 'radio', range: 'slider', number: 'spinbutton', search: 'searchbox',
-  email: 'textbox', tel: 'textbox', text: 'textbox', url: 'textbox', '': 'textbox',
-  password: null, hidden: null, file: null, color: null, date: null, 'datetime-local': null, month: null, time: null, week: null,
+  email: 'textbox', tel: 'textbox', text: 'textbox', url: 'textbox', '': 'textbox', hidden: null,
 };
 
 const LANDMARK_CONTEXT = /^(article|aside|main|nav|section)$/;
@@ -28,6 +28,7 @@ export function getRole(el: Element): string | null {
     case 'input': {
       const type = (el.getAttribute('type') || '').toLowerCase();
       if ((type === '' || type === 'text' || type === 'search' || type === 'email' || type === 'tel' || type === 'url') && el.hasAttribute('list')) return 'combobox';
+      if (type === 'search' && el.hasAttribute('list')) return 'combobox';
       return type in INPUT_ROLES ? INPUT_ROLES[type] : 'textbox';
     }
     case 'textarea': return 'textbox';
@@ -319,4 +320,152 @@ export function suggestLocator(el: Element): string {
   if (role) return `getByRole(${q(role)})`;
   if (el.id) return `locator(${q('#' + el.id)})`;
   return `locator(${q(tag(el))})`;
+}
+
+// ---------- accessibility snapshot (what an agent sees through Playwright MCP) ----------
+
+export interface AriaNode {
+  /** ARIA role, or 'text' for loose text */
+  role: string;
+  name: string;
+  el: Element | null;
+  /** [level=1], [checked], [disabled], [selected] */
+  props: string[];
+  /** inline value: text of a leaf, value of a field */
+  value?: string;
+  url?: string;
+  placeholder?: string;
+  ref?: string;
+  children: AriaNode[];
+}
+
+const SKIP_TAGS = /^(script|style|template|noscript|head|meta|link)$/;
+const TEXT_LEAF_ROLES = new Set(['paragraph', 'listitem', 'cell', 'strong', 'emphasis', 'caption', 'status', 'alert', 'term', 'definition', 'code', 'blockquote', 'columnheader', 'rowheader', 'rowgroup', 'generic']);
+const VALUE_ROLES = new Set(['textbox', 'searchbox', 'spinbutton', 'combobox']);
+
+function mergeText(nodes: AriaNode[]): AriaNode[] {
+  const out: AriaNode[] = [];
+  for (const n of nodes) {
+    const prev = out[out.length - 1];
+    if (n.role === 'text' && prev?.role === 'text') prev.value = normalizeWhitespace(`${prev.value} ${n.value}`);
+    else out.push(n);
+  }
+  return out.filter((n) => n.role !== 'text' || n.value);
+}
+
+/** Builds a simplified accessibility tree like Playwright's ariaSnapshot(): roles, names, states; generic containers are flattened.
+ *  mcp: like Playwright MCP, also keep clickable elements without a role as `generic [cursor=pointer]`. */
+export function ariaTree(root: Element, opts: { mcp?: boolean } = {}): AriaNode[] {
+  let refs = 0;
+  const visit = (node: Node): AriaNode[] => {
+    if (node.nodeType === 3) {
+      const text = normalizeWhitespace(node.nodeValue || '');
+      return text ? [{ role: 'text', name: '', el: null, props: [], value: text, children: [] }] : [];
+    }
+    if (node.nodeType !== 1) return [];
+    const el = node as Element;
+    const t = tag(el);
+    if (SKIP_TAGS.test(t)) return [];
+    if (el.hasAttribute('data-preview-outline') || el.hasAttribute('data-emulator-overlay') || el.hasAttribute('data-inspector-overlay')) return [];
+    if (el.hasAttribute('hidden') || isHiddenForAria(el)) return [];
+    const role = getRole(el);
+    const named = !!role && role !== 'presentation' && role !== 'none' && role !== 'generic';
+    const clickable = !named && !!opts.mcp && style(el).cursor === 'pointer' && (!el.parentElement || style(el.parentElement).cursor !== 'pointer');
+    const ref = named || clickable ? `e${++refs}` : undefined;
+    let children: AriaNode[] = [];
+    if (t === 'select') children = Array.from((el as HTMLSelectElement).options).flatMap(visit);
+    else if (t !== 'input' && t !== 'textarea') el.childNodes.forEach((c) => { children.push(...visit(c)); });
+    if (t === 'br') return [{ role: 'text', name: '', el: null, props: [], value: ' ', children: [] }];
+    children = mergeText(children);
+    if (clickable) {
+      const g: AriaNode = { role: 'generic', name: '', el, props: ['cursor=pointer'], children, ref };
+      if (children.length && children.every((c) => c.role === 'text')) { g.value = children.map((c) => c.value).join(' ').trim(); g.children = []; }
+      return [g];
+    }
+    if (!named) return children;
+    const n: AriaNode = { role: role!, name: accessibleName(el), el, props: [], children, ref };
+    const level = role === 'heading' ? headingLevel(el) : undefined;
+    if (level) n.props.push(`level=${level}`);
+    const checked = isChecked(el);
+    if (checked === true) n.props.push('checked');
+    if (checked === 'mixed') n.props.push('checked=mixed');
+    if (t === 'option' && (el as HTMLOptionElement).selected) n.props.push('selected');
+    if (isDisabled(el)) n.props.push('disabled');
+    if (VALUE_ROLES.has(role) && t !== 'select') {
+      const v = (el as HTMLInputElement).value;
+      if (v) n.value = v;
+      const ph = el.getAttribute('placeholder');
+      if (ph && ph !== n.name) n.placeholder = ph;
+    }
+    if (role === 'link') n.url = el.getAttribute('href') || undefined;
+    // Text that only repeats the name is dropped; an unnamed leaf shows its text inline.
+    if (n.children.length && n.children.every((c) => c.role === 'text')) {
+      const text = n.children.map((c) => c.value).join(' ').trim();
+      if (n.name && normalizeWhitespace(text) === n.name) n.children = [];
+      else if (!n.name && TEXT_LEAF_ROLES.has(role)) { n.value = text; n.children = []; }
+    }
+    return [n];
+  };
+  return mergeText(Array.from(root.childNodes).flatMap(visit));
+}
+
+const yamlText = (s: string) => (/^[\s\-?:,[\]{}#&*!|>'"%@`]|: |:$|^\d+$/.test(s) ? JSON.stringify(s) : s);
+
+/** One line of the snapshot, e.g. `- button "Log in" [ref=e14]` */
+export function ariaLine(n: AriaNode, withRefs = false): string {
+  if (n.role === 'text') return `- text: ${yamlText(n.value || '')}`;
+  let s = `- ${n.role}`;
+  if (n.name) s += ` ${JSON.stringify(n.name)}`;
+  for (const p of n.props) if (!p.startsWith('cursor')) s += ` [${p}]`;
+  if (withRefs && n.ref) s += ` [ref=${n.ref}]`;
+  for (const p of n.props) if (p.startsWith('cursor')) s += ` [${p}]`;
+  const hasKids = n.children.length > 0 || !!n.url || !!n.placeholder;
+  if (n.value !== undefined && n.value !== '') s += `: ${VALUE_ROLES.has(n.role) ? JSON.stringify(n.value) : yamlText(n.value)}`;
+  else if (hasKids) s += ':';
+  return s;
+}
+
+/** Text form of the snapshot (YAML-like), as Playwright prints it. */
+export function ariaSnapshot(root: Element, withRefs = false): string {
+  const lines: string[] = [];
+  const walk = (nodes: AriaNode[], depth: number) => {
+    for (const n of nodes) {
+      lines.push('  '.repeat(depth) + ariaLine(n, withRefs));
+      if (n.url) lines.push('  '.repeat(depth + 1) + `- /url: ${n.url}`);
+      if (n.placeholder) lines.push('  '.repeat(depth + 1) + `- /placeholder: ${n.placeholder}`);
+      walk(n.children, depth + 1);
+    }
+  };
+  walk(ariaTree(root), 0);
+  return lines.join('\n');
+}
+
+// ---------- unique locator (like Playwright's "Pick locator") ----------
+
+function sameLocatorCount(el: Element, loc: string): number {
+  const doc = el.ownerDocument;
+  const all = Array.from(doc.body.querySelectorAll('*')).filter((e) => !isHiddenForAria(e) || e === el);
+  return all.filter((e) => suggestLocator(e) === loc).length;
+}
+
+const CONTAINERS: Array<{ match: (e: Element) => boolean; base: (e: Element) => string }> = [
+  { match: (e) => getRole(e) === 'row', base: () => "getByRole('row')" },
+  { match: (e) => !!e.getAttribute('data-testid') && /card|row|item/.test(e.getAttribute('data-testid')!), base: (e) => `getByTestId('${e.getAttribute('data-testid')}')` },
+  { match: (e) => getRole(e) === 'listitem' || getRole(e) === 'article', base: (e) => `getByRole('${getRole(e)}')` },
+];
+
+/** A locator that matches exactly this element: the suggested one, or scoped by its row / card via filter({ hasText }). */
+export function uniqueLocator(el: Element): string {
+  const base = suggestLocator(el);
+  if (sameLocatorCount(el, base) <= 1) return base;
+  for (let p = el.parentElement; p && p.tagName !== 'BODY'; p = p.parentElement) {
+    const c = CONTAINERS.find((x) => x.match(p!));
+    if (!c) continue;
+    const label = p.querySelector('h1, h2, h3, td, th, [data-testid$="name"]');
+    const text = normalizeWhitespace(label ? elementText(label) : '');
+    if (!text) continue;
+    return `${c.base(p)}.filter({ hasText: '${text.replace(/'/g, "\\'")}' }).${base}`;
+  }
+  const same = Array.from(el.ownerDocument.body.querySelectorAll('*')).filter((e) => suggestLocator(e) === base);
+  return `${base}.nth(${same.indexOf(el)})`;
 }

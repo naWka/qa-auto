@@ -189,6 +189,10 @@
     "SPRING20": {
       "percent": 20,
       "expired": true
+    },
+    "FLASH50": {
+      "percent": 50,
+      "expired": false
     }
   }
 }

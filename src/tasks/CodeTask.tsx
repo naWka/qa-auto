@@ -12,6 +12,7 @@ type CodeT = Extract<Task, { kind: 'fix' | 'find-bug' | 'code' }>;
 
 export function CodeTask({ task, register, phase }: KindProps<CodeT>) {
   const [code, setCode] = useState(task.starter);
+  const [files, setFiles] = useState(task.files);
   const [verdict, setVerdict] = useState<CodeVerdict | null>(null);
   const [busy, setBusy] = useState(false);
   const lab = useRef<LabHandle | null>(null);
@@ -25,7 +26,7 @@ export function CodeTask({ task, register, phase }: KindProps<CodeT>) {
       checkLabel: 'task.submitSolution',
       check: async () => {
         setBusy(true);
-        const run = (c: string, app: AppSetup | undefined, silent: boolean) => lab.current!.run({ code: c, app, silent, fast: silent });
+        const run = (c: string, app: AppSetup | undefined, silent: boolean) => lab.current!.run({ code: c, app, files, silent, fast: silent });
         const v = await gradeCode(code, task.checks, task.app, run);
         setVerdict(v);
         setBusy(false);
@@ -35,7 +36,7 @@ export function CodeTask({ task, register, phase }: KindProps<CodeT>) {
         }
         return { correct: v.ok, hadRedRun: red.current };
       },
-      reveal: () => { setCode(task.solution); setVerdict(null); },
+      reveal: () => { setCode(task.solution); setFiles(task.solutionFiles ?? task.files); setVerdict(null); },
     });
   });
 
@@ -50,9 +51,12 @@ export function CodeTask({ task, register, phase }: KindProps<CodeT>) {
         onCode={(c) => { setCode(c); setVerdict(null); }}
         readOnly={locked && phase !== 'correct'}
         app={task.app}
+        files={files}
+        onFiles={(f) => { setFiles(f); setVerdict(null); }}
         labRef={lab}
+        repeat={task.checks.repeat}
         onResult={onResult}
-        onReset={() => { setCode(task.starter); setVerdict(null); }}
+        onReset={() => { setCode(task.starter); setFiles(task.files); setVerdict(null); }}
       />
       {verdict && (
         <div className={`verdict ${verdict.ok ? 'ok' : 'bad'}`}>
@@ -60,8 +64,14 @@ export function CodeTask({ task, register, phase }: KindProps<CodeT>) {
             <div className="verdict-runs">
               <span className={`chip ${verdict.main.status === 'failed' ? 'chip-mint' : 'chip-coral'}`}><Icon name="bug" size={13} /> <U k="task.runOnBuggy" stack={false} />: {verdict.main.status === 'passed' ? '✓ pass' : '✗ fail'}</span>
               {verdict.also.map((a, i) => (
-                <span key={i} className={`chip ${a.ok ? 'chip-mint' : 'chip-coral'}`}><Icon name="shield" size={13} /> <U k="task.runOnFixed" stack={false} />: {a.result.status === 'passed' ? '✓ pass' : '✗ fail'}</span>
+                <span key={i} className={`chip ${a.ok ? 'chip-mint' : 'chip-coral'}`}><Icon name={a.expect === 'pass' ? 'shield' : 'bug'} size={13} /> <U k={a.expect === 'pass' ? 'task.runOnFixed' : 'task.runOnOther'} stack={false} />: {a.result.status === 'passed' ? '✓ pass' : '✗ fail'}</span>
               ))}
+            </div>
+          )}
+          {verdict.repeats && (
+            <div className="repeat-strip" aria-label="repeated runs">
+              {verdict.repeats.map((r, i) => <span key={i} className={`rep rep-${r}`}>{r === 'passed' ? '✓' : '✗'}</span>)}
+              <span className="muted small">{verdict.repeats.length}/{task.checks.repeat}</span>
             </div>
           )}
           {verdict.ok && task.kind === 'find-bug' && <Bi t={{ en: 'Bug caught: red on the buggy app, green on the fixed one.', ru: 'Баг пойман: красный на версии с багом, зелёный на исправленной.' }} size="sm" />}

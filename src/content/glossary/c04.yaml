@@ -148,8 +148,8 @@
     en: "What an element is for users and assistive technology: button, link, textbox, checkbox, heading."
     ru: "То, чем элемент является для пользователей и вспомогательных технологий: button, link, textbox, checkbox, heading."
   example:
-    en: "The password field has no textbox role, so use getByLabel('Password') instead."
-    ru: "У поля пароля нет роли textbox, поэтому используй getByLabel('Password')."
+    en: "The \"Add to cart\" div has no button role, so getByRole('button') can't find it — please use a real <button>."
+    ru: "У div «Add to cart» нет роли button, поэтому getByRole('button') его не находит, — пожалуйста, используйте настоящий <button>."
   context: code-review
   chapter: 4
 

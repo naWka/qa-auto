@@ -12,6 +12,8 @@ export interface Pacing {
 export class RunController {
   pacing: Pacing;
   aborted = false;
+  /** Trace recording: the page marks the element each action targets and emits 'highlight'. */
+  trace = false;
   private waiters: Array<() => void> = [];
   private emitFn: (e: RunEvent) => void;
 

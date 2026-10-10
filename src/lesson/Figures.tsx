@@ -137,6 +137,203 @@ function RedGreen() {
   );
 }
 
+
+type TT = { en: string; ru: string };
+
+function LocatorPriority() {
+  const rows: [string, TT, string][] = [
+    ["getByRole('button', { name: 'Log in' })", { en: 'What everyone sees: role + accessible name', ru: 'То, что видят все: роль + доступное имя' }, 'mint'],
+    ["getByLabel('Email')", { en: 'Form fields by their label', ru: 'Поля формы по подписи' }, 'mint'],
+    ["getByText('Your cart is empty.') · getByPlaceholder(…)", { en: 'Visible text; placeholder only without a label', ru: 'Видимый текст; placeholder — только если нет подписи' }, 'sky'],
+    ["getByTestId('cart-total')", { en: 'A contract with developers: stable, invisible to users', ru: 'Договорённость с разработчиками: стабильно, но не видно пользователю' }, 'butter'],
+    ["locator('#login-form > button.btn')", { en: 'CSS / XPath: last resort, breaks on redesign', ru: 'CSS / XPath: крайний случай, ломается от редизайна' }, 'coral'],
+  ];
+  return (
+    <div className="figure fig-ladder">
+      {rows.map(([code, t, tone], i) => (
+        <div key={i} className={`ladder-row tone-${tone}`}>
+          <span className="ladder-n">{i + 1}</span>
+          <code className="ladder-code">{code}</code>
+          <BiInline t={t} className="ladder-text" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Actionability() {
+  const steps: [TT, TT][] = [
+    [{ en: 'Attached', ru: 'В DOM' }, { en: 'the element exists', ru: 'элемент существует' }],
+    [{ en: 'Visible', ru: 'Видим' }, { en: 'has a size, not hidden', ru: 'имеет размер, не скрыт' }],
+    [{ en: 'Stable', ru: 'Неподвижен' }, { en: 'not animating', ru: 'не анимируется' }],
+    [{ en: 'Enabled', ru: 'Активен' }, { en: 'not disabled', ru: 'не disabled' }],
+    [{ en: 'Receives events', ru: 'Принимает клики' }, { en: 'not covered by a banner', ru: 'не закрыт баннером' }],
+  ];
+  return (
+    <div className="figure">
+      <div className="fig-flow fig-flow-tight">
+        {steps.map(([t, sub], i) => (
+          <div key={i} className="fig-step-wrap">
+            <Node tone={i === 4 ? 'rose' : 'mint'} icon={<Icon name="check" size={20} />} title={t} sub={sub} />
+            {i < steps.length - 1 && <Arrow />}
+          </div>
+        ))}
+      </div>
+      <div className="fig-caption"><Icon name="clock" size={14} /> <BiInline t={{ en: 'Playwright re-checks all of this until it passes or the timeout ends — then it acts.', ru: 'Playwright перепроверяет всё это, пока условия не выполнятся или не выйдет тайм-аут, — и только потом действует.' }} stack={false} /></div>
+    </div>
+  );
+}
+
+function FlakyCauses() {
+  const cards: [string, TT, TT][] = [
+    ['clock', { en: 'Race condition', ru: 'Состояние гонки' }, { en: 'The test reads before the app is done: “Loading products…” is still on screen.', ru: 'Тест читает раньше, чем приложение закончило: на экране ещё «Loading products…».' }],
+    ['globe', { en: 'Variable latency', ru: 'Плавающие задержки' }, { en: 'Fast today, slow tomorrow: hidden timing assumptions break.', ru: 'Сегодня быстро, завтра медленно: скрытые допущения о времени ломаются.' }],
+    ['repeat', { en: 'Shared state', ru: 'Общее состояние' }, { en: 'The same user, cart or order — tests depend on each other’s leftovers.', ru: 'Один пользователь, корзина или заказ — тесты зависят от чужих остатков.' }],
+    ['bug', { en: 'A real bug', ru: 'Настоящий баг' }, { en: 'Sometimes the app itself is flaky — then it’s a bug report, not a test fix.', ru: 'Иногда нестабильно само приложение — тогда это баг-репорт, а не правка теста.' }],
+  ];
+  return (
+    <div className="figure fig-cards">
+      {cards.map(([icon, t, d], i) => (
+        <div key={i} className="fig-card">
+          <div className="fig-card-head"><Icon name={icon} size={18} /> <BiInline t={t} className="fig-title" /></div>
+          <BiInline t={d} className="fig-sub" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Gate({ label }: { label: TT }) {
+  return <div className="fig-gate"><Icon name="eye" size={14} /> <BiInline t={label} stack={false} /></div>;
+}
+
+function TestAgents() {
+  return (
+    <div className="figure">
+      <div className="fig-flow">
+        <Node tone="lavender" icon={<Person who="you" size={34} />} title={{ en: 'You', ru: 'Ты' }} sub={{ en: 'request + seed test', ru: 'запрос + seed-тест' }} />
+        <Arrow />
+        <Node tone="rose" icon={<Icon name="map" size={24} />} title={{ en: 'Planner', ru: 'Планировщик' }} sub={{ en: 'explores the app → specs/plan.md', ru: 'исследует приложение → specs/plan.md' }} />
+        <Arrow />
+        <Node tone="sky" icon={<Icon name="code" size={24} />} title={{ en: 'Generator', ru: 'Генератор' }} sub={{ en: 'plan → tests/*.spec.ts, checks locators live', ru: 'план → tests/*.spec.ts, сверяет локаторы вживую' }} />
+        <Arrow />
+        <Node tone="peach" icon={<Icon name="wand" size={24} />} title={{ en: 'Healer', ru: 'Хилер' }} sub={{ en: 'failing test → fix or test.fixme()', ru: 'упавший тест → исправление или test.fixme()' }} />
+      </div>
+      <div className="fig-gates">
+        <Gate label={{ en: 'Gate 1: you approve the plan', ru: 'Точка 1: ты утверждаешь план' }} />
+        <Gate label={{ en: 'Gate 2: you review the code', ru: 'Точка 2: ты проверяешь код' }} />
+        <Gate label={{ en: 'Gate 3: you review every heal', ru: 'Точка 3: ты проверяешь каждое «лечение»' }} />
+      </div>
+    </div>
+  );
+}
+
+function ReviewGates() {
+  const gates: [TT, TT][] = [
+    [{ en: 'Plan', ru: 'План' }, { en: 'Right scenarios? Risks, boundaries, negatives?', ru: 'Те ли сценарии? Риски, границы, негативные случаи?' }],
+    [{ en: 'Code', ru: 'Код' }, { en: 'Five review questions for every test', ru: 'Пять вопросов ревью к каждому тесту' }],
+    [{ en: 'Proof', ru: 'Доказательство' }, { en: 'Each test goes red when its bug comes back', ru: 'Каждый тест краснеет, когда возвращается его баг' }],
+    [{ en: 'Heals', ru: 'Лечение' }, { en: 'Honest fix — or bug report + test.fixme()', ru: 'Честное исправление — или баг-репорт + test.fixme()' }],
+  ];
+  return (
+    <div className="figure fig-flow">
+      {gates.map(([t, d], i) => (
+        <div key={i} className="fig-step-wrap">
+          <Node tone={['lavender', 'sky', 'mint', 'peach'][i]} icon={<Icon name="shield" size={22} />} title={t} sub={d} />
+          {i < gates.length - 1 && <Arrow />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PageObject() {
+  return (
+    <div className="figure fig-pom">
+      <div className="pom-col">
+        {['login.spec.js', 'cart.spec.js', 'orders.spec.js'].map((f) => (
+          <div key={f} className="pom-file"><Icon name="code" size={14} /> {f}<span className="pom-call">loginPage.login(…)</span></div>
+        ))}
+      </div>
+      <Arrow />
+      <div className="pom-class">
+        <div className="pom-title"><Icon name="books" size={16} /> LoginPage</div>
+        <div className="pom-part"><BiInline t={{ en: 'Locators', ru: 'Локаторы' }} stack={false} /><code>email · password · submit</code></div>
+        <div className="pom-part"><BiInline t={{ en: 'Actions', ru: 'Действия' }} stack={false} /><code>goto() · login(email, password)</code></div>
+        <div className="pom-note"><BiInline t={{ en: 'The button was renamed? Change one line here.', ru: 'Переименовали кнопку? Меняешь одну строку здесь.' }} /></div>
+      </div>
+      <Arrow />
+      <div className="pom-page"><Icon name="globe" size={18} /> /login</div>
+    </div>
+  );
+}
+
+function FixtureLifecycle() {
+  return (
+    <div className="figure fig-flow">
+      <Node tone="mint" icon={<Icon name="wand" size={22} />} title={{ en: 'Setup', ru: 'Подготовка' }} sub={{ en: 'code before use(): log in, fill the cart', ru: 'код до use(): войти, наполнить корзину' }} />
+      <Arrow />
+      <Node tone="lavender" icon={<Icon name="play" size={22} />} title={{ en: 'use(value)', ru: 'use(value)' }} sub={{ en: 'the test runs with the ready value', ru: 'тест выполняется с готовым значением' }} />
+      <Arrow />
+      <Node tone="peach" icon={<Icon name="trash" size={22} />} title={{ en: 'Teardown', ru: 'Уборка' }} sub={{ en: 'code after use(): clean up, even if the test failed', ru: 'код после use(): уборка, даже если тест упал' }} />
+    </div>
+  );
+}
+
+function HttpExchange() {
+  return (
+    <div className="figure fig-http">
+      <div className="http-card http-req">
+        <div className="http-head"><span className="http-method">POST</span> /api/login</div>
+        <div className="http-sub"><BiInline t={{ en: 'Headers', ru: 'Заголовки' }} stack={false} /></div>
+        <code>Content-Type: application/json</code>
+        <div className="http-sub"><BiInline t={{ en: 'Body (JSON)', ru: 'Тело (JSON)' }} stack={false} /></div>
+        <pre>{'{ "email": "anna@bloomly.app",\n  "password": "bloom123" }'}</pre>
+      </div>
+      <Arrow />
+      <div className="http-card http-res">
+        <div className="http-head"><span className="http-status">200 OK</span></div>
+        <div className="http-sub"><BiInline t={{ en: 'Headers', ru: 'Заголовки' }} stack={false} /></div>
+        <code>content-type: application/json</code>
+        <div className="http-sub"><BiInline t={{ en: 'Body (JSON)', ru: 'Тело (JSON)' }} stack={false} /></div>
+        <pre>{'{ "token": "token-anna%40bloomly.app",\n  "user": { "name": "Anna Silva" } }'}</pre>
+      </div>
+    </div>
+  );
+}
+
+function UiVsApi() {
+  return (
+    <div className="figure fig-uiapi">
+      <div className="uiapi-row">
+        <span className="uiapi-label"><Icon name="globe" size={16} /> <BiInline t={{ en: 'Setup through the UI', ru: 'Подготовка через UI' }} stack={false} /></span>
+        <div className="uiapi-bar ui"><span>/login → fill → click → /shop → wait → add × 3 → /cart</span></div>
+        <span className="uiapi-time">~8 s</span>
+      </div>
+      <div className="uiapi-row">
+        <span className="uiapi-label"><Icon name="terminal" size={16} /> <BiInline t={{ en: 'Setup through the API', ru: 'Подготовка через API' }} stack={false} /></span>
+        <div className="uiapi-bar api"><span>POST /api/login · POST /api/orders</span></div>
+        <span className="uiapi-time">~0.1 s</span>
+      </div>
+      <div className="fig-caption"><Icon name="target" size={14} /> <BiInline t={{ en: 'Then check through the UI only what you are actually testing.', ru: 'А через UI проверяй только то, что действительно тестируешь.' }} stack={false} /></div>
+    </div>
+  );
+}
+
+function CiPipeline() {
+  return (
+    <div className="figure fig-flow">
+      <Node tone="lavender" icon={<Icon name="upload" size={22} />} title={{ en: 'Push / pull request', ru: 'Push / pull request' }} sub={{ en: 'git push origin my-branch', ru: 'git push origin my-branch' }} />
+      <Arrow />
+      <Node tone="sky" icon={<Icon name="gear" size={22} />} title={{ en: 'GitHub Actions', ru: 'GitHub Actions' }} sub={{ en: 'npm ci → npx playwright install → npx playwright test', ru: 'npm ci → npx playwright install → npx playwright test' }} />
+      <Arrow />
+      <Node tone="peach" icon={<Icon name="download" size={22} />} title={{ en: 'Report artifact', ru: 'Отчёт-артефакт' }} sub={{ en: 'playwright-report/ + traces', ru: 'playwright-report/ + трейсы' }} />
+      <Arrow />
+      <Node tone="mint" icon={<Icon name="shield" size={22} />} title={{ en: '✓ / ✗ on the PR', ru: '✓ / ✗ в PR' }} sub={{ en: 'red starts a conversation', ru: 'красное — повод поговорить' }} />
+    </div>
+  );
+}
+
 export function Figure({ id }: { id: string }) {
   switch (id) {
     case 'agent-loop': return <AgentLoop />;
@@ -145,6 +342,16 @@ export function Figure({ id }: { id: string }) {
     case 'dom-tree': return <DomTree />;
     case 'review-checklist': return <ReviewChecklist />;
     case 'red-green': return <RedGreen />;
+    case 'locator-priority': return <LocatorPriority />;
+    case 'actionability': return <Actionability />;
+    case 'flaky-causes': return <FlakyCauses />;
+    case 'test-agents': return <TestAgents />;
+    case 'review-gates': return <ReviewGates />;
+    case 'page-object': return <PageObject />;
+    case 'fixture-lifecycle': return <FixtureLifecycle />;
+    case 'http-exchange': return <HttpExchange />;
+    case 'ui-vs-api': return <UiVsApi />;
+    case 'ci-pipeline': return <CiPipeline />;
     default: return null;
   }
 }

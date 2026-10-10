@@ -5,7 +5,7 @@ import { Icon } from '../components/Icon';
 import { Mentor } from '../components/Mentor';
 import { Mochi } from '../components/Characters';
 import { chapterMastered, chapterUnlocked, currentStreak, lessonDone, termsLearned, useProgress } from '../store/progress';
-import { dueCount, lessonProgressRatio, nextBoss, nextLesson, weakTopics } from '../engine/plan';
+import { dueCount, lessonProgressRatio, nextBoss, nextLesson, weakTopics, placementVars } from '../engine/plan';
 import { levelFor } from '../engine/xp';
 import { pickPhrase } from '../engine/phrases';
 import { diffDays, today } from '../lib/dates';
@@ -96,7 +96,7 @@ export function HomePage() {
             {!p.placement?.done && !started && (
               <button className="card small-card accent" onClick={() => navigate('/placement')}>
                 <div className="small-card-head"><Icon name="compass" size={18} /> <U k="home.placementTitle" stack={false} /></div>
-                <div className="muted small"><U k="home.placementDesc" stack={false} /></div>
+                <div className="muted small"><U k="home.placementDesc" vars={placementVars()} stack={false} /></div>
               </button>
             )}
           </div>

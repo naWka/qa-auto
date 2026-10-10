@@ -18,6 +18,7 @@ import { LessonPage } from './pages/LessonPage';
 import { BossPage, CheckPage, PlacementPage, ReviewPage } from './pages/Flows';
 import { BadgesPage, GlossaryPage, InterviewPage, Onboarding, PlaygroundPage, SettingsPage } from './pages/OtherPages';
 import { SelfTestPage } from './pages/SelfTestPage';
+import { DevFiguresPage, DevLabPage, DevTaskPage } from './pages/DevPages';
 
 const NAV = [
   { path: '/', key: 'nav.home', icon: 'home' },
@@ -186,12 +187,16 @@ export function App() {
   const [a, b, c] = route.parts;
   let page: React.ReactNode;
   if (a === 'dev' && b === 'selftest') page = <SelfTestPage />;
+  else if (a === 'dev' && b === 'task' && c) page = <DevTaskPage id={c} />;
+  else if (a === 'dev' && b === 'lab') page = <DevLabPage />;
+  else if (a === 'dev' && b === 'figures') page = <DevFiguresPage />;
   else if (!onboarded && a !== 'placement') page = <Onboarding />;
   else if (!a) page = <HomePage />;
   else if (a === 'chapter' && b) page = <ChapterPage key={b} id={b} />;
   else if (a === 'lesson' && b) {
     const focus = route.query.get('focus');
-    page = <LessonPage key={`${b}-${focus}`} id={b} focus={focus ? focus.split(',').filter(Boolean) : null} />;
+    const step = route.query.get('step');
+    page = <LessonPage key={`${b}-${focus}-${step}`} id={b} focus={focus ? focus.split(',').filter(Boolean) : null} startStep={step ? Number(step) : undefined} />;
   } else if (a === 'check' && (b === 'lesson' || b === 'chapter') && c) page = <CheckPage key={`${b}-${c}`} scope={b} id={c} />;
   else if (a === 'boss' && b) page = <BossPage key={b} chapterId={b} />;
   else if (a === 'placement') page = <PlacementPage />;

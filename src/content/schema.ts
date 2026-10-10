@@ -26,6 +26,8 @@ export const AppConfig = z.object({
   latency: z.record(z.string(), z.union([z.number(), z.tuple([z.number(), z.number()])])).optional(),
   state: AppState.optional(),
   cookieBanner: z.boolean().optional(),
+  /** 'redesign': generated CSS class names and extra wrappers; same texts, roles, labels, test ids */
+  variant: z.enum(['redesign', 'sign-in']).optional(),
 }).strict();
 export type AppConfig = z.infer<typeof AppConfig>;
 
@@ -44,10 +46,16 @@ export const Checks = z.object({
   also: z.array(z.object({ app: AppConfig, expect: z.enum(['pass', 'fail']) }).strict()).optional(),
   static: z.array(StaticRule).optional(),
   minTests: z.number().int().optional(),
+  /** flaky-test fixes: the main run must give the expected outcome N times in a row (random latency) */
+  repeat: z.number().int().min(2).max(20).optional(),
 }).strict();
 export type Checks = z.infer<typeof Checks>;
 
 export const Option = z.object({ text: TS, correct: z.boolean().optional(), why: T.optional() }).strict();
+
+/** Extra virtual files next to the spec, e.g. { 'pages/LoginPage.js': '…' } — imported as './pages/LoginPage'. */
+export const Files = z.record(z.string().regex(/^[\w./-]+\.(js|ts|json)$/), z.string());
+export type Files = z.infer<typeof Files>;
 export type Option = z.infer<typeof Option>;
 
 export const TestCase = z.object({
@@ -99,6 +107,7 @@ export const FillTask = z.object({
   code: z.string(),
   blanks: z.array(z.object({ answers: z.array(z.string()).min(1), options: z.array(z.string()).optional() }).strict()).min(1),
   checks: Checks.optional(),
+  files: Files.optional(),
 }).strict();
 
 export const ParsonsTask = z.object({
@@ -109,6 +118,7 @@ export const ParsonsTask = z.object({
   alt: z.array(z.array(z.number().int())).optional(),
   code: z.boolean().optional(),
   checks: Checks.optional(),
+  files: Files.optional(),
 }).strict();
 
 export const MatchTask = z.object({
@@ -123,6 +133,7 @@ export const PredictTask = z.object({
   ...taskBase,
   kind: z.literal('predict'),
   code: z.string(),
+  files: Files.optional(),
   outcome: z.enum(['pass', 'fail']),
   reasons: z.array(Option).optional(),
 }).strict();
@@ -163,9 +174,11 @@ export const AgentTask = z.object({
     best: z.boolean().optional(),
     message: T,
     code: z.string(),
+    files: Files.optional(),
   }).strict()).min(2),
   missing: z.record(z.string(), T).optional(),
   checks: Checks.optional(),
+  files: Files.optional(),
 }).strict();
 
 export const CodeTask = z.object({
@@ -174,6 +187,38 @@ export const CodeTask = z.object({
   starter: z.string(),
   solution: z.string(),
   checks: Checks,
+  /** virtual files the student sees (and may edit) next to the spec */
+  files: Files.optional(),
+  /** the same files in the reference solution (defaults to `files`) */
+  solutionFiles: Files.optional(),
+}).strict();
+
+/** What the inspector panel reveals about the selected element (fading support). */
+export const InspectShow = z.enum(['attributes', 'role', 'name', 'locator']);
+export const InspectView = z.enum(['dom', 'aria', 'both']);
+
+/** Pick an element in the live page / DOM tree / accessibility snapshot. */
+export const InspectTask = z.object({
+  ...taskBase,
+  kind: z.literal('inspect'),
+  /** CSS selector of the element(s) that count as the right answer */
+  target: z.string(),
+  view: InspectView.optional(),
+  show: z.array(InspectShow).optional(),
+}).strict();
+
+/** Read a recorded run in a simplified trace viewer and point to the action where it went wrong. */
+export const TraceTask = z.object({
+  ...taskBase,
+  kind: z.literal('trace'),
+  code: z.string(),
+  files: Files.optional(),
+  /** code line(s) of the action the student should select */
+  answer: z.union([z.number().int().min(1), z.array(z.number().int().min(1)).min(1)]),
+  /** real outcome of the run (self-test verifies it) */
+  outcome: z.enum(['pass', 'fail']).optional(),
+  /** optional follow-up diagnosis question */
+  options: z.array(Option).optional(),
 }).strict();
 
 export const VocabTask = z.object({
@@ -191,12 +236,16 @@ export const VocabTask = z.object({
 
 export const Task = z.discriminatedUnion('kind', [
   ChoiceTask, InputTask, FillTask, ParsonsTask, MatchTask, PredictTask,
-  PickLocatorTask, ReviewTask, AgentTask, CodeTask, VocabTask,
+  PickLocatorTask, ReviewTask, AgentTask, CodeTask, VocabTask, InspectTask, TraceTask,
 ]);
 export type Task = z.infer<typeof Task>;
 export type TaskKind = Task['kind'];
 
-export const Figure = z.enum(['agent-loop', 'test-anatomy', 'manual-vs-auto', 'dom-tree', 'review-checklist', 'red-green']);
+export const Figure = z.enum([
+  'agent-loop', 'test-anatomy', 'manual-vs-auto', 'dom-tree', 'review-checklist', 'red-green',
+  'locator-priority', 'actionability', 'flaky-causes', 'test-agents', 'page-object', 'fixture-lifecycle',
+  'http-exchange', 'ui-vs-api', 'ci-pipeline', 'review-gates',
+]);
 
 export const Step = z.discriminatedUnion('type', [
   z.object({ type: z.literal('story'), lines: z.array(Line).min(1) }).strict(),
@@ -218,7 +267,31 @@ export const Step = z.discriminatedUnion('type', [
     code: z.string(),
     notes: z.array(z.object({ lines: z.union([z.number().int(), z.array(z.number().int())]), text: T }).strict()).min(1),
     app: AppConfig.optional(),
+    files: Files.optional(),
     runnable: z.boolean().optional(),
+    /** with runnable: also offer "Run ×N" (to show a flaky test) */
+    repeat: z.number().int().min(2).max(20).optional(),
+  }).strict(),
+  z.object({
+    type: z.literal('inspect'),
+    keyPoint: z.string().optional(),
+    title: T.optional(),
+    intro: T.optional(),
+    app: AppConfig.optional(),
+    /** CSS selector of the element selected at start */
+    focus: z.string().optional(),
+    view: InspectView.optional(),
+    mentor: T.optional(),
+  }).strict(),
+  z.object({
+    type: z.literal('trace'),
+    keyPoint: z.string().optional(),
+    title: T.optional(),
+    intro: T.optional(),
+    code: z.string(),
+    app: AppConfig.optional(),
+    files: Files.optional(),
+    mentor: T.optional(),
   }).strict(),
   z.object({
     type: z.literal('mapping'),

@@ -122,6 +122,8 @@ Mark 1–2 quick ones (`choice`/`fill`/`predict`/`input`) with `placement: true`
   code: |                              # optional snippet
     await page.goto('/login');
   figure: agent-loop                   # optional: agent-loop | test-anatomy | manual-vs-auto | dom-tree | review-checklist | red-green
+                                       #   | locator-priority | actionability | flaky-causes | test-agents | review-gates
+                                       #   | page-object | fixture-lifecycle | http-exchange | ui-vs-api | ci-pipeline
   mentor: { en: "...", ru: "..." }     # optional aside from Maya
 
 - type: example                        # worked example, notes attached to line numbers (1-based)
@@ -153,6 +155,23 @@ Mark 1–2 quick ones (`choice`/`fill`/`predict`/`input`) with `placement: true`
   links:                               # s<N> = action of step N, e<N> = expected result of step N
     - { from: s1, lines: [2] }
     - { from: e3, lines: [6] }
+
+- type: inspect                        # live page + DevTools-like inspector (chapter 4+)
+  title: {...}
+  intro: {...}
+  app: { route: /login }               # any AppConfig (state, bugs…)
+  focus: "#email"                      # optional: element selected at start (CSS, must match 1 element)
+  view: both                           # dom | aria | both (default both: Elements tree + agent's snapshot)
+  mentor: {...}
+
+- type: trace                          # records the run and opens a simplified trace viewer (chapter 7+)
+  title: {...}
+  intro: {...}
+  code: |
+    test('...', async ({ page }) => { ... });
+  app: {...}
+  files: {...}                         # optional virtual files
+  mentor: {...}
 
 - type: task
   task: <task>
@@ -339,6 +358,50 @@ docs/AUT.md), `placement`.
       - app: { state: { cart: [{ id: rose-bouquet, qty: 2 }] } }
         expect: pass
 
+# Inspect: the student picks an element on the live page, in the DOM tree or in the accessibility snapshot.
+# target = CSS selector of the right element(s) (el.matches(target)). show = what the details panel reveals while
+# answering (fading support; everything is shown after the answer). view: dom | aria | both.
+- id: c4-l3-t2
+  kind: inspect
+  app: { route: /cart, state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+  prompt: { en: "Find the element whose accessible name is “Increase Rose Bouquet”.", ru: "..." }
+  target: "[aria-label='Increase Rose Bouquet']"
+  view: aria
+  show: [attributes]
+
+# Trace: the run is recorded; the student clicks the action where things went wrong (answer = code line(s) of that
+# action) and optionally picks a diagnosis. outcome = real run result (self-test checks it).
+- id: c7-l3-t3
+  kind: trace
+  app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+  code: |
+    ...
+  answer: 5
+  outcome: fail
+  options:
+    - { text: { en: "A bug in the test: wrong promo code", ru: "..." }, correct: true, why: {...} }
+    - { text: { en: "A bug in the app", ru: "..." }, why: {...} }
+
+# Virtual files (chapter 9+): any runnable task (fix/find-bug/code, predict, agent, fill, parsons, trace)
+# and example steps accept `files` — extra modules next to the spec. In fix/find-bug tasks the student can edit
+# them (tabs above the editor); `solutionFiles` holds the reference version (defaults to `files`).
+# Agent responses may carry their own `files`. Spec imports: `import { LoginPage } from './pages/LoginPage';`.
+- id: c9-l2-t5
+  kind: fix
+  files:
+    pages/LoginPage.js: |
+      export class LoginPage { ... }
+  solutionFiles:
+    pages/LoginPage.js: |
+      export class LoginPage { ... }
+  starter: |
+    import { test, expect } from '@playwright/test';
+    import { LoginPage } from './pages/LoginPage';
+    ...
+  solution: |
+    ...
+  checks: { expect: pass }
+
 # Vocabulary quiz
 - id: c1-l1-t7
   kind: vocab
@@ -370,6 +433,11 @@ docs/AUT.md), `placement`.
   `getByButton`), CSS-class selectors, `waitForTimeout`, missing assertion, `expect(await x.isVisible()).toBeTruthy()`,
   wrong expected text vs the test case, wrong test data, steps that don't match the case.
 - Use `app.state` to preset login/cart when the lesson isn't about those steps.
+- `app.variant: redesign` (docs/AUT.md) = same app after a design-system migration; use it to prove a locator is
+  resilient (`also: [{ app: { variant: redesign }, expect: pass }]`).
+- Flaky tests: random `app.latency` ranges make runs non-deterministic — never in `predict`/`trace`; use `fix` with
+  `checks.repeat: 5` (must pass 5 runs in a row) and make the starter fail most runs. Example steps can offer
+  "Run ×N" with `runnable: true` + `repeat: 10`.
 
 ## 9. Glossary
 

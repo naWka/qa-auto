@@ -52,7 +52,7 @@ home:
   practice: { en: "Practise", ru: "Потренироваться" }
   mapTitle: { en: "Bloomly departments", ru: "Отделы Bloomly" }
   placementTitle: { en: "Already know some of this?", ru: "Что-то из этого уже знаешь?" }
-  placementDesc: { en: "Take a 10-minute entry check and skip what you know.", ru: "Пройди входную проверку на 10 минут и пропусти знакомое." }
+  placementDesc: { en: "Take a {min}-minute entry check and skip what you know.", ru: "Пройди входную проверку на {min} минут и пропусти знакомое." }
   allCaughtUp: { en: "All caught up for today", ru: "На сегодня всё повторено" }
   statsLessons: { en: "lessons", ru: "уроков" }
   statsTerms: { en: "terms", ru: "терминов" }
@@ -79,6 +79,8 @@ lesson:
   pretest: { en: "Quick guess", ru: "Угадай" }
   pretestNote: { en: "Before the lesson — guessing is fine. Mistakes now help you remember later.", ru: "До урока — можно гадать. Ошибки сейчас помогут запомнить." }
   example: { en: "Worked example", ru: "Разбор примера" }
+  inspect: { en: "Look under the hood", ru: "Заглянем под капот" }
+  trace: { en: "Trace viewer", ru: "Trace Viewer" }
   mapping: { en: "Test case → code", ru: "Тест-кейс → код" }
   hoverMapping: { en: "Hover or tap a step to see its code", ru: "Наведи или нажми на шаг, чтобы увидеть его код" }
   mistakes: { en: "Typical mistakes", ru: "Типичные ошибки" }
@@ -125,6 +127,8 @@ task:
     find-bug: { en: "Catch the bug", ru: "Поймай баг" }
     code: { en: "Write the test", ru: "Напиши тест" }
     vocab: { en: "Vocabulary", ru: "Лексика" }
+    inspect: { en: "Inspect the page", ru: "Исследуй страницу" }
+    trace: { en: "Read the trace", ru: "Прочитай трейс" }
   chooseOne: { en: "Choose one answer", ru: "Выбери один ответ" }
   chooseMany: { en: "Choose all that apply", ru: "Выбери все подходящие" }
   typeHere: { en: "Type your answer", ru: "Введи ответ" }
@@ -137,6 +141,7 @@ task:
   willFail: { en: "It will fail", ru: "Упадёт" }
   predictQuestion: { en: "Will this test pass or fail?", ru: "Этот тест пройдёт или упадёт?" }
   predictWhy: { en: "Why?", ru: "Почему?" }
+  diagnosis: { en: "Your diagnosis", ru: "Твой диагноз" }
   nowRun: { en: "Now run it and compare", ru: "Теперь запусти и сравни" }
   predictionRight: { en: "Your prediction matches the real run.", ru: "Твоё предсказание совпало с реальным запуском." }
   predictionWrong: { en: "The real run is different from your prediction.", ru: "Реальный запуск отличается от предсказания." }
@@ -159,6 +164,7 @@ task:
   running: { en: "Running…", ru: "Выполняется…" }
   stop: { en: "Stop", ru: "Стоп" }
   stepMode: { en: "Step by step", ru: "По шагам" }
+  runRepeat: { en: "Run ×{n}", ru: "Запустить ×{n}" }
   nextStep: { en: "Next step", ru: "Следующий шаг" }
   speed: { en: "Speed", ru: "Скорость" }
   resetCode: { en: "Reset code", ru: "Сбросить код" }
@@ -173,6 +179,7 @@ task:
   bugCaught: { en: "Bug caught: red on the buggy app, green on the fixed one.", ru: "Баг пойман: красный на версии с багом, зелёный на исправленной." }
   runOnBuggy: { en: "Run on the buggy app", ru: "Прогон на версии с багом" }
   runOnFixed: { en: "Run on the fixed app", ru: "Прогон на исправленной версии" }
+  runOnOther: { en: "Run on another buggy version", ru: "Прогон на другой версии с багом" }
   expectedOutcome: { en: "Expected", ru: "Ожидалось" }
   gotOutcome: { en: "Got", ru: "Получилось" }
   appNote: { en: "App state for this task", ru: "Состояние приложения в задании" }
@@ -306,7 +313,7 @@ onboarding:
   langDesc: { en: "English is part of the skill — we recommend both languages.", ru: "Английский — часть навыка, поэтому советуем оба языка." }
   formTitle: { en: "How should I address you in Russian?", ru: "Как к тебе обращаться по-русски?" }
   placementTitle: { en: "Want to skip what you know?", ru: "Хочешь пропустить знакомое?" }
-  placementDesc: { en: "12 practical tasks from chapters 1–3, about 10 minutes. Topics you nail are counted automatically.", ru: "12 практических заданий из глав 1–3, около 10 минут. Уверенно пройденные темы засчитаются автоматически." }
+  placementDesc: { en: "{n} practical tasks from chapters 1–{last}, about {min} minutes. Topics you nail are counted automatically.", ru: "{n} практических заданий из глав 1–{last}, около {min} минут. Уверенно пройденные темы засчитаются автоматически." }
   placementYes: { en: "Take the entry check", ru: "Пройти входную проверку" }
   placementNo: { en: "Start from the beginning", ru: "Начать с начала" }
 check:

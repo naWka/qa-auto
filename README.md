@@ -15,6 +15,10 @@ automation. The AI agent writes the code; the student learns to understand, dire
   (`public/aut`). The API mirrors Playwright Test (`test`, `expect`, `page.getByRole`, web-first assertions,
   auto-waiting, strict mode, fixtures, `request`). Step-by-step mode highlights each element; the report looks
   like Playwright's, with bilingual explanations. Simplifications are marked "Emulator note".
+- **Under the hood tools**: a DevTools-like inspector (DOM tree, accessibility snapshot as an agent sees it through
+  Playwright MCP, role / accessible name / suggested locator), a simplified trace viewer (Before/After snapshots of
+  every action), virtual files for page objects and fixtures, a fake REST API shared with the UI, a "redesign"
+  variant of Bloomly to prove locators resilient, and "Run ×N" for flaky tests.
 - **Spaced repetition** (SM-2) for terms and topics, "I know this" checks with practical task pools,
   an entry check, XP, levels, sticker badges, streaks, a glossary with pronunciation, interview prep.
 - Everything is static; progress lives in `localStorage` (export/import/reset in Settings).
@@ -28,8 +32,15 @@ npm run check:content  # validate YAML content
 npm run build          # content check + typecheck + production build
 ```
 
-Open `#/dev/selftest` in the dev server to run every reference solution, prediction and best agent response
-through the emulator.
+Dev pages (also available in production builds):
+- `#/dev/selftest` — runs every reference solution, prediction, best agent response, pick-locator, inspect and trace
+  task through the emulator (filter by id prefix, e.g. `c4-l2`). Scripts can call `window.__bloomqa.run(code, app, files)`
+  on this page to run a snippet.
+- `#/dev/task/<task-id>` — one task on its own; `#/lesson/<id>?step=N` — a lesson from step N.
+- `#/dev/lab` — the inspector, trace viewer and multi-file editor; `#/dev/figures` — all lesson figures.
+
+The final-project starter lives in `starter/`; the build packs it together with Bloomly (`public/aut`) into
+`downloads/bloomly-playwright-tests.zip` (see `scripts/starter-zip.ts`).
 
 ## Content
 

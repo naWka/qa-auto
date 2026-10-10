@@ -1,6 +1,7 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import YAML from 'yaml';
+import { STARTER_ZIP, buildStarterZip } from './scripts/starter-zip';
 
 // Content lives in YAML files; this plugin turns each into a JSON module.
 function yaml(): Plugin {
@@ -8,14 +9,39 @@ function yaml(): Plugin {
     name: 'content-yaml',
     transform(code, id) {
       if (!/\.ya?ml$/.test(id)) return null;
-      const data = YAML.parse(code, { prettyErrors: true });
-      return { code: `export default ${JSON.stringify(data)};`, map: null };
+      try {
+        const data = YAML.parse(code, { prettyErrors: true });
+        return { code: `export default ${JSON.stringify(data)};`, map: null };
+      } catch (e) {
+        // A broken lesson file is skipped (npm run check:content reports it); anything else stops the build.
+        if (!/\/chapters\/[^/]+\/l\d[^/]*\.ya?ml$/.test(id)) throw e;
+        this.warn(`skipping ${id}: ${(e as Error).message.split('\n')[0]}`);
+        return { code: 'export default null;', map: null };
+      }
+    },
+  };
+}
+
+// The final-project starter (chapter 11) as a downloadable zip: /qa-auto/downloads/bloomly-playwright-tests.zip
+function starterZip(): Plugin {
+  const root = import.meta.dirname;
+  return {
+    name: 'starter-zip',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (!req.url?.split('?')[0].endsWith(`/${STARTER_ZIP}`)) return next();
+        res.setHeader('Content-Type', 'application/zip');
+        res.end(buildStarterZip(root));
+      });
+    },
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: STARTER_ZIP, source: buildStarterZip(root) });
     },
   };
 }
 
 export default defineConfig({
   base: '/qa-auto/',
-  plugins: [react(), yaml()],
+  plugins: [react(), yaml(), starterZip()],
   build: { chunkSizeWarningLimit: 3000 },
 });

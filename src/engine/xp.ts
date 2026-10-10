@@ -3,7 +3,7 @@ import { story, type Level } from '../content';
 
 const BASE: Record<Task['kind'], number> = {
   choice: 5, input: 6, vocab: 4, match: 6, fill: 8, parsons: 8, predict: 8, 'pick-locator': 8,
-  review: 12, agent: 12, fix: 15, 'find-bug': 20, code: 20,
+  review: 12, agent: 12, fix: 15, 'find-bug': 20, code: 20, inspect: 8, trace: 10,
 };
 
 export const LESSON_BONUS = 15;

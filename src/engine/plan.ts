@@ -22,7 +22,7 @@ export function nextBoss(p: ProgressData): string | null {
   return null;
 }
 
-const QUICK = new Set(['choice', 'input', 'fill', 'parsons', 'match', 'predict', 'pick-locator', 'review', 'vocab']);
+const QUICK = new Set(['choice', 'input', 'fill', 'parsons', 'match', 'predict', 'pick-locator', 'review', 'vocab', 'inspect']);
 
 export interface WarmItem { cardId: string; task: Task }
 
@@ -102,11 +102,20 @@ export function chapterCheckItems(chapterId: string, p: ProgressData): { task: T
   });
 }
 
-/** Entry check: one quick item per lesson of every ready chapter. */
+/** The entry check covers the foundations only: later chapters build on them and are learned, not skipped. */
+export const PLACEMENT_CHAPTERS = 4;
+
+export function placementVars() {
+  const items = placementItems();
+  const last = Math.max(1, ...items.map((x) => chapters.find((c) => c.id === x.chapterId)?.number ?? 1));
+  return { n: items.length, last, min: Math.max(5, Math.round(items.length * 0.8)) };
+}
+
+/** Entry check: one quick item per lesson of the first ready chapters. */
 export function placementItems(): { task: Task; lessonId: string; chapterId: string }[] {
   const out: { task: Task; lessonId: string; chapterId: string }[] = [];
   for (const ch of chapters) {
-    if (ch.status !== 'ready') continue;
+    if (ch.status !== 'ready' || ch.number > PLACEMENT_CHAPTERS) continue;
     for (const l of lessonsOf(ch)) {
       const pool = l.checkPool.filter((t) => t.placement);
       const quick = l.checkPool.filter((t) => QUICK.has(t.kind) && t.kind !== 'review');

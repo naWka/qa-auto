@@ -58,6 +58,7 @@ export type RunEvent =
   | { type: 'step-end'; step: StepRecord }
   | { type: 'line'; line: number | null }
   | { type: 'navigate'; url: string }
+  | { type: 'highlight'; label: string }
   | { type: 'log'; text: string }
   | { type: 'paused'; title: string; line?: number }
   | { type: 'test-end'; result: TestResult }

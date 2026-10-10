@@ -27,13 +27,18 @@ Products (shop order = "Most popular"):
 | mint-succulent | Mint Succulent | plants | €12.00 | yes |
 | white-orchid | White Orchid | plants | €29.00 | **out of stock** (button disabled) |
 
-Promo codes: `BLOOM10` = −10%; `SPRING20` = expired. Delivery €4.90, free when
+Promo codes: `BLOOM10` = −10%; `SPRING20` = expired; `FLASH50` = −50% (flash sale — the only way to hit the
+free-delivery boundary exactly: 2 Rose Bouquet + 1 Lavender Pot + 1 Mint Succulent = €100.00 → €50.00 after the
+discount → delivery Free; bug `free-delivery-boundary` charges €4.90 there). Delivery €4.90, free when
 (subtotal − discount) ≥ €50. Prices are formatted `€35.00`.
 
 Anna's orders (newest first): #1042 2026-09-28 Rose Bouquet, Lavender Pot €53.00 Delivered ·
 #1041 2026-09-21 Sunny Tulips €28.90 Shipped · #1040 2026-09-14 Peony Dream €46.90 Processing ·
 #1039 2026-09-02 Mint Succulent, Mint Succulent €28.90 Delivered · #1038 2026-08-25 White Orchid €33.90 Cancelled ·
 #1037 2026-08-11 Rose Bouquet, Sunny Tulips €59.00 Delivered.
+
+Tom's orders: #1036 2026-09-30 Lavender Pot €22.90 Processing · #1035 2026-09-10 Peony Dream, Rose Bouquet €77.00 Shipped.
+Maya has no orders. A new order (UI checkout or API) gets id 1043.
 
 ## Layout on every page
 
@@ -51,7 +56,9 @@ Anna's orders (newest first): #1042 2026-09-28 Rose Bouquet, Lavender Pot €53.
 ### `/login` — Log in (title "Log in · Bloomly")
 - h1 **"Log in"** (note: the text "Log in" also appears on the nav link and the submit button → `getByText('Log in')` is a strict-mode violation).
 - `getByLabel('Email')` — text input `#email`, placeholder "you@example.com".
-- `getByLabel('Password')` — password input `#password`, placeholder "Your password" (password inputs have NO role textbox).
+- `getByLabel('Password')` — password input `#password`, placeholder "Your password". Like in real Playwright, a password
+  input has the role `textbox` (`getByRole('textbox', { name: 'Password' })` works), so `getByRole('textbox')` on `/login`
+  matches 2 elements.
 - checkbox **"Remember me"**.
 - button **"Log in"** (`data-testid=login-button`). While submitting (≈250 ms) it is disabled with text "Logging in…".
 - error box `getByRole('alert')` / `getByTestId('login-error')` (hidden until an error):
@@ -114,6 +121,26 @@ Anna's orders (newest first): #1042 2026-09-28 Rose Bouquet, Lavender Pot €53.
 
 ### Anything else → h1 "Page not found", title "Not found · Bloomly".
 
+## REST API (for the `request` fixture, chapter 10)
+
+Same data as the UI. Within one test the API and the page share one "server": an order created with
+`POST /api/orders` shows up on `/orders` (after a reload), a user created on `/signup` can log in via `POST /api/login`,
+an order cancelled with `DELETE /api/orders/:id` shows "Cancelled" on `/orders`. Logging in through the API does **not**
+log the page in (use `app.state.user` — like `storageState` in real Playwright).
+
+| Method & path | Auth | Success | Errors |
+|---|---|---|---|
+| `GET /api/health` | — | 200 `{ status: "ok" }` | |
+| `GET /api/products` (`?category=plants`, `?q=rose`) | — | 200 array of `{ id, name, category, price, inStock }` (price is a number: `35`) | |
+| `GET /api/products/:id` | — | 200 product | 404 `{ error: "Product not found" }` |
+| `POST /api/login` `{ email, password }` | — | 200 `{ token, user: { email, name } }`, token = `token-anna%40bloomly.app` | 400 `{ error: "Email and password are required" }` · 401 `{ error: "Invalid email or password" }` · 423 `{ error: "Account is locked" }` |
+| `GET /api/orders` | Bearer | 200 the user's orders `{ id, user, date, items, total, status }` (Anna: 6, ids 1037–1042) | 401 `{ error: "Unauthorized" }` |
+| `POST /api/orders` `{ items: [{ id, qty }] }` | Bearer | 201 order (id 1043, status "Processing", total incl. €4.90 delivery under €50; items "Rose Bouquet ×2") | 400 `Items are required` / `Unknown product: x` · 401 · 409 `White Orchid is out of stock` |
+| `GET /api/orders/:id` | Bearer | 200 order | 401 · 404 `Order not found` (also for another user's order) |
+| `DELETE /api/orders/:id` | Bearer | 204 (only "Processing" orders) | 401 · 404 · 409 `Only processing orders can be cancelled` |
+
+Header: `Authorization: Bearer <token>`. Any other path → 404 `{ error: "Not found: /api/…" }`; wrong method → 405.
+
 ## Bugs that tasks can switch on (`app.bugs`)
 
 | id | effect |
@@ -138,11 +165,38 @@ Anna's orders (newest first): #1042 2026-09-28 Rose Bouquet, Lavender Pot €53.
 | `checkout-past-date` | past delivery dates are accepted |
 | `orders-filter-wrong` | "Shipped" filter also shows Processing orders |
 | `orders-summary-wrong` | summary always counts all orders ("Showing 6 of 6") |
+| `a11y-add-to-cart-div` | "Add to cart" on product cards is a `<div class="btn small">` (no button role, out of stock = `aria-disabled="true"`): `getByRole('button', { name: 'Add to cart' })` finds nothing; `getByText`, `getByTestId` and a mouse click still work |
+| `a11y-qty-unnamed` | cart −/+ buttons and the quantity field have no `aria-label`: the buttons are named "−" / "+", the spinbutton has no name |
+| `a11y-search-no-label` | the shop search field has no `<label>` (placeholder "Search flowers" only): `getByLabel('Search')` finds nothing; `getByRole('searchbox', { name: 'Search flowers' })` works (name from the placeholder) |
+| `api-orders-no-auth` | `GET /api/orders` without a token returns 200 with **all** users' orders (expected 401) |
+| `api-total-no-delivery` | `POST /api/orders` never adds the €4.90 delivery fee |
+| `api-login-locked` | `POST /api/login` for locked@bloomly.app returns 200 with a token (expected 423) |
+| `api-out-of-stock-order` | `POST /api/orders` with `white-orchid` returns 201 (expected 409) |
+| `api-order-other-user` | `GET /api/orders/:id` returns another user's order (Tom can read Anna's #1042; expected 404) |
+| `api-price-string` | `GET /api/products(/:id)` returns `price` as a string `"35.00"` instead of the number `35` |
+
+## Redesign variant (`app.variant: redesign`)
+
+A "design-system migration" of the same app: every CSS class becomes a generated name (`btn` → `bl_btn__375kd`,
+`product-card` → `bl_productCard__lafxr`, …), form label+field pairs are wrapped in `<div class="bl_field__…">`,
+nav links are wrapped in a `<div>`, product cards show the price above the name and the image inside a wrapper div.
+**Unchanged:** all texts, roles, accessible names, labels, `id`s and `data-testid`s. So `locator('.btn')`,
+`locator('#login-form > input:nth-child(3)')`, `article > h2 + p` break; `getByRole`, `getByLabel`, `getByText`,
+`getByTestId`, `#email` keep working. Typical use: a task that must pass on both versions
+(`checks: { expect: pass, also: [{ app: { variant: redesign }, expect: pass }] }`).
+Standalone: `?variant=redesign`.
+
+## "Sign in" variant (`app.variant: sign-in`)
+
+A planned copy change: the submit button on `/login` says **"Sign in"** instead of "Log in" (same `data-testid=login-button`;
+the h1 and the nav link still say "Log in"). Use it for "the app changed on purpose" situations: a healer fixing a
+locator honestly, or a page object updated in one place. Standalone: `?variant=sign-in`.
 
 ## Latency (`app.latency`)
 
 Keys: `products` (default 150), `orders` (400), `login` (250), `signup` (250), `checkout` (300), `cookies` (0).
-Value: ms or `[min, max]` (random each run — used to create flaky tests).
+Value: ms or `[min, max]` (random each run — used to create flaky tests; such tasks can't be `predict`/`trace`,
+use `fix` with `checks.repeat: N` — the solution must pass N runs in a row).
 `app.cookieBanner: true` shows a fixed cookie dialog (role dialog "Cookie consent", buttons **Accept all** / **Reject**) that covers the bottom of the page.
 
 ## Preset state (`app.state`)
@@ -154,3 +208,6 @@ app:
     cart: [{ id: rose-bouquet, qty: 2 }]
     promo: BLOOM10
 ```
+
+Standalone (the final project, `npx serve -s app`): bugs and the variant come from the query string,
+`/?bugs=greeting-wrong-name,promo-stacks&variant=redesign`, and are remembered for the browser tab (sessionStorage).

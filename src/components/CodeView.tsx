@@ -5,7 +5,67 @@ import { classHighlighter, highlightTree } from '@lezer/highlight';
 
 type Tok = { text: string; cls: string };
 
+/** Plain-text snippets (Markdown plans, rules files, YAML workflows, shell commands) get a light highlighter. */
+export function detectLang(code: string): 'js' | 'md' | 'yaml' | 'shell' | 'html' {
+  const lines = code.split('\n').filter((l) => l.trim());
+  if (!lines.length) return 'js';
+  if (/^\s*<[a-zA-Z!]/.test(lines[0]) && lines.every((l) => !/\b(await|const|test\(|=>)/.test(l))) return 'html';
+  const jsish = lines.filter((l) => /[;{}]|=>|\bawait\b|\bconst\b|\bimport\b|\bexport\b|\bfunction\b/.test(l)).length;
+  if (lines.every((l) => /^\s*(\$ |npx |npm |git |cd |code |claude |playwright-cli |node |mkdir |#)/.test(l)) && lines.some((l) => !/^\s*#/.test(l))) return 'shell';
+  if (/^(name|on|jobs|steps|runs-on):/m.test(code) && /^\s+- (uses|run|name):/m.test(code)) return 'yaml';
+  if (jsish / lines.length < 0.25 && lines.some((l) => /^\s*(#{1,4} |[-*] |\d+\. |\*\*)/.test(l))) return 'md';
+  return 'js';
+}
+
+function simpleTokens(line: string, lang: 'md' | 'yaml' | 'shell' | 'html'): Tok[] {
+  const out: Tok[] = [];
+  const push = (text: string, cls = '') => { if (text) out.push({ text, cls }); };
+  if (lang === 'html') {
+    for (const part of line.split(/(<!--.*?-->|<\/?[a-zA-Z][^>]*>)/)) {
+      if (/^<!--/.test(part)) { push(part, 'tok-comment'); continue; }
+      const m = part.match(/^(<\/?)([a-zA-Z][\w-]*)([^>]*?)(\/?>)$/);
+      if (!m) { push(part); continue; }
+      push(m[1], 'tok-punctuation'); push(m[2], 'tok-typeName');
+      for (const a of m[3].split(/(\s[\w:-]+(?:="[^"]*")?)/)) {
+        const am = a.match(/^(\s[\w:-]+)(=)?("[^"]*")?$/);
+        if (am) { push(am[1], 'tok-propertyName'); push(am[2] || '', 'tok-punctuation'); push(am[3] || '', 'tok-string'); } else push(a);
+      }
+      push(m[4], 'tok-punctuation');
+    }
+    return out;
+  }
+  if (lang === 'md') {
+    const h = line.match(/^(\s*#{1,4} )(.*)$/);
+    if (h) { push(h[1], 'tok-keyword'); push(h[2], 'tok-heading'); return out; }
+    const m = line.match(/^(\s*(?:[-*]|\d+\.) )?(.*)$/)!;
+    push(m[1] || '', 'tok-punctuation');
+    for (const part of (m[2] || '').split(/(\*\*[^*]+\*\*|`[^`]+`|"[^"]*")/)) {
+      if (/^\*\*/.test(part)) push(part, 'tok-heading');
+      else if (/^`/.test(part)) push(part, 'tok-propertyName');
+      else if (/^"/.test(part)) push(part, 'tok-string');
+      else push(part);
+    }
+    return out;
+  }
+  if (lang === 'yaml') {
+    const m = line.match(/^(\s*-?\s*)([\w.-]+:)?(.*)$/)!;
+    push(m[1]); push(m[2] || '', 'tok-propertyName');
+    const rest = m[3] || '';
+    const c = rest.indexOf(' #');
+    if (c >= 0) { push(rest.slice(0, c), 'tok-string'); push(rest.slice(c), 'tok-comment'); } else push(rest, rest.trim() ? 'tok-string' : '');
+    return out;
+  }
+  if (/^\s*#/.test(line)) { push(line, 'tok-comment'); return out; }
+  const m = line.match(/^(\s*\$?\s*)(\S+)(.*)$/);
+  if (!m) { push(line); return out; }
+  push(m[1]); push(m[2], 'tok-keyword');
+  for (const part of m[3].split(/(\s--?[\w-]+(?:=\S+)?)/)) push(part, /^\s--?/.test(part) ? 'tok-propertyName' : '');
+  return out;
+}
+
 export function highlightLines(code: string): Tok[][] {
+  const lang = detectLang(code);
+  if (lang !== 'js') return code.split('\n').map((l) => simpleTokens(l, lang));
   const tree = parser.parse(code);
   const marks: { from: number; to: number; cls: string }[] = [];
   highlightTree(tree, classHighlighter, (from, to, classes) => marks.push({ from, to, cls: classes }));

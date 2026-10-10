@@ -69,7 +69,7 @@ export function DiffView({ before, after }: { before: string; after: string }) {
 export function KindChip({ kind }: { kind: string }) {
   const icons: Record<string, string> = {
     choice: 'check', input: 'chat', fill: 'code', parsons: 'menu', match: 'repeat', predict: 'crystal', 'pick-locator': 'target',
-    review: 'eye', agent: 'sparkle', fix: 'bug', 'find-bug': 'bug', code: 'code', vocab: 'book',
+    review: 'eye', agent: 'sparkle', fix: 'bug', 'find-bug': 'bug', code: 'code', vocab: 'book', inspect: 'inspect', trace: 'clock',
   };
   return <span className={`kind-chip kind-${kind}`}><Icon name={icons[kind] || 'sparkle'} size={14} /> <U k={`task.kind.${kind}`} stack={false} /></span>;
 }

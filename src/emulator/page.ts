@@ -8,7 +8,7 @@ import { Pending, SPEC, type TestRuntime } from './runtime';
 export const BASE_URL = 'http://localhost:3000';
 
 export interface BloomlyCtx {
-  config: { bugs: string[]; latency: Record<string, number | [number, number]>; cookieBanner?: boolean };
+  config: { bugs: string[]; latency: Record<string, number | [number, number]>; cookieBanner?: boolean; variant?: string };
   storage: Record<string, string>;
   onNavigate?: (path: string) => void;
   onReady?: (win: Window) => void;
@@ -244,6 +244,11 @@ export class Page {
   // ---- highlight overlay inside the app ----
   _highlight(el: Element, label: string) {
     const doc = el.ownerDocument;
+    if (this._rt.ctl.trace) {
+      doc.querySelectorAll('[data-trace-target]').forEach((n) => n.removeAttribute('data-trace-target'));
+      el.setAttribute('data-trace-target', '');
+      this._rt.ctl.emit({ type: 'highlight', label });
+    }
     const r = el.getBoundingClientRect();
     let ov = this._overlay;
     if (!ov || ov.ownerDocument !== doc || !ov.isConnected) {
@@ -433,6 +438,7 @@ export class Locator {
       const type = t === 'input' ? (el as HTMLInputElement).type : '';
       const isText = (t === 'input' && !/^(checkbox|radio|file|submit|button|reset|image|range|color|hidden)$/.test(type)) || t === 'textarea' || (el as HTMLElement).isContentEditable;
       if (!isText) {
+        if (t === 'input') throw new EmuError('not-input', `${method}: Error: Input of type "${type}" cannot be filled\nCall log:\n  - waiting for ${desc}\n  - locator resolved to ${previewElement(el)}`, { locator: desc, element: previewElement(el) });
         throw new EmuError('not-input', `${method}: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n  - waiting for ${desc}\n  - locator resolved to ${previewElement(el)}`, { locator: desc, element: previewElement(el) });
       }
       if (type === 'number' && value.trim() !== '' && isNaN(Number(value))) {

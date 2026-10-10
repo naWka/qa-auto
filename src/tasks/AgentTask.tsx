@@ -4,7 +4,7 @@ import { Bi, U, useLang } from '../components/Bi';
 import { CodeView } from '../components/CodeView';
 import { Icon } from '../components/Icon';
 import { Petal } from '../components/Characters';
-import { CodeLab } from '../lab/CodeLab';
+import { CodeLab, FilesView } from '../lab/CodeLab';
 import type { KindProps } from './types';
 
 type Agent = Extract<Task, { kind: 'agent' }>;
@@ -100,6 +100,7 @@ export function AgentTask({ task, register, phase }: KindProps<Agent>) {
               <Bi t={response.message} />
             </div>
           </div>
+          <FilesView files={response.files} />
           <CodeView code={response.code} label="example.spec.js" />
           {missing.length > 0 && (
             <div className="agent-missing">
@@ -109,7 +110,7 @@ export function AgentTask({ task, register, phase }: KindProps<Agent>) {
           )}
           <details className="agent-run">
             <summary><Icon name="play" size={15} /> <U k="task.run" stack={false} /></summary>
-            <CodeLab code={response.code} readOnly app={task.app} browserHeight={340} />
+            <CodeLab code={response.code} readOnly app={task.app} files={response.files ?? task.files} browserHeight={340} />
           </details>
         </div>
       )}

@@ -4,6 +4,16 @@ import type { T, TS } from '../content/schema';
 import type { Gender } from '../store/settings';
 
 marked.setOptions({ gfm: true, breaks: false });
+// External links (docs) open in a new tab so the lesson stays where it was; downloads stay in place.
+marked.use({
+  renderer: {
+    link({ href, title, tokens }) {
+      const text = this.parser.parseInline(tokens);
+      const ext = /^https?:\/\//.test(href);
+      return `<a href="${href}"${title ? ` title="${title}"` : ''}${ext ? ' target="_blank" rel="noopener noreferrer"' : ''}${/\.zip$/.test(href) ? ' download' : ''}>${text}</a>`;
+    },
+  },
+});
 
 const GENDER_RE = /\{([^{}|]*)\|([^{}|]*)\}/g;
 

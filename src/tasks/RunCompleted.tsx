@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import type { AppConfig } from '../content/schema';
+import type { AppConfig, Files } from '../content/schema';
 import { CodeLab } from '../lab/CodeLab';
 import { Icon } from '../components/Icon';
 import { U } from '../components/Bi';
 
 /** "See it run": an optional read-only lab for a completed snippet. */
-export function RunCompleted({ code, app }: { code: string; app?: AppConfig }) {
+export function RunCompleted({ code, app, files, repeat }: { code: string; app?: AppConfig; files?: Files; repeat?: number }) {
   const [open, setOpen] = useState(false);
   if (!open) {
     return (
@@ -14,5 +14,5 @@ export function RunCompleted({ code, app }: { code: string; app?: AppConfig }) {
       </button>
     );
   }
-  return <div className="run-completed"><CodeLab code={code} readOnly app={app} browserHeight={360} /></div>;
+  return <div className="run-completed"><CodeLab code={code} readOnly app={app} files={files} repeat={repeat} browserHeight={360} /></div>;
 }

@@ -10,12 +10,16 @@ import { useRunner, type RunArgs } from './useRunner';
 import type { AppSetup, RunResult } from '../emulator';
 import { useSettings } from '../store/settings';
 
+const SPEC_NAME = 'example.spec.js';
+
 export interface CodeLabProps {
   code: string;
   onCode?: (code: string) => void;
   readOnly?: boolean;
   app?: AppSetup;
   files?: Record<string, string>;
+  /** editing of the extra files (page objects, fixtures); without it they are read-only */
+  onFiles?: (files: Record<string, string>) => void;
   mode?: 'spec' | 'script';
   onResult?: (r: RunResult) => void;
   onReset?: () => void;
@@ -26,20 +30,56 @@ export interface CodeLabProps {
   browserHeight?: number;
   labRef?: React.MutableRefObject<LabHandle | null>;
   layout?: 'split' | 'stack';
+  /** show a "Run ×N" button: runs the test N times in a row (flaky tests) */
+  repeat?: number;
 }
 
 export interface LabHandle {
   run: (args?: Partial<RunArgs>) => Promise<RunResult>;
 }
 
-export function CodeLab({ code, onCode, readOnly, app, files, mode = 'spec', onResult, onReset, actions, hideRun, browserHeight = 420, labRef, layout = 'split' }: CodeLabProps) {
+/** Read-only list of extra files shown above a snippet (e.g. a page object the test imports). */
+export function FilesView({ files }: { files?: Record<string, string> }) {
+  if (!files || !Object.keys(files).length) return null;
+  return (
+    <div className="files-view">
+      {Object.entries(files).map(([name, src]) => (
+        <details key={name} className="file-block" open>
+          <summary><Icon name="code" size={14} /> {name}</summary>
+          <CodeView code={src} />
+        </details>
+      ))}
+    </div>
+  );
+}
+
+export function CodeLab({ code, onCode, readOnly, app, files, onFiles, mode = 'spec', onResult, onReset, actions, hideRun, browserHeight = 420, labRef, layout = 'split', repeat }: CodeLabProps) {
+  const [reps, setReps] = useState<('passed' | 'failed')[] | null>(null);
+  const [repBusy, setRepBusy] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
+  const [file, setFile] = useState<string>(SPEC_NAME);
+  const fileNames = files ? Object.keys(files) : [];
+  const onSpec = file === SPEC_NAME || !files || !(file in files);
   const { live, run, stop, next, setStepMode } = useRunner(frame);
   const [tab, setTab] = useState<'code' | 'browser' | 'report'>('code');
   const [jump, setJump] = useState<number | null>(null);
   const s = useUiString();
   const speed = useSettings((x) => x.speed);
   const update = useSettings((x) => x.update);
+
+  const runRepeat = async () => {
+    if (!repeat) return;
+    setRepBusy(true);
+    const out: ('passed' | 'failed')[] = [];
+    setReps([]);
+    for (let i = 0; i < repeat; i++) {
+      const r = await run({ code, app, files, mode, fast: true, silent: i < repeat - 1 });
+      if (r.status === 'aborted') break;
+      out.push(r.status === 'passed' ? 'passed' : 'failed');
+      setReps([...out]);
+    }
+    setRepBusy(false);
+  };
 
   const doRun = async (extra: Partial<RunArgs> = {}) => {
     if (window.innerWidth < 900) setTab('browser');
@@ -53,12 +93,25 @@ export function CodeLab({ code, onCode, readOnly, app, files, mode = 'spec', onR
     if (labRef) labRef.current = { run: doRun };
   });
 
-  const errLine = live.result?.error?.line ?? live.result?.tests.find((t) => t.error)?.error?.line ?? null;
+  const errInfo = live.result?.error ?? live.result?.tests.find((t) => t.error)?.error;
+  const errLine = errInfo && (!errInfo.file || errInfo.file === SPEC_NAME) ? errInfo.line ?? null : null;
 
-  const editor = readOnly ? (
+  const fileTabs = fileNames.length > 0 && (
+    <div className="file-tabs" role="tablist">
+      {[SPEC_NAME, ...fileNames].map((f) => (
+        <button key={f} type="button" role="tab" aria-selected={file === f} className={file === f ? 'active' : ''} onClick={() => setFile(f)}>{f}</button>
+      ))}
+    </div>
+  );
+  const otherReadOnly = readOnly || !onFiles;
+  const editor = !onSpec ? (
+    otherReadOnly
+      ? <CodeView key={file} code={files![file]} className="lab-codeview" />
+      : <CodeEditor key={file} value={files![file]} onChange={(v) => onFiles!({ ...files!, [file]: v })} minHeight={240} />
+  ) : readOnly ? (
     <CodeView code={code} runLine={live.running ? live.runLine : jump} errorLine={!live.running ? errLine : null} className="lab-codeview" />
   ) : (
-    <CodeEditor value={code} onChange={onCode} runLine={live.running ? live.runLine : jump} errorLine={!live.running ? errLine : null} minHeight={240} />
+    <CodeEditor key={SPEC_NAME} value={code} onChange={onCode} runLine={live.running ? live.runLine : jump} errorLine={!live.running ? errLine : null} minHeight={240} />
   );
 
   const toolbar = (
@@ -70,6 +123,9 @@ export function CodeLab({ code, onCode, readOnly, app, files, mode = 'spec', onR
       ))}
       {live.running && live.paused && (
         <button className="btn btn-rose" onClick={next}><Icon name="stepFwd" size={16} /> <U k="task.nextStep" stack={false} /></button>
+      )}
+      {repeat && !live.running && (
+        <button className="btn btn-soft" onClick={runRepeat} disabled={repBusy}><Icon name="repeat" size={16} /> <U k="task.runRepeat" vars={{ n: repeat }} stack={false} /></button>
       )}
       {mode === 'spec' && (
         <label className="toggle" title={s('task.stepMode')}>
@@ -104,6 +160,14 @@ export function CodeLab({ code, onCode, readOnly, app, files, mode = 'spec', onR
       </div>
       <div className="lab-code">
         {toolbar}
+        {reps && (
+          <div className="repeat-strip" aria-live="polite">
+            {reps.map((r, i) => <span key={i} className={`rep rep-${r}`}>{r === 'passed' ? '✓' : '✗'}</span>)}
+            {repBusy && <span className="spinner" />}
+            {!repBusy && <span className="muted small">{reps.filter((r) => r === 'passed').length}/{reps.length} <U k="report.passed" stack={false} /></span>}
+          </div>
+        )}
+        {fileTabs}
         <div className="lab-editor" onClick={() => setJump(null)}>{editor}</div>
       </div>
       <div className="lab-side">
@@ -111,7 +175,7 @@ export function CodeLab({ code, onCode, readOnly, app, files, mode = 'spec', onR
           <BrowserFrame ref={frame} url={live.url} height={browserHeight} busy={live.running} />
         </div>
         <div className="lab-report">
-          <TestReport live={live} code={code} onLine={(n) => { setJump(n); setTab('code'); }} />
+          <TestReport live={live} code={code} onLine={(n) => { setJump(n); setFile(SPEC_NAME); setTab('code'); }} />
         </div>
       </div>
     </div>

@@ -10,14 +10,18 @@ export interface CodeVerdict {
   main?: RunResult;
   also: { app: AppSetup; expect: 'pass' | 'fail'; result: RunResult; ok: boolean }[];
   fragileFree: boolean;
+  /** outcomes of repeated runs (checks.repeat) */
+  repeats?: ('passed' | 'failed')[];
 }
 
-const ASSERTION_CODES = new Set(['expect-failed', 'expect-not-found', 'expect-count', 'expect-url', 'expect-generic']);
+// A red run counts when the test caught something: a failed assertion, or a user action the app doesn't allow
+// (element missing / not actionable). The `also` run on the fixed app guards against simply wrong locators.
+const ASSERTION_CODES = new Set(['expect-failed', 'expect-not-found', 'expect-count', 'expect-url', 'expect-generic', 'action-timeout', 'action-not-actionable']);
 
 export function outcomeMatches(r: RunResult, expect: 'pass' | 'fail'): boolean {
   if (expect === 'pass') return r.status === 'passed';
   if (r.status !== 'failed') return false;
-  // A red run counts only when an assertion caught something (not a syntax error or a missing await).
+  // Not a syntax error, a missing await or a strict-mode violation.
   return r.tests.some((t) => t.status === 'failed' && t.error && ASSERTION_CODES.has(t.error.code));
 }
 
@@ -53,8 +57,24 @@ export async function gradeCode(
     problems.push({ en: `Expected at least ${checks.minTests} tests, found ${main.tests.length}.`, ru: `Ожидалось минимум ${checks.minTests} тестов, найдено ${main.tests.length}.` });
   }
 
+  let repeats: CodeVerdict['repeats'];
+  let repeatFailed = false;
+  if (checks?.repeat && outcomeMatches(main, expect)) {
+    repeats = [main.status === 'passed' ? 'passed' : 'failed'];
+    for (let i = 1; i < checks.repeat; i++) {
+      const r = await run(code, app, true);
+      repeats.push(outcomeMatches(r, expect) ? (expect === 'pass' ? 'passed' : 'failed') : (expect === 'pass' ? 'failed' : 'passed'));
+      if (!outcomeMatches(r, expect)) {
+        repeatFailed = true;
+        const good = repeats.filter((x) => x === (expect === 'pass' ? 'passed' : 'failed')).length;
+        problems.push({ en: `Run ${i + 1} of ${checks.repeat} went the other way (${good} of ${i + 1} as expected). The test is still flaky — look for what it assumes about timing.`, ru: `Прогон ${i + 1} из ${checks.repeat} дал другой результат (как ожидалось — ${good} из ${i + 1}). Тест всё ещё нестабилен — ищи, какие допущения о времени он делает.` });
+        break;
+      }
+    }
+  }
+
   const also: CodeVerdict['also'] = [];
-  if (outcomeMatches(main, expect)) {
+  if (outcomeMatches(main, expect) && !repeatFailed) {
     for (const extra of checks?.also || []) {
       const result = await run(code, extra.app as AppSetup, true);
       const ok = outcomeMatches(result, extra.expect);
@@ -66,5 +86,5 @@ export async function gradeCode(
       }
     }
   }
-  return { ok: problems.length === 0, problems, main, also, fragileFree };
+  return { ok: problems.length === 0, problems, main, also, fragileFree, repeats };
 }

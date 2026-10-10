@@ -48,12 +48,25 @@ export class APIRequestContext {
   private rt: TestRuntime;
   private data: AutData;
   private bugs: string[];
-  private extraOrders: Order[] = [];
+  /** The browser context's storage: the app keeps created orders, new users and status changes there. */
+  private storage: Record<string, string>;
 
-  constructor(rt: TestRuntime, data: AutData, bugs: string[]) {
+  constructor(rt: TestRuntime, data: AutData, bugs: string[], storage: Record<string, string> = {}) {
     this.rt = rt;
     this.data = structuredClone(data);
     this.bugs = bugs;
+    this.storage = storage;
+  }
+
+  private stored<T>(key: string, fallback: T): T {
+    try { return key in this.storage ? JSON.parse(this.storage[key]) : fallback; } catch { return fallback; }
+  }
+  private allOrders(): Order[] {
+    const status = this.stored<Record<string, string>>('orderStatus', {});
+    return [...this.data.orders, ...this.stored<Order[]>('orders', [])].map((o) => (status[o.id] ? { ...o, status: status[o.id] } : o));
+  }
+  private allUsers(): User[] {
+    return [...this.data.users, ...this.stored<User[]>('users', [])];
   }
   get __pwDescription() { return 'request'; }
 
@@ -82,13 +95,14 @@ export class APIRequestContext {
     const auth = Object.entries(headers || {}).find(([k]) => k.toLowerCase() === 'authorization')?.[1] || '';
     const m = auth.match(/^Bearer token-(.+)$/);
     if (!m) return null;
-    return this.data.users.find((u) => u.email === decodeURIComponent(m[1])) || null;
+    return this.allUsers().find((u) => u.email === decodeURIComponent(m[1])) || null;
   }
 
   private handle(method: string, url: URL, o: ReqOptions): [number, unknown] {
     const path = url.pathname.replace(/\/$/, '');
     const body = (o.data ?? {}) as Record<string, unknown>;
-    const pub = (p: Product) => ({ id: p.id, name: p.name, category: p.category, price: p.price, inStock: p.inStock });
+    const bug = (b: string) => this.bugs.includes(b);
+    const pub = (p: Product) => ({ id: p.id, name: p.name, category: p.category, price: bug('api-price-string') ? p.price.toFixed(2) : p.price, inStock: p.inStock });
     if (path === '/api/health') return method === 'GET' ? [200, { status: 'ok' }] : [405, { error: 'Method not allowed' }];
     if (path === '/api/products') {
       if (method !== 'GET') return [405, { error: 'Method not allowed' }];
@@ -110,16 +124,16 @@ export class APIRequestContext {
       const email = String(body.email ?? '').trim().toLowerCase();
       const password = String(body.password ?? '');
       if (!email || !password) return [400, { error: 'Email and password are required' }];
-      const u = this.data.users.find((x) => x.email === email);
+      const u = this.allUsers().find((x) => x.email === email);
       if (!u || u.password !== password) return [401, { error: 'Invalid email or password' }];
-      if (u.locked) return [423, { error: 'Account is locked' }];
+      if (u.locked && !bug('api-login-locked')) return [423, { error: 'Account is locked' }];
       return [200, { token: `token-${encodeURIComponent(u.email)}`, user: { email: u.email, name: u.name } }];
     }
     if (path === '/api/orders') {
       const u = this.user(o.headers);
       if (method === 'GET') {
         if (!u && !this.bugs.includes('api-orders-no-auth')) return [401, { error: 'Unauthorized' }];
-        const all = [...this.data.orders, ...this.extraOrders];
+        const all = this.allOrders();
         return [200, u ? all.filter((x) => x.user === u.email) : all];
       }
       if (method === 'POST') {
@@ -131,15 +145,15 @@ export class APIRequestContext {
         for (const it of items) {
           const p = this.data.products.find((x) => x.id === it.id);
           if (!p) return [400, { error: `Unknown product: ${it.id}` }];
-          if (!p.inStock) return [409, { error: `${p.name} is out of stock` }];
+          if (!p.inStock && !bug('api-out-of-stock-order')) return [409, { error: `${p.name} is out of stock` }];
           const qty = Math.max(1, Number(it.qty ?? 1));
           subtotal += p.price * qty;
           names.push(qty > 1 ? `${p.name} ×${qty}` : p.name);
         }
         const delivery = subtotal >= 50 || this.bugs.includes('api-total-no-delivery') ? 0 : 4.9;
-        const id = Math.max(...this.data.orders.map((x) => x.id), ...this.extraOrders.map((x) => x.id)) + 1;
+        const id = Math.max(...this.allOrders().map((x) => x.id)) + 1;
         const order: Order = { id, user: u.email, date: new Date().toISOString().slice(0, 10), items: names, total: Math.round((subtotal + delivery) * 100) / 100, status: 'Processing' };
-        this.extraOrders.push(order);
+        this.storage.orders = JSON.stringify([...this.stored<Order[]>('orders', []), order]);
         return [201, order];
       }
       return [405, { error: 'Method not allowed' }];
@@ -148,13 +162,12 @@ export class APIRequestContext {
     if (ord) {
       const u = this.user(o.headers);
       if (!u) return [401, { error: 'Unauthorized' }];
-      const all = [...this.data.orders, ...this.extraOrders];
-      const order = all.find((x) => x.id === Number(ord[1]) && x.user === u.email);
+      const order = this.allOrders().find((x) => x.id === Number(ord[1]) && (x.user === u.email || bug('api-order-other-user')));
       if (!order) return [404, { error: 'Order not found' }];
       if (method === 'GET') return [200, order];
       if (method === 'DELETE') {
         if (order.status !== 'Processing') return [409, { error: 'Only processing orders can be cancelled' }];
-        order.status = 'Cancelled';
+        this.storage.orderStatus = JSON.stringify({ ...this.stored<Record<string, string>>('orderStatus', {}), [order.id]: 'Cancelled' });
         return [204, undefined];
       }
       return [405, { error: 'Method not allowed' }];

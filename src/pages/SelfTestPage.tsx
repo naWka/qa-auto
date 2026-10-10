@@ -1,8 +1,8 @@
 // Dev page: runs every reference solution / prediction / best agent response through the emulator.
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { allTasks, chapters, lessonsOf } from '../content';
 import type { Checks, Task } from '../content/schema';
-import { RunController, runSpec, type AppSetup, type RunResult } from '../emulator';
+import { RunController, openPreview, runSpec, type AppSetup, type RunResult, type StepRecord } from '../emulator';
 import { AUT_DIR } from '../lab/useRunner';
 import { gradeCode } from '../tasks/gradeCode';
 import { fillCode } from '../tasks/FillTask';
@@ -10,7 +10,11 @@ import { fillCode } from '../tasks/FillTask';
 interface Row { id: string; kind: string; status: 'ok' | 'fail' | 'warn' | 'info'; note: string }
 
 declare global {
-  interface Window { __selftest?: { done: boolean; rows: Row[] } }
+  interface Window {
+    __selftest?: { done: boolean; rows: Row[] };
+    /** dev hook for scripts: run a snippet in the emulator and get a compact summary */
+    __bloomqa?: { run: (code: string, app?: AppSetup, files?: Record<string, string>) => Promise<unknown> };
+  }
 }
 
 export function SelfTestPage() {
@@ -19,8 +23,18 @@ export function SelfTestPage() {
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState('');
 
-  const run = (code: string, app: AppSetup | undefined): Promise<RunResult> =>
-    runSpec({ code, app, frame: frame.current, controller: new RunController({ speed: 0, stepMode: false }), autDir: AUT_DIR });
+  const run = (code: string, app: AppSetup | undefined, files?: Record<string, string>): Promise<RunResult> =>
+    runSpec({ code, app, files, frame: frame.current, controller: new RunController({ speed: 0, stepMode: false }), autDir: AUT_DIR });
+  useEffect(() => {
+    window.__bloomqa = {
+      run: async (code, app, files) => {
+        const r = await run(code, app, files);
+        const flat = (steps: StepRecord[], d = 0): string[] => steps.flatMap((x) => [`${'  '.repeat(d)}${x.status === 'failed' ? '✗' : '✓'} ${x.title}${x.line ? ` :${x.file ? x.file + ':' : ''}${x.line}` : ''}`, ...flat(x.children, d + 1)]);
+        return { status: r.status, error: r.error?.message, logs: r.logs, tests: r.tests.map((t) => ({ title: t.titlePath.join(' › '), status: t.status, error: t.error?.message, soft: t.softErrors.map((e) => e.message.split('\n')[0]), steps: flat(t.steps) })) };
+      },
+    };
+  }, []);
+  const lines = (steps: StepRecord[]): number[] => steps.flatMap((s) => [...(s.line && !s.file ? [s.line] : []), ...lines(s.children)]);
 
   const go = async () => {
     setBusy(true);
@@ -34,35 +48,35 @@ export function SelfTestPage() {
       const app = (t as { app?: AppSetup }).app;
       try {
         if (t.kind === 'fix' || t.kind === 'find-bug' || t.kind === 'code') {
-          const v = await gradeCode(t.solution, t.checks, app, (c, a) => run(c, a));
+          const v = await gradeCode(t.solution, t.checks, app, (c, a) => run(c, a, t.solutionFiles ?? t.files));
           push({ id: t.id, kind: t.kind, status: v.ok ? 'ok' : 'fail', note: v.ok ? 'solution ok' : v.problems.map((p) => p.en).join(' | ') + ' · ' + (v.main ? summarize(v.main) : '') });
           if (t.kind !== 'code') {
-            const s = await gradeCode(t.starter, t.checks, app, (c, a) => run(c, a));
+            const s = await gradeCode(t.starter, t.checks, app, (c, a) => run(c, a, t.files));
             if (s.ok) push({ id: t.id, kind: t.kind, status: 'warn', note: 'starter already satisfies checks' });
           }
         } else if (t.kind === 'predict') {
-          const r = await run(t.code, app);
+          const r = await run(t.code, app, t.files);
           const real = r.status === 'passed' ? 'pass' : 'fail';
           push({ id: t.id, kind: t.kind, status: real === t.outcome ? 'ok' : 'fail', note: `expected ${t.outcome}, real ${real} · ${summarize(r)}` });
         } else if (t.kind === 'agent') {
           const best = t.responses.find((x) => x.best)!;
           if (t.checks) {
-            const v = await gradeCode(best.code, t.checks as Checks, app, (c, a) => run(c, a));
+            const v = await gradeCode(best.code, t.checks as Checks, app, (c, a) => run(c, a, best.files ?? t.files));
             push({ id: t.id, kind: t.kind, status: v.ok ? 'ok' : 'fail', note: v.ok ? 'best response ok' : v.problems.map((p) => p.en).join(' | ') + ' · ' + (v.main ? summarize(v.main) : '') });
           } else {
-            const r = await run(best.code, app);
+            const r = await run(best.code, app, best.files ?? t.files);
             push({ id: t.id, kind: t.kind, status: r.status === 'passed' ? 'ok' : 'warn', note: `best: ${summarize(r)}` });
           }
           for (const resp of t.responses.filter((x) => !x.best)) {
-            const r = await run(resp.code, app);
+            const r = await run(resp.code, app, resp.files ?? t.files);
             if (r.status === 'error') push({ id: t.id, kind: 'agent-alt', status: 'warn', note: `response [${resp.when.join(',')}] has a code error: ${summarize(r)}` });
           }
         } else if (t.kind === 'fill' && t.checks) {
           const code = fillCode(t.code, t.blanks.map((b) => b.answers[0]));
-          const v = await gradeCode(code, t.checks, app, (c, a) => run(c, a));
+          const v = await gradeCode(code, t.checks, app, (c, a) => run(c, a, t.files));
           push({ id: t.id, kind: t.kind, status: v.ok ? 'ok' : 'fail', note: v.ok ? 'filled code ok' : v.problems.map((p) => p.en).join(' | ') + ' · ' + (v.main ? summarize(v.main) : '') });
         } else if (t.kind === 'parsons' && t.checks && t.code !== false) {
-          const v = await gradeCode(t.lines.join('\n'), t.checks, app, (c, a) => run(c, a));
+          const v = await gradeCode(t.lines.join('\n'), t.checks, app, (c, a) => run(c, a, t.files));
           push({ id: t.id, kind: t.kind, status: v.ok ? 'ok' : 'fail', note: v.ok ? 'assembled ok' : v.problems.map((p) => p.en).join(' | ') + ' · ' + (v.main ? summarize(v.main) : '') });
         } else if (t.kind === 'pick-locator') {
           const correct = t.options.find((o) => o.correct);
@@ -73,6 +87,19 @@ export function SelfTestPage() {
             const r = await run(code, app);
             push({ id: t.id, kind: t.kind, status: r.status === 'passed' ? 'ok' : 'fail', note: `${expr} → ${summarize(r)}` });
           }
+        } else if (t.kind === 'inspect') {
+          const doc = await openPreview(frame.current!, AUT_DIR, { ...(app as object), route: (app as { route?: string } | undefined)?.route || '/' });
+          await new Promise((r) => setTimeout(r, 700));
+          const n = doc ? doc.querySelectorAll(t.target).length : -1;
+          push({ id: t.id, kind: t.kind, status: n >= 1 ? 'ok' : 'fail', note: `${t.target} → ${n} element(s)` });
+        } else if (t.kind === 'trace') {
+          const r = await run(t.code, app, t.files);
+          const real = r.status === 'passed' ? 'pass' : 'fail';
+          const all = r.tests.flatMap((x) => lines(x.steps));
+          const want = Array.isArray(t.answer) ? t.answer : [t.answer];
+          const lineOk = want.every((l) => all.includes(l));
+          const outOk = !t.outcome || t.outcome === real;
+          push({ id: t.id, kind: t.kind, status: lineOk && outOk ? 'ok' : 'fail', note: `answer lines ${want.join(',')} ${lineOk ? 'found' : 'NOT among steps ' + [...new Set(all)].join(',')} · expected ${t.outcome ?? '-'}, real ${real} · ${summarize(r)}` });
         } else if (t.kind === 'input' && t.run === 'script' && t.code) {
           const r = await runSpec({ code: t.code, mode: 'script', frame: null, controller: new RunController({ speed: 0, stepMode: false }), autDir: AUT_DIR });
           const printed = r.logs.join('\n');
@@ -85,8 +112,18 @@ export function SelfTestPage() {
     }
     // runnable examples
     for (const ch of chapters) for (const l of lessonsOf(ch)) for (const s of l.steps) {
+      if (s.type === 'trace' && (!filter || l.id.startsWith(filter))) {
+        const r = await run(s.code, s.app as AppSetup, s.files);
+        push({ id: `${l.id} trace`, kind: 'trace-step', status: r.status === 'error' ? 'fail' : 'info', note: summarize(r) });
+      }
+      if (s.type === 'inspect' && s.focus && (!filter || l.id.startsWith(filter))) {
+        const doc = await openPreview(frame.current!, AUT_DIR, { ...(s.app as object), route: s.app?.route || '/' });
+        await new Promise((r) => setTimeout(r, 700));
+        const n = doc ? doc.querySelectorAll(s.focus).length : -1;
+        push({ id: `${l.id} inspect`, kind: 'inspect-step', status: n === 1 ? 'info' : 'fail', note: `focus ${s.focus} → ${n}` });
+      }
       if (s.type === 'example' && s.runnable && (!filter || l.id.startsWith(filter))) {
-        const r = await run(s.code, s.app as AppSetup);
+        const r = await run(s.code, s.app as AppSetup, s.files);
         push({ id: `${l.id} example`, kind: 'example', status: r.status === 'error' ? 'fail' : 'info', note: summarize(r) });
       }
     }

@@ -22,6 +22,8 @@ import { ReviewTask } from './ReviewTask';
 import { AgentTask } from './AgentTask';
 import { CodeTask } from './CodeTask';
 import { VocabTask } from './VocabTask';
+import { InspectTask } from './InspectTask';
+import { TraceTask } from './TraceTask';
 import type { T } from '../content/schema';
 
 export interface TaskOutcome {
@@ -48,6 +50,8 @@ export function TaskBody({ task, register, phase, exam, last }: { task: Task; re
     case 'agent': return <AgentTask task={task} {...p} />;
     case 'fix': case 'find-bug': case 'code': return <CodeTask task={task} {...p} />;
     case 'vocab': return <VocabTask task={task} {...p} />;
+    case 'inspect': return <InspectTask task={task} {...p} />;
+    case 'trace': return <TraceTask task={task} {...p} />;
   }
 }
 

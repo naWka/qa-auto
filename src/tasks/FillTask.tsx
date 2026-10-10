@@ -87,7 +87,7 @@ export function FillTask({ task, register, phase, exam }: KindProps<Fill>) {
         </pre>
       </div>
       {task.checks && (phase === 'correct' || phase === 'revealed') && !exam && (
-        <RunCompleted code={fillCode(task.code, values)} app={task.app} />
+        <RunCompleted code={fillCode(task.code, values)} app={task.app} files={task.files} />
       )}
     </div>
   );

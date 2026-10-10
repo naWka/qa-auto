@@ -18,13 +18,24 @@
   } catch (e) { /* cross-origin parent: standalone */ }
 
   var params = new URLSearchParams(location.search);
+  // Standalone: ?bugs=a,b (and ?variant=redesign) are remembered for the browser tab, so they survive reloads.
+  function fromQuery(name) {
+    var v = params.get(name);
+    try {
+      if (v !== null) sessionStorage.setItem('bloomly:' + name, v);
+      else v = sessionStorage.getItem('bloomly:' + name);
+    } catch (e) { /* storage blocked */ }
+    return v || '';
+  }
   var config = ctx ? (ctx.config || {}) : {
-    bugs: (params.get('bugs') || '').split(',').filter(Boolean),
+    bugs: fromQuery('bugs').split(',').filter(Boolean),
     latency: {},
     cookieBanner: params.get('cookies') === '1',
+    variant: fromQuery('variant'),
   };
   config.bugs = config.bugs || [];
   config.latency = config.latency || {};
+  var redesign = config.variant === 'redesign';
 
   function bug(name) { return config.bugs.indexOf(name) !== -1; }
 
@@ -75,7 +86,13 @@
   function product(id) { return DATA.products.find(function (p) { return p.id === id; }); }
   function cart() { return store.get('cart', []); }
   function cartCount() { return cart().reduce(function (s, i) { return s + i.qty; }, 0); }
-  function allOrders() { return DATA.orders.concat(store.get('orders', [])); }
+  function allOrders() {
+    // orderStatus: status changes made through the REST API (e.g. a cancelled order)
+    var status = store.get('orderStatus', {});
+    return DATA.orders.concat(store.get('orders', [])).map(function (o) {
+      return status[o.id] ? Object.assign({}, o, { status: status[o.id] }) : o;
+    });
+  }
 
   // ---------- routing ----------
   function currentPath() {
@@ -115,14 +132,14 @@
 
   function renderNav() {
     var user = sessionUser();
-    nav.innerHTML =
+    nav.innerHTML = (redesign ? '<div class="nav-links">' : '') +
       '<a href="/shop">Shop</a>' +
       '<a href="/orders">Orders</a>' +
       '<a href="/cart" data-testid="cart-link">Cart <span class="badge" data-testid="cart-count">' + cartCount() + '</span></a>' +
       (user
         ? '<span class="user-name" data-testid="user-name">' + esc(user.name.split(' ')[0]) + '</span>' +
           '<button type="button" class="link-btn" data-action="logout">Log out</button>'
-        : '<a href="/login">Log in</a>');
+        : '<a href="/login">Log in</a>') + (redesign ? '</div>' : '');
   }
   function refreshCartCount() {
     if (bug('cart-count-stale')) return;
@@ -209,7 +226,7 @@
       '<label for="password">Password</label>' +
       '<input id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password">' +
       '<label class="check"><input type="checkbox" id="remember" name="remember"> Remember me</label>' +
-      '<button type="submit" class="btn" data-testid="login-button">Log in</button>' +
+      '<button type="submit" class="btn" data-testid="login-button">' + (config.variant === 'sign-in' ? 'Sign in' : 'Log in') + '</button>' +
       '</form>' +
       '<p>New to Bloomly? <a href="/signup">Create an account</a></p>' +
       '<p class="hint">Demo account: anna@bloomly.app / bloom123</p>';
@@ -236,7 +253,7 @@
       btn.textContent = 'Logging in…';
       delay('login', 250).then(function () {
         btn.disabled = false;
-        btn.textContent = 'Log in';
+        btn.textContent = config.variant === 'sign-in' ? 'Sign in' : 'Log in';
         var user = allUsers().find(function (u) { return u.email === email; });
         if (!user || user.password !== pw) return fail('Invalid email or password.', true);
         if (user.locked) return fail('Your account is locked. Please contact support.');
@@ -334,7 +351,7 @@
     el.innerHTML =
       '<h1>Shop</h1>' +
       '<div class="toolbar">' +
-      '<label for="search">Search</label>' +
+      (bug('a11y-search-no-label') ? '' : '<label for="search">Search</label>') +
       '<input id="search" type="search" placeholder="Search flowers" value="' + esc(state.q) + '">' +
       '<label for="category">Category</label>' +
       '<select id="category"><option value="all">All</option><option value="bouquets">Bouquets</option><option value="plants">Plants</option></select>' +
@@ -364,12 +381,15 @@
         html += '<p data-testid="no-results">No flowers found for “' + esc(term) + '”.</p>';
       } else {
         html += '<ul class="grid" data-testid="product-list">' + list.map(function (p) {
+          var title = '<h2>' + esc(p.name) + '</h2>';
+          var price = '<p class="price" data-testid="product-price">' + money(p.price) + '</p>';
           return '<li><article class="product-card" data-testid="product-card" data-product-id="' + p.id + '">' +
-            '<img src="' + asset('img/' + p.img) + '" alt="' + esc(p.alt) + '">' +
-            '<h2>' + esc(p.name) + '</h2>' +
-            '<p class="price" data-testid="product-price">' + money(p.price) + '</p>' +
+            (redesign ? '<div class="card-media">' : '') + '<img src="' + asset('img/' + p.img) + '" alt="' + esc(p.alt) + '">' + (redesign ? '</div>' : '') +
+            (redesign ? price + title : title + price) +
             (p.inStock ? '' : '<p class="stock">Out of stock</p>') +
-            '<button type="button" class="btn small" data-testid="add-to-cart" data-id="' + p.id + '"' + (p.inStock ? '' : ' disabled') + '>Add to cart</button>' +
+            (bug('a11y-add-to-cart-div')
+              ? '<div class="btn small" data-testid="add-to-cart" data-id="' + p.id + '"' + (p.inStock ? '' : ' aria-disabled="true"') + '>Add to cart</div>'
+              : '<button type="button" class="btn small" data-testid="add-to-cart" data-id="' + p.id + '"' + (p.inStock ? '' : ' disabled') + '>Add to cart</button>') +
             '</article></li>';
         }).join('') + '</ul>';
       }
@@ -388,7 +408,7 @@
     $('#sort', el).addEventListener('change', function (e) { state.sort = e.target.value; if (!$('[data-testid="products-loading"]', el)) draw(); });
     el.addEventListener('click', function (e) {
       var btn = e.target.closest('[data-testid="add-to-cart"]');
-      if (!btn || btn.disabled) return;
+      if (!btn || btn.disabled || btn.getAttribute('aria-disabled') === 'true') return;
       var p = product(btn.getAttribute('data-id'));
       var items = cart();
       var item = items.find(function (i) { return i.id === p.id; });
@@ -436,13 +456,14 @@
       '<thead><tr><th scope="col">Product</th><th scope="col">Price</th><th scope="col">Quantity</th><th scope="col">Subtotal</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>' +
       '<tbody>' + items.map(function (i, idx) {
         var p = product(i.id);
+        var named = !bug('a11y-qty-unnamed');
         return '<tr data-testid="cart-row" data-id="' + p.id + '">' +
           '<td>' + esc(p.name) + '</td>' +
           '<td>' + money(p.price) + '</td>' +
           '<td><div class="qty">' +
-          '<button type="button" data-qty="-1" data-idx="' + idx + '" aria-label="Decrease ' + esc(p.name) + '"' + (i.qty <= 1 ? ' disabled' : '') + '>−</button>' +
-          '<input type="number" min="1" max="10" value="' + i.qty + '" data-idx="' + idx + '" data-testid="qty-input" aria-label="Quantity of ' + esc(p.name) + '">' +
-          '<button type="button" data-qty="1" data-idx="' + idx + '" aria-label="Increase ' + esc(p.name) + '"' + (i.qty >= 10 ? ' disabled' : '') + '>+</button>' +
+          '<button type="button" data-qty="-1" data-idx="' + idx + '"' + (named ? ' aria-label="Decrease ' + esc(p.name) + '"' : '') + (i.qty <= 1 ? ' disabled' : '') + '>−</button>' +
+          '<input type="number" min="1" max="10" value="' + i.qty + '" data-idx="' + idx + '" data-testid="qty-input"' + (named ? ' aria-label="Quantity of ' + esc(p.name) + '"' : '') + '>' +
+          '<button type="button" data-qty="1" data-idx="' + idx + '"' + (named ? ' aria-label="Increase ' + esc(p.name) + '"' : '') + (i.qty >= 10 ? ' disabled' : '') + '>+</button>' +
           '</div></td>' +
           '<td data-testid="row-subtotal">' + money(p.price * i.qty) + '</td>' +
           '<td><button type="button" class="link-btn" data-testid="remove-item" data-idx="' + idx + '">Remove</button></td>' +
@@ -680,8 +701,56 @@
     main.parentNode.replaceChild(fresh, main);
     main = fresh;
     (routes[path] || pageNotFound)(main, query);
+    if (redesign) wrapFields(main);
     if (ctx && ctx.onNavigate) ctx.onNavigate(currentPath());
     window.scrollTo(0, 0);
+  }
+
+  // ---------- "redesign" variant ----------
+  // Same texts, roles, labels and data-testid — but generated CSS class names and extra wrappers,
+  // like a design-system migration. CSS selectors tied to classes or DOM positions break; user-facing locators don't.
+  function hashOf(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0; return h.toString(36).slice(0, 5); }
+  function newClass(c) { return 'bl_' + c.replace(/-(\w)/g, function (m, x) { return x.toUpperCase(); }) + '__' + hashOf(c); }
+  var restyled = new WeakSet();
+  function restyle(node) {
+    if (node.nodeType !== 1) return;
+    var all = [node].concat(Array.prototype.slice.call(node.querySelectorAll('[class]')));
+    all.forEach(function (el) {
+      if (!el.getAttribute('class') || restyled.has(el)) return;
+      el.setAttribute('class', el.getAttribute('class').split(/\s+/).filter(Boolean).map(newClass).join(' '));
+      restyled.add(el);
+    });
+  }
+  function rewriteRules(rules) {
+    Array.prototype.forEach.call(rules, function (r) {
+      if (r.selectorText) r.selectorText = r.selectorText.replace(/\.([a-zA-Z][\w-]*)/g, function (m, c) { return '.' + newClass(c); });
+      if (r.cssRules) rewriteRules(r.cssRules);
+    });
+  }
+  function wrapFields(root) {
+    Array.prototype.forEach.call(root.querySelectorAll('form'), function (form) {
+      Array.prototype.forEach.call(form.querySelectorAll(':scope > label[for]'), function (label) {
+        var field = document.getElementById(label.getAttribute('for'));
+        if (!field || field.parentNode !== form) return;
+        var box = document.createElement('div');
+        box.className = 'field';
+        form.insertBefore(box, label);
+        box.appendChild(label);
+        box.appendChild(field);
+      });
+    });
+  }
+  if (redesign) {
+    try { Array.prototype.forEach.call(document.styleSheets, function (sh) { rewriteRules(sh.cssRules); }); } catch (e) { /* ignore */ }
+    var extra = document.createElement('style');
+    extra.textContent = '.' + newClass('btn') + '{border-radius:999px;letter-spacing:.02em}.' + newClass('field') + '{display:flex;flex-direction:column;gap:4px}.' +
+      newClass('product-card') + '{border-radius:22px}.' + newClass('nav-links') + '{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.' +
+      newClass('card-media') + ' img{width:100%;height:110px;object-fit:contain;border-radius:14px}';
+    document.head.appendChild(extra);
+    restyle(document.body);
+    new MutationObserver(function (records) {
+      records.forEach(function (r) { Array.prototype.forEach.call(r.addedNodes, restyle); });
+    }).observe(document.body, { childList: true, subtree: true });
   }
 
   fetch(asset('data.json'))

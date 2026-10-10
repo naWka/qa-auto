@@ -6,6 +6,7 @@ import { Icon } from '../components/Icon';
 import { Mentor } from '../components/Mentor';
 import { Sticker } from '../components/Sticker';
 import { speak } from '../components/TermLayer';
+import { placementVars } from '../engine/plan';
 import { useProgress, progressSnapshot, emptyProgress, type ProgressData } from '../store/progress';
 import { useSettings, settingsSnapshot, type Settings } from '../store/settings';
 import { CodeLab } from '../lab/CodeLab';
@@ -224,7 +225,7 @@ test('customer can add tulips to the cart', async ({ page }) => {
 });
 `;
 
-const BUGS = ['login-trim', 'login-no-error', 'greeting-wrong-name', 'signup-terms-ignored', 'search-case-sensitive', 'sort-by-name', 'add-to-cart-double', 'cart-count-stale', 'cart-total-ignores-qty', 'remove-wrong-item', 'promo-case-sensitive', 'promo-stacks', 'free-delivery-boundary', 'checkout-past-date', 'orders-filter-wrong', 'orders-summary-wrong'];
+const BUGS = ['login-trim', 'login-no-error', 'greeting-wrong-name', 'signup-terms-ignored', 'search-case-sensitive', 'sort-by-name', 'add-to-cart-double', 'cart-count-stale', 'cart-total-ignores-qty', 'remove-wrong-item', 'promo-case-sensitive', 'promo-stacks', 'free-delivery-boundary', 'checkout-past-date', 'orders-filter-wrong', 'orders-summary-wrong', 'a11y-add-to-cart-div', 'a11y-qty-unnamed', 'a11y-search-no-label'];
 
 export function PlaygroundPage() {
   const [code, setCode] = useState(() => { try { return localStorage.getItem('bloomqa-playground') || PLAYGROUND_CODE; } catch { return PLAYGROUND_CODE; } });
@@ -300,7 +301,7 @@ export function Onboarding() {
         {step === 3 && (
           <>
             <h2><U k="onboarding.placementTitle" /></h2>
-            <Bi t={uiText('onboarding.placementDesc')} />
+            <Bi t={uiText('onboarding.placementDesc')} vars={placementVars()} />
             <div className="onb-options col">
               <button className="btn btn-primary btn-lg" onClick={() => finish(true)}><Icon name="compass" size={18} /> <U k="onboarding.placementYes" stack={false} /></button>
               <button className="btn btn-soft btn-lg" onClick={() => finish(false)}><Icon name="play" size={18} /> <U k="onboarding.placementNo" stack={false} /></button>

@@ -45,7 +45,7 @@ export function previewElement(el: Element): string {
   const tag = el.tagName.toLowerCase();
   const attrs: string[] = [];
   for (const a of Array.from(el.attributes)) {
-    if (a.name === 'style') continue;
+    if (a.name === 'style' || a.name === 'data-trace-target') continue;
     if (attrs.length >= 5) { attrs.push('…'); break; }
     const v = a.value.length > 50 ? a.value.slice(0, 49) + '…' : a.value;
     attrs.push(v === '' ? a.name : `${a.name}="${v}"`);

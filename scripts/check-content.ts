@@ -150,6 +150,15 @@ function checkTask(t: any, file: string, where: string, keyPoints: Set<string> |
       if (t.mode === 'match') { if (!t.terms || t.terms.length < 3) err(file, `${t.id}: match needs ≥3 terms`); else t.terms.forEach((x: string) => checkTermId(x, file, t.id)); }
       break;
     }
+    case 'trace': {
+      if (t.options && !t.options.some((o: any) => o.correct)) err(file, `${t.id}: trace options have no correct answer`);
+      const lines = t.code.replace(/\n$/, '').split('\n').length;
+      for (const l of [t.answer].flat()) if (l > lines) err(file, `${t.id}: answer line ${l} > ${lines} lines`);
+      break;
+    }
+    case 'inspect':
+      if (!t.target.trim()) err(file, `${t.id}: inspect needs a target selector`);
+      break;
     case 'fix':
     case 'find-bug':
     case 'code':
@@ -174,6 +183,7 @@ if (existsSync(chaptersDir)) {
     if (ch) walkStrings(ch, rel(chFile), '');
     const lessonFiles = readdirSync(cdir).filter((f) => /^l\d+.*\.yaml$/.test(f)).sort();
     const found: string[] = [];
+    const chapterKps = new Set<string>();
     for (const lf of lessonFiles) {
       const file = join(cdir, lf);
       const lesson = zodCheck<any>(Lesson, load(file), rel(file));
@@ -186,6 +196,7 @@ if (existsSync(chaptersDir)) {
       walkStrings(lesson, r, '');
       lesson.terms.forEach((t: string) => checkTermId(t, r, 'terms'));
       const kps = new Set<string>(lesson.keyPoints.map((k: any) => k.id));
+      kps.forEach((k) => chapterKps.add(k));
       const kpUse = new Map<string, number>();
       lesson.steps.forEach((s: any, i: number) => {
         if (s.keyPoint && !kps.has(s.keyPoint)) err(r, `steps[${i}]: unknown keyPoint ${s.keyPoint}`);
@@ -209,7 +220,7 @@ if (existsSync(chaptersDir)) {
       if (!ch.lessons?.length) err(rel(chFile), 'ready chapter needs lessons');
       for (const id of ch.lessons || []) if (!found.includes(id)) err(rel(chFile), `lesson ${id} listed but no file found`);
       if (!ch.boss) warn(rel(chFile), 'ready chapter has no boss');
-      ch.boss?.tasks.forEach((t: any, i: number) => checkTask(t, rel(chFile), `boss.tasks[${i}]`, null));
+      ch.boss?.tasks.forEach((t: any, i: number) => checkTask(t, rel(chFile), `boss.tasks[${i}]`, chapterKps));
     }
     if (ch?.status === 'planned' && !ch.plan?.length) warn(rel(chFile), 'planned chapter has no plan');
   }

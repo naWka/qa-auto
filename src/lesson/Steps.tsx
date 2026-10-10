@@ -11,6 +11,8 @@ import { speak } from '../components/TermLayer';
 import { RunCompleted } from '../tasks/RunCompleted';
 import { useProgress } from '../store/progress';
 import { Figure } from './Figures';
+import { Inspector } from '../lab/Inspector';
+import { TraceViewer } from '../lab/TraceViewer';
 
 type S<K extends Step['type']> = Extract<Step, { type: K }>;
 
@@ -67,7 +69,31 @@ export function ExampleStep({ step }: { step: S<'example'> }) {
           </div>
         </div>
       </div>
-      {step.runnable && <RunCompleted code={step.code} app={step.app} />}
+      {step.runnable && <RunCompleted code={step.code} app={step.app} files={step.files} repeat={step.repeat} />}
+    </div>
+  );
+}
+
+export function InspectStep({ step }: { step: S<'inspect'> }) {
+  return (
+    <div className="step-inspect">
+      <StepLabel k="lesson.inspect" icon="inspect" />
+      {step.title && <h2 className="step-title"><BiInline t={step.title} /></h2>}
+      {step.intro && <Bi t={step.intro} />}
+      <Inspector app={step.app} focus={step.focus} view={step.view} pickByDefault />
+      {step.mentor && <Mentor t={step.mentor} mood="idle" compact />}
+    </div>
+  );
+}
+
+export function TraceStep({ step }: { step: S<'trace'> }) {
+  return (
+    <div className="step-trace">
+      <StepLabel k="lesson.trace" icon="clock" />
+      {step.title && <h2 className="step-title"><BiInline t={step.title} /></h2>}
+      {step.intro && <Bi t={step.intro} />}
+      <TraceViewer code={step.code} app={step.app} files={step.files} />
+      {step.mentor && <Mentor t={step.mentor} mood="idle" compact />}
     </div>
   );
 }
