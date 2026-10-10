@@ -1,4 +1,4 @@
-// Glossary, stickers, interview prep, settings, playground, onboarding.
+// Glossary, stickers, interview prep, settings, onboarding.
 import { useMemo, useRef, useState } from 'react';
 import { glossary, interview, story, uiText } from '../content';
 import { Bi, BiInline, U, usePrimary, useUiString } from '../components/Bi';
@@ -9,9 +9,8 @@ import { ListenButton } from '../components/Listen';
 import { placementVars } from '../engine/plan';
 import { useProgress, progressSnapshot } from '../store/progress';
 import { useSettings, type Settings } from '../store/settings';
-import { PLAYGROUND_KEY, applyBackup, backupCode, downloadBackup, hasProgress, parseBackup, summarize, type Backup, type Summary } from '../store/backup';
+import { applyBackup, backupCode, downloadBackup, hasProgress, parseBackup, summarize, type Backup, type Summary } from '../store/backup';
 import { formatDay, today } from '../lib/dates';
-import { CodeLab } from '../lab/CodeLab';
 import { navigate } from '../lib/router';
 
 export function GlossaryPage({ q: initial }: { q: string }) {
@@ -303,50 +302,6 @@ export function SettingsPage() {
           )}
         </div>
       </section>
-    </div>
-  );
-}
-
-const PLAYGROUND_CODE = `from playwright.sync_api import Page, expect
-
-
-def test_customer_can_add_tulips_to_the_cart(page: Page):
-    page.goto("/shop")
-    (
-        page.get_by_test_id("product-card")
-        .filter(has_text="Sunny Tulips")
-        .get_by_role("button", name="Add to cart")
-        .click()
-    )
-    expect(page.get_by_test_id("cart-count")).to_have_text("1")
-`;
-
-const BUGS = ['login-trim', 'login-no-error', 'greeting-wrong-name', 'signup-terms-ignored', 'search-case-sensitive', 'sort-by-name', 'add-to-cart-double', 'cart-count-stale', 'cart-total-ignores-qty', 'remove-wrong-item', 'promo-case-sensitive', 'promo-stacks', 'free-delivery-boundary', 'checkout-past-date', 'orders-filter-wrong', 'orders-summary-wrong', 'a11y-add-to-cart-div', 'a11y-qty-unnamed', 'a11y-search-no-label'];
-
-export function PlaygroundPage() {
-  const [code, setCode] = useState(() => { try { return localStorage.getItem(PLAYGROUND_KEY) || PLAYGROUND_CODE; } catch { return PLAYGROUND_CODE; } });
-  const [bugs, setBugs] = useState<string[]>([]);
-  const [cookie, setCookie] = useState(false);
-  const [slow, setSlow] = useState(false);
-  const save = (c: string) => { setCode(c); try { localStorage.setItem(PLAYGROUND_KEY, c); } catch { /* ignore */ } };
-  return (
-    <div className="page page-wide">
-      <h1 className="page-title"><Icon name="code" size={24} /> <U k="playground.title" /></h1>
-      <p className="page-intro"><U k="playground.intro" /></p>
-      <details className="card bug-panel">
-        <summary><Icon name="bug" size={16} /> <U k="playground.bugs" stack={false} /> {bugs.length ? <span className="chip chip-coral">{bugs.length}</span> : null}</summary>
-        <div className="chip-row">
-          {BUGS.map((b) => (
-            <label key={b} className={`chip-check ${bugs.includes(b) ? 'on' : ''}`}>
-              <input type="checkbox" checked={bugs.includes(b)} onChange={(e) => setBugs(e.target.checked ? [...bugs, b] : bugs.filter((x) => x !== b))} />
-              <code>{b}</code>
-            </label>
-          ))}
-          <label className={`chip-check ${cookie ? 'on' : ''}`}><input type="checkbox" checked={cookie} onChange={(e) => setCookie(e.target.checked)} /> <U k="playground.cookie" stack={false} /></label>
-          <label className={`chip-check ${slow ? 'on' : ''}`}><input type="checkbox" checked={slow} onChange={(e) => setSlow(e.target.checked)} /> <U k="playground.slow" stack={false} /></label>
-        </div>
-      </details>
-      <CodeLab code={code} onCode={save} onReset={() => save(PLAYGROUND_CODE)} app={{ bugs, cookieBanner: cookie, latency: slow ? { products: [100, 1500], orders: [200, 2000], login: [100, 1200] } : undefined }} browserHeight={460} />
     </div>
   );
 }

@@ -173,6 +173,7 @@ export function mergeProgress(a: ProgressData, b: ProgressData): ProgressData {
     badges: mergeRecords(base.badges, other.badges, (x, y) => earlier(x, y)!),
     placement: base.placement?.done ? base.placement : other.placement ?? base.placement,
     lastWarmup: [base.lastWarmup, other.lastWarmup].filter(Boolean).sort().pop(),
+    hunted: base.hunted || other.hunted ? mergeRecords(base.hunted ?? {}, other.hunted ?? {}, (x, y) => earlier(x, y)!) : undefined,
     stats,
   };
 }

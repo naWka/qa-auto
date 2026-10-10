@@ -18,7 +18,8 @@ import { HomePage } from './pages/HomePage';
 import { ChapterPage } from './pages/ChapterPage';
 import { LessonPage } from './pages/LessonPage';
 import { BossPage, CheckPage, PlacementPage, ReviewPage } from './pages/Flows';
-import { BadgesPage, GlossaryPage, InterviewPage, Onboarding, PlaygroundPage, SettingsPage } from './pages/OtherPages';
+import { BadgesPage, GlossaryPage, InterviewPage, Onboarding, SettingsPage } from './pages/OtherPages';
+import { PlaygroundPage } from './pages/PlaygroundPage';
 import { SelfTestPage } from './pages/SelfTestPage';
 import { DevFiguresPage, DevLabPage, DevTaskPage } from './pages/DevPages';
 

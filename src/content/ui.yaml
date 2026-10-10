@@ -368,7 +368,29 @@ placement:
   nothingCredited: { en: "We'll start from the beginning — it'll go fast with your experience.", ru: "Начнём с начала — с твоим опытом пойдёт быстро." }
 playground:
   title: { en: "Playground", ru: "Песочница" }
-  intro: { en: "Write any test against Bloomly and run it. Bugs can be switched on below.", ru: "Пиши любой тест для Bloomly и запускай. Ниже можно включить баги." }
+  intro: { en: "Catch Bloomly's bugs with tests: pick a bug report and change Petal's draft test until it catches the bug. Or write any test you like in free mode.", ru: "Лови баги Bloomly тестами: выбери баг-репорт и доработай черновик теста от Petal, чтобы он поймал баг. Или пиши любые тесты в свободном режиме." }
+  modeHunt: { en: "Bug hunt", ru: "Охота на баги" }
+  modeFree: { en: "Free mode", ru: "Свободный режим" }
+  tracker: { en: "Bug tracker", ru: "Баг-трекер" }
+  caughtOf: { en: "{n} of {total} caught", ru: "Поймано {n} из {total}" }
+  caught: { en: "Caught", ru: "Пойман" }
+  preconditions: { en: "Preconditions", ru: "Предусловия" }
+  steps: { en: "Steps to reproduce", ru: "Шаги воспроизведения" }
+  expected: { en: "Expected", ru: "Ожидаемый результат" }
+  actual: { en: "Actual, with the bug", ru: "Фактический результат, с багом" }
+  loggedIn: { en: "Logged in as {email}", ru: "Выполнен вход: {email}" }
+  cart: { en: "In the cart: {items}", ru: "В корзине: {items}" }
+  promo: { en: "Promo code {code} is applied", ru: "Применён промокод {code}" }
+  petalDraft: { en: "Petal wrote a test for this flow — it's in the editor. It is green even with the bug switched on, so it misses the bug. Change it so it catches the bug.", ru: "Petal написал тест для этого сценария — он в редакторе. Тест зелёный даже с включённым багом, то есть баг он пропускает. Измени тест так, чтобы он ловил баг." }
+  goal: { en: "Caught = red with the bug and green on the fixed app.", ru: "Пойман = красный с багом и зелёный на исправленной версии." }
+  check: { en: "Does it catch the bug?", ru: "Ловит ли баг?" }
+  hint: { en: "Hint", ru: "Подсказка" }
+  solution: { en: "Show a solution", ru: "Показать решение" }
+  useSolution: { en: "Put it in the editor", ru: "Вставить в редактор" }
+  bugOn: { en: "Bug on", ru: "Баг включён" }
+  bugOnTitle: { en: "Run with the bug switched on. Off: the fixed app.", ru: "Запуск с включённым багом. Выключено — исправленная версия." }
+  caughtMsg: { en: "Bug caught: red with the bug, green on the fixed app. Once developers fix the bug, this test keeps it from coming back.", ru: "Баг пойман: красный с багом, зелёный на исправленной версии. Когда разработчики исправят баг, этот тест не даст ему вернуться." }
+  nextBug: { en: "Next bug", ru: "Следующий баг" }
   bugs: { en: "Switch on bugs", ru: "Включить баги" }
   cookie: { en: "Cookie banner", ru: "Баннер cookies" }
   slow: { en: "Slow network (random delays)", ru: "Медленная сеть (случайные задержки)" }

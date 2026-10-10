@@ -36,6 +36,8 @@ export interface ProgressData {
   badges: Record<string, string>;
   placement?: { done: boolean; skipped?: boolean; at?: string };
   lastWarmup?: string;
+  /** Playground bug hunt: bug id → day the student's test first caught it */
+  hunted?: Record<string, string>;
   stats: Stats;
 }
 
@@ -149,13 +151,15 @@ interface Actions {
   saveExplanation: (lessonId: string, text: string) => void;
   setPlacement: (v: { done: boolean; skipped?: boolean }) => void;
   setWarmupDone: () => void;
+  /** Marks a playground bug as caught; true the first time. */
+  catchBug: (bugId: string) => boolean;
   replaceAll: (data: ProgressData) => void;
   reset: () => void;
 }
 
 export type ProgressStore = ProgressData & Actions;
 
-const DATA_KEYS = [...Object.keys(emptyProgress()), 'placement', 'lastWarmup'] as (keyof ProgressData)[];
+const DATA_KEYS = [...Object.keys(emptyProgress()), 'placement', 'lastWarmup', 'hunted'] as (keyof ProgressData)[];
 
 function dataOf(s: ProgressStore): ProgressData {
   const out: Partial<Record<keyof ProgressData, unknown>> = {};
@@ -344,9 +348,18 @@ export const useProgress = create<ProgressStore>()(
 
         setWarmupDone: () => set({ lastWarmup: today() }),
 
-        replaceAll: (data) => set(syncTermCards({ ...emptyProgress(), ...data })),
+        catchBug: (bugId) => {
+          if (get().hunted?.[bugId]) return false;
+          commit((d) => {
+            d.hunted = { ...d.hunted, [bugId]: today() };
+            d.stats.bugsFound++;
+          });
+          return true;
+        },
 
-        reset: () => set(emptyProgress()),
+        replaceAll: (data) => set(syncTermCards({ ...emptyProgress(), hunted: undefined, ...data })),
+
+        reset: () => set({ ...emptyProgress(), hunted: undefined }),
       };
     },
     {

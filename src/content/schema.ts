@@ -383,3 +383,28 @@ export const Interview = z.object({
     tip: T.optional(),
   }).strict()).min(10),
 }).strict();
+
+/** Playground bug hunt: a switchable Bloomly bug as a bug report, Petal's draft test that misses it, and a solution. */
+export const HuntBug = z.object({
+  id: z.string(),
+  area: z.string(),
+  title: T,
+  steps: T,
+  expected: T,
+  actual: T,
+  /** preconditions: state set up before the test (the bug itself is switched on by the page) */
+  app: z.object({ state: AppState }).strict().optional(),
+  /** key in `starters`: green on healthy Bloomly and with the bug */
+  starter: z.string(),
+  hint: T,
+  /** green on healthy Bloomly, red with the bug */
+  solution: z.string(),
+}).strict();
+export type HuntBug = z.infer<typeof HuntBug>;
+
+export const Playground = z.object({
+  areas: z.array(z.object({ id: z.string(), title: T }).strict()).min(1),
+  starters: z.record(z.string(), z.string()),
+  bugs: z.array(HuntBug).min(1),
+}).strict();
+export type Playground = z.infer<typeof Playground>;

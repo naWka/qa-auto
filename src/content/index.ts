@@ -1,10 +1,11 @@
 // Loads all YAML content at build time and exposes typed lookups.
-import type { Chapter, GlossaryEntry, Lesson, Step, Task, T } from './schema';
+import type { Chapter, GlossaryEntry, Lesson, Playground, Step, Task, T } from './schema';
 import uiData from './ui.yaml';
 import storyData from './story.yaml';
 import phrasesData from './phrases.yaml';
 import errorsData from './errors.yaml';
 import interviewData from './interview.yaml';
+import playgroundData from './playground.yaml';
 
 const chapterFiles = import.meta.glob('./chapters/*/chapter.yaml', { eager: true, import: 'default' }) as Record<string, Chapter>;
 /** A lesson without its steps (they load on demand), plus a summary of its step tasks for XP. */
@@ -110,3 +111,5 @@ export const errorTexts = errorsData as {
 
 export interface InterviewQ { id: string; topic: string; q: T; a: T; tip?: T }
 export const interview = (interviewData as { questions: InterviewQ[] }).questions;
+
+export const playground = playgroundData as Playground;

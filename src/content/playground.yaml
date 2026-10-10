@@ -1,0 +1,876 @@
+# Bug hunt in the Playground: Bloomly's switchable bugs written up as bug reports.
+# Each bug gets Petal's draft test (`starter`: green on healthy Bloomly AND with the bug — it doesn't catch it yet),
+# a hint and a reference solution (green on healthy Bloomly, red with the bug).
+# `app.state` is set before the test (shown as preconditions); the bug itself is switched on by the page.
+# Checked by #/dev/selftest (filter "hunt").
+
+areas:
+  - id: login
+    title: { en: "Log in & account", ru: "Вход и аккаунт" }
+  - id: signup
+    title: { en: "Sign up", ru: "Регистрация" }
+  - id: shop
+    title: { en: "Shop", ru: "Каталог" }
+  - id: cart
+    title: { en: "Cart", ru: "Корзина" }
+  - id: checkout
+    title: { en: "Checkout & orders", ru: "Заказ" }
+  - id: a11y
+    title: { en: "Accessibility", ru: "Доступность" }
+  - id: api
+    title: { en: "API", ru: "API" }
+
+starters:
+  login: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_customer_can_log_in(page: Page):
+        page.goto("/login")
+        page.get_by_label("Email").fill("anna@bloomly.app")
+        page.get_by_label("Password").fill("bloom123")
+        page.get_by_role("button", name="Log in").click()
+        expect(page.get_by_test_id("user-name")).to_have_text("Anna")
+  login-wrong: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_wrong_password_is_rejected(page: Page):
+        page.goto("/login")
+        page.get_by_label("Email").fill("anna@bloomly.app")
+        page.get_by_label("Password").fill("wrong-password")
+        page.get_by_role("button", name="Log in").click()
+        expect(page).to_have_url("http://localhost:3000/login")
+  signup: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_customer_can_sign_up(page: Page):
+        page.goto("/signup")
+        page.get_by_label("Full name").fill("Nina Park")
+        page.get_by_label("Email").fill("nina@example.com")
+        page.get_by_label("Password").fill("flowers2026")
+        page.get_by_label("Country").select_option("Portugal")
+        page.get_by_label("I agree to the Terms of Service").check()
+        page.get_by_role("button", name="Create account").click()
+        expect(page.get_by_role("heading", name="Account created!")).to_be_visible()
+  search: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_search_finds_roses(page: Page):
+        page.goto("/shop")
+        page.get_by_label("Search").fill("Rose")
+        expect(page.get_by_test_id("product-card")).to_have_count(1)
+        expect(page.get_by_test_id("product-card")).to_contain_text("Rose Bouquet")
+  sort: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_products_can_be_sorted_by_price(page: Page):
+        page.goto("/shop")
+        page.get_by_label("Sort by").select_option("Price: low to high")
+        expect(page.get_by_test_id("product-card")).to_have_count(6)
+  add-to-cart: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_customer_can_add_tulips_to_the_cart(page: Page):
+        page.goto("/shop")
+        (
+            page.get_by_test_id("product-card")
+            .filter(has_text="Sunny Tulips")
+            .get_by_role("button", name="Add to cart")
+            .click()
+        )
+        expect(page.get_by_test_id("toast")).to_have_text("Sunny Tulips added to cart")
+  cart-qty: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_quantity_changes_the_price(page: Page):
+        page.goto("/cart")
+        page.get_by_role("button", name="Increase Rose Bouquet").click()
+        expect(page.get_by_test_id("row-subtotal")).to_have_text("€70.00")
+  cart-remove: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_customer_can_remove_an_item(page: Page):
+        page.goto("/cart")
+        (
+            page.get_by_test_id("cart-row")
+            .filter(has_text="Sunny Tulips")
+            .get_by_role("button", name="Remove")
+            .click()
+        )
+        expect(page.get_by_test_id("cart-row")).to_have_count(1)
+  promo: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_promo_code_gives_a_discount(page: Page):
+        page.goto("/cart")
+        page.get_by_label("Promo code").fill("BLOOM10")
+        page.get_by_role("button", name="Apply").click()
+        expect(page.get_by_test_id("cart-total")).to_have_text("€36.40")
+  delivery: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_delivery_is_free_from_50_euros(page: Page):
+        page.goto("/cart")
+        expect(page.get_by_test_id("cart-subtotal")).to_have_text("€100.00")
+        expect(page.get_by_test_id("cart-delivery")).to_have_text("Free")
+  checkout: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_customer_can_place_an_order(page: Page):
+        page.goto("/checkout")
+        page.get_by_label("Street address").fill("Rua das Flores 12")
+        page.get_by_label("City").select_option("Lisbon")
+        page.get_by_label("Delivery date").fill("2030-12-24")
+        page.get_by_role("button", name="Place order").click()
+        expect(page.get_by_role("heading", name="Thank you for your order!")).to_be_visible()
+  orders-shipped: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_orders_can_be_filtered_by_status(page: Page):
+        page.goto("/orders")
+        page.get_by_label("Status").select_option("Shipped")
+        expect(page.get_by_test_id("order-row").first).to_contain_text("#1041")
+  orders-delivered: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_filter_shows_delivered_orders(page: Page):
+        page.goto("/orders")
+        page.get_by_label("Status").select_option("Delivered")
+        expect(page.get_by_test_id("order-row")).to_have_count(3)
+  a11y-cart-button: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_customer_can_add_tulips_to_the_cart(page: Page):
+        page.goto("/shop")
+        (
+            page.get_by_test_id("product-card")
+            .filter(has_text="Sunny Tulips")
+            .get_by_test_id("add-to-cart")
+            .click()
+        )
+        expect(page.get_by_test_id("cart-count")).to_have_text("1")
+  a11y-qty: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_customer_can_change_the_quantity(page: Page):
+        page.goto("/cart")
+        page.get_by_test_id("qty-input").fill("3")
+        expect(page.get_by_test_id("row-subtotal")).to_have_text("€105.00")
+  a11y-search: |
+    from playwright.sync_api import Page, expect
+
+
+    def test_search_finds_roses(page: Page):
+        page.goto("/shop")
+        page.get_by_placeholder("Search flowers").fill("Rose")
+        expect(page.get_by_test_id("product-card")).to_have_count(1)
+  api: |
+    from playwright.sync_api import Page
+
+
+    def test_customer_gets_own_orders(page: Page):
+        login = page.request.post("/api/login", data={"email": "anna@bloomly.app", "password": "bloom123"})
+        token = login.json()["token"]
+        response = page.request.get("/api/orders", headers={"Authorization": "Bearer " + token})
+        assert response.status == 200
+        assert len(response.json()) == 6
+
+bugs:
+  # ---------- log in & account ----------
+  - id: login-trim
+    area: login
+    title: { en: "Spaces around the email block login", ru: "Пробелы вокруг email не дают войти" }
+    steps:
+      en: "1. Open **/login**.\n2. Enter the email with spaces around it, as if pasted: `\"  anna@bloomly.app \"`. Password `bloom123`.\n3. Click **Log in**."
+      ru: "1. Открой **/login**.\n2. Введи email с пробелами по краям, как будто его вставили из буфера: `\"  anna@bloomly.app \"`. Пароль `bloom123`.\n3. Нажми **Log in**."
+    expected: { en: "The spaces are ignored, Anna is logged in.", ru: "Пробелы игнорируются, Анна входит в аккаунт." }
+    actual: { en: "Error “Please enter a valid email address.”", ru: "Ошибка «Please enter a valid email address.»" }
+    starter: login
+    hint:
+      en: "Petal's test types a clean email. Type it the way the steps say — with the spaces."
+      ru: "В тесте Petal email введён без пробелов. Введи его так, как в шагах, — с пробелами."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_email_with_spaces_still_logs_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("  anna@bloomly.app ")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_test_id("user-name")).to_have_text("Anna")
+
+  - id: login-case-sensitive
+    area: login
+    title: { en: "An email with capital letters can't log in", ru: "Email с заглавными буквами не принимается" }
+    steps:
+      en: "1. Open **/login**.\n2. Enter `Anna@Bloomly.app` and `bloom123`.\n3. Click **Log in**."
+      ru: "1. Открой **/login**.\n2. Введи `Anna@Bloomly.app` и `bloom123`.\n3. Нажми **Log in**."
+    expected: { en: "Letter case in the email doesn't matter, Anna is logged in.", ru: "Регистр букв в email не важен, Анна входит в аккаунт." }
+    actual: { en: "Error “Invalid email or password.”", ru: "Ошибка «Invalid email or password.»" }
+    starter: login
+    hint:
+      en: "Change only the email in Petal's test: `Anna@Bloomly.app`."
+      ru: "Поменяй в тесте Petal только email: `Anna@Bloomly.app`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_email_is_not_case_sensitive(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("Anna@Bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_test_id("user-name")).to_have_text("Anna")
+
+  - id: login-no-error
+    area: login
+    title: { en: "A wrong password shows no error", ru: "Неверный пароль — и никакой ошибки" }
+    steps:
+      en: "1. Open **/login**.\n2. Enter `anna@bloomly.app` and a wrong password.\n3. Click **Log in**."
+      ru: "1. Открой **/login**.\n2. Введи `anna@bloomly.app` и неверный пароль.\n3. Нажми **Log in**."
+    expected: { en: "The error “Invalid email or password.” appears.", ru: "Появляется ошибка «Invalid email or password.»" }
+    actual: { en: "Nothing happens: no error, the customer doesn't know what went wrong.", ru: "Ничего не происходит: ошибки нет, покупатель не понимает, что не так." }
+    starter: login-wrong
+    hint:
+      en: "Petal only checks that the page stays on /login. Check the message too: it has the role `alert`."
+      ru: "Petal проверяет только, что страница осталась на /login. Проверь и само сообщение: у него роль `alert`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_wrong_password_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("wrong-password")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
+
+  - id: login-redirect-home
+    area: login
+    title: { en: "After login the customer lands on the home page", ru: "После входа покупатель попадает на главную" }
+    steps:
+      en: "1. Open **/login**.\n2. Log in as `anna@bloomly.app` / `bloom123`."
+      ru: "1. Открой **/login**.\n2. Войди как `anna@bloomly.app` / `bloom123`."
+    expected: { en: "The **My account** page opens: `/account`.", ru: "Открывается страница **My account**: `/account`." }
+    actual: { en: "The home page `/` opens.", ru: "Открывается главная `/`." }
+    starter: login
+    hint:
+      en: "Petal checks the name in the header — it's there on every page. Check the address: `expect(page).to_have_url(...)`."
+      ru: "Petal проверяет имя в шапке — оно есть на любой странице. Проверь адрес: `expect(page).to_have_url(...)`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_login_opens_my_account(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page).to_have_url("http://localhost:3000/account")
+
+  - id: greeting-wrong-name
+    area: login
+    title: { en: "My account greets the customer by last name", ru: "В аккаунте приветствие по фамилии" }
+    steps:
+      en: "1. Log in as `anna@bloomly.app` / `bloom123`.\n2. Read the heading on **My account**."
+      ru: "1. Войди как `anna@bloomly.app` / `bloom123`.\n2. Прочитай заголовок на странице **My account**."
+    expected: { en: "The heading “Welcome back, Anna!”", ru: "Заголовок «Welcome back, Anna!»" }
+    actual: { en: "The heading “Welcome back, Silva!”", ru: "Заголовок «Welcome back, Silva!»" }
+    starter: login
+    hint:
+      en: "Petal checks the header, not the greeting. Check the page heading: `page.get_by_role(\"heading\", level=1)`."
+      ru: "Petal проверяет шапку, а не приветствие. Проверь заголовок страницы: `page.get_by_role(\"heading\", level=1)`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_account_greets_by_first_name(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Anna!")
+
+  # ---------- sign up ----------
+  - id: signup-terms-ignored
+    area: signup
+    title: { en: "An account is created without accepting the terms", ru: "Аккаунт создаётся без согласия с условиями" }
+    steps:
+      en: "1. Open **/signup**.\n2. Fill in name, email, password and country.\n3. Leave **I agree to the Terms of Service** unticked.\n4. Click **Create account**."
+      ru: "1. Открой **/signup**.\n2. Заполни имя, email, пароль и страну.\n3. Не ставь галочку **I agree to the Terms of Service**.\n4. Нажми **Create account**."
+    expected: { en: "Error “You must accept the Terms of Service.” No account.", ru: "Ошибка «You must accept the Terms of Service.» Аккаунт не создан." }
+    actual: { en: "“Account created!”", ru: "«Account created!»" }
+    starter: signup
+    hint:
+      en: "Remove the line that ticks the box, and expect the error instead of success. The error has the test id `terms-error`."
+      ru: "Убери строку, которая ставит галочку, и вместо успеха жди ошибку. У ошибки test id `terms-error`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_terms_must_be_accepted(page: Page):
+          page.goto("/signup")
+          page.get_by_label("Full name").fill("Nina Park")
+          page.get_by_label("Email").fill("nina@example.com")
+          page.get_by_label("Password").fill("flowers2026")
+          page.get_by_label("Country").select_option("Portugal")
+          page.get_by_role("button", name="Create account").click()
+          expect(page.get_by_test_id("terms-error")).to_have_text("You must accept the Terms of Service.")
+
+  - id: signup-short-password
+    area: signup
+    title: { en: "A 7-character password is accepted", ru: "Пароль из 7 символов принимается" }
+    steps:
+      en: "1. Open **/signup**.\n2. Fill in the form with the password `flower7` (7 characters).\n3. Click **Create account**."
+      ru: "1. Открой **/signup**.\n2. Заполни форму с паролем `flower7` (7 символов).\n3. Нажми **Create account**."
+    expected: { en: "Error “Password must be at least 8 characters.”", ru: "Ошибка «Password must be at least 8 characters.»" }
+    actual: { en: "“Account created!”", ru: "«Account created!»" }
+    starter: signup
+    hint:
+      en: "Petal's password is long enough. Try the boundary: 7 characters, and expect the error from `password-error`."
+      ru: "У Petal пароль достаточно длинный. Проверь границу: 7 символов — и жди ошибку из `password-error`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_password_needs_8_characters(page: Page):
+          page.goto("/signup")
+          page.get_by_label("Full name").fill("Nina Park")
+          page.get_by_label("Email").fill("nina@example.com")
+          page.get_by_label("Password").fill("flower7")
+          page.get_by_label("Country").select_option("Portugal")
+          page.get_by_label("I agree to the Terms of Service").check()
+          page.get_by_role("button", name="Create account").click()
+          expect(page.get_by_test_id("password-error")).to_have_text("Password must be at least 8 characters.")
+
+  - id: signup-greeting-email
+    area: signup
+    title: { en: "The sign-up greeting shows the email instead of the name", ru: "После регистрации приветствуют по email, а не по имени" }
+    steps:
+      en: "1. Sign up as **Nina Park**, `nina@example.com`.\n2. Read the message under “Account created!”."
+      ru: "1. Зарегистрируйся как **Nina Park**, `nina@example.com`.\n2. Прочитай сообщение под «Account created!»."
+    expected: { en: "The text “Welcome to Bloomly, Nina.”", ru: "Текст «Welcome to Bloomly, Nina.»" }
+    actual: { en: "The text “Welcome to Bloomly, nina@example.com.”", ru: "Текст «Welcome to Bloomly, nina@example.com.»" }
+    starter: signup
+    hint:
+      en: "Petal checks only the heading. Check the text under it too: test id `signup-success`."
+      ru: "Petal проверяет только заголовок. Проверь и текст под ним: test id `signup-success`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_signup_greets_by_first_name(page: Page):
+          page.goto("/signup")
+          page.get_by_label("Full name").fill("Nina Park")
+          page.get_by_label("Email").fill("nina@example.com")
+          page.get_by_label("Password").fill("flowers2026")
+          page.get_by_label("Country").select_option("Portugal")
+          page.get_by_label("I agree to the Terms of Service").check()
+          page.get_by_role("button", name="Create account").click()
+          expect(page.get_by_test_id("signup-success")).to_contain_text("Welcome to Bloomly, Nina.")
+
+  # ---------- shop ----------
+  - id: search-case-sensitive
+    area: shop
+    title: { en: "Search only works with the right capital letters", ru: "Поиск работает только с правильными заглавными" }
+    steps:
+      en: "1. Open **/shop**.\n2. Type `rose` in **Search**."
+      ru: "1. Открой **/shop**.\n2. Введи `rose` в поле **Search**."
+    expected: { en: "Rose Bouquet is found: one card.", ru: "Находится Rose Bouquet: одна карточка." }
+    actual: { en: "The message “No flowers found for “rose”.”", ru: "Сообщение «No flowers found for “rose”.»" }
+    starter: search
+    hint:
+      en: "Customers rarely type capitals. Search for `rose` instead of `Rose`."
+      ru: "Покупатели редко пишут с заглавной. Ищи `rose`, а не `Rose`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_search_ignores_letter_case(page: Page):
+          page.goto("/shop")
+          page.get_by_label("Search").fill("rose")
+          expect(page.get_by_test_id("product-card")).to_have_count(1)
+          expect(page.get_by_test_id("product-card")).to_contain_text("Rose Bouquet")
+
+  - id: sort-by-name
+    area: shop
+    title: { en: "“Price: low to high” sorts by name", ru: "«Price: low to high» сортирует по названию" }
+    steps:
+      en: "1. Open **/shop**.\n2. Choose **Sort by → Price: low to high**."
+      ru: "1. Открой **/shop**.\n2. Выбери **Sort by → Price: low to high**."
+    expected: { en: "Cheapest first: €12.00, €18.00, €24.00, €29.00, €35.00, €42.00.", ru: "Сначала дешёвые: €12.00, €18.00, €24.00, €29.00, €35.00, €42.00." }
+    actual: { en: "A–Z order: Lavender Pot, Mint Succulent, Peony Dream…", ru: "Порядок по алфавиту: Lavender Pot, Mint Succulent, Peony Dream…" }
+    starter: sort
+    hint:
+      en: "Petal only checks that there are 6 cards — any order passes. Check the order of the prices: `to_have_text([...])` takes a list."
+      ru: "Petal проверяет только, что карточек 6, — пройдёт любой порядок. Проверь порядок цен: `to_have_text([...])` принимает список."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_products_can_be_sorted_by_price(page: Page):
+          page.goto("/shop")
+          page.get_by_label("Sort by").select_option("Price: low to high")
+          expect(page.get_by_test_id("product-price")).to_have_text(
+              ["€12.00", "€18.00", "€24.00", "€29.00", "€35.00", "€42.00"]
+          )
+
+  # ---------- cart ----------
+  - id: add-to-cart-double
+    area: cart
+    title: { en: "One click adds two items", ru: "Один клик добавляет два товара" }
+    steps:
+      en: "1. Open **/shop**.\n2. Click **Add to cart** on Sunny Tulips once."
+      ru: "1. Открой **/shop**.\n2. Один раз нажми **Add to cart** у Sunny Tulips."
+    expected: { en: "The cart counter in the header shows 1.", ru: "Счётчик корзины в шапке показывает 1." }
+    actual: { en: "The counter shows 2.", ru: "Счётчик показывает 2." }
+    starter: add-to-cart
+    hint:
+      en: "Petal checks the pop-up message — it looks fine. Check the counter: `page.get_by_test_id(\"cart-count\")`."
+      ru: "Petal проверяет всплывающее сообщение — с ним всё в порядке. Проверь счётчик: `page.get_by_test_id(\"cart-count\")`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_one_click_adds_one_item(page: Page):
+          page.goto("/shop")
+          (
+              page.get_by_test_id("product-card")
+              .filter(has_text="Sunny Tulips")
+              .get_by_role("button", name="Add to cart")
+              .click()
+          )
+          expect(page.get_by_test_id("cart-count")).to_have_text("1")
+
+  - id: cart-count-stale
+    area: cart
+    title: { en: "The cart counter doesn't update", ru: "Счётчик корзины не обновляется" }
+    steps:
+      en: "1. Open **/shop**.\n2. Click **Add to cart** on Sunny Tulips.\n3. Look at the cart counter in the header."
+      ru: "1. Открой **/shop**.\n2. Нажми **Add to cart** у Sunny Tulips.\n3. Посмотри на счётчик корзины в шапке."
+    expected: { en: "The counter changes to 1 right away.", ru: "Счётчик сразу меняется на 1." }
+    actual: { en: "The counter stays at 0 until the page is reloaded.", ru: "Счётчик остаётся 0, пока не перезагрузишь страницу." }
+    starter: add-to-cart
+    hint:
+      en: "The pop-up message appears either way. Check the counter itself: `page.get_by_test_id(\"cart-count\")`."
+      ru: "Всплывающее сообщение появляется в любом случае. Проверь сам счётчик: `page.get_by_test_id(\"cart-count\")`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_cart_counter_updates_right_away(page: Page):
+          page.goto("/shop")
+          (
+              page.get_by_test_id("product-card")
+              .filter(has_text="Sunny Tulips")
+              .get_by_role("button", name="Add to cart")
+              .click()
+          )
+          expect(page.get_by_test_id("cart-count")).to_have_text("1")
+
+  - id: cart-total-ignores-qty
+    area: cart
+    title: { en: "The cart total ignores the quantity", ru: "Итог корзины не учитывает количество" }
+    app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+    steps:
+      en: "1. Open **/cart**.\n2. Click **+** next to Rose Bouquet (quantity 2)."
+      ru: "1. Открой **/cart**.\n2. Нажми **+** у Rose Bouquet (количество 2)."
+    expected: { en: "Row €70.00, total €70.00 (delivery is free from €50).", ru: "Строка €70.00, итого €70.00 (от €50 доставка бесплатная)." }
+    actual: { en: "Row €70.00, but the total is €39.90 — as if there were one bouquet.", ru: "Строка €70.00, но итого €39.90 — как будто букет один." }
+    starter: cart-qty
+    hint:
+      en: "Petal checks only the row, and the row is right. Check the total: test id `cart-total`."
+      ru: "Petal проверяет только строку, а она верная. Проверь итог: test id `cart-total`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_total_counts_the_quantity(page: Page):
+          page.goto("/cart")
+          page.get_by_role("button", name="Increase Rose Bouquet").click()
+          expect(page.get_by_test_id("row-subtotal")).to_have_text("€70.00")
+          expect(page.get_by_test_id("cart-total")).to_have_text("€70.00")
+
+  - id: remove-wrong-item
+    area: cart
+    title: { en: "“Remove” deletes the wrong item", ru: "«Remove» удаляет не тот товар" }
+    app: { state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] } }
+    steps:
+      en: "1. Open **/cart**.\n2. Click **Remove** in the Sunny Tulips row."
+      ru: "1. Открой **/cart**.\n2. Нажми **Remove** в строке Sunny Tulips."
+    expected: { en: "Only Rose Bouquet is left.", ru: "Остаётся только Rose Bouquet." }
+    actual: { en: "Rose Bouquet is gone, Sunny Tulips is still there.", ru: "Rose Bouquet пропал, Sunny Tulips на месте." }
+    starter: cart-remove
+    hint:
+      en: "Petal counts the rows — one row is left either way. Check *which* row is left."
+      ru: "Petal считает строки — одна строка остаётся в любом случае. Проверь, *какая* строка осталась."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_remove_deletes_the_right_item(page: Page):
+          page.goto("/cart")
+          (
+              page.get_by_test_id("cart-row")
+              .filter(has_text="Sunny Tulips")
+              .get_by_role("button", name="Remove")
+              .click()
+          )
+          expect(page.get_by_test_id("cart-row")).to_have_count(1)
+          expect(page.get_by_test_id("cart-row")).to_contain_text("Rose Bouquet")
+
+  - id: promo-case-sensitive
+    area: cart
+    title: { en: "A promo code in lower case is rejected", ru: "Промокод строчными буквами не принимается" }
+    app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+    steps:
+      en: "1. Open **/cart** (Rose Bouquet, €35.00).\n2. Enter `bloom10` in **Promo code** and click **Apply**."
+      ru: "1. Открой **/cart** (Rose Bouquet, €35.00).\n2. Введи `bloom10` в **Promo code** и нажми **Apply**."
+    expected: { en: "−10% is applied: total €36.40.", ru: "Скидка −10% применяется: итого €36.40." }
+    actual: { en: "The message “This promo code is not valid.”", ru: "Сообщение «This promo code is not valid.»" }
+    starter: promo
+    hint:
+      en: "Change only the code in Petal's test: `bloom10`."
+      ru: "Поменяй в тесте Petal только код: `bloom10`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_promo_code_ignores_letter_case(page: Page):
+          page.goto("/cart")
+          page.get_by_label("Promo code").fill("bloom10")
+          page.get_by_role("button", name="Apply").click()
+          expect(page.get_by_test_id("cart-total")).to_have_text("€36.40")
+
+  - id: promo-stacks
+    area: cart
+    title: { en: "The same promo code works twice", ru: "Один промокод срабатывает дважды" }
+    app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+    steps:
+      en: "1. Open **/cart** (Rose Bouquet, €35.00).\n2. Apply `BLOOM10`.\n3. Click **Apply** once more."
+      ru: "1. Открой **/cart** (Rose Bouquet, €35.00).\n2. Примени `BLOOM10`.\n3. Нажми **Apply** ещё раз."
+    expected: { en: "Still −10%: total €36.40.", ru: "Всё ещё −10%: итого €36.40." }
+    actual: { en: "−20%: total €32.90.", ru: "−20%: итого €32.90." }
+    starter: promo
+    hint:
+      en: "Click **Apply** a second time, then check the same total."
+      ru: "Нажми **Apply** второй раз и проверь тот же итог."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_promo_code_does_not_stack(page: Page):
+          page.goto("/cart")
+          page.get_by_label("Promo code").fill("BLOOM10")
+          page.get_by_role("button", name="Apply").click()
+          page.get_by_role("button", name="Apply").click()
+          expect(page.get_by_test_id("cart-total")).to_have_text("€36.40")
+
+  - id: free-delivery-boundary
+    area: cart
+    title: { en: "Exactly €50.00 still pays for delivery", ru: "Ровно €50.00 — а доставка всё равно платная" }
+    app: { state: { cart: [{ id: rose-bouquet, qty: 2 }, { id: lavender-pot, qty: 1 }, { id: mint-succulent, qty: 1 }] } }
+    steps:
+      en: "1. Open **/cart** (subtotal €100.00).\n2. Apply the flash-sale code `FLASH50` (−50%): exactly €50.00."
+      ru: "1. Открой **/cart** (сумма €100.00).\n2. Примени код распродажи `FLASH50` (−50%): ровно €50.00."
+    expected: { en: "Delivery is **Free** (free from €50.00), total €50.00.", ru: "Доставка **Free** (бесплатно от €50.00), итого €50.00." }
+    actual: { en: "Delivery €4.90, total €54.90.", ru: "Доставка €4.90, итого €54.90." }
+    starter: delivery
+    hint:
+      en: "Petal checks delivery at €100 — far from the boundary. Test the boundary itself: apply `FLASH50`."
+      ru: "Petal проверяет доставку при €100 — далеко от границы. Проверь саму границу: примени `FLASH50`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_delivery_is_free_at_exactly_50_euros(page: Page):
+          page.goto("/cart")
+          page.get_by_label("Promo code").fill("FLASH50")
+          page.get_by_role("button", name="Apply").click()
+          expect(page.get_by_test_id("cart-delivery")).to_have_text("Free")
+          expect(page.get_by_test_id("cart-total")).to_have_text("€50.00")
+
+  # ---------- checkout & orders ----------
+  - id: checkout-past-date
+    area: checkout
+    title: { en: "Checkout accepts a delivery date in the past", ru: "Заказ принимает дату доставки в прошлом" }
+    app: { state: { user: anna@bloomly.app, cart: [{ id: rose-bouquet, qty: 1 }] } }
+    steps:
+      en: "1. Open **/checkout**.\n2. Fill in the address and city, set **Delivery date** to `2020-01-01`.\n3. Click **Place order**."
+      ru: "1. Открой **/checkout**.\n2. Заполни адрес и город, в **Delivery date** укажи `2020-01-01`.\n3. Нажми **Place order**."
+    expected: { en: "Error “Delivery date can't be in the past.”", ru: "Ошибка «Delivery date can't be in the past.»" }
+    actual: { en: "The order is placed: “Thank you for your order!”", ru: "Заказ оформлен: «Thank you for your order!»" }
+    starter: checkout
+    hint:
+      en: "Use a past date and expect the error from `co-date-error` instead of the thank-you page."
+      ru: "Укажи прошедшую дату и вместо страницы «спасибо» жди ошибку из `co-date-error`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_delivery_date_cannot_be_in_the_past(page: Page):
+          page.goto("/checkout")
+          page.get_by_label("Street address").fill("Rua das Flores 12")
+          page.get_by_label("City").select_option("Lisbon")
+          page.get_by_label("Delivery date").fill("2020-01-01")
+          page.get_by_role("button", name="Place order").click()
+          expect(page.get_by_test_id("co-date-error")).to_have_text("Delivery date can't be in the past.")
+
+  - id: orders-filter-wrong
+    area: checkout
+    title: { en: "The “Shipped” filter also shows other orders", ru: "Фильтр «Shipped» показывает и другие заказы" }
+    app: { state: { user: anna@bloomly.app } }
+    steps:
+      en: "1. Open **/orders**.\n2. Choose **Status → Shipped**."
+      ru: "1. Открой **/orders**.\n2. Выбери **Status → Shipped**."
+    expected: { en: "One order: #1041.", ru: "Один заказ: #1041." }
+    actual: { en: "Two orders: #1041 Shipped and #1040 Processing.", ru: "Два заказа: #1041 Shipped и #1040 Processing." }
+    starter: orders-shipped
+    hint:
+      en: "Petal checks only the first row. Check how many rows there are: `to_have_count`."
+      ru: "Petal проверяет только первую строку. Проверь, сколько всего строк: `to_have_count`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_shipped_filter_shows_only_shipped_orders(page: Page):
+          page.goto("/orders")
+          page.get_by_label("Status").select_option("Shipped")
+          expect(page.get_by_test_id("order-row")).to_have_count(1)
+          expect(page.get_by_test_id("order-row")).to_contain_text("#1041")
+
+  - id: orders-summary-wrong
+    area: checkout
+    title: { en: "The orders summary ignores the filter", ru: "Сводка заказов не учитывает фильтр" }
+    app: { state: { user: anna@bloomly.app } }
+    steps:
+      en: "1. Open **/orders**.\n2. Choose **Status → Delivered**."
+      ru: "1. Открой **/orders**.\n2. Выбери **Status → Delivered**."
+    expected: { en: "3 rows and the line “Showing 3 of 6 orders”.", ru: "3 строки и надпись «Showing 3 of 6 orders»." }
+    actual: { en: "3 rows, but the line says “Showing 6 of 6 orders”.", ru: "3 строки, но надпись «Showing 6 of 6 orders»." }
+    starter: orders-delivered
+    hint:
+      en: "The rows are right. Check the line under the table: test id `orders-summary`."
+      ru: "Строки верные. Проверь надпись под таблицей: test id `orders-summary`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_summary_counts_filtered_orders(page: Page):
+          page.goto("/orders")
+          page.get_by_label("Status").select_option("Delivered")
+          expect(page.get_by_test_id("order-row")).to_have_count(3)
+          expect(page.get_by_test_id("orders-summary")).to_have_text("Showing 3 of 6 orders")
+
+  # ---------- accessibility ----------
+  - id: a11y-add-to-cart-div
+    area: a11y
+    title: { en: "“Add to cart” isn't a button for a screen reader", ru: "«Add to cart» — не кнопка для скринридера" }
+    steps:
+      en: "1. Open **/shop**.\n2. Look for **Add to cart** on Sunny Tulips the way a screen reader does — as a button."
+      ru: "1. Открой **/shop**.\n2. Найди **Add to cart** у Sunny Tulips так, как ищет скринридер, — как кнопку."
+    expected: { en: "It's a button: role `button`, name “Add to cart”.", ru: "Это кнопка: роль `button`, имя «Add to cart»." }
+    actual: { en: "It's a `<div>` styled as a button: a mouse click works, but a screen reader doesn't announce a button and the keyboard can't reach it.", ru: "Это `<div>`, который выглядит как кнопка: мышью нажимается, но скринридер не объявляет кнопку, а с клавиатуры до неё не добраться." }
+    starter: a11y-cart-button
+    hint:
+      en: "Petal finds it by test id, so the test doesn't notice. Find it the way a user does: `get_by_role(\"button\", name=\"Add to cart\")`."
+      ru: "Petal ищет её по test id, поэтому тест ничего не замечает. Ищи так, как ищет пользователь: `get_by_role(\"button\", name=\"Add to cart\")`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_add_to_cart_is_a_button(page: Page):
+          page.goto("/shop")
+          (
+              page.get_by_test_id("product-card")
+              .filter(has_text="Sunny Tulips")
+              .get_by_role("button", name="Add to cart")
+              .click()
+          )
+          expect(page.get_by_test_id("cart-count")).to_have_text("1")
+
+  - id: a11y-qty-unnamed
+    area: a11y
+    title: { en: "The quantity field has no name", ru: "У поля количества нет названия" }
+    app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
+    steps:
+      en: "1. Open **/cart**.\n2. Look for the Rose Bouquet quantity field by its label."
+      ru: "1. Открой **/cart**.\n2. Найди поле количества Rose Bouquet по его подписи."
+    expected: { en: "The field is called “Quantity of Rose Bouquet”.", ru: "Поле называется «Quantity of Rose Bouquet»." }
+    actual: { en: "The field has no name, and the buttons next to it are called just “−” and “+”.", ru: "У поля нет названия, а кнопки рядом называются просто «−» и «+»." }
+    starter: a11y-qty
+    hint:
+      en: "Petal uses the test id. Find the field by its label: `get_by_label(\"Quantity of Rose Bouquet\")`."
+      ru: "Petal ищет по test id. Найди поле по подписи: `get_by_label(\"Quantity of Rose Bouquet\")`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_quantity_field_has_a_name(page: Page):
+          page.goto("/cart")
+          page.get_by_label("Quantity of Rose Bouquet").fill("3")
+          expect(page.get_by_test_id("row-subtotal")).to_have_text("€105.00")
+
+  - id: a11y-search-no-label
+    area: a11y
+    title: { en: "The search field has no label", ru: "У поля поиска нет подписи" }
+    steps:
+      en: "1. Open **/shop**.\n2. Look for the search field by its label **Search**."
+      ru: "1. Открой **/shop**.\n2. Найди поле поиска по подписи **Search**."
+    expected: { en: "The field has the label “Search”.", ru: "У поля есть подпись «Search»." }
+    actual: { en: "Only the placeholder “Search flowers”, which disappears as soon as you type.", ru: "Есть только подсказка «Search flowers», и она исчезает, как только начинаешь печатать." }
+    starter: a11y-search
+    hint:
+      en: "Petal finds the field by its placeholder. Find it by the label: `get_by_label(\"Search\")`."
+      ru: "Petal ищет поле по подсказке-плейсхолдеру. Найди его по подписи: `get_by_label(\"Search\")`."
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_search_field_has_a_label(page: Page):
+          page.goto("/shop")
+          page.get_by_label("Search").fill("Rose")
+          expect(page.get_by_test_id("product-card")).to_have_count(1)
+
+  # ---------- API ----------
+  - id: api-orders-no-auth
+    area: api
+    title: { en: "The orders API answers without a token", ru: "API заказов отвечает без токена" }
+    steps:
+      en: "1. Send `GET /api/orders` without the `Authorization` header."
+      ru: "1. Отправь `GET /api/orders` без заголовка `Authorization`."
+    expected: { en: "401 Unauthorized.", ru: "401 Unauthorized." }
+    actual: { en: "200 and the orders of **all** customers.", ru: "200 и заказы **всех** покупателей." }
+    starter: api
+    hint:
+      en: "Send the same request without `headers=` and check `response.status`."
+      ru: "Отправь тот же запрос без `headers=` и проверь `response.status`."
+    solution: |
+      from playwright.sync_api import Page
+
+
+      def test_orders_need_a_token(page: Page):
+          response = page.request.get("/api/orders")
+          assert response.status == 401
+
+  - id: api-total-no-delivery
+    area: api
+    title: { en: "A new order via the API skips the delivery fee", ru: "Заказ через API без платы за доставку" }
+    steps:
+      en: "1. Log in with `POST /api/login`.\n2. Send `POST /api/orders` with one Rose Bouquet: `{\"items\": [{\"id\": \"rose-bouquet\", \"qty\": 1}]}`."
+      ru: "1. Войди через `POST /api/login`.\n2. Отправь `POST /api/orders` с одним Rose Bouquet: `{\"items\": [{\"id\": \"rose-bouquet\", \"qty\": 1}]}`."
+    expected: { en: "201, `total` is `39.9` (35 + 4.90 delivery under €50).", ru: "201, `total` равен `39.9` (35 + 4.90 за доставку до €50)." }
+    actual: { en: "`total` is `35`.", ru: "`total` равен `35`." }
+    starter: api
+    hint:
+      en: "Create the order with the token and check `response.json()[\"total\"]`."
+      ru: "Создай заказ с токеном и проверь `response.json()[\"total\"]`."
+    solution: |
+      from playwright.sync_api import Page
+
+
+      def test_order_total_includes_delivery(page: Page):
+          login = page.request.post("/api/login", data={"email": "anna@bloomly.app", "password": "bloom123"})
+          headers = {"Authorization": "Bearer " + login.json()["token"]}
+          response = page.request.post("/api/orders", headers=headers, data={"items": [{"id": "rose-bouquet", "qty": 1}]})
+          assert response.status == 201
+          assert response.json()["total"] == 39.9
+
+  - id: api-login-locked
+    area: api
+    title: { en: "A locked account can log in through the API", ru: "Заблокированный аккаунт входит через API" }
+    steps:
+      en: "1. Send `POST /api/login` with `locked@bloomly.app` / `bloom123`."
+      ru: "1. Отправь `POST /api/login` с `locked@bloomly.app` / `bloom123`."
+    expected: { en: "Status 423 and `{\"error\": \"Account is locked\"}`.", ru: "Статус 423 и `{\"error\": \"Account is locked\"}`." }
+    actual: { en: "200 and a token.", ru: "200 и токен." }
+    starter: api
+    hint:
+      en: "Log in as the locked user and check `status`."
+      ru: "Войди под заблокированным пользователем и проверь `status`."
+    solution: |
+      from playwright.sync_api import Page
+
+
+      def test_locked_account_cannot_log_in(page: Page):
+          response = page.request.post("/api/login", data={"email": "locked@bloomly.app", "password": "bloom123"})
+          assert response.status == 423
+
+  - id: api-out-of-stock-order
+    area: api
+    title: { en: "The API accepts an order for an out-of-stock flower", ru: "API принимает заказ на товар, которого нет" }
+    steps:
+      en: "1. Log in with `POST /api/login`.\n2. Send `POST /api/orders` with `white-orchid` (out of stock)."
+      ru: "1. Войди через `POST /api/login`.\n2. Отправь `POST /api/orders` с `white-orchid` (нет в наличии)."
+    expected: { en: "Status 409 “White Orchid is out of stock”.", ru: "Статус 409 «White Orchid is out of stock»." }
+    actual: { en: "201, the order is created.", ru: "201, заказ создан." }
+    starter: api
+    hint:
+      en: "Order `white-orchid` with the token and check `status`."
+      ru: "Закажи `white-orchid` с токеном и проверь `status`."
+    solution: |
+      from playwright.sync_api import Page
+
+
+      def test_out_of_stock_flower_cannot_be_ordered(page: Page):
+          login = page.request.post("/api/login", data={"email": "anna@bloomly.app", "password": "bloom123"})
+          headers = {"Authorization": "Bearer " + login.json()["token"]}
+          response = page.request.post("/api/orders", headers=headers, data={"items": [{"id": "white-orchid", "qty": 1}]})
+          assert response.status == 409
+
+  - id: api-order-other-user
+    area: api
+    title: { en: "One customer can read another customer's order", ru: "Покупатель видит чужой заказ" }
+    steps:
+      en: "1. Log in with `POST /api/login` as `tom@bloomly.app` / `tulips42`.\n2. Send `GET /api/orders/1042` — Anna's order."
+      ru: "1. Войди через `POST /api/login` как `tom@bloomly.app` / `tulips42`.\n2. Отправь `GET /api/orders/1042` — это заказ Анны."
+    expected: { en: "404 Order not found.", ru: "404 Order not found." }
+    actual: { en: "200 and Anna's order.", ru: "200 и заказ Анны." }
+    starter: api
+    hint:
+      en: "Log in as Tom, ask for order 1042 with his token and check `status`."
+      ru: "Войди как Том, запроси заказ 1042 с его токеном и проверь `status`."
+    solution: |
+      from playwright.sync_api import Page
+
+
+      def test_customer_cannot_read_another_order(page: Page):
+          login = page.request.post("/api/login", data={"email": "tom@bloomly.app", "password": "tulips42"})
+          headers = {"Authorization": "Bearer " + login.json()["token"]}
+          response = page.request.get("/api/orders/1042", headers=headers)
+          assert response.status == 404
+
+  - id: api-price-string
+    area: api
+    title: { en: "The product price comes as a string", ru: "Цена товара приходит строкой" }
+    steps:
+      en: "1. Send `GET /api/products/rose-bouquet`."
+      ru: "1. Отправь `GET /api/products/rose-bouquet`."
+    expected: { en: "`price` is the number `35`.", ru: "`price` — число `35`." }
+    actual: { en: "`price` is the string `\"35.00\"`.", ru: "`price` — строка `\"35.00\"`." }
+    starter: api
+    hint:
+      en: "Get the product and compare `response.json()[\"price\"]` with the number `35`."
+      ru: "Запроси товар и сравни `response.json()[\"price\"]` с числом `35`."
+    solution: |
+      from playwright.sync_api import Page
+
+
+      def test_price_is_a_number(page: Page):
+          response = page.request.get("/api/products/rose-bouquet")
+          assert response.json()["price"] == 35

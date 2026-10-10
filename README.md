@@ -22,6 +22,9 @@ direct, review and verify it.
   Playwright MCP, role / accessible name / suggested locator), a simplified trace viewer (Before/After snapshots of
   every action), virtual files for page objects and fixtures, a fake REST API shared with the UI, a "redesign"
   variant of Bloomly to prove locators resilient, and "Run ×N" for flaky tests.
+- **Playground**: a bug hunt over Bloomly's bug tracker — each switchable bug is a bug report with steps, expected and
+  actual results, and Petal's draft test that misses it; the student changes the test until it is red with the bug
+  and green on the fixed app. A free mode runs any test with any bugs switched on.
 - **Spaced repetition** (SM-2) for terms and topics, "I know this" checks with practical task pools,
   an entry check, XP, levels, sticker badges, streaks, a glossary with pronunciation, interview prep.
 - Everything is static; progress lives in `localStorage`. Settings can save a copy as a file or a one-line code

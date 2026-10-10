@@ -1,6 +1,6 @@
 // Dev page: runs every reference solution / prediction / best agent response through the emulator.
 import { useEffect, useRef, useState } from 'react';
-import { chapters, loadAllTasks, loadLesson, lessonsOf } from '../content';
+import { chapters, loadAllTasks, loadLesson, lessonsOf, playground } from '../content';
 import type { Checks, Task } from '../content/schema';
 import { RunController, openPreview, runSpec, type AppSetup, type RunResult, type StepRecord } from '../emulator';
 import { AUT_DIR } from '../lab/useRunner';
@@ -110,6 +110,17 @@ export function SelfTestPage() {
         push({ id: t.id, kind: t.kind, status: 'fail', note: `crash: ${(e as Error).message}` });
       }
     }
+    // playground bug hunt: Petal's draft misses the bug, the solution catches it
+    for (const b of playground.bugs) {
+      if (filter && !`hunt-${b.id}`.startsWith(filter)) continue;
+      const fixed = { state: b.app?.state };
+      const buggy = { ...fixed, bugs: [b.id] };
+      const v = await gradeCode(b.solution, { expect: 'fail', also: [{ app: fixed, expect: 'pass' }] }, buggy, (c, a) => run(c, a));
+      push({ id: `hunt-${b.id}`, kind: 'hunt', status: v.ok ? 'ok' : 'fail', note: v.ok ? 'solution catches the bug' : v.problems.map((p) => p.en).join(' | ') + ' · ' + (v.main ? summarize(v.main) : '') });
+      const starter = playground.starters[b.starter];
+      const [s1, s2] = [await run(starter, fixed), await run(starter, buggy)];
+      if (s1.status !== 'passed' || s2.status !== 'passed') push({ id: `hunt-${b.id}`, kind: 'hunt', status: 'fail', note: `starter must pass with and without the bug: ${summarize(s1)} / ${summarize(s2)}` });
+    }
     // runnable examples
     for (const ch of chapters) for (const meta of lessonsOf(ch)) for (const s of (await loadLesson(meta.id))?.steps ?? []) {
       const l = meta;
@@ -137,7 +148,7 @@ export function SelfTestPage() {
     <div className="page page-wide selftest">
       <h1 className="page-title">Self-test</h1>
       <div className="row gap">
-        <input className="text-input" placeholder="filter by id prefix, e.g. c1-l2" value={filter} onChange={(e) => setFilter(e.target.value)} />
+        <input className="text-input" placeholder="filter by id prefix, e.g. c1-l2 or hunt-" value={filter} onChange={(e) => setFilter(e.target.value)} />
         <button className="btn btn-primary" onClick={go} disabled={busy}>{busy ? 'Running…' : 'Run all'}</button>
         <span>{Object.entries(counts).map(([k, v]) => `${k}: ${v}`).join(' · ')}</span>
       </div>

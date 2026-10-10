@@ -142,6 +142,10 @@ for (const dir of readdirSync(chaptersDir).sort()) {
 if (!filter) {
   for (const f of readdirSync(join(ROOT, 'glossary'))) walkStrings(YAML.parse(readFileSync(join(ROOT, 'glossary', f), 'utf8')), `glossary/${f}`);
   for (const f of ['interview.yaml', 'phrases.yaml', 'story.yaml', 'ui.yaml', 'errors.yaml']) walkStrings(YAML.parse(readFileSync(join(ROOT, f), 'utf8')), f);
+  const pg = YAML.parse(readFileSync(join(ROOT, 'playground.yaml'), 'utf8'));
+  for (const [k, src] of Object.entries(pg.starters as Record<string, string>)) check(src, `playground starter ${k}`, true);
+  for (const b of pg.bugs) check(b.solution, `playground ${b.id} solution`, true);
+  walkStrings(pg, 'playground.yaml');
 }
 
 for (const s of scripts) {

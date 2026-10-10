@@ -3,7 +3,7 @@
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import YAML from 'yaml';
-import { Lesson, Chapter, GlossaryEntry, Phrases, Interview, Task } from '../src/content/schema.ts';
+import { Lesson, Chapter, GlossaryEntry, Phrases, Interview, Playground, Task } from '../src/content/schema.ts';
 import { audioJobs, hasAudio } from './audio-texts.ts';
 
 const ROOT = join(import.meta.dirname, '..', 'src', 'content');
@@ -242,6 +242,26 @@ for (const [name, schema] of [['phrases.yaml', Phrases], ['interview.yaml', Inte
   if (!existsSync(file)) { warn(name, 'missing'); continue; }
   const data = zodCheck<any>(schema, load(file), rel(file));
   if (data) walkStrings(data, rel(file), '');
+}
+
+// ---------- playground bug hunt ----------
+{
+  const file = join(ROOT, 'playground.yaml');
+  const data = zodCheck<any>(Playground, load(file), rel(file));
+  if (data) {
+    walkStrings({ areas: data.areas, bugs: data.bugs }, rel(file), '');
+    const areas = new Set(data.areas.map((a: any) => a.id));
+    const appSrc = ['public/aut/app.js', 'src/emulator/api.ts'].map((f) => readFileSync(join(ROOT, '..', '..', f), 'utf8')).join('\n');
+    const seen = new Set<string>();
+    for (const b of data.bugs) {
+      if (seen.has(b.id)) err(rel(file), `duplicate bug ${b.id}`);
+      seen.add(b.id);
+      if (!areas.has(b.area)) err(rel(file), `bug ${b.id}: unknown area "${b.area}"`);
+      if (!data.starters[b.starter]) err(rel(file), `bug ${b.id}: unknown starter "${b.starter}"`);
+      if (!appSrc.includes(`'${b.id}'`)) err(rel(file), `bug ${b.id}: Bloomly has no such bug (public/aut/app.js, src/emulator/api.ts)`);
+    }
+    for (const a of areas) if (!data.bugs.some((b: any) => b.area === a)) warn(rel(file), `area ${a} has no bugs`);
+  }
 }
 
 // ---------- audio ----------

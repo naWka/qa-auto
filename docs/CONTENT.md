@@ -531,6 +531,15 @@ Before the engine gets a text, inline code is turned into what a developer would
 out. Words it still gets wrong go to `src/content/pronounce.yaml` (`JSON: Jason`). To see what the engine gets:
 `npm run audio -- --say "text"`.
 
+### Playground bug hunt
+
+`src/content/playground.yaml`: every switchable Bloomly bug (docs/AUT.md) as a bug report — `title`, `steps`,
+`expected`, `actual`, optional preconditions `app.state` — plus Petal's draft test (`starter`, a key in `starters`),
+a `hint` and a `solution`. The draft must pass on the fixed app **and** with the bug (it misses the bug); the solution
+must pass on the fixed app and fail with the bug through an assertion or a blocked action (the same rule as
+`find-bug`). `check:content` validates the file, `check:code` parses the code, `#/dev/selftest` (filter `hunt-`)
+runs both. A new bug in `public/aut/app.js` or `src/emulator/api.ts` gets an entry here.
+
 ## 10. Quality checklist
 
 - [ ] EN/RU paragraphs aligned, RU natural; gender variants on every past-tense verb about the student.

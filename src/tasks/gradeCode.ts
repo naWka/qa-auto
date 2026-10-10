@@ -14,9 +14,10 @@ export interface CodeVerdict {
   repeats?: ('passed' | 'failed')[];
 }
 
-// A red run counts when the test caught something: a failed assertion, or a user action the app doesn't allow
-// (element missing / not actionable). The `also` run on the fixed app guards against simply wrong locators.
-const ASSERTION_CODES = new Set(['expect-failed', 'expect-not-found', 'expect-count', 'expect-url', 'expect-generic', 'action-timeout', 'action-not-actionable']);
+// A red run counts when the test caught something: a failed assertion (`expect` or a plain `assert`), or a user
+// action the app doesn't allow (element missing / not actionable). The `also` run on the fixed app guards against
+// simply wrong locators.
+const ASSERTION_CODES = new Set(['expect-failed', 'expect-not-found', 'expect-count', 'expect-url', 'expect-generic', 'assert-failed', 'action-timeout', 'action-not-actionable']);
 
 export function outcomeMatches(r: RunResult, expect: 'pass' | 'fail'): boolean {
   if (expect === 'pass') return r.status === 'passed';
