@@ -12,7 +12,7 @@ keyPoints:
     title: { en: "Rules: how the team writes tests", ru: "Правила: как команда пишет тесты" }
   - id: kp-prompt-context
     title: { en: "Give context; specific beats vague", ru: "Дай контекст: конкретика лучше размытости" }
-terms: [prompt, context, test-case, precondition, test-data, expected-result, assertion, locator]
+terms: [vague, precise, leave-out, turn-into, fall-back-on, case-sensitive, generic]
 steps:
   - type: story
     lines:
@@ -630,10 +630,10 @@ steps:
       keyPoint: kp-prompt-context
       mode: cloze
       sentence:
-        en: "Give the agent more ___: the page, the account and an existing test to follow."
-        ru: "Дай агенту больше контекста: страницу, аккаунт и существующий тест как образец."
-      answer: context
-      options: [context, hallucination, diff]
+        en: "“Test the search” is too ___: Petal had to guess what to check, so it only checked that the field exists."
+        ru: "«Test the search» — слишком размытая задача: Petal пришлось гадать, что проверять, и он проверил только, что поле существует."
+      answer: vague
+      options: [vague, precise, case-sensitive]
 
   - type: mistakes
     keyPoint: kp-prompt-context

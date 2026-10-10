@@ -12,7 +12,7 @@ keyPoints:
     title: { en: "Names from the live snapshot, not from memory", ru: "Имена — из снимка живой страницы, а не из памяти" }
   - id: kp-policy-file
     title: { en: "A policy in the rules file works for every prompt", ru: "Политика в файле правил работает для каждого промпта" }
-terms: [project-rules, prompt, hallucination, accessibility-snapshot, mcp, locator, code-review]
+terms: [from-memory, start-fresh, short-lived, escape-hatch, enforce, keep-in-sync, per, fail-quietly]
 steps:
   - type: story
     lines:

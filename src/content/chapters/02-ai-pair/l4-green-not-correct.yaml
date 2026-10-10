@@ -12,7 +12,7 @@ keyPoints:
     title: { en: "“Fixing” a red test to match a bug", ru: "«Починка» красного теста под баг" }
   - id: kp-make-it-fail
     title: { en: "Trust a test after you've seen it fail for the right reason", ru: "Доверяй тесту, когда увидел{а|}, как он падает по правильной причине" }
-terms: [false-negative, false-positive, test-coverage, assertion, pass, fail, bug, diff]
+terms: [false-negative, false-positive, ship, cover-up, sneaky]
 steps:
   - type: story
     lines:
@@ -511,7 +511,7 @@ steps:
       mode: cloze
       sentence:
         en: "The healer changed the expected count from 1 to 2. Now the test is green, but the bug is still there — a ___."
-        ru: "Хилер поменял ожидаемое количество с 1 на 2. Теперь тест зелёный, а баг на месте — это ложноотрицательный результат."
+        ru: "Хилер поменял ожидаемое количество с 1 на 2. Теперь тест зелёный, а баг на месте — тест его просто не видит."
       answer: false negative
       options: [false negative, false positive, flaky test]
 

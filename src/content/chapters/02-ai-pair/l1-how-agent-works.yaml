@@ -12,7 +12,7 @@ keyPoints:
     title: { en: "The agent doesn't know the requirements and can hallucinate", ru: "Агент не знает требований и может галлюцинировать" }
   - id: kp-you-decide
     title: { en: "You decide what to test and whether to trust the result", ru: "Ты решаешь, что проверять и можно ли доверять результату" }
-terms: [ai-agent, llm, prompt, context, mcp, accessibility-snapshot, hallucination, negative-test, edge-case]
+terms: [accessibility-snapshot, pair-with, own, check-against, mix-up, boundary-value, report-back]
 steps:
   - type: story
     lines:
@@ -504,18 +504,18 @@ steps:
       keyPoint: kp-agent-limits
       mode: cloze
       sentence:
-        en: "Petal used `page.open()` — a method that doesn't exist. That's a ___."
-        ru: "Petal использовал `page.open()` — метод, которого не существует. Это галлюцинация."
-      answer: hallucination
-      options: [hallucination, prompt, context]
+        en: "`page.open()` looks ___, so it survives a quick glance — but Playwright has no such method."
+        ru: "`page.open()` выглядит правдоподобно, поэтому проскакивает при беглом взгляде, — но такого метода в Playwright нет."
+      answer: plausible
+      options: [plausible, vague, outdated]
 
   - type: task
     task:
       id: c2-l1-t7
       kind: vocab
-      keyPoint: kp-agent-loop
+      keyPoint: kp-you-decide
       mode: match
-      terms: [llm, ai-agent, mcp, accessibility-snapshot]
+      terms: [accessibility-snapshot, pair-with, own, check-against]
 
   - type: mistakes
     keyPoint: kp-agent-limits

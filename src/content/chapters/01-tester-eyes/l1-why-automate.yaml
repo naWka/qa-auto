@@ -20,7 +20,7 @@ keyPoints:
     title:
       en: "The agent writes the code; you decide what to check"
       ru: "Код пишет агент, а что проверять — решаешь ты"
-terms: [manual-testing, test-automation, automated-test, regression-testing, test-case, test-runner, test-suite, smoke-test]
+terms: [click-through, slip-through, repetitive, exploratory-testing, pay-off, one-off, worth]
 
 steps:
   - type: story
@@ -332,10 +332,10 @@ steps:
         en: "Pick the word that fits."
         ru: "Выбери подходящее слово."
       sentence:
-        en: "Before every release we run the ___ suite: about 400 cases that check old features still work."
-        ru: "Перед каждым релизом мы прогоняем регрессионный набор: около 400 кейсов, которые проверяют, что старые функции работают."
-      answer: regression
-      options: [regression, smoke, exploratory]
+        en: "Automation ___ when a check runs many times; a one-off check is cheaper by hand."
+        ru: "Автоматизация окупается, когда проверка запускается много раз; разовую проверку дешевле сделать руками."
+      answer: pays off
+      options: [pays off, clicks through, slips through]
 
   - type: task
     task:

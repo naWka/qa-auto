@@ -22,8 +22,8 @@
     en: "A test that sometimes passes and sometimes fails on the same code."
     ru: "Тест, который на одном и том же коде то проходит, то падает."
   example:
-    en: "The orders filter test is flaky again — I'll dig into its trace today."
-    ru: "Тест фильтра заказов снова флакает — сегодня разберу его трейс."
+    en: "The orders filter is a flaky test again — I'll dig into its trace today."
+    ru: "Тест фильтра заказов снова нестабильный — сегодня разберу его трейс."
   context: standup
   chapter: 7
 

@@ -20,7 +20,7 @@ keyPoints:
     title:
       en: "Assert exactly what the test case expects"
       ru: "Проверяй ровно то, что ожидает тест-кейс"
-terms: [assertion, expected-result, actual-result, bug, pass, fail]
+terms: [assertion, outage, wording, spot, turn-red, catch-a-bug, go-unnoticed]
 
 steps:
   - type: story

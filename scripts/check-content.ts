@@ -173,6 +173,8 @@ function checkTask(t: any, file: string, where: string, keyPoints: Set<string> |
 // ---------- chapters & lessons ----------
 const chaptersDir = join(ROOT, 'chapters');
 const lessonIds = new Set<string>();
+/** term id → the lesson whose `terms` list it is in */
+const termLesson = new Map<string, string>();
 let placementCount = 0;
 if (existsSync(chaptersDir)) {
   for (const dir of readdirSync(chaptersDir).sort()) {
@@ -195,7 +197,14 @@ if (existsSync(chaptersDir)) {
       found.push(lesson.id);
       if (ch && lesson.chapter !== ch.id) err(r, `lesson.chapter ${lesson.chapter} ≠ ${ch.id}`);
       walkStrings(lesson, r, '');
-      lesson.terms.forEach((t: string) => checkTermId(t, r, 'terms'));
+      lesson.terms.forEach((t: string) => {
+        checkTermId(t, r, 'terms');
+        const owner = termLesson.get(t);
+        if (owner && owner !== lesson.id) warn(r, `term "${t}" is already in ${owner}'s terms — one word, one lesson`);
+        else termLesson.set(t, lesson.id);
+        const e = glossary.get(t);
+        if (e && !e.example.en.toLowerCase().includes(e.en.toLowerCase())) warn(r, `term "${t}": its glossary example doesn't contain "${e.en}" (no fill-the-gap flashcard)`);
+      });
       const kps = new Set<string>(lesson.keyPoints.map((k: any) => k.id));
       kps.forEach((k) => chapterKps.add(k));
       const kpUse = new Map<string, number>();

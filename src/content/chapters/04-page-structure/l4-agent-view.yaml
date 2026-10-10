@@ -14,7 +14,7 @@ keyPoints:
     title: { en: "Missing or unnamed in the snapshot → the agent guesses", ru: "Нет в снимке или нет имени → агент угадывает" }
   - id: kp-verify-locators
     title: { en: "Check the agent's locators against the real page", ru: "Сверяй локаторы агента с реальной страницей" }
-terms: [devtools, inspect, accessibility-snapshot, mcp, hallucination, locator, role, accessible-name]
+terms: [inspect, make-up, evidence, quick-one, intended]
 
 steps:
   - type: story

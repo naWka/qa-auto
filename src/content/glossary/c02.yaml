@@ -162,8 +162,8 @@
     en: "A review decision: the change can't be merged yet, the author must fix the points in your comments."
     ru: "Решение по итогам ревью: изменение пока нельзя мержить, автор должен исправить то, что указано в комментариях."
   example:
-    en: "Requesting changes: the second test has no assertion."
-    ru: "Запрашиваю правки: во втором тесте нет проверки."
+    en: "I'll request changes: the second test has no assertion."
+    ru: "Запрошу правки: во втором тесте нет проверки."
   context: code-review
   chapter: 2
 
@@ -207,4 +207,270 @@
     en: "Let's add a negative test for the expired promo code SPRING20."
     ru: "Давай добавим негативный тест на просроченный промокод SPRING20."
   context: meeting
+  chapter: 2
+
+- id: pair-with
+  en: pair with
+  ipa: /ˈper wɪð/
+  ru: работать в паре с
+  pos: verb phrase
+  def:
+    en: "To work on a task together with someone — a colleague or an AI agent — at one screen or in one session."
+    ru: "Работать над задачей вместе с кем-то — коллегой или ИИ-агентом — за одним экраном или в одной сессии."
+  example:
+    en: "Can you pair with me on the checkout tests after lunch?"
+    ru: "Поработаешь со мной в паре над тестами чекаута после обеда?"
+  context: standup
+  chapter: 2
+
+- id: own
+  en: own
+  ipa: /oʊn/
+  ru: отвечать за
+  pos: verb
+  def:
+    en: "To be the person responsible for something and its result: a feature, a test suite, the test design."
+    ru: "Быть ответственным за что-то и его результат: за фичу, набор тестов, тест-дизайн."
+  example:
+    en: "Petal writes the code, but I own the test design for checkout."
+    ru: "Код пишет Petal, а за тест-дизайн чекаута отвечаю я."
+  context: meeting
+  chapter: 2
+
+- id: check-against
+  en: check against
+  ipa: /ˌtʃek əˈɡenst/
+  ru: сверять с
+  pos: verb phrase
+  def:
+    en: "To compare something with a source you trust — a test case, the requirements, the real page — to see if it matches."
+    ru: "Сравнивать что-то с надёжным источником — тест-кейсом, требованиями, настоящей страницей, — чтобы понять, совпадает ли."
+  example:
+    en: "Always check against the test case, not against what the screen shows today."
+    ru: "Всегда сверяй с тест-кейсом, а не с тем, что экран показывает сегодня."
+  context: code-review
+  chapter: 2
+
+- id: mix-up
+  en: mix up
+  ipa: /ˌmɪks ˈʌp/
+  ru: путать, перепутать
+  pos: phrasal verb
+  def:
+    en: "To confuse two things and use one instead of the other, e.g. two users' data or two libraries' APIs."
+    ru: "Спутать две вещи и использовать одну вместо другой — например, данные двух пользователей или API двух библиотек."
+  example:
+    en: "Agents often mix up the Python and JavaScript versions of Playwright."
+    ru: "Агенты часто путают Python- и JavaScript-версии Playwright."
+  context: code-review
+  chapter: 2
+
+- id: boundary-value
+  en: boundary value
+  ipa: /ˈbaʊndəri ˌvæljuː/
+  ru: граничное значение
+  pos: noun
+  def:
+    en: "A value exactly at the edge of an allowed range, or just inside or outside it — where bugs hide most often."
+    ru: "Значение ровно на границе допустимого диапазона или сразу внутри либо снаружи неё — там баги прячутся чаще всего."
+  example:
+    en: "€50.00 is a boundary value for free delivery, so let's test €49.99, €50.00 and €50.01."
+    ru: "€50.00 — граничное значение для бесплатной доставки, так что проверим €49.99, €50.00 и €50.01."
+  context: meeting
+  chapter: 2
+
+- id: report-back
+  en: report back
+  ipa: /rɪˌpɔːrt ˈbæk/
+  ru: отчитаться, доложить о результате
+  pos: phrasal verb
+  def:
+    en: "To tell the person who gave you a task what you did and what you found."
+    ru: "Рассказать тому, кто дал задачу, что сделано и что обнаружено."
+  example:
+    en: "Run the new tests on staging and report back with the failures."
+    ru: "Прогони новые тесты на стейдже и отчитайся, что упало."
+  context: chat
+  chapter: 2
+
+- id: precise
+  en: precise
+  ipa: /prɪˈsaɪs/
+  ru: точный, конкретный
+  pos: adjective
+  def:
+    en: "Exact and detailed, leaving nothing to guess."
+    ru: "Точный и подробный — не оставляет места для догадок."
+  example:
+    en: "Keep the prompt precise: the page, the account and the exact error text."
+    ru: "Промпт должен быть конкретным: страница, аккаунт и точный текст ошибки."
+  context: prompt
+  chapter: 2
+
+- id: leave-out
+  en: leave out
+  ipa: /ˌliːv ˈaʊt/
+  ru: пропустить, не включить
+  pos: phrasal verb
+  def:
+    en: "To not include something, on purpose or by mistake."
+    ru: "Не включить что-то — намеренно или по ошибке."
+  example:
+    en: "If you leave out the expected result, the test will have nothing to assert."
+    ru: "Если не указать ожидаемый результат, тесту нечего будет проверять."
+  context: prompt
+  chapter: 2
+
+- id: turn-into
+  en: turn into
+  ipa: /ˌtɜːrn ˈɪntuː/
+  ru: превращать(ся) в
+  pos: phrasal verb
+  def:
+    en: "To change and become something else."
+    ru: "Измениться и стать чем-то другим."
+  example:
+    en: "Each expected result should turn into an assertion."
+    ru: "Каждый ожидаемый результат должен превратиться в проверку."
+  context: general
+  chapter: 2
+
+- id: fall-back-on
+  en: fall back on
+  ipa: /ˌfɔːl ˈbæk ɑːn/
+  ru: откатываться к привычному варианту, прибегать к
+  pos: phrasal verb
+  def:
+    en: "To use an old or default option because nothing better was given."
+    ru: "Использовать старый или привычный вариант, потому что лучшего не дали."
+  example:
+    en: "Without project rules, agents fall back on CSS classes and fixed pauses."
+    ru: "Без правил проекта агенты откатываются к CSS-классам и фиксированным паузам."
+  context: chat
+  chapter: 2
+
+- id: case-sensitive
+  en: case-sensitive
+  ipa: /ˌkeɪs ˈsensətɪv/
+  ru: чувствительный к регистру
+  pos: adjective
+  def:
+    en: "Treating capital and small letters as different, so “Rose” and “rose” don't match."
+    ru: "Различающий заглавные и строчные буквы: «Rose» и «rose» не совпадают."
+  example:
+    en: "Search is case-sensitive on this build: “rose” finds nothing, “Rose” finds the bouquet."
+    ru: "В этой сборке поиск чувствителен к регистру: «rose» ничего не находит, а «Rose» находит букет."
+  context: bug-report
+  chapter: 2
+
+- id: generic
+  en: generic
+  ipa: /dʒəˈnerɪk/
+  ru: слишком общий, шаблонный
+  pos: adjective
+  def:
+    en: "General and not tied to the specific case, so it could fit almost anything."
+    ru: "Общий, не привязанный к конкретному случаю, — подойдёт почти к чему угодно."
+  example:
+    en: "The test name is too generic — “test_cart” says nothing about the promo code rule."
+    ru: "Название теста слишком общее: «test_cart» ничего не говорит о правиле промокода."
+  context: code-review
+  chapter: 2
+
+- id: address
+  en: address
+  ipa: /əˈdres/
+  ru: учесть, отработать (замечания)
+  pos: verb
+  def:
+    en: "To deal with a review comment: make the change it asks for, or explain why not."
+    ru: "Отработать комментарий ревью: внести запрошенное изменение или объяснить, почему нет."
+  example:
+    en: "Please address my comments before we merge."
+    ru: "Пожалуйста, учти мои замечания до мержа."
+  context: code-review
+  chapter: 2
+
+- id: subtle
+  en: subtle
+  ipa: /ˈsʌtl/
+  ru: тонкий, неочевидный
+  pos: adjective
+  def:
+    en: "Small and hard to notice, but important."
+    ru: "Небольшой и трудно заметный, но важный."
+  example:
+    en: "It's a subtle bug: the count is right, but the wrong item was removed."
+    ru: "Баг неочевидный: количество правильное, но удалился не тот товар."
+  context: bug-report
+  chapter: 2
+
+- id: back-and-forth
+  en: back-and-forth
+  ipa: /ˌbæk ən ˈfɔːrθ/
+  ru: лишняя переписка, хождение туда-сюда
+  pos: noun
+  def:
+    en: "A long exchange of messages or fixes before people (or an agent) get it right."
+    ru: "Долгий обмен сообщениями или правками, прежде чем все (или агент) сделают как надо."
+  example:
+    en: "One clear comment with the line and the fix saves a lot of back-and-forth."
+    ru: "Один понятный комментарий с номером строки и исправлением экономит много лишней переписки."
+  context: chat
+  chapter: 2
+
+- id: fall-for
+  en: fall for
+  ipa: /ˈfɔːl fɔːr/
+  ru: купиться на, попасться на
+  pos: phrasal verb
+  def:
+    en: "To believe something that isn't true, e.g. an agent's confident “all green”."
+    ru: "Поверить в то, что неправда, — например, в уверенное «всё зелёное» от агента."
+  example:
+    en: "Don't fall for “All tests pass ✅” — open the tests and read the assertions."
+    ru: "Не покупайся на «All tests pass ✅» — открой тесты и прочитай проверки."
+  context: chat
+  chapter: 2
+
+- id: overkill
+  en: overkill
+  ipa: /ˈoʊvərkɪl/
+  ru: перебор, слишком радикально
+  pos: noun
+  def:
+    en: "Much more effort or force than the situation needs."
+    ru: "Гораздо больше усилий или радикальности, чем требует ситуация."
+  example:
+    en: "Rejecting the whole PR is overkill — one comment on line 7 will fix it."
+    ru: "Отклонять весь PR — перебор: хватит одного комментария к строке 7."
+  context: code-review
+  chapter: 2
+
+- id: cover-up
+  en: cover-up
+  ipa: /ˈkʌvər ʌp/
+  ru: сокрытие, попытка замять
+  pos: noun
+  def:
+    en: "An action that hides a problem instead of fixing it."
+    ru: "Действие, которое прячет проблему вместо того, чтобы её исправить."
+  example:
+    en: "Changing the expected total to match the app isn't a fix, it's a cover-up."
+    ru: "Поменять ожидаемый итог под приложение — это не исправление, а попытка замять баг."
+  context: code-review
+  chapter: 2
+
+- id: sneaky
+  en: sneaky
+  ipa: /ˈsniːki/
+  ru: коварный, хитрый
+  pos: adjective
+  def:
+    en: "Hidden and hard to notice, so it can trick you."
+    ru: "Скрытый и трудно заметный, поэтому легко вводит в заблуждение."
+  example:
+    en: "A missing `()` after `to_be_visible` is a sneaky bug: the test stays green and checks nothing."
+    ru: "Пропущенные `()` после `to_be_visible` — коварная ошибка: тест остаётся зелёным и ничего не проверяет."
+  context: code-review
   chapter: 2

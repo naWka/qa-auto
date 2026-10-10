@@ -12,7 +12,7 @@ keyPoints:
     title: { en: "A variable gives test data a name", ru: "Переменная даёт тестовым данным имя" }
   - id: kp-fstring
     title: { en: "f-strings put data into text", ru: "f-строки подставляют данные в текст" }
-terms: [code, string, number, boolean, none, variable, constant, f-string, comment, test-data]
+terms: [string, variable, quotes, lowercase, trailing-space, character-by-character, double-check]
 
 steps:
   - type: story

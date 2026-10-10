@@ -14,7 +14,7 @@ keyPoints:
     title: { en: "for item in items: repeats steps — inside one test", ru: "for item in items: повторяет шаги — внутри одного теста" }
   - id: kp-parametrize
     title: { en: "@pytest.mark.parametrize turns each data row into its own test", ru: "@pytest.mark.parametrize превращает каждую строку данных в отдельный тест" }
-terms: [list, dictionary, loop, decorator, test-data, data-driven-testing, parameterization, test-report]
+terms: [loop, hard-coded, square-brackets, curly-braces, show-up, the-catch, at-a-glance, cut-corners]
 
 steps:
   - type: story
@@ -637,10 +637,10 @@ steps:
       kind: vocab
       mode: cloze
       sentence:
-        en: "Petal put the test data into a ___ and used parametrize to create one test per item."
-        ru: "Petal сложил тестовые данные в список и с помощью parametrize создал по тесту на каждый элемент."
-      answer: list
-      options: [list, dictionary, loop]
+        en: "Petal's test only works for Anna: the expected greeting is ___ instead of built from the data row."
+        ru: "Тест Petal работает только для Анны: ожидаемое приветствие жёстко прописано, а не собирается из строки данных."
+      answer: hard-coded
+      options: [hard-coded, case-sensitive, misspelled]
 
   - type: mistakes
     title: { en: "Typical list, dict and loop mistakes", ru: "Типичные ошибки со списками, словарями и циклами" }

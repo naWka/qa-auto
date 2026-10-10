@@ -180,3 +180,297 @@
     ru: "У этой кнопки-иконки нет имени — это баг доступности, и агент эту кнопку тоже не видит."
   context: bug-report
   chapter: 4
+
+- id: skeleton
+  en: skeleton
+  ipa: /ˈskelətn/
+  ru: каркас, заготовка
+  pos: noun
+  def:
+    en: "A bare first version of a page or file: the structure is there, the real content comes later."
+    ru: "Голая первая версия страницы или файла: структура есть, настоящее содержимое появится позже."
+  example:
+    en: "The agent gave me a skeleton of the test: the steps are there, but no assertions yet."
+    ru: "Агент выдал мне каркас теста: шаги есть, а проверок пока нет."
+  context: chat
+  chapter: 4
+
+- id: live
+  en: live page
+  ipa: /ˌlaɪv ˈpeɪdʒ/
+  ru: живая, открытая в браузере страница
+  pos: noun
+  def:
+    en: "The page as it runs right now in a real browser, not the HTML file or a copy. “Live” rhymes with “five” here."
+    ru: "Страница, как она работает прямо сейчас в настоящем браузере, а не HTML-файл или копия. «Live» здесь читается /laɪv/, как в «five»."
+  example:
+    en: "Don't trust the HTML file — check the button on the live page."
+    ru: "Не доверяй HTML-файлу — проверь кнопку на живой странице."
+  context: chat
+  chapter: 4
+
+- id: nested
+  en: nested
+  ipa: /ˈnestɪd/
+  ru: вложенный
+  pos: adjective
+  def:
+    en: "Placed inside another element, like a folder inside a folder."
+    ru: "Находящийся внутри другого элемента — как папка внутри папки."
+  example:
+    en: "The counter is a span nested inside the Cart link, so its number is part of the link's name."
+    ru: "Счётчик — это span, вложенный в ссылку Cart, поэтому его число входит в имя ссылки."
+  context: code-review
+  chapter: 4
+
+- id: layout
+  en: layout
+  ipa: /ˈleɪaʊt/
+  ru: вёрстка, расположение элементов
+  pos: noun
+  def:
+    en: "How elements are arranged on the screen: their positions, sizes and order."
+    ru: "То, как элементы расположены на экране: их места, размеры и порядок."
+  example:
+    en: "The redesign only changes the layout, so role-based locators won't notice."
+    ru: "Редизайн меняет только вёрстку, поэтому локаторы по ролям этого не заметят."
+  context: code-review
+  chapter: 4
+
+- id: heading
+  en: heading
+  ipa: /ˈhedɪŋ/
+  ru: заголовок на странице
+  pos: noun
+  def:
+    en: "A title on the page, such as `<h1>`. Not the same as the header, which is the top bar of the site."
+    ru: "Заголовок на странице, например `<h1>`. Не путать с header — шапкой сайта."
+  example:
+    en: "The page heading says “Your cart”, but the header link still shows “Cart 0”."
+    ru: "Заголовок страницы — «Your cart», а ссылка в шапке всё ещё показывает «Cart 0»."
+  context: bug-report
+  chapter: 4
+
+- id: bet-on
+  en: bet on
+  ipa: /ˈbet ɑːn/
+  ru: делать ставку на, полагаться на
+  pos: phrasal verb
+  def:
+    en: "To rely on something that may not stay true."
+    ru: "Полагаться на то, что может и не сработать."
+  example:
+    en: "I wouldn't bet on a three-second wait — CI machines are slower than your laptop."
+    ru: "Не стоит делать ставку на трёхсекундное ожидание: машины CI медленнее твоего ноутбука."
+  context: code-review
+  chapter: 4
+
+- id: heads-up
+  en: heads-up
+  ipa: /ˈhedz ʌp/
+  ru: предупреждение заранее
+  pos: noun
+  def:
+    en: "A short early warning so people can prepare for a change."
+    ru: "Короткое заблаговременное предупреждение, чтобы люди успели подготовиться к изменению."
+  example:
+    en: "Just a heads-up: staging is down until noon, so this morning's smoke tests will be red."
+    ru: "Просто предупреждаю: стейджинг лежит до полудня, так что утренние смоук-тесты будут красными."
+  context: chat
+  chapter: 4
+
+- id: survive
+  en: survive
+  ipa: /sərˈvaɪv/
+  ru: пережить, выдержать изменение
+  pos: verb
+  def:
+    en: "Of a test or locator: to keep working after a change in the app, such as a redesign."
+    ru: "О тесте или локаторе: продолжать работать после изменения в приложении, например редизайна."
+  example:
+    en: "This locator won't survive the redesign — it depends on the `.btn` class."
+    ru: "Этот локатор не переживёт редизайн — он зависит от класса `.btn`."
+  context: code-review
+  chapter: 4
+
+- id: land
+  en: land
+  ipa: /lænd/
+  ru: выйти, попасть в сборку
+  pos: verb
+  def:
+    en: "Of a change or feature: to get merged and arrive in the build or release."
+    ru: "Об изменении или фиче: попасть в основную ветку и оказаться в сборке или релизе."
+  example:
+    en: "The new checkout should land on staging tomorrow, so I'll update the tests today."
+    ru: "Новое оформление заказа должно появиться на стейджинге завтра, так что тесты я обновлю сегодня."
+  context: standup
+  chapter: 4
+
+- id: tell-apart
+  en: tell apart
+  ipa: /ˌtel əˈpɑːrt/
+  ru: различать, отличать друг от друга
+  pos: phrasal verb
+  def:
+    en: "To see the difference between two similar things."
+    ru: "Видеть разницу между двумя похожими вещами."
+  example:
+    en: "Without aria-labels, the two “+” buttons are impossible to tell apart."
+    ru: "Без aria-label две кнопки «+» невозможно отличить друг от друга."
+  context: bug-report
+  chapter: 4
+
+- id: convention
+  en: convention
+  ipa: /kənˈvenʃn/
+  ru: договорённость, соглашение
+  pos: noun
+  def:
+    en: "An agreed way of doing something that the whole team follows, such as how to name test ids."
+    ru: "Принятый способ что-то делать, которому следует вся команда, — например, как называть test id."
+  example:
+    en: "Our naming convention for test ids is kebab-case: `cart-count`, not `cartCount`."
+    ru: "По нашей договорённости test id пишутся через дефис: `cart-count`, а не `cartCount`."
+  context: code-review
+  chapter: 4
+
+- id: sighted
+  en: sighted
+  ipa: /ˈsaɪtɪd/
+  ru: зрячий
+  pos: adjective
+  def:
+    en: "Able to see; in accessibility, users who read the screen with their eyes, not through a screen reader."
+    ru: "Видящий; в доступности — пользователи, которые читают экран глазами, а не через скринридер."
+  example:
+    en: "The red border works for sighted users, but a screen reader says nothing about the error."
+    ru: "Красная рамка работает для зрячих пользователей, но скринридер про ошибку ничего не говорит."
+  context: bug-report
+  chapter: 4
+
+- id: announce
+  en: announce
+  ipa: /əˈnaʊns/
+  ru: объявлять, произносить вслух
+  pos: verb
+  def:
+    en: "Of a screen reader: to read an element out loud — its name, role and state."
+    ru: "О скринридере: произносить элемент вслух — его имя, роль и состояние."
+  example:
+    en: "Screen readers announce the + button as just “plus, button” — no product name."
+    ru: "Скринридеры объявляют кнопку + просто как «плюс, кнопка» — без названия товара."
+  context: bug-report
+  chapter: 4
+
+- id: reach
+  en: reach
+  ipa: /riːtʃ/
+  ru: добраться, дойти до элемента
+  pos: verb
+  def:
+    en: "To get to an element, for example with the Tab key, so you can use it."
+    ru: "Добраться до элемента — например, клавишей Tab, — чтобы им воспользоваться."
+  example:
+    en: "You can't reach the “Apply” button with Tab, so keyboard users can't enter a promo code."
+    ru: "До кнопки «Apply» не добраться клавишей Tab, поэтому пользователи клавиатуры не могут ввести промокод."
+  context: bug-report
+  chapter: 4
+
+- id: user-impact
+  en: user impact
+  ipa: /ˈjuːzər ˌɪmpækt/
+  ru: влияние на пользователей
+  pos: noun
+  def:
+    en: "What a bug means for real users: who is affected and what they can't do."
+    ru: "Что баг означает для реальных пользователей: кого он затрагивает и что они не могут сделать."
+  example:
+    en: "Please add the user impact to the ticket: who can't check out and how often it happens."
+    ru: "Добавь, пожалуйста, в тикет влияние на пользователей: кто не может оформить заказ и как часто это случается."
+  context: bug-report
+  chapter: 4
+
+- id: workaround
+  en: workaround
+  ipa: /ˈwɜːrkəraʊnd/
+  ru: обходной путь, костыль
+  pos: noun
+  def:
+    en: "A way to get around a problem without fixing its cause."
+    ru: "Способ обойти проблему, не устраняя её причину."
+  example:
+    en: "Switching to the CSS class is a workaround — the real fix is a label on the field."
+    ru: "Переход на CSS-класс — это обходной путь; настоящее исправление — подпись у поля."
+  context: code-review
+  chapter: 4
+
+- id: ship
+  en: ship
+  ipa: /ʃɪp/
+  ru: выкатить, выпустить в релиз
+  pos: verb
+  def:
+    en: "To release a change or feature to users or into a build."
+    ru: "Выпустить изменение или фичу для пользователей или в сборку."
+  example:
+    en: "We can't ship this build: the checkout button has no accessible name."
+    ru: "Эту сборку нельзя выпускать: у кнопки оформления заказа нет доступного имени."
+  context: meeting
+  chapter: 4
+
+- id: make-up
+  en: make up
+  ipa: /ˌmeɪk ˈʌp/
+  ru: выдумать, придумать
+  pos: phrasal verb
+  def:
+    en: "To invent something that isn't real — a name, a class, a fact."
+    ru: "Придумать то, чего на самом деле нет, — имя, класс, факт."
+  example:
+    en: "The agent never opened the page, so it had to make up the button name."
+    ru: "Агент так и не открыл страницу, поэтому ему пришлось выдумать имя кнопки."
+  context: code-review
+  chapter: 4
+
+- id: evidence
+  en: evidence
+  ipa: /ˈevɪdəns/
+  ru: доказательство, подтверждение
+  pos: noun
+  def:
+    en: "Facts that show something is true. Uncountable: “some evidence”, never “an evidence”."
+    ru: "Факты, которые показывают, что что-то верно. Неисчисляемое: «some evidence», но не «an evidence»."
+  example:
+    en: "“Verified” isn't evidence — please attach the snapshot or a screenshot."
+    ru: "«Проверено» — это не доказательство; приложи, пожалуйста, снимок или скриншот."
+  context: code-review
+  chapter: 4
+
+- id: quick-one
+  en: quick one
+  ipa: /ˌkwɪk ˈwʌn/
+  ru: быстрый вопрос
+  pos: phrase
+  def:
+    en: "A casual chat opener meaning “I have a short question or request”."
+    ru: "Неформальное начало сообщения в чате: «у меня короткий вопрос или просьба»."
+  example:
+    en: "Kai, quick one: should the cart counter reset after logout?"
+    ru: "Кай, быстрый вопрос: счётчик корзины должен сбрасываться после выхода?"
+  context: chat
+  chapter: 4
+
+- id: intended
+  en: intended
+  ipa: /ɪnˈtendɪd/
+  ru: задуманный, так и задумано
+  pos: adjective
+  def:
+    en: "Planned to be that way. “Is that intended?” politely asks whether something is a bug or a decision."
+    ru: "Запланированный, задуманный. «Is that intended?» — вежливый способ спросить, баг это или решение."
+  example:
+    en: "The discount disappears after a page refresh — is that intended?"
+    ru: "Скидка пропадает после обновления страницы — так и задумано?"
+  context: chat
+  chapter: 4

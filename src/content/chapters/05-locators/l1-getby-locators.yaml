@@ -18,7 +18,7 @@ keyPoints:
     title:
       en: "get_by_test_id: a contract, stable but invisible to users"
       ru: "get_by_test_id: договорённость — стабильно, но не видно пользователю"
-terms: [locator, role, accessible-name, element, test-id, css-selector, xpath, resilient-locator]
+terms: [last-resort, reach-for, read-like, user-facing, contract, trade-off, breaking-change]
 
 steps:
   - type: story

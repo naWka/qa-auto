@@ -12,7 +12,7 @@ keyPoints:
     title: { en: "Spot invented methods, elements and texts", ru: "Находить выдуманные методы, элементы и тексты" }
   - id: kp-request-changes
     title: { en: "Request changes like a good bug report", ru: "Запрашивать правки, как в хорошем баг-репорте" }
-terms: [code-review, request-changes, diff, hallucination, assertion, locator, test-data, pull-request]
+terms: [request-changes, hard-wait, address, subtle, back-and-forth, fall-for, overkill]
 steps:
   - type: story
     lines:

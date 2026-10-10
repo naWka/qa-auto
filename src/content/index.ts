@@ -44,6 +44,9 @@ export function loadLesson(id: string): Promise<Lesson | undefined> {
 export const glossary = new Map<string, GlossaryEntry>();
 for (const list of Object.values(glossaryFiles)) for (const e of list || []) glossary.set(e.id, e);
 
+/** Glossary ids that some lesson teaches as vocabulary (flashcards, "words learned"). The rest are reference only. */
+export const studyTerms = new Set([...lessons.values()].flatMap((l) => l.terms));
+
 export function chapterById(id: string) {
   return chapters.find((c) => c.id === id);
 }

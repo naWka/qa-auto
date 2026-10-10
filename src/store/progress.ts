@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Task } from '../content/schema';
-import { chapters, lessons, lessonsOf, story } from '../content';
+import { chapters, lessons, lessonsOf, story, studyTerms } from '../content';
 import { addDays, diffDays, today } from '../lib/dates';
 import { newCard, review, type Card } from '../engine/srs';
 import { BOSS_BONUS, LESSON_BONUS, baseXp, earnedXp, levelFor } from '../engine/xp';
@@ -76,6 +76,27 @@ export function chapterUnlocked(p: ProgressData, chapterId: string): boolean {
   const idx = chapters.findIndex((c) => c.id === chapterId);
   if (idx <= 0) return true;
   return chapterMastered(p, chapters[idx - 1].id);
+}
+
+/**
+ * Keeps word cards in step with the lessons' vocabulary lists when they change:
+ * drops cards for words no lesson teaches any more, adds cards for new words of finished lessons.
+ */
+export function syncTermCards(p: ProgressData): ProgressData {
+  if (!p.srs || !p.lessons) return p;
+  const srs = { ...p.srs };
+  let changed = false;
+  for (const key of Object.keys(srs)) {
+    if (key.startsWith('term:') && !studyTerms.has(key.slice(5))) { delete srs[key]; changed = true; }
+  }
+  const t = today();
+  for (const [id, lp] of Object.entries(p.lessons)) {
+    if (lp.status !== 'done') continue;
+    for (const term of lessons.get(id)?.terms || []) {
+      if (!srs[`term:${term}`]) { srs[`term:${term}`] = newCard('term', t); changed = true; }
+    }
+  }
+  return changed ? { ...p, srs } : p;
 }
 
 export function termsLearned(p: ProgressData): number {
@@ -323,7 +344,7 @@ export const useProgress = create<ProgressStore>()(
 
         setWarmupDone: () => set({ lastWarmup: today() }),
 
-        replaceAll: (data) => set({ ...emptyProgress(), ...data }),
+        replaceAll: (data) => set(syncTermCards({ ...emptyProgress(), ...data })),
 
         reset: () => set(emptyProgress()),
       };
@@ -332,6 +353,7 @@ export const useProgress = create<ProgressStore>()(
       name: 'bloomqa-progress',
       version: 1,
       partialize: (s) => dataOf(s as ProgressStore),
+      merge: (persisted, current) => ({ ...current, ...(persisted ? syncTermCards(persisted as ProgressData) : {}) }),
     },
   ),
 );

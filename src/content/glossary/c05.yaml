@@ -68,3 +68,353 @@
     ru: "Используй `.filter(has_text=\"Peony Dream\")` вместо `.nth(3)` — порядок карточек может поменяться."
   context: code-review
   chapter: 5
+
+- id: last-resort
+  en: last resort
+  ipa: /ˌlæst rɪˈzɔːrt/
+  ru: крайняя мера
+  pos: noun
+  def:
+    en: "The option you use only when nothing better works."
+    ru: "Вариант, к которому прибегают, только когда ничего лучше не подходит."
+  example:
+    en: "XPath is a last resort here — the field has a label, so please use `get_by_label`."
+    ru: "XPath здесь — крайняя мера: у поля есть подпись, так что используй `get_by_label`."
+  context: code-review
+  chapter: 5
+
+- id: reach-for
+  en: reach for
+  ipa: /ˈriːtʃ fɔːr/
+  ru: хвататься за
+  pos: phrasal verb
+  def:
+    en: "To choose something first, out of habit, without thinking much."
+    ru: "Выбирать что-то первым делом, по привычке, не особо раздумывая."
+  example:
+    en: "Agents often reach for CSS classes because old tests on the internet use them."
+    ru: "Агенты часто хватаются за CSS-классы, потому что так написаны старые тесты в интернете."
+  context: code-review
+  chapter: 5
+
+- id: read-like
+  en: read like
+  ipa: /ˈriːd laɪk/
+  ru: читаться как
+  pos: verb phrase
+  def:
+    en: "To sound like a certain kind of text when you read it."
+    ru: "Восприниматься при чтении как определённый текст."
+  example:
+    en: "I like this test: the locators read like the steps of TC-500."
+    ru: "Мне нравится этот тест: локаторы читаются как шаги TC-500."
+  context: code-review
+  chapter: 5
+
+- id: user-facing
+  en: user-facing
+  ipa: /ˈjuːzər ˌfeɪsɪŋ/
+  ru: видимый пользователю
+  pos: adjective
+  def:
+    en: "Seen or used directly by the people who use the product."
+    ru: "Такой, что пользователи видят его или работают с ним напрямую."
+  example:
+    en: "Renaming the button is a user-facing change, so the test case needs an update too."
+    ru: "Переименование кнопки — изменение, заметное пользователям, поэтому тест-кейс тоже нужно обновить."
+  context: code-review
+  chapter: 5
+
+- id: contract
+  en: contract
+  ipa: /ˈkɑːntrækt/
+  ru: обязательство между командами
+  pos: noun
+  def:
+    en: "An agreement between teams that something, like a test id or an API field, will stay the same."
+    ru: "Договорённость между командами, что что-то — test id или поле API — не будет меняться."
+  example:
+    en: "The test id is a contract: if you rename it, please update the tests in the same PR."
+    ru: "Test id — это договорённость: если переименовываешь его, обнови, пожалуйста, тесты в том же PR."
+  context: meeting
+  chapter: 5
+
+- id: trade-off
+  en: trade-off
+  ipa: /ˈtreɪd ɔːf/
+  ru: компромисс
+  pos: noun
+  def:
+    en: "What you give up to get something else you want."
+    ru: "То, чем жертвуешь ради чего-то другого."
+  example:
+    en: "Test ids are stable but invisible to users — that's the trade-off."
+    ru: "Test id стабильны, но невидимы для пользователей — в этом и компромисс."
+  context: meeting
+  chapter: 5
+
+- id: breaking-change
+  en: breaking change
+  ipa: /ˈbreɪkɪŋ ˈtʃeɪndʒ/
+  ru: ломающее изменение
+  pos: noun
+  def:
+    en: "A change that makes existing code, tests or integrations stop working."
+    ru: "Изменение, после которого перестают работать существующий код, тесты или интеграции."
+  example:
+    en: "Renaming a `data-testid` is a breaking change for our tests — please update them in the same PR."
+    ru: "Переименование `data-testid` ломает наши тесты — пожалуйста, обнови их в том же PR."
+  context: code-review
+  chapter: 5
+
+- id: false-alarm
+  en: false alarm
+  ipa: /ˌfɔːls əˈlɑːrm/
+  ru: ложная тревога
+  pos: noun
+  def:
+    en: "A failure or warning that turns out to have no real problem behind it."
+    ru: "Падение или предупреждение, за которым не оказалось настоящей проблемы."
+  example:
+    en: "Last night's red run was a false alarm — the selectors broke, not the shop."
+    ru: "Вчерашний красный прогон — ложная тревога: сломались селекторы, а не магазин."
+  context: standup
+  chapter: 5
+
+- id: stale
+  en: stale
+  ipa: /steɪl/
+  ru: неактуальный, «протухший»
+  pos: adjective
+  def:
+    en: "Out of date: it describes the app as it used to be."
+    ru: "Устаревший: описывает приложение таким, каким оно было раньше."
+  example:
+    en: "The checkout works — the selector is just stale after the redesign."
+    ru: "Чекаут работает — просто селектор устарел после редизайна."
+  context: chat
+  chapter: 5
+
+- id: cry-wolf
+  en: cry wolf
+  ipa: /ˌkraɪ ˈwʊlf/
+  ru: поднимать ложную тревогу
+  pos: idiom
+  def:
+    en: "To raise alarms so often without reason that people stop believing them."
+    ru: "Так часто поднимать тревогу без причины, что ей перестают верить."
+  example:
+    en: "If these tests cry wolf every night, nobody will read the report when a real bug appears."
+    ru: "Если эти тесты каждую ночь поднимают ложную тревогу, никто не прочитает отчёт, когда появится настоящий баг."
+  context: meeting
+  chapter: 5
+
+- id: relax
+  en: relax
+  ipa: /rɪˈlæks/
+  ru: ослабить
+  pos: verb
+  def:
+    en: "To make a check or a rule less strict."
+    ru: "Сделать проверку или правило менее строгими."
+  example:
+    en: "Please don't relax the assertion — fix the locator and keep the count of 3."
+    ru: "Пожалуйста, не ослабляй проверку — исправь локатор и оставь количество 3."
+  context: code-review
+  chapter: 5
+
+- id: blind-to
+  en: blind to
+  ipa: /ˈblaɪnd tuː/
+  ru: слепой к
+  pos: adjective phrase
+  def:
+    en: "Unable to notice a certain problem."
+    ru: "Неспособный заметить определённую проблему."
+  example:
+    en: "With `.first` the test is blind to the bug: it never checks which row was removed."
+    ru: "С `.first` тест слеп к этому багу: он не проверяет, какая строка удалена."
+  context: code-review
+  chapter: 5
+
+- id: narrow-down
+  en: narrow down
+  ipa: /ˌnæroʊ ˈdaʊn/
+  ru: сузить
+  pos: phrasal verb
+  def:
+    en: "To make a set of possible matches smaller until only the right one is left."
+    ru: "Сокращать круг вариантов, пока не останется только нужный."
+  example:
+    en: "The locator matches six buttons, so let's narrow down the search to the Sunny Tulips card."
+    ru: "Локатор находит шесть кнопок, так что давай сузим поиск до карточки Sunny Tulips."
+  context: chat
+  chapter: 5
+
+- id: resolve-to
+  en: resolve to
+  ipa: /rɪˈzɑːlv tuː/
+  ru: находить, указывать на
+  pos: verb phrase
+  def:
+    en: "Of a locator: to point to these elements when Playwright searches the page."
+    ru: "О локаторе: находить именно эти элементы при поиске на странице."
+  example:
+    en: "Each `aka` line is a locator that would resolve to just one element."
+    ru: "Каждая строка `aka` — это локатор, который нашёл бы ровно один элемент."
+  context: chat
+  chapter: 5
+
+- id: silence
+  en: silence
+  ipa: /ˈsaɪləns/
+  ru: заглушить
+  pos: verb
+  def:
+    en: "To make a warning or an error stop showing without fixing its cause."
+    ru: "Сделать так, чтобы предупреждение или ошибка перестали появляться, не устранив причину."
+  example:
+    en: "Please don't silence the strict mode error with `.first` — filter the row instead."
+    ru: "Пожалуйста, не глуши ошибку строгого режима через `.first` — лучше отфильтруй строку."
+  context: code-review
+  chapter: 5
+
+- id: off-by-one
+  en: off-by-one
+  ipa: /ˌɔːf baɪ ˈwʌn/
+  ru: ошибка на единицу
+  pos: noun, adjective
+  def:
+    en: "A mistake where a count or an index is one too high or too low, e.g. counting from 1 when the code counts from 0."
+    ru: "Ошибка, когда счёт или индекс сдвинут на один, например если считать с 1, а код считает с 0."
+  example:
+    en: "It's an off-by-one: `.nth(2)` is the third card, not the second."
+    ru: "Это ошибка на единицу: `.nth(2)` — третья карточка, а не вторая."
+  context: code-review
+  chapter: 5
+
+- id: clarifying-question
+  en: clarifying question
+  ipa: /ˈklerəfaɪɪŋ ˈkwestʃən/
+  ru: уточняющий вопрос
+  pos: noun
+  def:
+    en: "A question you ask to understand exactly what someone means."
+    ru: "Вопрос, который задают, чтобы точно понять, что имеется в виду."
+  example:
+    en: "One clarifying question before I automate this case: which row should 'Remove' delete?"
+    ru: "Один уточняющий вопрос, прежде чем я автоматизирую этот кейс: какую строку должна удалять «Remove»?"
+  context: meeting
+  chapter: 5
+
+- id: from-memory
+  en: from memory
+  ipa: /frəm ˈmeməri/
+  ru: по памяти
+  pos: adverb phrase
+  def:
+    en: "Without looking at the real source, relying only on what you remember."
+    ru: "Не глядя в настоящий источник, только на основе того, что помнишь."
+  example:
+    en: "Petal wrote these locators from memory, so half of the names don't exist on the page."
+    ru: "Petal написал эти локаторы по памяти, поэтому половины имён на странице нет."
+  context: code-review
+  chapter: 5
+
+- id: start-fresh
+  en: start fresh
+  ipa: /ˌstɑːrt ˈfreʃ/
+  ru: начинать с чистого листа
+  pos: verb phrase
+  def:
+    en: "To begin again with nothing carried over from before."
+    ru: "Начинать заново, ничего не перенося из прошлого."
+  example:
+    en: "Each new agent session will start fresh, so the rules must live in `CLAUDE.md`."
+    ru: "Каждая новая сессия агента начнётся с чистого листа, поэтому правила должны жить в `CLAUDE.md`."
+  context: meeting
+  chapter: 5
+
+- id: short-lived
+  en: short-lived
+  ipa: /ˌʃɔːrt ˈlɪvd/
+  ru: недолговечный
+  pos: adjective
+  def:
+    en: "Lasting only a short time."
+    ru: "Существующий недолго."
+  example:
+    en: "A rule in a prompt is short-lived: the next session won't know it."
+    ru: "Правило в промпте недолговечно: следующая сессия о нём не узнает."
+  context: meeting
+  chapter: 5
+
+- id: escape-hatch
+  en: escape hatch
+  ipa: /ɪˈskeɪp hætʃ/
+  ru: запасной выход
+  pos: noun
+  def:
+    en: "A planned way out for when the normal rule can't be followed."
+    ru: "Заранее предусмотренный выход на случай, когда обычному правилу следовать невозможно."
+  example:
+    en: "Add an escape hatch to the prompt: if there's no role or name, stop and ask me."
+    ru: "Добавь в промпт запасной выход: если нет ни роли, ни имени, остановись и спроси меня."
+  context: prompt
+  chapter: 5
+
+- id: enforce
+  en: enforce
+  ipa: /ɪnˈfɔːrs/
+  ru: следить за соблюдением
+  pos: verb
+  def:
+    en: "To make sure a rule is actually followed."
+    ru: "Следить за тем, чтобы правило действительно соблюдалось."
+  example:
+    en: "A short, checkable policy is easy to enforce in code review."
+    ru: "За соблюдением короткой проверяемой политики легко следить на код-ревью."
+  context: meeting
+  chapter: 5
+
+- id: keep-in-sync
+  en: keep in sync
+  ipa: /ˌkiːp ɪn ˈsɪŋk/
+  ru: держать синхронными
+  pos: verb phrase
+  def:
+    en: "To make sure two copies of something always say the same thing."
+    ru: "Следить, чтобы две копии чего-то всегда совпадали."
+  example:
+    en: "Two rules files are harder to keep in sync than one."
+    ru: "Два файла правил сложнее держать синхронными, чем один."
+  context: meeting
+  chapter: 5
+
+- id: per
+  en: per
+  ipa: /pɜːr/
+  ru: согласно
+  pos: preposition
+  def:
+    en: "According to a rule, a document or a decision."
+    ru: "В соответствии с правилом, документом или решением."
+  example:
+    en: "Per the test case, the total should be €77.00, not €51.90."
+    ru: "Согласно тест-кейсу, итог должен быть €77.00, а не €51.90."
+  context: code-review
+  chapter: 5
+
+- id: fail-quietly
+  en: fail quietly
+  ipa: /ˌfeɪl ˈkwaɪətli/
+  ru: ломаться незаметно
+  pos: verb phrase
+  def:
+    en: "To break without an obvious error, so nobody notices at first."
+    ru: "Ломаться без явной ошибки, так что сначала никто не замечает."
+  example:
+    en: "Fragile locators fail quietly: green today, red after the next redesign."
+    ru: "Хрупкие локаторы ломаются незаметно: сегодня зелёные, после следующего редизайна — красные."
+  context: code-review
+  chapter: 5

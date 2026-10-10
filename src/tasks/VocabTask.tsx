@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { GlossaryEntry, Task } from '../content/schema';
-import { glossary } from '../content';
+import { glossary, studyTerms } from '../content';
 import { Bi, U, useLang } from '../components/Bi';
 import { ListenButton } from '../components/Listen';
 import { MatchBoard } from './MatchTask';
@@ -8,8 +8,16 @@ import { shuffle, type KindProps, type Registration } from './types';
 
 type Vocab = Extract<Task, { kind: 'vocab' }>;
 
+/** Russian translation for quizzes: drops the English in brackets ("проверка (assertion)" → "проверка"), which gives the answer away. */
+export function quizRu(e: GlossaryEntry): string {
+  const ru = e.ru.replace(/\s*\([^()]*[A-Za-z][^()]*\)/g, '').trim();
+  return ru || e.ru;
+}
+
 export function distractors(entry: GlossaryEntry, n = 3): GlossaryEntry[] {
-  const all = [...glossary.values()].filter((e) => e.id !== entry.id);
+  const others = [...glossary.values()].filter((e) => e.id !== entry.id);
+  const studied = others.filter((e) => studyTerms.has(e.id));
+  const all = studied.length >= n ? studied : others;
   const near = all.filter((e) => Math.abs(e.chapter - entry.chapter) <= 1);
   return shuffle(near.length >= n ? near : all).slice(0, n);
 }
@@ -56,7 +64,7 @@ export function OptionCard({ prompt, options, answer, register, phase, speakText
 export function VocabTask({ task, register, phase }: KindProps<Vocab>) {
   const { lang } = useLang();
   if (task.mode === 'match' && task.terms) {
-    const pairs = task.terms.map((id) => glossary.get(id)).filter(Boolean).map((e) => ({ left: e!.en, right: e!.ru }));
+    const pairs = task.terms.map((id) => glossary.get(id)).filter(Boolean).map((e) => ({ left: e!.en, right: quizRu(e!) }));
     return <MatchBoard spec={{ id: task.id, pairs }} register={register} phase={phase} />;
   }
   if (task.mode === 'cloze' && task.sentence && task.answer && task.options) {
@@ -89,12 +97,12 @@ export function TranslateCard({ entry, enToRu, register, phase }: { entry: Gloss
       prompt={enToRu ? (
         <div className="vocab-term"><span className="term-word">{entry.en}</span><span className="term-ipa">{entry.ipa}</span></div>
       ) : (
-        <div className="vocab-term"><span className="term-word">{entry.ru}</span></div>
+        <div className="vocab-term"><span className="term-word">{quizRu(entry)}</span></div>
       )}
       speakText={enToRu ? entry.en : undefined}
       sentence={<div className="vocab-ask"><U k={enToRu ? 'review.translate' : 'review.translateBack'} stack={false} /></div>}
-      options={enToRu ? [entry.ru, ...ds.map((d) => d.ru)] : [entry.en, ...ds.map((d) => d.en)]}
-      answer={enToRu ? entry.ru : entry.en}
+      options={enToRu ? [quizRu(entry), ...ds.map(quizRu)] : [entry.en, ...ds.map((d) => d.en)]}
+      answer={enToRu ? quizRu(entry) : entry.en}
       register={register}
       phase={phase}
     />

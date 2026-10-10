@@ -1,6 +1,6 @@
 // Decisions about what to study: next lesson, warm-up queue, checks, placement, weak topics.
 import type { Task } from '../content/schema';
-import { chapters, glossary, lessons, lessonsOf, type LessonMeta as Lesson } from '../content';
+import { chapters, glossary, lessons, lessonsOf, studyTerms, type LessonMeta as Lesson } from '../content';
 import { chapterMastered, chapterUnlocked, lessonDone, type ProgressData } from '../store/progress';
 import { isDue } from './srs';
 import { shuffle } from '../tasks/types';
@@ -61,7 +61,7 @@ function termTask(termId: string): Task {
   if (r < 0.34 && exampleHasTerm) {
     const idx = e.example.en.toLowerCase().indexOf(e.en.toLowerCase());
     const sentence = { en: e.example.en.slice(0, idx) + '___' + e.example.en.slice(idx + e.en.length), ru: e.example.ru };
-    const others = shuffle([...glossary.values()].filter((x) => x.id !== e.id && Math.abs(x.chapter - e.chapter) <= 2)).slice(0, 3).map((x) => x.en);
+    const others = shuffle([...glossary.values()].filter((x) => x.id !== e.id && studyTerms.has(x.id) && Math.abs(x.chapter - e.chapter) <= 2)).slice(0, 3).map((x) => x.en);
     return { id: `srs-${termId}`, kind: 'vocab', mode: 'cloze', sentence, answer: e.en, options: [e.en, ...others] } as Task;
   }
   return { id: `srs-${termId}`, kind: 'vocab', mode: 'translate', term: termId, direction: r < 0.67 ? 'en-ru' : 'ru-en' } as Task;

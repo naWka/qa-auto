@@ -78,7 +78,7 @@ minutes: 8
 keyPoints:                  # 2–4 ideas the lesson teaches; tasks reference them
   - id: kp-goto
     title: { en: "page.goto opens a page", ru: "page.goto открывает страницу" }
-terms: [action, locator, test-step]      # 5–10 ids → auto "Vocabulary" block at the end
+terms: [tick, swapped, happy-path, ambiguous]   # 5–8 ids → auto "Vocabulary" block at the end (see §9 "What goes into terms")
 steps: [...]
 checkPool: [...]            # 8 tasks for "I know this" checks, review and placement
 ```
@@ -409,9 +409,9 @@ docs/AUT.md), `placement`.
 - id: c1-l1-t7
   kind: vocab
   mode: cloze                           # cloze | translate | match
-  sentence: { en: "The login test is ___: it fails every third run.", ru: "Тест логина нестабильный: падает через раз." }
-  answer: flaky
-  options: [flaky, green, smoke]
+  sentence: { en: "Please don't just ___ the test until it turns green — read the error first.", ru: "Пожалуйста, не перезапускай тест, пока он не позеленеет, — сначала прочитай ошибку." }
+  answer: rerun                         # the ru line is shown under the gap: it must not contain a cognate of the answer
+  options: [rerun, triage, spot]
 - id: c1-l1-t8
   kind: vocab
   mode: translate
@@ -420,7 +420,7 @@ docs/AUT.md), `placement`.
 - id: c1-l1-t9
   kind: vocab
   mode: match
-  terms: [assertion, locator, test-step, expected-result]
+  terms: [tick, swapped, plausible, happy-path]   # pairs EN ↔ RU from the glossary (English in brackets is hidden)
 ```
 
 ## 8. Rules for code in tasks
@@ -465,8 +465,28 @@ One file per owning chapter: `src/content/glossary/cNN.yaml` = list of entries:
   chapter: 1
 ```
 `example` = a realistic sentence from standup / code review / bug report / Slack. IPA in American English.
+`example.en` must contain the exact `en` string: the flashcard cuts out its first (case-insensitive) occurrence to
+make a gap, so that occurrence must be the term itself, not part of a longer word. New entries: `ru` without the
+English in brackets (quizzes hide brackets anyway).
 
-Term ownership (who writes the entry; anyone may *reference* any id):
+### What goes into a lesson's `terms`
+
+`terms` is the lesson's vocabulary: the end-of-lesson word list, the flashcards and the "words learned" counter.
+The student is an experienced manual QA, so it holds only English they don't know yet:
+- **No loanwords or everyday QA jargon** — if the Russian is the English word in Cyrillic, or a Russian QA uses the
+  word daily, it isn't worth learning: test case, bug, smoke, regression, test data, expected result, pass/fail,
+  locator, element, DOM, XPath, prompt, LLM, MCP, code review, diff, function, method, argument, import, timeout…
+  Such terms stay in the glossary for `[[links]]`, but not in `terms`.
+- **Yes:** automation terms whose English isn't transparent (assertion, flaky test, false negative, accessible name,
+  indentation, traceback, strict mode) and work English from the lesson's own texts — phrasal verbs, collocations,
+  adjectives a QA needs in a standup, a review comment, a bug report or a prompt (slip through, file a bug, walk me
+  through, heads-up, narrow down, false alarm, hard-coded, on purpose, trade-off).
+- The term must occur in the lesson's English text. 5–8 terms per lesson. One word = one lesson: if the word is
+  already in another lesson's `terms`, pick another one (the glossary entry lives in the chapter that uses it first).
+- Vocab tasks follow the same rule: no cloze whose answer is a cognate the Russian line gives away
+  ("галлюцинация" → hallucination), no match with trivial pairs.
+
+Term ownership (who writes the entry; anyone may *reference* any id). Base terms:
 - **c1**: manual-testing, test-automation, automated-test, test-case, test-step, expected-result, actual-result,
   regression-testing, test-suite, test-file, test-runner, action, assertion, locator, test-report, pass, fail,
   precondition, test-data, smoke-test, timeout, bug
@@ -483,6 +503,21 @@ Term ownership (who writes the entry; anyone may *reference* any id):
   class, fixture, parameterization, data-driven-testing, refactoring · api-testing, endpoint, request, response,
   status-code, http-method, payload, json, header, auth-token · ci-cd, pipeline, codegen, html-report, headless,
   cross-browser-testing, pull-request, repository, commit, portfolio, config-file, virtual-environment
+
+Work-English vocabulary (2026-10 pass):
+- **c1**: click-through, slip-through, repetitive, exploratory-testing, pay-off, one-off, vague, worth, tick, fill-in,
+  line-by-line, swapped, plausible, happy-path, ambiguous, outage, wording, spot, turn-red, catch-a-bug, go-unnoticed,
+  nightly-run, triage, file-a-bug, rerun, on-purpose, outdated, for-the-right-reason
+- **c2**: pair-with, own, check-against, mix-up, boundary-value, report-back, precise, leave-out, turn-into,
+  fall-back-on, case-sensitive, generic, address, subtle, back-and-forth, fall-for, overkill, cover-up, sneaky
+- **c3**: quotes, lowercase, trailing-space, character-by-character, double-check, helper, call, extract,
+  walk-me-through, type-hint, line-up, brackets, colon, misspelled, up-front, just-to-be-safe, hard-coded,
+  square-brackets, curly-braces, show-up, the-catch, at-a-glance, cut-corners
+- **c4**: skeleton, live, nested, layout, heading, bet-on, heads-up, survive, land, tell-apart, convention, sighted,
+  announce, reach, user-impact, workaround, ship, make-up, evidence, quick-one, intended
+- **c5**: last-resort, reach-for, read-like, user-facing, contract, trade-off, breaking-change, false-alarm, stale,
+  cry-wolf, relax, blind-to, narrow-down, resolve-to, silence, off-by-one, clarifying-question, from-memory,
+  start-fresh, short-lived, escape-hatch, enforce, keep-in-sync, per, fail-quietly
 
 ### Audio
 

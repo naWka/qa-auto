@@ -338,7 +338,7 @@
 - id: traceback
   en: traceback
   ipa: /ˈtreɪsbæk/
-  ru: трейсбек, стек вызовов (traceback)
+  ru: стек вызовов (traceback)
   pos: noun
   def:
     en: "The part of an error report that shows where the error happened: the file, the line number and the code around it. In pytest output the failing line is marked with `>` and the error follows on `E` lines."
@@ -347,4 +347,326 @@
     en: "Read the traceback from the bottom: `test_login.py` line 14, the alert text didn't match."
     ru: "Читай трейсбек снизу: `test_login.py`, строка 14 — текст alert не совпал."
   context: chat
+  chapter: 3
+
+- id: quotes
+  en: quotes
+  ipa: /kwoʊts/
+  ru: кавычки
+  pos: noun
+  def:
+    en: "The marks `\"...\"` or `'...'` around text in code. Everything between them is a string, used exactly as written."
+    ru: "Знаки `\"...\"` или `'...'` вокруг текста в коде. Всё, что между ними, — строка, и код использует её ровно так, как она записана."
+  example:
+    en: "`fill(\"email\")` has quotes around the name, so the test types the word \"email\" instead of the address."
+    ru: "В `fill(\"email\")` имя стоит в кавычках, поэтому тест вводит слово «email» вместо адреса."
+  context: code-review
+  chapter: 3
+
+- id: lowercase
+  en: lowercase
+  ipa: /ˈloʊərkeɪs/
+  ru: строчный, в нижнем регистре
+  pos: adjective
+  def:
+    en: "Written in small letters: `b`, not `B`. The opposite is a capital letter (uppercase)."
+    ru: "Написанный маленькими буквами: `b`, а не `B`. Противоположность — заглавная буква, верхний регистр."
+  example:
+    en: "The button says \"Log in\" with a lowercase i, but the test expects \"Log In\"."
+    ru: "На кнопке «Log in» со строчной i, а тест ждёт «Log In»."
+  context: code-review
+  chapter: 3
+
+- id: trailing-space
+  en: trailing space
+  ipa: /ˌtreɪlɪŋ ˈspeɪs/
+  ru: лишний пробел в конце
+  pos: noun
+  def:
+    en: "An extra space at the end of a text. You can't see it on screen or in a report, but for code it's a real character."
+    ru: "Лишний пробел в конце текста. На экране и в отчёте его не видно, но для кода это настоящий символ."
+  example:
+    en: "The password has a trailing space — \"bloom123 \" — so the login fails with \"Invalid email or password.\""
+    ru: "В пароле лишний пробел в конце — «bloom123 », — поэтому логин падает с «Invalid email or password.»"
+  context: code-review
+  chapter: 3
+
+- id: character-by-character
+  en: character by character
+  ipa: /ˈkerəktər baɪ ˈkerəktər/
+  ru: посимвольно
+  pos: adverb
+  def:
+    en: "One letter, space and punctuation mark at a time — the way code compares strings."
+    ru: "По одной букве, пробелу и знаку препинания — так код сравнивает строки."
+  example:
+    en: "Compare the expected text with the page character by character: the app has a comma after \"back\"."
+    ru: "Сравни ожидаемый текст со страницей посимвольно: в приложении после «back» стоит запятая."
+  context: code-review
+  chapter: 3
+
+- id: double-check
+  en: double-check
+  ipa: /ˌdʌbl ˈtʃek/
+  ru: перепроверить
+  pos: verb
+  def:
+    en: "To check something a second time to be sure it's right."
+    ru: "Проверить ещё раз, чтобы убедиться, что всё верно."
+  example:
+    en: "Could you double-check Tom's password in the test data? The login test is red."
+    ru: "Можешь перепроверить пароль Тома в тестовых данных? Тест логина красный."
+  context: chat
+  chapter: 3
+
+- id: helper
+  en: helper
+  ipa: /ˈhelpər/
+  ru: вспомогательная функция
+  pos: noun
+  def:
+    en: "A small function with steps that many tests share, such as `log_in(page, email, password)`. Tests call it instead of repeating the steps."
+    ru: "Небольшая функция с шагами, общими для многих тестов, например `log_in(page, email, password)`. Тесты вызывают её вместо того, чтобы повторять шаги."
+  example:
+    en: "The bug is in the helper, not in the tests: it logs in as Anna every time."
+    ru: "Баг во вспомогательной функции, а не в тестах: она каждый раз логинит Анну."
+  context: code-review
+  chapter: 3
+
+- id: call
+  en: call
+  ipa: /kɔːl/
+  ru: вызвать (функцию); вызов
+  pos: verb, noun
+  def:
+    en: "To run a function or method by writing its name with brackets: `log_in(page, ...)`. Defining a function doesn't run it — only a call does."
+    ru: "Запустить функцию или метод, написав имя со скобками: `log_in(page, ...)`. Объявление функцию не запускает — запускает только вызов."
+  example:
+    en: "Don't forget to call the helper in the test — defining it does nothing."
+    ru: "Не забудь вызвать вспомогательную функцию в тесте — само объявление ничего не делает."
+  context: code-review
+  chapter: 3
+
+- id: extract
+  en: extract
+  ipa: /ɪkˈstrækt/
+  ru: вынести (в отдельную функцию)
+  pos: verb
+  def:
+    en: "To move repeated code into its own function or file and use it from there — a typical refactoring request."
+    ru: "Перенести повторяющийся код в отдельную функцию или файл и использовать его оттуда — типичная просьба при рефакторинге."
+  example:
+    en: "Extract the cart steps into a helper and call it from both tests."
+    ru: "Вынеси шаги корзины во вспомогательную функцию и вызывай её из обоих тестов."
+  context: prompt
+  chapter: 3
+
+- id: walk-me-through
+  en: walk me through
+  ipa: /ˌwɔːk mi ˈθruː/
+  ru: объясни по шагам
+  pos: verb phrase
+  def:
+    en: "A polite way to ask someone to explain something step by step."
+    ru: "Вежливая просьба объяснить что-то по шагам."
+  example:
+    en: "Could you walk me through this helper before I approve the PR?"
+    ru: "Можешь объяснить мне эту функцию по шагам, прежде чем я одобрю PR?"
+  context: chat
+  chapter: 3
+
+- id: type-hint
+  en: type hint
+  ipa: /ˈtaɪp hɪnt/
+  ru: подсказка типа
+  pos: noun
+  def:
+    en: "A label after a name that says what kind of value it is, like `: Page` or `: str`. It helps readers and the editor; Python doesn't enforce it."
+    ru: "Пометка после имени, которая говорит, какого вида значение, например `: Page` или `: str`. Помогает читателю и редактору; Python её не проверяет."
+  example:
+    en: "The type hint says `: str`, but the test passes a number — Python won't complain, so check it in review."
+    ru: "Подсказка типа говорит `: str`, а тест передаёт число — Python не пожалуется, так что проверь это на ревью."
+  context: code-review
+  chapter: 3
+
+- id: line-up
+  en: line up
+  ipa: /ˌlaɪn ˈʌp/
+  ru: сопоставить, приложить одно к другому
+  pos: verb phrase
+  def:
+    en: "To put two things side by side and match them part by part, like a call and its def line."
+    ru: "Поставить две вещи рядом и сопоставить по частям — например, вызов и строку def."
+  example:
+    en: "Line up the call with the def line: the second argument goes to email."
+    ru: "Приложи вызов к строке def: второй аргумент попадает в email."
+  context: code-review
+  chapter: 3
+
+- id: brackets
+  en: brackets
+  ipa: /ˈbrækɪts/
+  ru: скобки
+  pos: noun
+  def:
+    en: "The round marks `( )` after a method name (in American English also \"parentheses\"). They make it run: `click()` clicks, `click` does nothing."
+    ru: "Круглые знаки `( )` после имени метода. Именно они его запускают: `click()` кликает, а `click` без них ничего не делает."
+  example:
+    en: "Please add brackets after click — right now the button is never pressed."
+    ru: "Добавь, пожалуйста, скобки после click — сейчас кнопку так и не нажимают."
+  context: code-review
+  chapter: 3
+
+- id: colon
+  en: colon
+  ipa: /ˈkoʊlən/
+  ru: двоеточие
+  pos: noun
+  def:
+    en: "The mark `:`. In Python a colon at the end of a `def`, `if` or `for` line opens a block; the indented lines below belong to it."
+    ru: "Знак `:`. В Python двоеточие в конце строки с `def`, `if` или `for` открывает блок; строки с отступом под ним относятся к нему."
+  example:
+    en: "The file won't start: the def line is missing its colon."
+    ru: "Файл не запускается: в строке def не хватает двоеточия."
+  context: chat
+  chapter: 3
+
+- id: misspelled
+  en: misspelled
+  ipa: /ˌmɪsˈspeld/
+  ru: написанный с ошибкой
+  pos: adjective
+  def:
+    en: "Written with a spelling mistake, like `expcet` instead of `expect`, or \"Recieve\" instead of \"Receive\"."
+    ru: "Написанный с орфографической ошибкой: `expcet` вместо `expect` или «Recieve» вместо «Receive»."
+  example:
+    en: "The checkout button is misspelled: it says \"Plcae order\"."
+    ru: "На кнопке оформления заказа опечатка: написано «Plcae order»."
+  context: bug-report
+  chapter: 3
+
+- id: up-front
+  en: up front
+  ipa: /ˌʌp ˈfrʌnt/
+  ru: заранее
+  pos: adverb
+  def:
+    en: "In advance, before the work starts."
+    ru: "Заранее, до начала работы."
+  example:
+    en: "Give the agent the test data up front, so it doesn't have to guess."
+    ru: "Дай агенту тестовые данные заранее, чтобы ему не пришлось угадывать."
+  context: prompt
+  chapter: 3
+
+- id: just-to-be-safe
+  en: just to be safe
+  ipa: /ˌdʒʌst tə bi ˈseɪf/
+  ru: на всякий случай
+  pos: phrase
+  def:
+    en: "As an extra precaution, even if it's probably not needed."
+    ru: "Для подстраховки, даже если это, скорее всего, не нужно."
+  example:
+    en: "We re-ran the suite just to be safe — still green."
+    ru: "На всякий случай мы перезапустили прогон — всё ещё зелёный."
+  context: chat
+  chapter: 3
+
+- id: hard-coded
+  en: hard-coded
+  ipa: /ˌhɑːrd ˈkoʊdɪd/
+  ru: жёстко прописанный в коде
+  pos: adjective
+  def:
+    en: "Written into the code as a fixed value instead of coming from the data, so it doesn't change when the data changes."
+    ru: "Записанный прямо в код как фиксированное значение, а не взятый из данных, поэтому не меняется вместе с данными."
+  example:
+    en: "The expected name is hard-coded as \"Anna\", so the test fails for Tom's row."
+    ru: "Ожидаемое имя жёстко прописано как «Anna», поэтому тест падает на строке Тома."
+  context: code-review
+  chapter: 3
+
+- id: square-brackets
+  en: square brackets
+  ipa: /ˌskwer ˈbrækɪts/
+  ru: квадратные скобки
+  pos: noun
+  def:
+    en: "The marks `[ ]`. In Python they hold a list — `[\"rose\", \"tulips\"]` — and pick one item: `users[0]`, `user[\"email\"]`."
+    ru: "Знаки `[ ]`. В Python в них записывают список — `[\"rose\", \"tulips\"]` — и достают один элемент: `users[0]`, `user[\"email\"]`."
+  example:
+    en: "In Python you read a dict value in square brackets: user[\"email\"], not user.email."
+    ru: "В Python значение из словаря читают в квадратных скобках: user[\"email\"], а не user.email."
+  context: code-review
+  chapter: 3
+
+- id: curly-braces
+  en: curly braces
+  ipa: /ˌkɜːrli ˈbreɪsɪz/
+  ru: фигурные скобки
+  pos: noun
+  def:
+    en: "The marks `{ }`. In Python they hold a dict — `{\"email\": \"anna@bloomly.app\"}` — and mark the gaps in an f-string: `f\"Hi, {name}!\"`."
+    ru: "Знаки `{ }`. В Python в них записывают словарь — `{\"email\": \"anna@bloomly.app\"}` — и отмечают пропуски в f-строке: `f\"Hi, {name}!\"`."
+  example:
+    en: "The expected text still has curly braces in it — the f before the quotes is missing."
+    ru: "В ожидаемом тексте остались фигурные скобки — пропала f перед кавычками."
+  context: code-review
+  chapter: 3
+
+- id: show-up
+  en: show up
+  ipa: /ˌʃoʊ ˈʌp/
+  ru: появляться, отображаться
+  pos: verb phrase
+  def:
+    en: "To appear — on a page, in a report or in a log."
+    ru: "Появляться — на странице, в отчёте или в логе."
+  example:
+    en: "The error message doesn't show up when the password is wrong."
+    ru: "При неверном пароле сообщение об ошибке не появляется."
+  context: bug-report
+  chapter: 3
+
+- id: the-catch
+  en: the catch
+  ipa: /ðə ˈkætʃ/
+  ru: подвох
+  pos: noun
+  def:
+    en: "A hidden problem in something that looks good at first."
+    ru: "Скрытая проблема в том, что поначалу выглядит хорошо."
+  example:
+    en: "The catch: if one user fails, the report doesn't say which one."
+    ru: "Подвох в том, что если упадёт один пользователь, по отчёту не понять, какой."
+  context: code-review
+  chapter: 3
+
+- id: at-a-glance
+  en: at a glance
+  ipa: /æt ə ˈɡlæns/
+  ru: сразу, с первого взгляда
+  pos: adverb
+  def:
+    en: "Immediately, with one quick look."
+    ru: "Сразу, с одного быстрого взгляда."
+  example:
+    en: "With readable ids you can tell at a glance which promo code failed."
+    ru: "С понятными id сразу видно, какой промокод упал."
+  context: code-review
+  chapter: 3
+
+- id: cut-corners
+  en: cut corners
+  ipa: /ˌkʌt ˈkɔːrnərz/
+  ru: халтурить, делать абы как
+  pos: verb phrase
+  def:
+    en: "To do something faster or more cheaply by skipping the parts that matter."
+    ru: "Делать быстрее или проще, пропуская важные части."
+  example:
+    en: "\"Make it shorter\" invites the agent to cut corners — it may drop half of the checks."
+    ru: "«Сделай покороче» провоцирует агента халтурить — он может выкинуть половину проверок."
+  context: prompt
   chapter: 3

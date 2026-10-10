@@ -24,7 +24,7 @@ keyPoints:
     title:
       en: "A locator says which element: get_by_label, get_by_role"
       ru: "Локатор говорит, какой элемент: get_by_label, get_by_role"
-terms: [test-step, action, locator, test-file, test-data, precondition, test-case]
+terms: [tick, fill-in, line-by-line, swapped, plausible, happy-path, ambiguous]
 
 steps:
   - type: story
@@ -393,7 +393,7 @@ steps:
       prompt:
         en: "Match the terms with their meanings."
         ru: "Сопоставь термины с их значениями."
-      terms: [test-step, action, locator, test-data]
+      terms: [tick, swapped, plausible, happy-path]
 
   - type: task
     task:

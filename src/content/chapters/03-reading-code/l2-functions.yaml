@@ -14,7 +14,7 @@ keyPoints:
     title: { en: "Positional arguments go by order, keyword arguments by name", ru: "Позиционные аргументы идут по порядку, именованные — по имени" }
   - id: kp-return
     title: { en: "`return` hands a value back; without it you get None", ru: "`return` отдаёт значение обратно, а без него приходит None" }
-terms: [function, parameter, argument, keyword-argument, method, none, fixture, precondition]
+terms: [keyword-argument, helper, call, extract, walk-me-through, type-hint, line-up]
 
 steps:
   - type: story
@@ -461,10 +461,10 @@ steps:
       kind: vocab
       mode: cloze
       sentence:
-        en: "In `get_by_role(\"button\", name=\"Log in\")`, the part `name=\"Log in\"` is a keyword ___."
-        ru: "В `get_by_role(\"button\", name=\"Log in\")` часть `name=\"Log in\"` — это именованный аргумент."
-      answer: argument
-      options: [argument, parameter, property]
+        en: "Petal defined `add_roses` but forgot to ___ it in the test, so the cart is still empty."
+        ru: "Petal объявил `add_roses`, но забыл вызвать её в тесте, поэтому корзина всё ещё пуста."
+      answer: call
+      options: [call, extract, return]
 
   - type: mistakes
     title: { en: "Typical mistakes around functions", ru: "Типичные ошибки с функциями" }

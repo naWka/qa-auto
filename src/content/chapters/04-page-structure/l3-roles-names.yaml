@@ -14,7 +14,7 @@ keyPoints:
     title: { en: "Role + name: how users find things — and the most stable way for tests", ru: "Роль + имя: так ищут пользователи — и так надёжнее всего искать тестам" }
   - id: kp-a11y-bug
     title: { en: "An accessibility bug is a real bug — and it confuses the agent too", ru: "Баг доступности — настоящий баг, и он сбивает с толку агента" }
-terms: [role, accessible-name, accessibility, element, tag, locator, bug, accessibility-snapshot]
+terms: [accessible-name, accessibility, announce, reach, user-impact, workaround]
 
 steps:
   - type: story

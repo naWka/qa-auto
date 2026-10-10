@@ -20,7 +20,7 @@ keyPoints:
     title:
       en: "Red means a bug in the app or a broken test — triage it"
       ru: "Красный — это баг в приложении или сломанный тест: разберись"
-terms: [test-report, pass, fail, timeout, bug, actual-result, test-runner]
+terms: [nightly-run, triage, file-a-bug, rerun, on-purpose, outdated, for-the-right-reason]
 
 steps:
   - type: story
@@ -418,10 +418,10 @@ steps:
         en: "Pick the word that fits."
         ru: "Выбери подходящее слово."
       sentence:
-        en: "The test failed with a ___: the button never appeared."
-        ru: "Тест упал по тайм-ауту: кнопка так и не появилась."
-      answer: timeout
-      options: [timeout, pass, locator]
+        en: "Please don't just ___ the test until it turns green — read the error first."
+        ru: "Пожалуйста, не перезапускай тест, пока он не позеленеет, — сначала прочитай ошибку."
+      answer: rerun
+      options: [rerun, triage, spot]
 
   - type: task
     task:

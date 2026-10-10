@@ -12,7 +12,7 @@ keyPoints:
     title: { en: "Elements are tags with content, nested like folders", ru: "Элементы — теги с содержимым, вложенные как папки" }
   - id: kp-dom-not-pixels
     title: { en: "Playwright searches the DOM, not the pixels", ru: "Playwright ищет в DOM, а не по пикселям" }
-terms: [dom, html, element, tag, attribute, devtools, inspect, locator]
+terms: [skeleton, live, nested, layout, heading, bet-on]
 
 steps:
   - type: story

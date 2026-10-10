@@ -18,7 +18,7 @@ keyPoints:
     title:
       en: "False alarms cost the team its trust in the suite"
       ru: "Ложные тревоги подрывают доверие команды к набору тестов"
-terms: [fragile-selector, resilient-locator, css-selector, xpath, locator, false-positive, flaky-test, test-suite]
+terms: [fragile-selector, resilient-locator, false-alarm, stale, cry-wolf, relax, blind-to]
 
 steps:
   - type: story

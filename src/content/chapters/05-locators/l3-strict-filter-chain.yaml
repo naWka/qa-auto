@@ -12,7 +12,7 @@ keyPoints:
     title: { en: "filter narrows a list, chaining searches inside", ru: "filter сужает список, цепочка ищет внутри" }
   - id: kp-first-nth-red-flag
     title: { en: ".first and .nth() hide “which one?”", ru: ".first и .nth() прячут вопрос «какой именно?»" }
-terms: [strict-mode, filter, chaining, locator, element, error-message, code-review]
+terms: [strict-mode, chaining, narrow-down, resolve-to, silence, off-by-one, clarifying-question]
 
 steps:
   - type: story

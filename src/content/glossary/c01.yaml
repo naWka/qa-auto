@@ -306,3 +306,395 @@
     ru: "Баг заведён: страница аккаунта приветствует пользователей по фамилии."
   context: bug-report
   chapter: 1
+
+- id: click-through
+  en: click through
+  ipa: /ˈklɪk θruː/
+  ru: прокликать
+  pos: phrasal verb
+  def:
+    en: "To go through screens or test cases by clicking, step by step, usually by hand."
+    ru: "Пройти экраны или тест-кейсы, кликая шаг за шагом, обычно вручную."
+  example:
+    en: "Before the release I had to click through the whole checkout in three browsers."
+    ru: "Перед релизом мне пришлось прокликать всё оформление заказа в трёх браузерах."
+  context: standup
+  chapter: 1
+
+- id: slip-through
+  en: slip through
+  ipa: /ˈslɪp θruː/
+  ru: проскочить (о баге)
+  pos: phrasal verb
+  def:
+    en: "Of a bug: to get past testing unnoticed and reach users."
+    ru: "О баге: незаметно пройти мимо тестирования и попасть к пользователям."
+  example:
+    en: "How did this bug slip through regression?"
+    ru: "Как этот баг проскочил через регрессию?"
+  context: meeting
+  chapter: 1
+
+- id: repetitive
+  en: repetitive
+  ipa: /rɪˈpɛtətɪv/
+  ru: однообразный, повторяющийся
+  pos: adjective
+  def:
+    en: "Done the same way again and again: boring for people, ideal for automation."
+    ru: "Повторяющийся раз за разом одинаково: скучно для людей, идеально для автоматизации."
+  example:
+    en: "Let's give Petal the repetitive checks and keep the new features for people."
+    ru: "Давайте отдадим Petal однообразные проверки, а новые фичи оставим людям."
+  context: meeting
+  chapter: 1
+
+- id: exploratory-testing
+  en: exploratory testing
+  ipa: /ɪkˈsplɔːrətɔːri ˈtɛstɪŋ/
+  ru: исследовательское тестирование
+  pos: noun
+  def:
+    en: "Testing without a fixed script: you learn the feature and invent new checks as you go."
+    ru: "Тестирование без готового сценария: изучаешь фичу и придумываешь проверки по ходу."
+  example:
+    en: "I'll spend an hour on exploratory testing of the new gift-card flow."
+    ru: "Час потрачу на исследовательское тестирование нового сценария с подарочными картами."
+  context: standup
+  chapter: 1
+
+- id: pay-off
+  en: pay off
+  ipa: /ˌpeɪ ˈɔːf/
+  ru: окупаться
+  pos: phrasal verb
+  def:
+    en: "To be worth the time or money spent on it."
+    ru: "Оправдать потраченное время или деньги."
+  example:
+    en: "Automating the banner check won't pay off — it runs only once."
+    ru: "Автоматизация проверки баннера не окупится — её запустят всего один раз."
+  context: meeting
+  chapter: 1
+
+- id: one-off
+  en: one-off
+  ipa: /ˌwʌn ˈɔːf/
+  ru: разовый
+  pos: adjective
+  def:
+    en: "Happening or needed only once."
+    ru: "Происходящий или нужный только один раз."
+  example:
+    en: "It's a one-off check for the holiday banner, so I'll do it by hand."
+    ru: "Это разовая проверка праздничного баннера, так что сделаю её руками."
+  context: chat
+  chapter: 1
+
+- id: vague
+  en: vague
+  ipa: /veɪɡ/
+  ru: размытый, расплывчатый
+  pos: adjective
+  def:
+    en: "Not clear or specific enough to act on."
+    ru: "Недостаточно ясный или конкретный, чтобы по нему действовать."
+  example:
+    en: "\"Test the login\" is too vague — give the agent the steps and the expected result."
+    ru: "«Протестируй логин» — слишком размыто: дай агенту шаги и ожидаемый результат."
+  context: prompt
+  chapter: 1
+
+- id: worth
+  en: worth
+  ipa: /wɜːrθ/
+  ru: стоит (того)
+  pos: adjective (worth + -ing)
+  def:
+    en: "Useful enough to spend time on: \"worth checking\", \"not worth automating\"."
+    ru: "Достаточно полезный, чтобы тратить на это время: «стоит проверить», «не стоит автоматизировать»."
+  example:
+    en: "Is the new filter worth automating, or will it change again next sprint?"
+    ru: "Стоит ли автоматизировать новый фильтр, или он опять поменяется в следующем спринте?"
+  context: meeting
+  chapter: 1
+
+- id: tick
+  en: tick
+  ipa: /tɪk/
+  ru: поставить галочку, отметить
+  pos: verb
+  def:
+    en: "To mark a checkbox (Americans also say \"check\"). In Playwright it's `check()`."
+    ru: "Поставить отметку в чекбоксе (в американском английском ещё «check»). В Playwright это `check()`."
+  example:
+    en: "Step 4 says to tick \"Remember me\", but the test skips it."
+    ru: "Шаг 4 велит поставить галочку «Remember me», а тест его пропускает."
+  context: code-review
+  chapter: 1
+
+- id: fill-in
+  en: fill in
+  ipa: /ˌfɪl ˈɪn/
+  ru: заполнить (форму, поле)
+  pos: phrasal verb
+  def:
+    en: "To complete a form or a field by typing the required information."
+    ru: "Ввести нужные данные в форму или поле."
+  example:
+    en: "Steps to reproduce: fill in the sign-up form and leave Email empty."
+    ru: "Шаги воспроизведения: заполнить форму регистрации и оставить Email пустым."
+  context: bug-report
+  chapter: 1
+
+- id: line-by-line
+  en: line by line
+  ipa: /ˌlaɪn baɪ ˈlaɪn/
+  ru: построчно
+  pos: adverb
+  def:
+    en: "Going through every line in order, without skipping any."
+    ru: "Проходя каждую строку по порядку, ничего не пропуская."
+  example:
+    en: "Compare Petal's test with TC-003 line by line — that's how you find a missing step."
+    ru: "Сравни тест Petal с TC-003 построчно — так и находят пропущенный шаг."
+  context: code-review
+  chapter: 1
+
+- id: swapped
+  en: swapped
+  ipa: /swɑːpt/
+  ru: перепутанный местами
+  pos: adjective
+  def:
+    en: "Put in each other's place by mistake, like two digits or two fields."
+    ru: "Ошибочно поменянный местами — например, две цифры или два поля."
+  example:
+    en: "The digits in the password are swapped: tulips24 instead of tulips42."
+    ru: "В пароле цифры перепутаны местами: tulips24 вместо tulips42."
+  context: code-review
+  chapter: 1
+
+- id: plausible
+  en: plausible
+  ipa: /ˈplɔːzəbl/
+  ru: правдоподобный
+  pos: adjective
+  def:
+    en: "Looking reasonable or true, even when it is wrong."
+    ru: "Выглядящий разумным или верным, даже если это ошибка."
+  example:
+    en: "The agent invented plausible test data: test@example.com doesn't exist in Bloomly."
+    ru: "Агент придумал правдоподобные тестовые данные: пользователя test@example.com в Bloomly нет."
+  context: code-review
+  chapter: 1
+
+- id: happy-path
+  en: happy path
+  ipa: /ˈhæpi pæθ/
+  ru: позитивный сценарий
+  pos: noun
+  def:
+    en: "The main scenario where everything goes right: valid data, no errors."
+    ru: "Основной сценарий, в котором всё идёт как надо: верные данные, никаких ошибок."
+  example:
+    en: "Petal covered only the happy path; the wrong-password case is still missing."
+    ru: "Petal покрыл только позитивный сценарий, случая с неверным паролем всё ещё нет."
+  context: code-review
+  chapter: 1
+
+- id: ambiguous
+  en: ambiguous
+  ipa: /æmˈbɪɡjuəs/
+  ru: неоднозначный
+  pos: adjective
+  def:
+    en: "Having more than one possible meaning or match."
+    ru: "Допускающий больше одного толкования или совпадения."
+  example:
+    en: "The step \"click Log in\" is ambiguous: there are three \"Log in\" elements on the page."
+    ru: "Шаг «нажать Log in» неоднозначный: на странице три элемента «Log in»."
+  context: code-review
+  chapter: 1
+
+- id: outage
+  en: outage
+  ipa: /ˈaʊtɪdʒ/
+  ru: сбой, простой сервиса
+  pos: noun
+  def:
+    en: "A period when a service or a feature doesn't work for users."
+    ru: "Период, когда сервис или функция не работает у пользователей."
+  example:
+    en: "During this morning's outage nobody could log in for an hour."
+    ru: "Во время утреннего сбоя целый час никто не мог войти."
+  context: standup
+  chapter: 1
+
+- id: wording
+  en: wording
+  ipa: /ˈwɜːrdɪŋ/
+  ru: формулировка
+  pos: noun
+  def:
+    en: "The exact words used to say something, for example in a requirement or an expected result."
+    ru: "Точные слова, которыми что-то сказано, — например, в требовании или ожидаемом результате."
+  example:
+    en: "The wording of the expected result is unclear: which error should be shown?"
+    ru: "Формулировка ожидаемого результата неясная: какая именно ошибка должна показаться?"
+  context: code-review
+  chapter: 1
+
+- id: spot
+  en: spot
+  ipa: /spɑːt/
+  ru: заметить
+  pos: verb
+  def:
+    en: "To notice something that is easy to miss."
+    ru: "Заметить то, что легко пропустить."
+  example:
+    en: "Can you spot what's wrong with this assertion?"
+    ru: "Сможешь заметить, что не так с этой проверкой?"
+  context: code-review
+  chapter: 1
+
+- id: turn-red
+  en: turn red
+  ipa: /ˌtɜːrn ˈrɛd/
+  ru: покраснеть (о тесте)
+  pos: verb phrase
+  def:
+    en: "Of a test: to start failing. \"Turn green\" means to start passing."
+    ru: "О тесте: начать падать. «Turn green» — начать проходить."
+  example:
+    en: "If login breaks, this test should turn red."
+    ru: "Если вход сломается, этот тест должен покраснеть."
+  context: code-review
+  chapter: 1
+
+- id: catch-a-bug
+  en: catch a bug
+  ipa: /ˌkætʃ ə ˈbʌɡ/
+  ru: поймать баг
+  pos: verb phrase
+  def:
+    en: "Of a test or a tester: to detect a bug before users do."
+    ru: "О тесте или тестировщике: обнаружить баг раньше пользователей."
+  example:
+    en: "A test with no assertion will never catch a bug."
+    ru: "Тест без проверки никогда не поймает баг."
+  context: code-review
+  chapter: 1
+
+- id: go-unnoticed
+  en: go unnoticed
+  ipa: /ˌɡoʊ ʌnˈnoʊtɪst/
+  ru: остаться незамеченным
+  pos: verb phrase
+  def:
+    en: "To happen without anyone seeing or checking it."
+    ru: "Произойти так, что никто этого не увидит и не проверит."
+  example:
+    en: "Without an assertion on the error text, a wrong message would go unnoticed."
+    ru: "Без проверки текста ошибки неправильное сообщение осталось бы незамеченным."
+  context: code-review
+  chapter: 1
+
+- id: nightly-run
+  en: nightly run
+  ipa: /ˈnaɪtli rʌn/
+  ru: ночной прогон
+  pos: noun
+  def:
+    en: "An automatic run of the test suite every night, with results ready in the morning."
+    ru: "Автоматический прогон тестов каждую ночь; утром результаты уже готовы."
+  example:
+    en: "The nightly run had two failures; I'm triaging them now."
+    ru: "В ночном прогоне два падения, сейчас их разбираю."
+  context: standup
+  chapter: 1
+
+- id: triage
+  en: triage
+  ipa: /triˈɑːʒ/
+  ru: разбирать (падения, баги), сортировать по важности
+  pos: verb, noun
+  def:
+    en: "To go through failures or bugs one by one and decide what each is and what to fix first."
+    ru: "Разобрать падения или баги по одному и решить, что это и чем заняться в первую очередь."
+  example:
+    en: "Before anyone reruns anything, let's triage the two red tests."
+    ru: "Прежде чем что-то перезапускать, давайте разберём два красных теста."
+  context: standup
+  chapter: 1
+
+- id: file-a-bug
+  en: file a bug
+  ipa: /ˌfaɪl ə ˈbʌɡ/
+  ru: завести баг
+  pos: verb phrase
+  def:
+    en: "To create a bug report in the tracker, for example in Jira."
+    ru: "Создать баг-репорт в трекере, например в Jira."
+  example:
+    en: "The test follows TC-001, so the app is wrong — I'll file a bug."
+    ru: "Тест следует TC-001, значит, ошибается приложение — заведу баг."
+  context: standup
+  chapter: 1
+
+- id: rerun
+  en: rerun
+  ipa: /ˌriːˈrʌn/
+  ru: перезапустить
+  pos: verb
+  def:
+    en: "To run a test or a suite again."
+    ru: "Запустить тест или набор тестов ещё раз."
+  example:
+    en: "I'll rerun the failed test once the new build is deployed."
+    ru: "Перезапущу упавший тест, когда выкатят новую сборку."
+  context: chat
+  chapter: 1
+
+- id: on-purpose
+  en: on purpose
+  ipa: /ɑːn ˈpɜːrpəs/
+  ru: намеренно, специально
+  pos: adverb
+  def:
+    en: "Deliberately, not by accident."
+    ru: "Намеренно, а не случайно."
+  example:
+    en: "We broke the greeting on purpose to prove the test can fail."
+    ru: "Мы специально сломали приветствие, чтобы доказать, что тест может упасть."
+  context: chat
+  chapter: 1
+
+- id: outdated
+  en: outdated
+  ipa: /ˌaʊtˈdeɪtɪd/
+  ru: устаревший
+  pos: adjective
+  def:
+    en: "No longer correct because the app or the requirements have changed."
+    ru: "Уже неверный, потому что приложение или требования изменились."
+  example:
+    en: "The test is red because its expected text is outdated: the button now says \"Sign in\"."
+    ru: "Тест красный, потому что ожидаемый текст устарел: на кнопке теперь «Sign in»."
+  context: code-review
+  chapter: 1
+
+- id: for-the-right-reason
+  en: for the right reason
+  ipa: /fər ðə ˌraɪt ˈriːzn/
+  ru: по правильной причине
+  pos: phrase
+  def:
+    en: "Of a test result: red because of a real bug, or green because the check really passed, not by accident."
+    ru: "О результате теста: красный из-за настоящего бага или зелёный, потому что проверка действительно прошла, а не случайно."
+  example:
+    en: "Before you trust a red test, make sure it fails for the right reason."
+    ru: "Прежде чем доверять красному тесту, убедись, что он падает по правильной причине."
+  context: code-review
+  chapter: 1

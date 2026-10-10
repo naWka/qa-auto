@@ -14,7 +14,7 @@ keyPoints:
     title: { en: "An @ line changes how pytest treats a function", ru: "Строка с @ меняет то, как pytest обращается с функцией" }
   - id: kp-call-brackets
     title: { en: "A method runs only with ()", ru: "Метод выполняется только со скобками ()" }
-terms: [indentation, import, decorator, method, function, syntax, error-message, traceback]
+terms: [indentation, traceback, brackets, colon, misspelled, up-front, just-to-be-safe]
 
 steps:
   - type: story
@@ -517,6 +517,16 @@ steps:
       explain:
         en: "`NameError` means Python doesn't know the name. `expect` comes from `playwright.sync_api`, so it goes into line 1 next to `Page`. Deleting or weakening the check would also silence the error — and leave a test that can't fail."
         ru: "`NameError` значит, что Python не знает этого имени. `expect` берётся из `playwright.sync_api`, поэтому его дописывают в строку 1 рядом с `Page`. Удалить или ослабить проверку — тоже способ заглушить ошибку, но тогда останется тест, который не может упасть."
+
+  - type: task
+    task:
+      id: c3-l3-t8
+      kind: vocab
+      mode: match
+      prompt:
+        en: "Match the words with their meanings."
+        ru: "Сопоставь слова с их значениями."
+      terms: [brackets, colon, indentation, misspelled]
 
   - type: mistakes
     title: { en: "Small slips with big effects", ru: "Мелкие промахи с большими последствиями" }
