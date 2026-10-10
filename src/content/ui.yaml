@@ -291,6 +291,10 @@ settings:
   themeAuto: { en: "System", ru: "Как в системе" }
   themeLight: { en: "Light", ru: "Светлая" }
   themeDark: { en: "Dark", ru: "Тёмная" }
+  speech: { en: "English audio", ru: "Озвучка на английском" }
+  speechDesc: { en: "How fast the voice reads terms, work phrases and interview answers. A slower pace helps to catch every word.", ru: "Как быстро голос читает термины, рабочие фразы и ответы для собеседования. В медленном темпе легче расслышать каждое слово." }
+  speechNormal: { en: "Normal", ru: "Обычная" }
+  speechSlow: { en: "Slower (0.75×)", ru: "Медленнее (0.75×)" }
   speed: { en: "Test run speed", ru: "Скорость прогона тестов" }
   speedDesc: { en: "Slower runs highlight every element the test touches.", ru: "Медленный прогон подсвечивает каждый элемент, с которым работает тест." }
   slow: { en: "Slow", ru: "Медленно" }

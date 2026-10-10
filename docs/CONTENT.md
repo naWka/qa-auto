@@ -484,6 +484,18 @@ Term ownership (who writes the entry; anyone may *reference* any id):
   status-code, http-method, payload, json, header, auth-token · ci-cd, pipeline, codegen, html-report, headless,
   cross-browser-testing, pull-request, repository, commit, portfolio, config-file, virtual-environment
 
+### Audio
+
+Glossary terms and examples, lesson work phrases (`phrases` steps) and interview questions and answers have
+pre-generated audio: `npm run audio` reads them with Kokoro (local, needs [uv](https://docs.astral.sh/uv/)) into
+`public/audio/*.mp3` and updates `src/content/audio.json`. Only new or changed texts are generated; files nobody
+uses are removed. Commit both. A text without audio is read by the browser voice, and `check:content` warns.
+
+Before the engine gets a text, inline code is turned into what a developer would say
+(`page.getByRole('button')` → "page dot get by role button"), camelCase is split, emails and case ids are spelled
+out. Words it still gets wrong go to `src/content/pronounce.yaml` (`JSON: Jason`). To see what the engine gets:
+`npm run audio -- --say "text"`.
+
 ## 10. Quality checklist
 
 - [ ] EN/RU paragraphs aligned, RU natural; gender variants on every past-tense verb about the student.

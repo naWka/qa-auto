@@ -6,22 +6,7 @@ import { glossary } from '../content';
 import { Bi, U, useLang } from './Bi';
 import { Icon } from './Icon';
 import { navigate } from '../lib/router';
-
-export function speak(text: string) {
-  try {
-    const synth = window.speechSynthesis;
-    if (!synth) return;
-    synth.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US';
-    u.rate = 0.9;
-    const voice = synth.getVoices().find((v) => v.lang.startsWith('en-US')) || synth.getVoices().find((v) => v.lang.startsWith('en'));
-    if (voice) u.voice = voice;
-    synth.speak(u);
-  } catch {
-    /* speech is optional */
-  }
-}
+import { ListenButton } from './Listen';
 
 interface Open { id: string; rect: DOMRect; pinned: boolean }
 
@@ -100,7 +85,7 @@ export function TermLayer() {
               <div className="term-word">{entry.en}</div>
               <div className="term-ipa">{entry.ipa}{entry.pos ? <span className="term-pos"> · {entry.pos}</span> : null}</div>
             </div>
-            <button className="icon-btn" onClick={() => speak(entry.en)} aria-label="Listen" title="Listen"><Icon name="volume" /></button>
+            <ListenButton text={entry.en} />
           </div>
           {lang !== 'en' && <div className="term-ru">{entry.ru}</div>}
           {lang === 'en' && <div className="term-ru term-ru-muted">{entry.ru}</div>}
@@ -108,7 +93,7 @@ export function TermLayer() {
           <div className="term-example">
             <div className="term-example-label"><Icon name="chat" size={14} /> <U k="glossary.example" stack={false} /></div>
             <Bi t={entry.example} size="sm" />
-            <button className="link-btn tiny" onClick={() => speak(entry.example.en)}><Icon name="volume" size={14} /> <U k="glossary.listen" stack={false} /></button>
+            <ListenButton text={entry.example.en} label />
           </div>
           <button className="link-btn" onClick={() => { setOpen(null); navigate(`/glossary?q=${encodeURIComponent(entry.en)}`); }}>
             <U k="glossary.openGlossary" stack={false} /> <Icon name="chevronRight" size={14} />

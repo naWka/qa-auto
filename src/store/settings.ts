@@ -11,6 +11,8 @@ export interface Settings {
   theme: Theme;
   /** ms pause on each highlighted step during a test run */
   speed: number;
+  /** playback rate of the English audio: 1 or a slower 0.75 */
+  speechRate: number;
   celebrations: boolean;
   onboarded: boolean;
   /** Day of the last saved copy of progress (file or code); not part of the copy itself. */
@@ -28,6 +30,7 @@ export const defaultSettings: Settings = {
   gender: 'f',
   theme: 'auto',
   speed: 350,
+  speechRate: 1,
   celebrations: true,
   onboarded: false,
 };
@@ -44,5 +47,5 @@ export const useSettings = create<SettingsStore>()(
 
 export function settingsSnapshot(): Settings {
   const s = useSettings.getState();
-  return { lang: s.lang, gender: s.gender, theme: s.theme, speed: s.speed, celebrations: s.celebrations, onboarded: s.onboarded };
+  return { lang: s.lang, gender: s.gender, theme: s.theme, speed: s.speed, speechRate: s.speechRate, celebrations: s.celebrations, onboarded: s.onboarded };
 }

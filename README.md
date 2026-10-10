@@ -34,6 +34,7 @@ npm install
 npm run dev            # http://localhost:5173/qa-auto/
 npm run check:content  # validate YAML content
 npm run check:code     # parse every Python snippet, run "what will it print" tasks, find JS leftovers
+npm run audio          # generate English audio for new or changed texts (needs uv, see docs/CONTENT.md)
 npm run build          # content check + typecheck + production build
 ```
 

@@ -4,6 +4,7 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import YAML from 'yaml';
 import { Lesson, Chapter, GlossaryEntry, Phrases, Interview, Task } from '../src/content/schema.ts';
+import { audioJobs, hasAudio } from './audio-texts.ts';
 
 const ROOT = join(import.meta.dirname, '..', 'src', 'content');
 const errors: string[] = [];
@@ -233,6 +234,10 @@ for (const [name, schema] of [['phrases.yaml', Phrases], ['interview.yaml', Inte
   const data = zodCheck<any>(schema, load(file), rel(file));
   if (data) walkStrings(data, rel(file), '');
 }
+
+// ---------- audio ----------
+const silent = audioJobs().filter((j) => !hasAudio(j)).length;
+if (silent) warn('public/audio', `${silent} texts have no generated audio (the browser voice reads them) — run npm run audio`);
 
 void Task;
 for (const w of warnings) console.log(w);

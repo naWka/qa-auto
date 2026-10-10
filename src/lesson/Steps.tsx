@@ -7,7 +7,7 @@ import { CodeView } from '../components/CodeView';
 import { Dialogue, Mentor } from '../components/Mentor';
 import { TestCaseCard } from '../components/Common';
 import { Icon } from '../components/Icon';
-import { speak } from '../components/TermLayer';
+import { ListenButton } from '../components/Listen';
 import { RunCompleted } from '../tasks/RunCompleted';
 import { useProgress } from '../store/progress';
 import { Figure } from './Figures';
@@ -182,7 +182,7 @@ export function PhrasesStep({ step }: { step: S<'phrases'> }) {
               <Bi t={{ en: p.en, ru: p.ru }} />
               {p.note && <div className="phrase-note"><Bi t={p.note} size="sm" /></div>}
             </div>
-            <button className="icon-btn" onClick={() => speak(p.en)} aria-label="Listen"><Icon name="volume" size={18} /></button>
+            <ListenButton text={p.en} size={18} />
           </div>
         ))}
       </div>
@@ -200,7 +200,7 @@ export function VocabStep({ lesson }: { lesson: Lesson }) {
           if (!e) return null;
           return (
             <div key={id} className="vocab-row">
-              <button className="icon-btn" onClick={() => speak(e.en)} aria-label="Listen"><Icon name="volume" size={18} /></button>
+              <ListenButton text={e.en} size={18} />
               <div className="vocab-main">
                 <div><button type="button" className="term" data-term={e.id}>{e.en}</button> <span className="term-ipa">{e.ipa}</span></div>
                 <div className="vocab-ru">{e.ru}</div>

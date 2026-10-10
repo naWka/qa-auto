@@ -1,0 +1,21 @@
+# How to say words the speech engine gets wrong. Key = word as written (case-sensitive, whole word),
+# value = what to say instead. Applied to every spoken text: the generated audio and the browser voice.
+# After a change run `npm run audio` to regenerate the affected files.
+
+JSON: Jason
+README: read me
+VS: V.S.
+e2e: end-to-end
+e.g.: for example
+i.e.: that is
+id: ID
+testid: test ID
+ui: UI
+pytest-playwright: pie test Playwright
+conftest.py: conf test dot pie
+conftest: conf test
+pytest: pie test
+venv: V env
+xfail: X fail
+parametrize: parameterize
+snake_case: snake case

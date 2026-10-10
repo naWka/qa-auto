@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { GlossaryEntry, Task } from '../content/schema';
 import { glossary } from '../content';
 import { Bi, U, useLang } from '../components/Bi';
-import { Icon } from '../components/Icon';
-import { speak } from '../components/TermLayer';
+import { ListenButton } from '../components/Listen';
 import { MatchBoard } from './MatchTask';
 import { shuffle, type KindProps, type Registration } from './types';
 
@@ -16,13 +15,14 @@ export function distractors(entry: GlossaryEntry, n = 3): GlossaryEntry[] {
 }
 
 /** A single-choice card among text options; shared with the review session. */
-export function OptionCard({ prompt, options, answer, register, phase, onSpeak, sentence }: {
+export function OptionCard({ prompt, options, answer, register, phase, speakText, sentence }: {
   prompt: React.ReactNode;
   options: string[];
   answer: string;
   register: (r: Registration) => void;
   phase: string;
-  onSpeak?: () => void;
+  /** English text with a listen button next to the prompt */
+  speakText?: string;
   sentence?: React.ReactNode;
 }) {
   const order = useMemo(() => shuffle(options), [options.join('|')]);
@@ -36,7 +36,7 @@ export function OptionCard({ prompt, options, answer, register, phase, onSpeak, 
     <div className="vocab-card">
       <div className="vocab-prompt">
         {prompt}
-        {onSpeak && <button type="button" className="icon-btn" onClick={onSpeak} aria-label="Listen"><Icon name="volume" /></button>}
+        {speakText && <ListenButton text={speakText} />}
       </div>
       {sentence}
       <div className="vocab-options">
@@ -91,7 +91,7 @@ export function TranslateCard({ entry, enToRu, register, phase }: { entry: Gloss
       ) : (
         <div className="vocab-term"><span className="term-word">{entry.ru}</span></div>
       )}
-      onSpeak={enToRu ? () => speak(entry.en) : undefined}
+      speakText={enToRu ? entry.en : undefined}
       sentence={<div className="vocab-ask"><U k={enToRu ? 'review.translate' : 'review.translateBack'} stack={false} /></div>}
       options={enToRu ? [entry.ru, ...ds.map((d) => d.ru)] : [entry.en, ...ds.map((d) => d.en)]}
       answer={enToRu ? entry.ru : entry.en}

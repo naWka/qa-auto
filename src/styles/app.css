@@ -163,6 +163,10 @@ button { font: inherit; color: inherit; }
 .icon-btn { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; transition: background var(--t-fast); flex-shrink: 0; }
 .icon-btn:hover, .icon-btn.active { background: var(--lavender-soft); color: var(--lavender-strong); }
 .icon-btn.sm { width: 26px; height: 26px; border-radius: 8px; }
+.icon-btn.listen.speaking { background: var(--lavender-soft); color: var(--lavender-strong); animation: listening 1.4s ease-in-out infinite; }
+.link-btn.listen.speaking svg { animation: listening-icon 1.4s ease-in-out infinite; }
+@keyframes listening { 50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--lavender) 30%, transparent); } }
+@keyframes listening-icon { 50% { opacity: .45; } }
 .link-btn { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--lavender-strong); font-weight: 600; cursor: pointer; padding: 4px 0; }
 .link-btn.tiny { font-size: .8rem; }
 .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 999px; font-size: .78rem; font-weight: 700; font-family: var(--font-display); white-space: nowrap; }

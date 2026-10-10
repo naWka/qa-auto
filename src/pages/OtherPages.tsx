@@ -5,7 +5,7 @@ import { Bi, BiInline, U, usePrimary, useUiString } from '../components/Bi';
 import { Icon } from '../components/Icon';
 import { Mentor } from '../components/Mentor';
 import { Sticker } from '../components/Sticker';
-import { speak } from '../components/TermLayer';
+import { ListenButton } from '../components/Listen';
 import { placementVars } from '../engine/plan';
 import { useProgress, progressSnapshot } from '../store/progress';
 import { useSettings, type Settings } from '../store/settings';
@@ -49,7 +49,7 @@ export function GlossaryPage({ q: initial }: { q: string }) {
                 <div className="term-word">{e.en}</div>
                 <div className="term-ipa">{e.ipa}{e.pos ? ` · ${e.pos}` : ''}</div>
               </div>
-              <button className="icon-btn" onClick={() => speak(e.en)} aria-label="Listen"><Icon name="volume" size={18} /></button>
+              <ListenButton text={e.en} size={18} />
             </div>
             <div className="term-ru">{e.ru}</div>
             <Bi t={e.def} size="sm" />
@@ -105,12 +105,12 @@ export function InterviewPage() {
             <div className="qa-q">
               <span className={`chip chip-ghost`}><BiInline t={uiText(`interview.topic.${q.topic}`)} stack={false} /></span>
               <Bi t={q.q} size="lg" />
-              <button className="icon-btn" onClick={() => speak(q.q.en)} aria-label="Listen"><Icon name="volume" size={18} /></button>
+              <ListenButton text={q.q.en} size={18} />
             </div>
             {open[q.id] ? (
               <div className="qa-a">
                 <Bi t={q.a} />
-                <button className="link-btn tiny" onClick={() => speak(q.a.en)}><Icon name="volume" size={14} /> <U k="glossary.listen" stack={false} /></button>
+                <ListenButton text={q.a.en} label />
                 {q.tip && <div className="explain-box"><div className="explain-label"><Icon name="bulb" size={14} /> <U k="interview.tip" stack={false} /></div><Bi t={q.tip} size="sm" /></div>}
               </div>
             ) : (
@@ -222,6 +222,7 @@ export function SettingsPage() {
     }
   };
 
+  const speechSample = glossary.get('test-automation')?.example.en;
   const Opt = <K extends keyof Settings>({ k, v, label }: { k: K; v: Settings[K]; label: string }) => (
     <button className={`seg-btn ${st[k] === v ? 'on' : ''}`} onClick={() => st.update({ [k]: v } as Partial<Settings>)}><U k={label} stack={false} /></button>
   );
@@ -241,6 +242,12 @@ export function SettingsPage() {
       <section className="card set-card">
         <h2><Icon name="moon" size={18} /> <U k="settings.theme" stack={false} /></h2>
         <div className="seg-row"><Opt k="theme" v="auto" label="settings.themeAuto" /><Opt k="theme" v="light" label="settings.themeLight" /><Opt k="theme" v="dark" label="settings.themeDark" /></div>
+      </section>
+      <section className="card set-card">
+        <h2><Icon name="volume" size={18} /> <U k="settings.speech" stack={false} /></h2>
+        <p className="muted small"><U k="settings.speechDesc" stack={false} /></p>
+        <div className="seg-row"><Opt k="speechRate" v={1} label="settings.speechNormal" /><Opt k="speechRate" v={0.75} label="settings.speechSlow" /></div>
+        {speechSample && <ListenButton text={speechSample} label />}
       </section>
       <section className="card set-card">
         <h2><Icon name="clock" size={18} /> <U k="settings.speed" stack={false} /></h2>
