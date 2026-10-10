@@ -45,8 +45,8 @@ steps:
           <main id="main"></main>
         answers: ["0", "zero", "none", "ноль", "нет", "ни одной"]
         hints:
-          - en: "Look at what is between `<main id=\"main\">` and `</main>`."
-            ru: "Посмотри, что стоит между `<main id=\"main\">` и `</main>`."
+          - en: 'Look at what is between `<main id="main">` and `</main>`.'
+            ru: 'Посмотри, что стоит между `<main id="main">` и `</main>`.'
           - en: "The closing tag comes right after the opening one."
             ru: "Закрывающий тег идёт сразу после открывающего."
         explain:
@@ -57,8 +57,8 @@ steps:
         kind: choice
         keyPoint: kp-dom-not-pixels
         prompt:
-          en: "A test runs `await page.getByRole('button', { name: 'Log in' }).click();`. How does Playwright find the button?"
-          ru: "Тест выполняет `await page.getByRole('button', { name: 'Log in' }).click();`. Как Playwright находит кнопку?"
+          en: 'A test runs `page.get_by_role("button", name="Log in").click()`. How does Playwright find the button?'
+          ru: 'Тест выполняет `page.get_by_role("button", name="Log in").click()`. Как Playwright находит кнопку?'
         options:
           - text:
               en: "It searches the page's tree of elements for a button named “Log in” and clicks that element"
@@ -80,8 +80,8 @@ steps:
               en: "That would break as soon as the layout moves. Playwright finds the element again on every run."
               ru: "Это сломалось бы при первом же сдвиге вёрстки. Playwright заново находит элемент при каждом запуске."
         hints:
-          - en: "Read the locator: does `getByRole('button', …)` describe a place on the screen or a kind of element?"
-            ru: "Прочитай локатор: `getByRole('button', …)` описывает место на экране или вид элемента?"
+          - en: 'Read the locator: does `get_by_role("button", …)` describe a place on the screen or a kind of element?'
+            ru: 'Прочитай локатор: `get_by_role("button", …)` описывает место на экране или вид элемента?'
         explain:
           en: "Playwright asks the page's structure — the DOM — for an element with the role button and the name “Log in”, then scrolls to it and clicks it. Position, color and size don't matter."
           ru: "Playwright запрашивает у структуры страницы — DOM — элемент с ролью button и именем «Log in», затем прокручивает к нему и кликает. Положение, цвет и размер не важны."
@@ -97,10 +97,10 @@ steps:
       - en: "It's the difference between a test case and a test run. The case is written in advance and doesn't change; the run is happening now — statuses change, comments appear. Tests, like you, work with the run."
         ru: "Это как разница между тест-кейсом и прогоном. Кейс написан заранее и не меняется, а прогон идёт прямо сейчас — меняются статусы, появляются комментарии. Тесты, как и ты, работают с прогоном."
     code: |
-      # index.html — what the server sends
+      <!-- index.html — what the server sends -->
       <main id="main"></main>
 
-      # The live DOM on /login a moment later (shortened)
+      <!-- The live DOM on /login a moment later (shortened) -->
       <main id="main">
         <h1>Log in</h1>
         <form id="login-form">…</form>
@@ -158,12 +158,12 @@ steps:
           ru: "`<label>` содержит подпись, которую ты видишь («Email»). `<input>` — само поле: без содержимого и без закрывающего тега. Его настройки — [[атрибуты|attribute]] в открывающем теге: `id` и `type`. О них — следующий урок."
       - lines: 7
         text:
-          en: "Same tag `<input>`, different attribute: `type=\"password\"` makes the browser hide what you type."
-          ru: "Тот же тег `<input>`, другой атрибут: `type=\"password\"` заставляет браузер скрывать вводимые символы."
+          en: 'Same tag `<input>`, different attribute: `type="password"` makes the browser hide what you type.'
+          ru: 'Тот же тег `<input>`, другой атрибут: `type="password"` заставляет браузер скрывать вводимые символы.'
       - lines: 8
         text:
-          en: "The text between `<button>` and `</button>` is what you see on the button — and what `getByRole('button', { name: 'Log in' })` looks for."
-          ru: "Текст между `<button>` и `</button>` — то, что написано на кнопке, и то, что ищет `getByRole('button', { name: 'Log in' })`."
+          en: 'The text between `<button>` and `</button>` is what you see on the button — and what `get_by_role("button", name="Log in")` looks for.'
+          ru: 'Текст между `<button>` и `</button>` — то, что написано на кнопке, и то, что ищет `get_by_role("button", name="Log in")`.'
 
   - type: theory
     keyPoint: kp-dom-not-pixels
@@ -173,14 +173,14 @@ steps:
         ru: "Ты находишь кнопку «Log in» глазами: по месту, цвету и размеру. [[Локатор|locator]] на картинку не смотрит вообще: это поисковый запрос к DOM — «элемент с ролью button и именем Log in». При каждом запуске Playwright заново находит этот элемент, прокручивает к нему и кликает."
       - en: "So a redesign that moves or recolors a button doesn't break a good locator: the element in the tree is still the same. It's like finding a test case by its ID and title, not as “the fifth row on the screen” — the row moves when someone re-sorts the list, the ID doesn't."
         ru: "Поэтому редизайн, который сдвинул или перекрасил кнопку, хороший локатор не ломает: элемент в дереве остался тем же. Это как искать тест-кейс по ID и названию, а не как «пятую строку на экране»: строка уедет, если кто-то пересортирует список, а ID — нет."
-      - en: "And the DOM holds more than you see. Bloomly's login error box is in the tree from the start — empty and hidden. Playwright knows the difference: actions wait until an element is visible, and `toBeVisible()` checks exactly that."
-        ru: "А ещё в DOM больше, чем видно глазу. Блок ошибки на странице входа Bloomly есть в дереве с самого начала — пустой и скрытый. Playwright эту разницу знает: действия ждут, пока элемент станет видимым, а `toBeVisible()` проверяет именно это."
+      - en: "And the DOM holds more than you see. Bloomly's login error box is in the tree from the start — empty and hidden. Playwright knows the difference: actions wait until an element is visible, and `to_be_visible()` checks exactly that."
+        ru: "А ещё в DOM больше, чем видно глазу. Блок ошибки на странице входа Bloomly есть в дереве с самого начала — пустой и скрытый. Playwright эту разницу знает: действия ждут, пока элемент станет видимым, а `to_be_visible()` проверяет именно это."
     code: |
-      // Searches the DOM: role "button" + name "Log in" — survives a redesign
-      await page.getByRole('button', { name: 'Log in' }).click();
+      # Searches the DOM: role "button" + name "Log in" — survives a redesign
+      page.get_by_role("button", name="Log in").click()
 
-      // Clicks a point on the screen — breaks when the layout moves
-      await page.mouse.click(612, 344);
+      # Clicks a point on the screen — breaks when the layout moves
+      page.mouse.click(612, 344)
     mentor:
       en: "Agents that work from screenshots sometimes produce exactly that second line. If you see coordinates in generated code, ask for a locator by role and name instead."
       ru: "Агенты, которые работают со скриншотами, иногда выдают ровно такую вторую строку. Видишь в сгенерированном коде координаты — проси вместо них локатор по роли и имени."
@@ -210,7 +210,7 @@ steps:
           why:
             en: "`<h2>` closes on the same line with `</h2>` and contains only the text “Rose Bouquet”. It's the button's neighbour, not its parent."
             ru: "`<h2>` закрывается в той же строке тегом `</h2>` и содержит только текст «Rose Bouquet». Это сосед кнопки, а не родитель."
-        - text: "<p class=\"price\">"
+        - text: '<p class="price">'
           why:
             en: "The price paragraph closes before the button starts. They are neighbours inside the same card."
             ru: "Абзац с ценой закрывается до того, как начинается кнопка. Они соседи внутри одной карточки."
@@ -250,8 +250,8 @@ steps:
           ru: "Прокрути страницу до Peony Dream и нажми на название. Какой элемент выбрался?"
         - en: "You got the `<h2>` — a child. Its parent is the closest row above it in the tree that is indented one step less."
           ru: "Выбрался `<h2>` — дочерний элемент. Его родитель — ближайшая строка выше в дереве, у которой отступ на шаг меньше."
-        - en: "Select the row `<article class=\"product-card\" … data-product-id=\"peony-dream\">`."
-          ru: "Выбери строку `<article class=\"product-card\" … data-product-id=\"peony-dream\">`."
+        - en: 'Select the row `<article class="product-card" … data-product-id="peony-dream">`.'
+          ru: 'Выбери строку `<article class="product-card" … data-product-id="peony-dream">`.'
       praise:
         en: "You climbed from the child to its parent. That's the move you'll make whenever a locator should search inside one card."
         ru: "Ты {поднялась|поднялся} от дочернего элемента к родителю. Это движение понадобится каждый раз, когда локатор должен искать внутри одной карточки."
@@ -271,12 +271,12 @@ steps:
         en: "Will this test pass or fail?"
         ru: "Этот тест пройдёт или упадёт?"
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('shop shows all six products', async ({ page }) => {
-          await page.goto('/shop');
-          await expect(page.getByTestId('product-card')).toHaveCount(6);
-        });
+
+        def test_shop_shows_all_six_products(page: Page):
+            page.goto("/shop")
+            expect(page.get_by_test_id("product-card")).to_have_count(6)
       outcome: pass
       reasons:
         - text:
@@ -293,13 +293,13 @@ steps:
             en: "It fails: the cards are still loading when the check runs"
             ru: "Упадёт: в момент проверки карточки ещё грузятся"
           why:
-            en: "`await expect(...)` doesn't look just once — it retries for up to 5 seconds. 150 ms is nothing."
-            ru: "`await expect(...)` смотрит не один раз — он повторяет попытки до 5 секунд. 150 мс — это ничто."
+            en: "`expect(...)` doesn't look just once — it retries for up to 5 seconds. 150 ms is nothing."
+            ru: "`expect(...)` смотрит не один раз — он повторяет попытки до 5 секунд. 150 мс — это ничто."
       hints:
         - en: "Where does Playwright look: in the file or in the browser?"
           ru: "Куда смотрит Playwright: в файл или в браузер?"
-        - en: "How long does `await expect(...)` keep trying?"
-          ru: "Сколько времени `await expect(...)` продолжает попытки?"
+        - en: "How long does `expect(...)` keep trying?"
+          ru: "Сколько времени `expect(...)` продолжает попытки?"
       praise:
         en: "Yes — the file was empty, the page wasn't. You're already thinking in DOM."
         ru: "Да — файл был пустым, а страница нет. Ты уже мыслишь категориями DOM."
@@ -320,12 +320,12 @@ steps:
       view: dom
       show: [attributes]
       hints:
-        - en: "It belongs to the login form. Open `<form id=\"login-form\" …>` in the tree with its arrow."
-          ru: "Он относится к форме входа. Раскрой `<form id=\"login-form\" …>` в дереве стрелкой."
+        - en: 'It belongs to the login form. Open `<form id="login-form" …>` in the tree with its arrow.'
+          ru: 'Он относится к форме входа. Раскрой `<form id="login-form" …>` в дереве стрелкой.'
         - en: "Look for an element with the attribute `hidden`."
           ru: "Ищи элемент с атрибутом `hidden`."
         - en: "It's the first child of the form: `<div role=\"alert\" class=\"error\" data-testid=\"login-error\" hidden>`."
-          ru: "Это первый дочерний элемент формы: `<div role=\"alert\" class=\"error\" data-testid=\"login-error\" hidden>`."
+          ru: 'Это первый дочерний элемент формы: `<div role="alert" class="error" data-testid="login-error" hidden>`.'
       praise:
         en: "Found the invisible one. Elements shows what the screen hides — that's why testers live in DevTools."
         ru: "Ты наш{ла|ёл} невидимку! Elements показывает то, что прячет экран, — поэтому тестировщики живут в DevTools."
@@ -352,33 +352,33 @@ steps:
           - action: "Click \"Add to cart\" on the Sunny Tulips card"
             expected: "The cart counter in the header shows 1"
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('Sunny Tulips can be added to the cart', async ({ page }) => {
-          await page.goto('/shop');
-          await page.waitForTimeout(3000); // let JavaScript build the page
-          await page.mouse.click(395, 610); // "Add to cart" under the 2nd picture
-          await expect(page.getByTestId('cart-count')).toHaveText('1');
-        });
+
+        def test_customer_can_add_a_product_to_the_cart(page: Page):
+            page.goto("/shop")
+            page.wait_for_timeout(3000)  # let JavaScript build the page
+            page.mouse.click(395, 610)  # "Add to cart" under the 2nd picture
+            expect(page.get_by_test_id("cart-count")).to_have_text("1")
       issues:
-        - line: 5
+        - line: 6
           type: hard-wait
           note:
             en: "A fixed 3-second pause. The cards are in the DOM after about 150 ms, and locators and `expect` wait on their own. The pause slows every run and is still a guess: on a slow day 3 seconds may not be enough."
             ru: "Фиксированная пауза в 3 секунды. Карточки появляются в DOM примерно через 150 мс, а локаторы и `expect` ждут сами. Пауза замедляет каждый прогон и всё равно остаётся угадыванием: в медленный день 3 секунд может не хватить."
-        - line: 6
+        - line: 7
           type: fragile-locator
           note:
             en: "A point on the screen, not an element. Another window size, a cookie banner or a new card order — and the click lands somewhere else. Find the “Add to cart” button inside the Sunny Tulips card in the DOM."
             ru: "Точка на экране, а не элемент. Другой размер окна, баннер про cookies или новый порядок карточек — и клик попадёт в другое место. Найди в DOM кнопку «Add to cart» внутри карточки Sunny Tulips."
       types: [fragile-locator, hard-wait, no-assertion, wrong-data, hallucination]
       hints:
-        - en: "The assertion on line 7 matches TC-402. Look at how the test waits and how it clicks."
-          ru: "Проверка в строке 7 соответствует TC-402. Посмотри, как тест ждёт и как кликает."
+        - en: "The assertion on line 8 matches TC-402. Look at how the test waits and how it clicks."
+          ru: "Проверка в строке 8 соответствует TC-402. Посмотри, как тест ждёт и как кликает."
         - en: "Which line depends on pixels instead of the DOM? Which one depends on a guessed time?"
           ru: "Какая строка зависит от пикселей, а не от DOM? А какая — от угаданного времени?"
-        - en: "Line 5 is a hard-wait; line 6 is a fragile-locator."
-          ru: "Строка 5 — hard-wait, строка 6 — fragile-locator."
+        - en: "Line 6 is a hard-wait; line 7 is a fragile-locator."
+          ru: "Строка 6 — hard-wait, строка 7 — fragile-locator."
       praise:
         en: "Both caught. “Green on my laptop” didn't fool you — you asked what happens on another screen."
         ru: "Обе пойманы. «Зелёный на моём ноутбуке» тебя не убедил: ты {спросила|спросил}, что будет на другом экране."
@@ -410,8 +410,8 @@ steps:
           text: "Write a Playwright test for TC-401: the Sunny Tulips card in the shop shows the price €24.00."
           ru: "Напиши Playwright-тест для TC-401: в карточке Sunny Tulips в магазине указана цена €24.00."
         - id: scope
-          text: "There are six product cards (data-testid=\"product-card\"), each with its own price (data-testid=\"product-price\"). Take the card that contains the text \"Sunny Tulips\" and check the price inside that card."
-          ru: "На странице шесть карточек товаров (data-testid=\"product-card\"), у каждой своя цена (data-testid=\"product-price\"). Возьми карточку, в которой есть текст «Sunny Tulips», и проверь цену внутри этой карточки."
+          text: 'There are six product cards (data-testid="product-card"), each with its own price (data-testid="product-price"). Take the card that contains the text "Sunny Tulips" and check the price inside that card.'
+          ru: 'На странице шесть карточек товаров (data-testid="product-card"), у каждой своя цена (data-testid="product-price"). Возьми карточку, в которой есть текст «Sunny Tulips», и проверь цену внутри этой карточки.'
         - id: live
           text: "Take locators from the live page at /shop, not from index.html."
           ru: "Бери локаторы с живой страницы /shop, а не из index.html."
@@ -425,35 +425,35 @@ steps:
             en: "Done! I find the card that contains “Sunny Tulips” and check the price inside it. Green ✅"
             ru: "Готово! Я нахожу карточку, в которой есть «Sunny Tulips», и проверяю цену внутри неё. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('Sunny Tulips card shows €24.00', async ({ page }) => {
-              await page.goto('/shop');
-              const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
-              await expect(card.getByTestId('product-price')).toHaveText('€24.00');
-            });
+
+            def test_shop_shows_the_price_of_sunny_tulips(page: Page):
+                page.goto("/shop")
+                card = page.get_by_test_id("product-card").filter(has_text="Sunny Tulips")
+                expect(card.get_by_test_id("product-price")).to_have_text("€24.00")
         - when: [live]
           message:
             en: "I opened /shop: there are six `product-price` elements. Sunny Tulips is the second card, so I took the second price. Green ✅"
             ru: "Я открыл /shop: там шесть элементов `product-price`. Sunny Tulips — вторая карточка, поэтому я взял вторую цену. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('Sunny Tulips card shows €24.00', async ({ page }) => {
-              await page.goto('/shop');
-              await expect(page.getByTestId('product-price').nth(1)).toHaveText('€24.00');
-            });
+
+            def test_shop_shows_the_price_of_sunny_tulips(page: Page):
+                page.goto("/shop")
+                expect(page.get_by_test_id("product-price").nth(1)).to_have_text("€24.00")
         - when: []
           message:
             en: "Here's the test! I used the test id `product-price` for the price."
             ru: "Вот тест! Для цены я использовал test id `product-price`."
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('Sunny Tulips card shows €24.00', async ({ page }) => {
-              await page.goto('/shop');
-              await expect(page.getByTestId('product-price')).toHaveText('€24.00');
-            });
+
+            def test_shop_shows_the_price_of_sunny_tulips(page: Page):
+                page.goto("/shop")
+                expect(page.get_by_test_id("product-price")).to_have_text("€24.00")
       missing:
         scope:
           en: "Without the card to search inside, Petal didn't know which of the six prices you meant. It either took all six at once (strict mode violation) or picked one by its position — and positions change when someone sorts the shop by price."
@@ -472,8 +472,8 @@ steps:
         en: "You described the element through its parent — exactly how nesting helps a locator find the one element you mean."
         ru: "Ты {описала|описал} элемент через его родителя — именно так вложенность помогает локатору найти тот самый элемент."
       explain:
-        en: "`filter({ hasText: 'Sunny Tulips' })` picks the one card that contains that text; `card.getByTestId('product-price')` then searches only inside it — like opening one folder instead of searching the whole project. `nth(1)` was green too, but it depends on the order of cards, not on the product."
-        ru: "`filter({ hasText: 'Sunny Tulips' })` выбирает ту единственную карточку, где есть этот текст, а `card.getByTestId('product-price')` ищет только внутри неё — как открыть одну папку вместо поиска по всему проекту. `nth(1)` тоже был зелёным, но он зависит от порядка карточек, а не от товара."
+        en: '`filter(has_text="Sunny Tulips")` picks the one card that contains that text; `card.get_by_test_id("product-price")` then searches only inside it — like opening one folder instead of searching the whole project. `nth(1)` was green too, but it depends on the order of cards, not on the product.'
+        ru: '`filter(has_text="Sunny Tulips")` выбирает ту единственную карточку, где есть этот текст, а `card.get_by_test_id("product-price")` ищет только внутри неё — как открыть одну папку вместо поиска по всему проекту. `nth(1)` тоже был зелёным, но он зависит от порядка карточек, а не от товара.'
 
   - type: task
     task:
@@ -484,8 +484,8 @@ steps:
         en: "Petal saw the error box in the DOM and asserted that it exists. We'll also run your test on a build where the error never appears — it must fail there."
         ru: "Petal увидел блок ошибки в DOM и проверил, что он существует. Мы ещё запустим твой тест на сборке, где ошибка не появляется, — там он должен упасть."
       prompt:
-        en: "Fix the assertion on line 8 so it checks what the user actually sees."
-        ru: "Исправь проверку в строке 8, чтобы она проверяла то, что пользователь действительно видит."
+        en: "Fix the assertion on line 9 so it checks what the user actually sees."
+        ru: "Исправь проверку в строке 9, чтобы она проверяла то, что пользователь действительно видит."
       testCase:
         id: TC-403
         title: Wrong password shows an error
@@ -498,25 +498,25 @@ steps:
           - action: "Click \"Log in\""
             expected: "Error \"Invalid email or password.\" is shown"
       starter: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('wrong password shows an error', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('wrong-pass');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByTestId('login-error')).toHaveCount(1);
-        });
+
+        def test_wrong_password_shows_an_error(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("wrong-pass")
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_test_id("login-error")).to_have_count(1)
       solution: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('wrong password shows an error', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('wrong-pass');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByTestId('login-error')).toHaveText('Invalid email or password.');
-        });
+
+        def test_wrong_password_shows_an_error(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("wrong-pass")
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_test_id("login-error")).to_have_text("Invalid email or password.")
       checks:
         expect: pass
         static: [hasAssertion]
@@ -526,38 +526,38 @@ steps:
       hints:
         - en: "Is the error box in the DOM *before* you click “Log in”? You found it in an earlier task."
           ru: "Есть ли блок ошибки в DOM *до* клика по «Log in»? Ты {нашла|нашёл} его в одном из прошлых заданий."
-        - en: "`toHaveCount(1)` only proves the element exists. Check its text instead."
-          ru: "`toHaveCount(1)` доказывает только, что элемент существует. Проверь лучше его текст."
-        - en: "Line 8: `await expect(page.getByTestId('login-error')).toHaveText('Invalid email or password.');`"
-          ru: "Строка 8: `await expect(page.getByTestId('login-error')).toHaveText('Invalid email or password.');`"
+        - en: "`to_have_count(1)` only proves the element exists. Check its text instead."
+          ru: "`to_have_count(1)` доказывает только, что элемент существует. Проверь лучше его текст."
+        - en: 'Line 9: `expect(page.get_by_test_id("login-error")).to_have_text("Invalid email or password.")`'
+          ru: 'Строка 9: `expect(page.get_by_test_id("login-error")).to_have_text("Invalid email or password.")`'
       praise:
         en: "Now the test checks what the user sees, not just what the DOM contains. Red on the broken build, green on the good one."
         ru: "Теперь тест проверяет то, что видит пользователь, а не просто содержимое DOM. Красный на сломанной сборке, зелёный на рабочей."
       explain:
-        en: "The error box is always in the DOM — hidden and empty until an error happens. So `toHaveCount(1)` is true on every build, even on one that shows no error at all. `toHaveText` checks the actual message (an empty hidden box fails it), so the test can finally catch the bug."
-        ru: "Блок ошибки всегда есть в DOM — скрытый и пустой, пока ошибка не случится. Поэтому `toHaveCount(1)` выполняется на любой сборке, даже на той, где ошибка вообще не показывается. `toHaveText` проверяет само сообщение (пустой скрытый блок эту проверку не пройдёт), и тест наконец может поймать баг."
+        en: "The error box is always in the DOM — hidden and empty until an error happens. So `to_have_count(1)` is true on every build, even on one that shows no error at all. `to_have_text` checks the actual message (an empty hidden box fails it), so the test can finally catch the bug."
+        ru: "Блок ошибки всегда есть в DOM — скрытый и пустой, пока ошибка не случится. Поэтому `to_have_count(1)` выполняется на любой сборке, даже на той, где ошибка вообще не показывается. `to_have_text` проверяет само сообщение (пустой скрытый блок эту проверку не пройдёт), и тест наконец может поймать баг."
 
   - type: mistakes
     keyPoint: kp-dom-not-pixels
     title: { en: "DOM mistakes agents make", ru: "Ошибки с DOM, которые делают агенты" }
     items:
-      - wrong: "await page.mouse.click(612, 344); // the Log in button"
-        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+      - wrong: "page.mouse.click(612, 344)  # the Log in button"
+        right: 'page.get_by_role("button", name="Log in").click()'
         why:
           en: "Coordinates are pixels, not elements. Screenshot-based tools write them; a new banner or another window size breaks them."
           ru: "Координаты — это пиксели, а не элементы. Их пишут инструменты, работающие со скриншотами; новый баннер или другой размер окна их ломает."
-      - wrong: "await page.waitForTimeout(3000); // let JavaScript build the page"
-        right: "await expect(page.getByTestId('product-card')).toHaveCount(6);"
+      - wrong: "page.wait_for_timeout(3000)  # let JavaScript build the page"
+        right: 'expect(page.get_by_test_id("product-card")).to_have_count(6)'
         why:
           en: "The DOM fills in after loading, but don't guess how long it takes. Assert the state you need — `expect` retries until the DOM has it."
           ru: "DOM заполняется после загрузки, но не угадывай, сколько это займёт. Проверяй нужное состояние — `expect` повторяет попытки, пока оно не появится в DOM."
-      - wrong: "await expect(page.getByTestId('login-error')).toHaveCount(1);"
-        right: "await expect(page.getByTestId('login-error')).toHaveText('Invalid email or password.');"
+      - wrong: 'expect(page.get_by_test_id("login-error")).to_have_count(1)'
+        right: 'expect(page.get_by_test_id("login-error")).to_have_text("Invalid email or password.")'
         why:
           en: "“In the DOM” isn't “shown to the user”. The hidden, empty error box is always there."
           ru: "«Есть в DOM» не значит «показано пользователю». Скрытый пустой блок ошибки там есть всегда."
-      - wrong: "// index.html has no Add to cart button, so the shop is broken"
-        right: "// check the live DOM: DevTools → Elements on /shop"
+      - wrong: "# index.html has no Add to cart button, so the shop is broken"
+        right: "# check the live DOM: DevTools → Elements on /shop"
         why:
           en: "The source file is a skeleton. Judge the page by the live DOM — that's what users and tests get."
           ru: "Исходный файл — только каркас. Судить о странице нужно по живому DOM: именно его получают пользователи и тесты."
@@ -580,8 +580,8 @@ steps:
         en: "Please don't click by coordinates. Use a locator by role and name — coordinates break with any layout change."
         ru: "Пожалуйста, не кликай по координатам. Используй локатор по роли и имени — координаты ломаются при любом изменении вёрстки."
       - context: code-review
-        en: "toHaveCount(1) passes even when no error is shown: the hidden box is always in the DOM. Please assert the text."
-        ru: "toHaveCount(1) проходит, даже когда ошибка не показана: скрытый блок всегда есть в DOM. Пожалуйста, проверь текст."
+        en: "to_have_count(1) passes even when no error is shown: the hidden box is always in the DOM. Please assert the text."
+        ru: "to_have_count(1) проходит, даже когда ошибка не показана: скрытый блок всегда есть в DOM. Пожалуйста, проверь текст."
       - context: bug-report
         en: "After a wrong password, the error box stays hidden: it's in the DOM, but nothing is shown to the user."
         ru: "После неверного пароля блок ошибки остаётся скрытым: в DOM он есть, но пользователю ничего не показывается."
@@ -652,13 +652,13 @@ checkPool:
       en: "Will this test pass or fail?"
       ru: "Этот тест пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('Anna sees six orders', async ({ page }) => {
-        await page.goto('/orders');
-        const rows = await page.getByTestId('order-row').count();
-        expect(rows).toBe(6);
-      });
+
+      def test_anna_sees_six_orders(page: Page):
+          page.goto("/orders")
+          rows = page.get_by_test_id("order-row").count()
+          assert rows == 6
     outcome: fail
     reasons:
       - text:
@@ -680,11 +680,11 @@ checkPool:
     hints:
       - en: "What is on the page right after `goto`?"
         ru: "Что на странице сразу после `goto`?"
-      - en: "Does `count()` wait and retry, like `await expect(...).toHaveCount(6)` does?"
-        ru: "`count()` ждёт и повторяет попытки, как `await expect(...).toHaveCount(6)`?"
+      - en: "Does `count()` wait and retry, like `expect(...).to_have_count(6)` does?"
+        ru: "`count()` ждёт и повторяет попытки, как `expect(...).to_have_count(6)`?"
     explain:
-      en: "The DOM changes after the page opens: first “Loading orders…”, 0.4 s later six rows. `count()` takes one look and gets 0, so `expect(0).toBe(6)` fails. `await expect(page.getByTestId('order-row')).toHaveCount(6)` would retry until the live tree is ready."
-      ru: "DOM меняется уже после открытия страницы: сначала «Loading orders…», через 0,4 с — шесть строк. `count()` смотрит один раз и получает 0, поэтому `expect(0).toBe(6)` падает. `await expect(page.getByTestId('order-row')).toHaveCount(6)` повторял бы попытки, пока живое дерево не будет готово."
+      en: 'The DOM changes after the page opens: first “Loading orders…”, 0.4 s later six rows. `count()` takes one look and gets 0, so `assert 0 == 6` fails. `expect(page.get_by_test_id("order-row")).to_have_count(6)` would retry until the live tree is ready.'
+      ru: 'DOM меняется уже после открытия страницы: сначала «Loading orders…», через 0,4 с — шесть строк. `count()` смотрит один раз и получает 0, поэтому `assert 0 == 6` падает. `expect(page.get_by_test_id("order-row")).to_have_count(6)` повторял бы попытки, пока живое дерево не будет готово.'
 
   - id: c4-l1-k3
     kind: inspect
@@ -701,11 +701,11 @@ checkPool:
         ru: "Оба лежат в одном контейнере. Найди в дереве `<input>` для Email и посмотри на уровень выше."
       - en: "It's not `<main>` — that one is further up. Take the closest one."
         ru: "Это не `<main>` — он выше. Нужен ближайший."
-      - en: "Select `<form id=\"login-form\" …>`."
-        ru: "Выбери `<form id=\"login-form\" …>`."
+      - en: 'Select `<form id="login-form" …>`.'
+        ru: 'Выбери `<form id="login-form" …>`.'
     explain:
-      en: "`<form id=\"login-form\">` is the parent of the labels, both fields, the checkbox and the button. `<main>` contains them too, but only as grandchildren — the form is the closest common parent."
-      ru: "`<form id=\"login-form\">` — родитель подписей, обоих полей, чекбокса и кнопки. `<main>` тоже их содержит, но только как «внуков»; ближайший общий родитель — форма."
+      en: '`<form id="login-form">` is the parent of the labels, both fields, the checkbox and the button. `<main>` contains them too, but only as grandchildren — the form is the closest common parent.'
+      ru: '`<form id="login-form">` — родитель подписей, обоих полей, чекбокса и кнопки. `<main>` тоже их содержит, но только как «внуков»; ближайший общий родитель — форма.'
 
   - id: c4-l1-k4
     kind: choice
@@ -728,7 +728,7 @@ checkPool:
         correct: true
         why:
           en: "The `<span>` opens and closes between `<a href=\"/cart\">` and `</a>`, so its text is part of the link's text."
-          ru: "`<span>` открывается и закрывается между `<a href=\"/cart\">` и `</a>`, поэтому его текст входит в текст ссылки."
+          ru: '`<span>` открывается и закрывается между `<a href="/cart">` и `</a>`, поэтому его текст входит в текст ссылки.'
       - text:
           en: "“Cart” — the `<span>` is a separate element"
           ru: "«Cart» — `<span>` — это отдельный элемент"
@@ -767,13 +767,13 @@ checkPool:
       en: "Will this test pass or fail?"
       ru: "Этот тест пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('customer can write a gift message', async ({ page }) => {
-        await page.goto('/checkout');
-        await page.getByLabel('Gift message').fill('Happy birthday!');
-        await expect(page.getByTestId('gift-counter')).toHaveText('15/200');
-      });
+
+      def test_customer_can_write_a_gift_message(page: Page):
+          page.goto("/checkout")
+          page.get_by_label("Gift message").fill("Happy birthday!")
+          expect(page.get_by_test_id("gift-counter")).to_have_text("15/200")
     outcome: fail
     reasons:
       - text:
@@ -798,8 +798,8 @@ checkPool:
       - en: "What does a user have to do first to see the field?"
         ru: "Что пользователь должен сделать сначала, чтобы увидеть поле?"
     explain:
-      en: "Playwright found the textarea in the DOM, waited for it to become visible for 5 seconds and gave up. Add `await page.getByLabel('This is a gift').check();` before typing, and the test passes."
-      ru: "Playwright нашёл поле (textarea) в DOM, 5 секунд ждал, пока оно станет видимым, и сдался. Добавь `await page.getByLabel('This is a gift').check();` перед вводом — и тест пройдёт."
+      en: 'Playwright found the textarea in the DOM, waited for it to become visible until the timeout ran out and gave up. Add `page.get_by_label("This is a gift").check()` before typing, and the test passes.'
+      ru: 'Playwright нашёл поле (textarea) в DOM, до конца таймаута ждал, пока оно станет видимым, и сдался. Добавь `page.get_by_label("This is a gift").check()` перед вводом — и тест пройдёт.'
 
   - id: c4-l1-k6
     kind: choice
@@ -812,21 +812,21 @@ checkPool:
       en: "Which of these lines will still work after the redesign? Pick all that apply."
       ru: "Какие из этих строк будут работать после редизайна? Выбери все подходящие."
     options:
-      - text: "await page.getByRole('link', { name: 'Shop' }).click();"
+      - text: 'page.get_by_role("link", name="Shop").click()'
         correct: true
         why:
           en: "It searches the DOM by role and name, and the redesign touched neither."
           ru: "Ищет в DOM по роли и имени, а редизайн не тронул ни то, ни другое."
-      - text: "await expect(page.getByTestId('cart-count')).toHaveText('0');"
+      - text: 'expect(page.get_by_test_id("cart-count")).to_have_text("0")'
         correct: true
         why:
           en: "The test id is in the HTML, and the HTML didn't change."
           ru: "Test id записан в HTML, а HTML не изменился."
-      - text: "await page.mouse.click(1105, 32); // the Cart link"
+      - text: "page.mouse.click(1105, 32)  # the Cart link"
         why:
           en: "A point on the screen. The menu has moved, so the click lands on something else — or on nothing."
           ru: "Точка на экране. Меню переехало, и клик попадёт во что-то другое — или в пустоту."
-      - text: "await page.getByLabel('Email').fill('anna@bloomly.app');"
+      - text: 'page.get_by_label("Email").fill("anna@bloomly.app")'
         correct: true
         why:
           en: "The label and the field are the same elements in the DOM as before."
@@ -848,15 +848,15 @@ checkPool:
       en: "On /login you see one big green “Log in” button. Will this test pass or fail?"
       ru: "На /login ты видишь одну большую зелёную кнопку «Log in». Этот тест пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('Anna can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('bloom123');
-        await page.getByText('Log in').click();
-        await expect(page).toHaveURL('/account');
-      });
+
+      def test_anna_can_log_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_text("Log in").click()
+          expect(page).to_have_url("http://localhost:3000/account")
     outcome: fail
     reasons:
       - text:
@@ -881,8 +881,8 @@ checkPool:
       - en: "Count them: the heading, the menu, the button."
         ru: "Посчитай: заголовок, меню, кнопка."
     explain:
-      en: "You see one button; the DOM has three elements with the text “Log in”. `getByText('Log in')` matches all three, so Playwright stops with a *strict mode violation* instead of clicking a random one. `getByRole('button', { name: 'Log in' })` points to exactly one element."
-      ru: "Ты видишь одну кнопку, а в DOM три элемента с текстом «Log in». `getByText('Log in')` находит все три, и Playwright останавливается с ошибкой *strict mode violation*, а не кликает наугад. `getByRole('button', { name: 'Log in' })` указывает ровно на один элемент."
+      en: 'You see one button; the DOM has three elements with the text “Log in”. `get_by_text("Log in")` matches all three, so Playwright stops with a *strict mode violation* instead of clicking a random one. `get_by_role("button", name="Log in")` points to exactly one element.'
+      ru: 'Ты видишь одну кнопку, а в DOM три элемента с текстом «Log in». `get_by_text("Log in")` находит все три, и Playwright останавливается с ошибкой *strict mode violation*, а не кликает наугад. `get_by_role("button", name="Log in")` указывает ровно на один элемент.'
 
   - id: c4-l1-k8
     kind: inspect
@@ -899,8 +899,8 @@ checkPool:
         ru: "Клик по названию товара выбирает `<td>` — ячейку. Её родитель — строка."
       - en: "In the tree: `<table>` → `<tbody>` → `<tr>` → `<td>`. Go one level up from the cell."
         ru: "В дереве: `<table>` → `<tbody>` → `<tr>` → `<td>`. Поднимись от ячейки на уровень выше."
-      - en: "Select `<tr data-testid=\"cart-row\" data-id=\"sunny-tulips\">`."
-        ru: "Выбери `<tr data-testid=\"cart-row\" data-id=\"sunny-tulips\">`."
+      - en: 'Select `<tr data-testid="cart-row" data-id="sunny-tulips">`.'
+        ru: 'Выбери `<tr data-testid="cart-row" data-id="sunny-tulips">`.'
     explain:
       en: "A table is nested several levels deep: table → tbody → tr (row) → td (cell). The row contains everything about one product: name, price, quantity, subtotal and its own Remove button."
       ru: "Таблица вложена на несколько уровней: table → tbody → tr (строка) → td (ячейка). Строка содержит всё об одном товаре: название, цену, количество, сумму и свою кнопку Remove."

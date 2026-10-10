@@ -5,7 +5,7 @@ import type { AppConfig, Files } from '../content/schema';
 import { BiInline, U } from '../components/Bi';
 import { CodeView } from '../components/CodeView';
 import { Icon } from '../components/Icon';
-import { RunController, runSpec, type RunResult, type StepRecord, type TestResult } from '../emulator';
+import { RunController, SPEC_FILE, runSpec, type RunResult, type StepRecord, type TestResult } from '../emulator';
 import { AUT_DIR } from './useRunner';
 import { ErrorBlock } from './TestReport';
 
@@ -234,7 +234,7 @@ export function TraceViewer({ code, app, files, onSelect, onResult, selectLine, 
           {tab === 'call' && (entry ? (
             <dl className="trace-call">
               <dt>action</dt><dd><code>{entry.title}</code></dd>
-              {entry.line && <><dt>source</dt><dd><code>{entry.file || 'example.spec.js'}:{entry.line}</code></dd></>}
+              {entry.line && <><dt>source</dt><dd><code>{entry.file || SPEC_FILE}:{entry.line}</code></dd></>}
               <dt>duration</dt><dd>{fmtMs(entry.duration)}</dd>
               <dt>status</dt><dd className={entry.status}>{entry.status}</dd>
               {entry.error && <><dt>error</dt><dd><code className="trace-err">{entry.error}</code></dd></>}

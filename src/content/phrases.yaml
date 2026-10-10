@@ -654,7 +654,7 @@ progress:
   - { en: "In {days} days you've built a habit and a skill. Both count.", ru: "Дней с начала: {days}. За это время появились и привычка, и навык — считается и то, и другое." }
   - { en: "{tasks} tasks, {terms} terms, and a lot of determination.", ru: "Задачи: {tasks}. Термины: {terms}. И очень много упорства." }
   - { en: "You've been at this for {days} days, and it shows in how you review code.", ru: "Ты занимаешься уже {days}-й день, и это видно по твоему ревью." }
-  - { en: "{lessons} lessons done. Remember when await looked scary?", ru: "Уроков пройдено: {lessons}. Помнишь, как пугал await?" }
+  - { en: "{lessons} lessons done. Remember when a traceback looked scary?", ru: "Уроков пройдено: {lessons}. Помнишь, как пугал первый traceback?" }
   - { en: "{terms} terms learned — you'd follow most of a Playwright PR discussion now.", ru: "Выучено терминов: {terms} — ты уже поймёшь большую часть обсуждения в PR про Playwright." }
   - { en: "{tasks} solved tasks later, Petal checks with you before it guesses.", ru: "Решённых задач: {tasks} — и Petal теперь сначала советуется с тобой, а потом уже угадывает." }
   - { en: "Since you started {days} days ago: {lessons} lessons, {tasks} tasks, {terms} terms. Wow.", ru: "С начала пути (дней: {days}) — уроков: {lessons}, задач: {tasks}, терминов: {terms}. Ого." }

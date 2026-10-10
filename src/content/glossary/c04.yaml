@@ -50,8 +50,8 @@
     en: "The name in angle brackets that says what an element is, like `<button>`, `<input>` or `<h1>`."
     ru: "Имя в угловых скобках, которое говорит, что это за элемент: `<button>`, `<input>` или `<h1>`."
   example:
-    en: "\"Add to cart\" is a `<div>` tag, not a `<button>`, so getByRole('button') can't find it — that's an accessibility bug."
-    ru: "«Add to cart» — это тег `<div>`, а не `<button>`, поэтому getByRole('button') его не находит — это баг доступности."
+    en: "\"Add to cart\" is a `<div>` tag, not a `<button>`, so `get_by_role(\"button\")` can't find it — that's an accessibility bug."
+    ru: "«Add to cart» — это тег `<div>`, а не `<button>`, поэтому `get_by_role(\"button\")` его не находит — это баг доступности."
   context: bug-report
   chapter: 4
 
@@ -106,8 +106,8 @@
     en: "A pattern that finds elements by tag, id, class or position, such as `#email` or `.card > button`."
     ru: "Шаблон, который находит элементы по тегу, id, классу или положению, например `#email` или `.card > button`."
   example:
-    en: "Please replace this CSS selector with getByRole — the class names change in the redesign."
-    ru: "Пожалуйста, замени этот CSS-селектор на getByRole — имена классов поменяются при редизайне."
+    en: "Please replace this CSS selector with `get_by_role` — the class names change in the redesign."
+    ru: "Пожалуйста, замени этот CSS-селектор на `get_by_role` — имена классов поменяются при редизайне."
   context: code-review
   chapter: 4
 
@@ -148,8 +148,8 @@
     en: "What an element is for users and assistive technology: button, link, textbox, checkbox, heading."
     ru: "То, чем элемент является для пользователей и вспомогательных технологий: button, link, textbox, checkbox, heading."
   example:
-    en: "The \"Add to cart\" div has no button role, so getByRole('button') can't find it — please use a real <button>."
-    ru: "У div «Add to cart» нет роли button, поэтому getByRole('button') его не находит, — пожалуйста, используйте настоящий <button>."
+    en: "The \"Add to cart\" div has no button role, so `get_by_role(\"button\")` can't find it — please use a real <button>."
+    ru: "У div «Add to cart» нет роли button, поэтому `get_by_role(\"button\")` его не находит, — пожалуйста, используйте настоящий <button>."
   context: code-review
   chapter: 4
 

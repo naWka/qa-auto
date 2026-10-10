@@ -1,9 +1,9 @@
 id: c5-l1
 chapter: c5
-title: { en: "getBy* locators: find it like a user", ru: "Локаторы getBy*: ищем как пользователь" }
+title: { en: "get_by_* locators: find it like a user", ru: "Локаторы get_by_*: ищем как пользователь" }
 goal:
-  en: "Pick the right built-in locator for any element on the Bloomly login and shop pages."
-  ru: "Подбирать подходящий встроенный локатор для любого элемента на страницах входа и магазина Bloomly."
+  en: "Pick the right built-in get_by_* locator for any element on the Bloomly login and shop pages."
+  ru: "Подбирать подходящий встроенный локатор get_by_* для любого элемента на страницах входа и магазина Bloomly."
 minutes: 10
 keyPoints:
   - id: kp-locator-priority
@@ -12,12 +12,12 @@ keyPoints:
       ru: "Лестница: роль → подпись → текст → test id; CSS — последним"
   - id: kp-role-label
     title:
-      en: "getByRole + name for controls, getByLabel for fields"
-      ru: "getByRole с именем — для элементов управления, getByLabel — для полей"
+      en: "get_by_role + name for controls, get_by_label for fields"
+      ru: "get_by_role с именем — для элементов управления, get_by_label — для полей"
   - id: kp-testid-contract
     title:
-      en: "getByTestId: a contract, stable but invisible to users"
-      ru: "getByTestId: договорённость — стабильно, но не видно пользователю"
+      en: "get_by_test_id: a contract, stable but invisible to users"
+      ru: "get_by_test_id: договорённость — стабильно, но не видно пользователю"
 terms: [locator, role, accessible-name, element, test-id, css-selector, xpath, resilient-locator]
 
 steps:
@@ -49,16 +49,16 @@ steps:
           ru: "Шаг из твоего тест-кейса: «Ввести ‘rose’ в поле Search». Какой локатор больше всего похож на этот шаг?"
         optionsCode: true
         options:
-          - text: "page.getByLabel('Search')"
+          - text: 'page.get_by_label("Search")'
             correct: true
             why:
               en: "It names the field the way the step does: by its label “Search”."
               ru: "Он называет поле так же, как шаг: по подписи «Search»."
-          - text: "page.locator('div.toolbar > input:first-of-type')"
+          - text: 'page.locator("div.toolbar > input:first-of-type")'
             why:
               en: "It describes the layout: a class and a position. Nobody reading the step would look for the field this way."
               ru: "Он описывает вёрстку: класс и позицию. Никто, читая шаг, не стал бы искать поле так."
-          - text: "page.locator('//main/div[1]/input')"
+          - text: 'page.locator("//main/div[1]/input")'
             why:
               en: "An XPath route through the page structure. One new wrapper `<div>`, and it points to nothing."
               ru: "XPath-маршрут по структуре страницы. Добавят одну обёртку `<div>` — и он ни на что не указывает."
@@ -68,8 +68,8 @@ steps:
           - en: "The step names the field by its label."
             ru: "Шаг называет поле по его подписи."
         explain:
-          en: "A good locator reads like a test step: it names what the user sees. `getByLabel('Search')` keeps working when the layout changes, because the label stays."
-          ru: "Хороший локатор читается как шаг теста: он называет то, что видит пользователь. `getByLabel('Search')` продолжает работать, когда меняется вёрстка, потому что подпись остаётся."
+          en: 'A good locator reads like a test step: it names what the user sees. `get_by_label("Search")` keeps working when the layout changes, because the label stays.'
+          ru: 'Хороший локатор читается как шаг теста: он называет то, что видит пользователь. `get_by_label("Search")` продолжает работать, когда меняется вёрстка, потому что подпись остаётся.'
       - id: c5-l1-p2
         kind: input
         keyPoint: kp-role-label
@@ -93,8 +93,8 @@ steps:
     body:
       - en: "In a test case you write “Click the **Log in** button”, not “click the third blue rectangle in the form”. Users find things by what they see: what kind of thing it is and what it says."
         ru: "В тест-кейсе ты пишешь «Нажать кнопку **Log in**», а не «нажать третий синий прямоугольник в форме». Пользователи находят элементы по тому, что видят: что это за элемент и что на нём написано."
-      - en: "Playwright's built-in [[locators|locator]] work the same way. Try them in this order: `getByRole` → `getByLabel` → `getByText` / `getByPlaceholder` → `getByTestId`. A [[CSS selector|css-selector]] or [[XPath|xpath]] is the last resort."
-        ru: "Встроенные [[локаторы|locator]] Playwright работают так же. Пробуй их в таком порядке: `getByRole` → `getByLabel` → `getByText` / `getByPlaceholder` → `getByTestId`. [[CSS-селектор|css-selector]] или [[XPath|xpath]] — крайний случай."
+      - en: "Playwright's built-in [[locators|locator]] work the same way. Try them in this order: `get_by_role` → `get_by_label` → `get_by_text` / `get_by_placeholder` → `get_by_test_id`. A [[CSS selector|css-selector]] or [[XPath|xpath]] is the last resort."
+        ru: "Встроенные [[локаторы|locator]] Playwright работают так же. Пробуй их в таком порядке: `get_by_role` → `get_by_label` → `get_by_text` / `get_by_placeholder` → `get_by_test_id`. [[CSS-селектор|css-selector]] или [[XPath|xpath]] — крайний случай."
       - en: "The higher the rung, the closer it is to what the user sees — so the test breaks when the user's experience changes, not when Kai renames a class. That's a [[resilient locator|resilient-locator]]. The Playwright docs give the same advice, and its recorder (codegen) also prefers role, text and test id locators."
         ru: "Чем выше ступенька, тем ближе локатор к тому, что видит пользователь, — и тест ломается, когда меняется опыт пользователя, а не когда Кай переименовал класс. Это и есть [[устойчивый локатор|resilient-locator]]. Документация Playwright советует то же самое, и его рекордер (codegen) тоже предпочитает локаторы по роли, тексту и test id."
     figure: locator-priority
@@ -104,38 +104,38 @@ steps:
 
   - type: theory
     keyPoint: kp-role-label
-    title: { en: "getByRole for controls, getByLabel for fields", ru: "getByRole — для элементов управления, getByLabel — для полей" }
+    title: { en: "get_by_role for controls, get_by_label for fields", ru: "get_by_role — для элементов управления, get_by_label — для полей" }
     body:
-      - en: "`getByRole(role, { name })` finds an [[element|element]] by its [[role|role]] and [[accessible name|accessible-name]] — the pair you met in chapter 4. Use it for what users click, tick or read as a title: `button`, `link`, `checkbox`, `radio`, `heading`."
-        ru: "`getByRole(role, { name })` находит [[элемент|element]] по его [[роли|role]] и [[доступному имени|accessible-name]] — эту пару ты уже знаешь по главе 4. Используй его для того, на что пользователи нажимают, что отмечают галочкой или читают как заголовок: `button`, `link`, `checkbox`, `radio`, `heading`."
-      - en: "For form fields use `getByLabel('Email')`: it finds the field that the label “Email” belongs to — just like your step “Enter the email in the Email field”. `getByText` is for plain text such as messages; `getByPlaceholder` only when a field has no label."
-        ru: "Для полей формы используй `getByLabel('Email')`: он находит поле, к которому относится подпись «Email», — прямо как твой шаг «Ввести email в поле Email». `getByText` — для обычного текста, например сообщений; `getByPlaceholder` — только если у поля нет подписи."
-      - en: "The name matches part of the text and ignores case: `{ name: 'Cart' }` finds the link “Cart 0”. Add `exact: true` when only the whole name will do."
-        ru: "Имя совпадает по части текста и без учёта регистра: `{ name: 'Cart' }` находит ссылку «Cart 0». Добавь `exact: true`, когда подходит только полное имя."
+      - en: '`get_by_role("button", name="Log in")` finds an [[element|element]] by its [[role|role]] (the first argument) and [[accessible name|accessible-name]] (the keyword argument `name=`) — the pair you met in chapter 4. Use it for what users click, tick or read as a title: `button`, `link`, `checkbox`, `radio`, `heading`.'
+        ru: '`get_by_role("button", name="Log in")` находит [[элемент|element]] по [[роли|role]] (первый аргумент) и [[доступному имени|accessible-name]] (именованный аргумент `name=`) — эту пару ты уже знаешь по главе 4. Используй его для того, на что пользователи нажимают, что отмечают галочкой или читают как заголовок: `button`, `link`, `checkbox`, `radio`, `heading`.'
+      - en: 'For form fields use `get_by_label("Email")`: it finds the field that the label “Email” belongs to — just like your step “Enter the email in the Email field”. `get_by_text` is for plain text such as messages; `get_by_placeholder` only when a field has no label.'
+        ru: 'Для полей формы используй `get_by_label("Email")`: он находит поле, к которому относится подпись «Email», — прямо как твой шаг «Ввести email в поле Email». `get_by_text` — для обычного текста, например сообщений; `get_by_placeholder` — только если у поля нет подписи.'
+      - en: 'The name matches part of the text and ignores case: `name="Cart"` finds the link “Cart 0”. Add `exact=True` when only the whole name will do.'
+        ru: 'Имя совпадает по части текста и без учёта регистра: `name="Cart"` находит ссылку «Cart 0». Добавь `exact=True`, когда подходит только полное имя.'
     code: |
-      page.getByRole('heading', { name: 'Log in' })
-      page.getByRole('button', { name: 'Log in' })
-      page.getByRole('link', { name: 'Create an account' })
-      page.getByRole('checkbox', { name: 'Remember me' })
-      page.getByLabel('Email')
-      page.getByText('Your cart is empty.')
+      page.get_by_role("heading", name="Log in")
+      page.get_by_role("button", name="Log in")
+      page.get_by_role("link", name="Create an account")
+      page.get_by_role("checkbox", name="Remember me")
+      page.get_by_label("Email")
+      page.get_by_text("Your cart is empty.")
     mentor:
-      en: "Why not just `getByText('Log in')`? On /login that text is on three elements. The role says which one you mean — the same way your test case says “the button”, not “the words”."
-      ru: "Почему не просто `getByText('Log in')`? На /login этот текст есть у трёх элементов. Роль говорит, какой из них ты имеешь в виду, — так же, как тест-кейс говорит «кнопка», а не «слова»."
+      en: 'Why not just `get_by_text("Log in")`? On /login that text is on three elements. The role says which one you mean — the same way your test case says “the button”, not “the words”.'
+      ru: 'Почему не просто `get_by_text("Log in")`? На /login этот текст есть у трёх элементов. Роль говорит, какой из них ты имеешь в виду, — так же, как тест-кейс говорит «кнопка», а не «слова».'
 
   - type: theory
     keyPoint: kp-testid-contract
-    title: { en: "getByTestId: a contract with developers", ru: "getByTestId: договорённость с разработчиками" }
+    title: { en: "get_by_test_id: a contract with developers", ru: "get_by_test_id: договорённость с разработчиками" }
     body:
-      - en: "Some elements have no role name and no label: the products count “6 products”, the cart total, the number on the cart link. For them Kai adds a `data-testid`, and you use `getByTestId('results-count')`."
-        ru: "У некоторых элементов нет ни имени по роли, ни подписи: счётчик «6 products», итог корзины, число на ссылке корзины. Для них Кай добавляет `data-testid`, а ты используешь `getByTestId('results-count')`."
+      - en: 'Some elements have no role name and no label: the products count “6 products”, the cart total, the number on the cart link. For them Kai adds a `data-testid`, and you use `get_by_test_id("results-count")`.'
+        ru: 'У некоторых элементов нет ни имени по роли, ни подписи: счётчик «6 products», итог корзины, число на ссылке корзины. Для них Кай добавляет `data-testid`, а ты используешь `get_by_test_id("results-count")`.'
       - en: "A [[test ID|test-id]] is like a test case ID: TC-500 stays the same when someone rewords the title, but no customer ever sees it. It's a contract: Kai keeps the id, you rely on it. It survives redesigns and even text changes."
         ru: "[[Тестовый идентификатор|test-id]] похож на ID тест-кейса: TC-500 не меняется, когда кто-то переписывает название, но ни один клиент его никогда не видит. Это договорённость: Кай сохраняет id, ты на него опираешься. Он переживает и редизайн, и даже смену текста."
-      - en: "The price: it's invisible. If “Add to cart” stops being a real button, a `getByTestId` test stays green, while a `getByRole` test catches it. So: test ids for what has no user-facing name — role and label for everything else."
-        ru: "Цена — невидимость. Если «Add to cart» перестанет быть настоящей кнопкой, тест с `getByTestId` останется зелёным, а тест с `getByRole` это поймает. Поэтому test id — для того, у чего нет видимого пользователю имени, а роль и подпись — для всего остального."
+      - en: "The price: it's invisible. If “Add to cart” stops being a real button, a `get_by_test_id` test stays green, while a `get_by_role` test catches it. So: test ids for what has no user-facing name — role and label for everything else."
+        ru: "Цена — невидимость. Если «Add to cart» перестанет быть настоящей кнопкой, тест с `get_by_test_id` останется зелёным, а тест с `get_by_role` это поймает. Поэтому test id — для того, у чего нет видимого пользователю имени, а роль и подпись — для всего остального."
     mentor:
-      en: "Agents love test ids: easy to copy, rarely ambiguous. Worse, they invent them — `getByTestId('search-input')` looks perfect, and Bloomly has no such id. Every test id in a test must exist on the page."
-      ru: "Агенты обожают test id: их легко скопировать, и они редко бывают неоднозначными. Хуже того, агенты их выдумывают: `getByTestId('search-input')` выглядит идеально, но в Bloomly такого id нет. Каждый test id в тесте должен существовать на странице."
+      en: 'Agents love test ids: easy to copy, rarely ambiguous. Worse, they invent them — `get_by_test_id("search-input")` looks perfect, and Bloomly has no such id. Every test id in a test must exist on the page.'
+      ru: 'Агенты обожают test id: их легко скопировать, и они редко бывают неоднозначными. Хуже того, агенты их выдумывают: `get_by_test_id("search-input")` выглядит идеально, но в Bloomly такого id нет. Каждый test id в тесте должен существовать на странице.'
 
   - type: example
     keyPoint: kp-locator-priority
@@ -144,43 +144,43 @@ steps:
       en: "TC-500: Anna logs in with “Remember me” ticked. Every locator is picked from the ladder — the notes say why. Press Run to see it green."
       ru: "TC-500: Anna входит с отмеченным «Remember me». Каждый локатор выбран по лестнице — в заметках объяснено почему. Нажми Run, чтобы увидеть зелёный прогон."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('user can log in with Remember me', async ({ page }) => {
-        await page.goto('/login');
-        await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible();
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('bloom123');
-        await page.getByRole('checkbox', { name: 'Remember me' }).check();
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        await expect(page.getByTestId('account-email')).toHaveText('anna@bloomly.app');
-      });
+
+      def test_user_can_log_in_with_remember_me(page: Page):
+          page.goto("/login")
+          expect(page.get_by_role("heading", name="Log in")).to_be_visible()
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("checkbox", name="Remember me").check()
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
+          expect(page.get_by_test_id("account-email")).to_have_text("anna@bloomly.app")
     notes:
-      - lines: 5
+      - lines: 6
         text:
           en: "Rung 1: role + name. Three elements say “Log in”; `heading` picks the page title."
           ru: "Ступенька 1: роль + имя. «Log in» написано на трёх элементах; `heading` выбирает заголовок страницы."
-      - lines: [6, 7]
+      - lines: [7, 8]
         text:
           en: "Rung 2: fields by their label, like the step “Enter the email in the Email field”. The placeholder “you@example.com” would work too — but it's only a hint that disappears as you type, one rung lower."
           ru: "Ступенька 2: поля по подписи, как в шаге «Ввести email в поле Email». Плейсхолдер «you@example.com» тоже сработал бы — но это лишь подсказка, которая исчезает при вводе, на ступеньку ниже."
-      - lines: 8
+      - lines: 9
         text:
           en: "Rung 1: a checkbox by its role and the text of its label."
           ru: "Ступенька 1: чекбокс по роли и тексту его подписи."
-      - lines: 9
-        text:
-          en: "Same name as line 5, different role. The menu link “Log in” is a `link`, so `button` matches only the form button."
-          ru: "То же имя, что в строке 5, но другая роль. Ссылка «Log in» в меню — это `link`, поэтому `button` находит только кнопку формы."
       - lines: 10
+        text:
+          en: "Same name as line 6, different role. The menu link “Log in” is a `link`, so `button` matches only the form button."
+          ru: "То же имя, что в строке 6, но другая роль. Ссылка «Log in» в меню — это `link`, поэтому `button` находит только кнопку формы."
+      - lines: 11
         text:
           en: "Rung 1 again: the greeting is a heading, and its name is the exact text from the test case."
           ru: "Снова ступенька 1: приветствие — заголовок, а его имя — точный текст из тест-кейса."
-      - lines: 11
+      - lines: 12
         text:
-          en: "Rung 4: the email on the account page is a plain value — no role name, no label. Kai's test id is the honest choice. `getByText('anna@bloomly.app')` would find it only if the value were already right."
-          ru: "Ступенька 4: email на странице аккаунта — просто значение, без имени по роли и без подписи. Test id от Кая — честный выбор. `getByText('anna@bloomly.app')` нашёл бы его, только если значение уже правильное."
+          en: "Rung 4: the email on the account page is a plain value — no role name, no label. Kai's test id is the honest choice. `get_by_text(\"anna@bloomly.app\")` would find it only if the value were already right."
+          ru: 'Ступенька 4: email на странице аккаунта — просто значение, без имени по роли и без подписи. Test id от Кая — честный выбор. `get_by_text("anna@bloomly.app")` нашёл бы его, только если значение уже правильное.'
     runnable: true
 
   - type: task
@@ -194,20 +194,20 @@ steps:
         en: "TC-500, step 4: “Click the **Log in** button.” Pick the locator for the highlighted button."
         ru: "TC-500, шаг 4: «Нажать кнопку **Log in**». Выбери локатор для подсвеченной кнопки."
       options:
-        - text: "page.getByRole('button', { name: 'Log in' })"
+        - text: 'page.get_by_role("button", name="Log in")'
           correct: true
           why:
             en: "Rung 1: what the user sees — a button that says “Log in”. Exactly one element matches."
             ru: "Ступенька 1: то, что видит пользователь, — кнопка с надписью «Log in». Подходит ровно один элемент."
-        - text: "page.getByTestId('login-button')"
+        - text: 'page.get_by_test_id("login-button")'
           why:
             en: "Stable and unique — but rung 4. Users never see test ids, and this button has a perfectly good role and name. Keep test ids for elements that have neither."
             ru: "Стабильный и уникальный — но это ступенька 4. Пользователи не видят test id, а у этой кнопки есть отличные роль и имя. Test id оставь для элементов, у которых нет ни того, ни другого."
-        - text: "page.getByText('Log in')"
+        - text: 'page.get_by_text("Log in")'
           why:
             en: "Three elements show this text: the menu link, the heading and the button. Which one? The text alone can't say."
             ru: "Этот текст есть у трёх элементов: ссылки в меню, заголовка и кнопки. Какой из них? Сам текст этого не скажет."
-        - text: "page.locator('#login-form > button.btn')"
+        - text: 'page.locator("#login-form > button.btn")'
           why:
             en: "CSS tied to the class `btn` and the form structure — the first thing Kai's redesign changes. Last rung."
             ru: "CSS, привязанный к классу `btn` и структуре формы, — первое, что изменит редизайн Кая. Последняя ступенька."
@@ -216,8 +216,8 @@ steps:
           ru: "Иди по лестнице сверху: есть ли у кнопки роль и имя?"
         - en: "Three of the four would click this button today. Which of them describes what the user sees?"
           ru: "Сегодня эту кнопку нажали бы три варианта из четырёх. Какой из них описывает то, что видит пользователь?"
-        - en: "A button that says “Log in”: `getByRole('button', …)`."
-          ru: "Кнопка с надписью «Log in»: `getByRole('button', …)`."
+        - en: 'A button that says “Log in”: `get_by_role("button", …)`.'
+          ru: 'Кнопка с надписью «Log in»: `get_by_role("button", …)`.'
       praise:
         en: "Top rung, one match, reads like the test step. That's the locator a senior reviewer approves without a comment."
         ru: "Верхняя ступенька, одно совпадение, читается как шаг теста. Такой локатор сеньор на ревью одобрит без единого комментария."
@@ -235,23 +235,23 @@ steps:
         ru: "Сопоставь каждый элемент страницы входа с его локатором. Осторожно: у двух из них одинаковое имя."
       pairs:
         - left: { en: "The page title “Log in”", ru: "Заголовок страницы «Log in»" }
-          right: "page.getByRole('heading', { name: 'Log in' })"
+          right: 'page.get_by_role("heading", name="Log in")'
         - left: { en: "The “Log in” button in the form", ru: "Кнопка «Log in» в форме" }
-          right: "page.getByRole('button', { name: 'Log in' })"
+          right: 'page.get_by_role("button", name="Log in")'
         - left: { en: "The “Create an account” link", ru: "Ссылка «Create an account»" }
-          right: "page.getByRole('link', { name: 'Create an account' })"
+          right: 'page.get_by_role("link", name="Create an account")'
         - left: { en: "The “Remember me” checkbox", ru: "Чекбокс «Remember me»" }
-          right: "page.getByRole('checkbox', { name: 'Remember me' })"
+          right: 'page.get_by_role("checkbox", name="Remember me")'
         - left: { en: "The Password field", ru: "Поле Password" }
-          right: "page.getByLabel('Password')"
+          right: 'page.get_by_label("Password")'
       rightCode: true
       hints:
-        - en: "The first argument of `getByRole` says what kind of element it is."
-          ru: "Первый аргумент `getByRole` говорит, что это за элемент."
+        - en: "The first argument of `get_by_role` says what kind of element it is."
+          ru: "Первый аргумент `get_by_role` говорит, что это за элемент."
         - en: "A title is a `heading`; the thing that submits the form is a `button`."
           ru: "Заголовок — это `heading`; то, чем отправляют форму, — `button`."
-        - en: "A field with a label → `getByLabel`."
-          ru: "Поле с подписью → `getByLabel`."
+        - en: "A field with a label → `get_by_label`."
+          ru: "Поле с подписью → `get_by_label`."
       praise:
         en: "Same name, different roles — you kept the heading and the button apart."
         ru: "Имя одно, роли разные — и ты не {перепутала|перепутал} заголовок с кнопкой."
@@ -266,24 +266,24 @@ steps:
       keyPoint: kp-role-label
       app: { route: /shop }
       prompt:
-        en: "Your step: “Sort the shop by Price: low to high.” The test will use `page.getByLabel('Sort by')`. Click the element this locator returns."
-        ru: "Твой шаг: «Отсортировать магазин по Price: low to high». Тест будет использовать `page.getByLabel('Sort by')`. Нажми на элемент, который вернёт этот локатор."
+        en: 'Your step: “Sort the shop by Price: low to high.” The test will use `page.get_by_label("Sort by")`. Click the element this locator returns.'
+        ru: 'Твой шаг: «Отсортировать магазин по Price: low to high». Тест будет использовать `page.get_by_label("Sort by")`. Нажми на элемент, который вернёт этот локатор.'
       target: "#sort"
       view: both
       show: [role, name]
       hints:
         - en: "There are two candidates: the words “Sort by” and the dropdown next to them."
           ru: "Кандидатов два: слова «Sort by» и выпадающий список рядом с ними."
-        - en: "`getByLabel` returns the thing you can type into or choose from, not its caption."
-          ru: "`getByLabel` возвращает то, во что можно вводить или из чего можно выбирать, а не надпись к нему."
-        - en: "The dropdown: `<select id=\"sort\">`, role `combobox`, name “Sort by”."
-          ru: "Выпадающий список: `<select id=\"sort\">`, роль `combobox`, имя «Sort by»."
+        - en: "`get_by_label` returns the thing you can type into or choose from, not its caption."
+          ru: "`get_by_label` возвращает то, во что можно вводить или из чего можно выбирать, а не надпись к нему."
+        - en: 'The dropdown: `<select id="sort">`, role `combobox`, name “Sort by”.'
+          ru: 'Выпадающий список: `<select id="sort">`, роль `combobox`, имя «Sort by».'
       praise:
-        en: "You picked the field, not its caption — that's exactly what getByLabel does."
-        ru: "Ты {выбрала|выбрал} поле, а не надпись к нему, — именно так и работает getByLabel."
+        en: "You picked the field, not its caption — that's exactly what get_by_label does."
+        ru: "Ты {выбрала|выбрал} поле, а не надпись к нему, — именно так и работает get_by_label."
       explain:
-        en: "`<label for=\"sort\">` gives the dropdown its accessible name “Sort by”. `getByLabel` follows that link and returns the dropdown itself, so `selectOption('price-asc')` works on it. The caption is just text — there's nothing to choose in it."
-        ru: "`<label for=\"sort\">` даёт выпадающему списку доступное имя «Sort by». `getByLabel` идёт по этой связи и возвращает сам список, поэтому `selectOption('price-asc')` на нём работает. Надпись — просто текст, в ней ничего не выберешь."
+        en: "`<label for=\"sort\">` gives the dropdown its accessible name “Sort by”. `get_by_label` follows that link and returns the dropdown itself, so `select_option(\"price-asc\")` works on it. The caption is just text — there's nothing to choose in it."
+        ru: '`<label for="sort">` даёт выпадающему списку доступное имя «Sort by». `get_by_label` идёт по этой связи и возвращает сам список, поэтому `select_option("price-asc")` на нём работает. Надпись — просто текст, в ней ничего не выберешь.'
 
   - type: task
     task:
@@ -300,32 +300,32 @@ steps:
           - { action: "Open /shop" }
           - { action: "Type the search term into \"Search\"", data: "tulips", expected: "The \"Sunny Tulips\" card is shown; the count says \"1 product\"" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('search finds Sunny Tulips', async ({ page }) => {
-          await page.goto('/shop');
-          await page.___('Search').fill('tulips');
-          await expect(page.getByRole('___', { name: 'Sunny Tulips' })).toBeVisible();
-          await expect(page.___('results-count')).toHaveText('1 product');
-        });
+
+        def test_search_finds_a_product_by_name(page: Page):
+            page.goto("/shop")
+            page.___("Search").fill("tulips")
+            expect(page.get_by_role("___", name="Sunny Tulips")).to_be_visible()
+            expect(page.___("results-count")).to_have_text("1 product")
       blanks:
-        - { answers: [getByLabel], options: [getByLabel, getByText, getByTestId] }
+        - { answers: [get_by_label], options: [get_by_label, get_by_text, get_by_test_id] }
         - { answers: [heading], options: [heading, button, link] }
-        - { answers: [getByTestId] }
+        - { answers: [get_by_test_id] }
       checks: { expect: pass }
       hints:
-        - en: "Line 5 is a form field with a label. Line 6 is the product name — the title of the card."
-          ru: "Строка 5 — поле формы с подписью. Строка 6 — название товара, заголовок карточки."
+        - en: "Line 6 is a form field with a label. Line 7 is the product name — the title of the card."
+          ru: "Строка 6 — поле формы с подписью. Строка 7 — название товара, заголовок карточки."
         - en: "The products count has no role name and no label — only a test id."
           ru: "У счётчика товаров нет ни имени по роли, ни подписи — только test id."
-        - en: "In order: getByLabel, heading, getByTestId."
-          ru: "По порядку: getByLabel, heading, getByTestId."
+        - en: "In order: get_by_label, heading, get_by_test_id."
+          ru: "По порядку: get_by_label, heading, get_by_test_id."
       praise:
         en: "Three rungs in one test, each chosen for a reason — and it's green."
         ru: "Три ступеньки в одном тесте, каждая выбрана не случайно, — и тест зелёный."
       explain:
-        en: "The field has a label → `getByLabel`. The product name is an `<h2>` → role `heading`. “1 product” is plain text with no name of its own → `getByTestId('results-count')`, the contract Kai keeps for tests."
-        ru: "У поля есть подпись → `getByLabel`. Название товара — `<h2>` → роль `heading`. «1 product» — обычный текст без собственного имени → `getByTestId('results-count')`, договорённость, которую Кай сохраняет для тестов."
+        en: 'The field has a label → `get_by_label`. The product name is an `<h2>` → role `heading`. “1 product” is plain text with no name of its own → `get_by_test_id("results-count")`, the contract Kai keeps for tests.'
+        ru: 'У поля есть подпись → `get_by_label`. Название товара — `<h2>` → роль `heading`. «1 product» — обычный текст без собственного имени → `get_by_test_id("results-count")`, договорённость, которую Кай сохраняет для тестов.'
 
   - type: task
     task:
@@ -348,46 +348,46 @@ steps:
           - { action: "Tick \"Remember me\"" }
           - { action: "Click \"Log in\"", expected: "The account page shows \"Welcome back, Anna!\"" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('user can log in with Remember me', async ({ page }) => {
-          await page.goto('/login');
-          await page.locator('#login-form > input:nth-of-type(1)').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.locator('.check input').check();
-          await page.getByText('Log in').click();
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+
+        def test_user_can_log_in_with_remember_me(page: Page):
+            page.goto("/login")
+            page.locator("#login-form > input:nth-of-type(1)").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.locator(".check input").check()
+            page.get_by_text("Log in").click()
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       issues:
-        - line: 5
+        - line: 6
           type: fragile-locator
           note:
-            en: "“The first input in the form” is a position. Kai's redesign wraps every field in a `<div>`, and this finds nothing. Use `getByLabel('Email')`."
-            ru: "«Первое поле в форме» — это позиция. Редизайн Кая оборачивает каждое поле в `<div>`, и этот селектор ничего не найдёт. Используй `getByLabel('Email')`."
-        - line: 7
-          type: fragile-locator
-          note:
-            en: "`.check` is a style class. Use `getByRole('checkbox', { name: 'Remember me' })`."
-            ru: "`.check` — класс стиля. Используй `getByRole('checkbox', { name: 'Remember me' })`."
+            en: "“The first input in the form” is a position. Kai's redesign wraps every field in a `<div>`, and this finds nothing. Use `get_by_label(\"Email\")`."
+            ru: '«Первое поле в форме» — это позиция. Редизайн Кая оборачивает каждое поле в `<div>`, и этот селектор ничего не найдёт. Используй `get_by_label("Email")`.'
         - line: 8
           type: fragile-locator
           note:
-            en: "“Log in” is on three elements, so this click fails with a strict mode violation. Use `getByRole('button', { name: 'Log in' })`."
-            ru: "«Log in» есть у трёх элементов, поэтому клик падает с ошибкой strict mode. Используй `getByRole('button', { name: 'Log in' })`."
-      types: [fragile-locator, hallucination, weak-assertion, hard-wait, missing-await]
+            en: '`.check` is a style class. Use `get_by_role("checkbox", name="Remember me")`.'
+            ru: '`.check` — класс стиля. Используй `get_by_role("checkbox", name="Remember me")`.'
+        - line: 9
+          type: fragile-locator
+          note:
+            en: '“Log in” is on three elements, so this click fails with a strict mode violation. Use `get_by_role("button", name="Log in")`.'
+            ru: '«Log in» есть у трёх элементов, поэтому клик падает с ошибкой strict mode. Используй `get_by_role("button", name="Log in")`.'
+      types: [fragile-locator, hallucination, weak-assertion, hard-wait, not-called]
       hints:
         - en: "Go line by line: does the locator describe what the user sees?"
           ru: "Иди построчно: описывает ли локатор то, что видит пользователь?"
         - en: "Watch for positions (`nth-of-type`), classes (`.check`) and text that appears more than once."
           ru: "Ищи позиции (`nth-of-type`), классы (`.check`) и текст, который встречается не один раз."
-        - en: "Lines 5, 7 and 8 — all fragile-locator."
-          ru: "Строки 5, 7 и 8 — все fragile-locator."
+        - en: "Lines 6, 8 and 9 — all fragile-locator."
+          ru: "Строки 6, 8 и 9 — все fragile-locator."
       praise:
         en: "Three weak locators, three catches — and you left the good ones alone."
         ru: "Три слабых локатора — три находки, а хорошие ты не {тронула|тронул}."
       explain:
-        en: "Line 8 is the trap: `getByText` is on the ladder, but here the text alone is ambiguous. Lines 5 and 7 work today and break on the redesign. Lines 6 and 9 are already on rungs 1–2."
-        ru: "Строка 8 — ловушка: `getByText` есть на лестнице, но здесь одного текста мало. Строки 5 и 7 работают сегодня и сломаются при редизайне. Строки 6 и 9 уже стоят на ступеньках 1–2."
+        en: "Line 9 is the trap: `get_by_text` is on the ladder, but here the text alone is ambiguous. Lines 6 and 8 work today and break on the redesign. Lines 7 and 10 are already on rungs 1–2."
+        ru: "Строка 9 — ловушка: `get_by_text` есть на лестнице, но здесь одного текста мало. Строки 6 и 8 работают сегодня и сломаются при редизайне. Строки 7 и 10 уже стоят на ступеньках 1–2."
 
   - type: task
     task:
@@ -402,18 +402,18 @@ steps:
         en: "Will Petal's test pass or fail on this build?"
         ru: "Тест Petal пройдёт или упадёт на этой сборке?"
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('add Sunny Tulips to the cart', async ({ page }) => {
-          await page.goto('/shop?q=sunny');
-          await page.getByTestId('add-to-cart').click();
-          await expect(page.getByTestId('cart-count')).toHaveText('1');
-        });
+
+        def test_add_sunny_tulips_to_the_cart(page: Page):
+            page.goto("/shop?q=sunny")
+            page.get_by_test_id("add-to-cart").click()
+            expect(page.get_by_test_id("cart-count")).to_have_text("1")
       outcome: pass
       reasons:
         - text:
             en: "Pass: the `<div>` still has `data-testid=\"add-to-cart\"`, and a mouse click still works. The test id doesn't care that it's no longer a button."
-            ru: "Пройдёт: у `<div>` остался `data-testid=\"add-to-cart\"`, а клик мышью по-прежнему работает. Локатору по test id всё равно, что это больше не кнопка."
+            ru: 'Пройдёт: у `<div>` остался `data-testid="add-to-cart"`, а клик мышью по-прежнему работает. Локатору по test id всё равно, что это больше не кнопка.'
           correct: true
         - text:
             en: "Fail: a `<div>` can't be clicked."
@@ -428,8 +428,8 @@ steps:
             en: "It updates — adding to the cart works. Only the button role is gone."
             ru: "Обновляется — добавление в корзину работает. Пропала только роль кнопки."
       hints:
-        - en: "What does `getByTestId` look at: the role or the attribute?"
-          ru: "На что смотрит `getByTestId`: на роль или на атрибут?"
+        - en: "What does `get_by_test_id` look at: the role or the attribute?"
+          ru: "На что смотрит `get_by_test_id`: на роль или на атрибут?"
         - en: "Did Kai's refactor remove the `data-testid`?"
           ru: "Убрал ли рефакторинг Кая `data-testid`?"
         - en: "It passes. Now think: is that good news?"
@@ -438,8 +438,8 @@ steps:
         en: "Right — and you saw the catch: green here means the bug slipped through."
         ru: "Верно — и ты {заметила|заметил} подвох: зелёный здесь значит, что баг проскочил."
       explain:
-        en: "The test id survived the refactor, so the test is green — while keyboard and screen-reader users can't add anything to the cart. With `getByRole('button', { name: 'Add to cart' })` the same test fails and reports the bug. Stable but invisible: that's the trade-off of rung 4."
-        ru: "Test id пережил рефакторинг, поэтому тест зелёный — а пользователи клавиатуры и скринридеров ничего не могут добавить в корзину. С `getByRole('button', { name: 'Add to cart' })` тот же тест падает и сообщает о баге. Стабильно, но невидимо — вот цена ступеньки 4."
+        en: "The test id survived the refactor, so the test is green — while keyboard and screen-reader users can't add anything to the cart. With `get_by_role(\"button\", name=\"Add to cart\")` the same test fails and reports the bug. Stable but invisible: that's the trade-off of rung 4."
+        ru: 'Test id пережил рефакторинг, поэтому тест зелёный — а пользователи клавиатуры и скринридеров ничего не могут добавить в корзину. С `get_by_role("button", name="Add to cart")` тот же тест падает и сообщает о баге. Стабильно, но невидимо — вот цена ступеньки 4.'
 
   - type: task
     task:
@@ -461,7 +461,7 @@ steps:
       blocks:
         - { id: task, locked: true, text: "Write a Playwright test for TC-503: the shop search ignores letter case.", ru: "Напиши Playwright-тест для TC-503: поиск в магазине не зависит от регистра." }
         - { id: case, text: 'Steps: open /shop and type "ROSE" into the Search field. Expected: the "Rose Bouquet" card is shown and the count says "1 product".', ru: "Шаги: открыть /shop и ввести «ROSE» в поле Search. Ожидаемый результат: показана карточка «Rose Bouquet», а счётчик говорит «1 product»." }
-        - { id: policy, text: "Locators: getByRole with the accessible name, getByLabel for form fields. Use getByTestId only for elements with no role name or label, like the products count. No CSS classes, no XPath.", ru: "Локаторы: getByRole с доступным именем, getByLabel для полей формы. getByTestId — только для элементов без имени по роли и без подписи, например для счётчика товаров. Никаких CSS-классов и XPath." }
+        - { id: policy, text: "Locators: get_by_role with the accessible name, get_by_label for form fields. Use get_by_test_id only for elements with no role name or label, like the products count. No CSS classes, no XPath.", ru: "Локаторы: get_by_role с доступным именем, get_by_label для полей формы. get_by_test_id — только для элементов без имени по роли и без подписи, например для счётчика товаров. Никаких CSS-классов и XPath." }
         - { id: stable, text: "Use the most stable locators you can.", ru: "Используй самые стабильные локаторы, какие только можно." }
       responses:
         - when: [case, policy]
@@ -470,52 +470,52 @@ steps:
             en: "Done! The field by its label, the product by its heading, and a test id only for the count — it has no name of its own. Green ✅"
             ru: "Готово! Поле — по подписи, товар — по заголовку, а test id — только для счётчика: у него нет собственного имени. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('search ignores letter case', async ({ page }) => {
-              await page.goto('/shop');
-              await page.getByLabel('Search').fill('ROSE');
-              await expect(page.getByRole('heading', { name: 'Rose Bouquet' })).toBeVisible();
-              await expect(page.getByTestId('results-count')).toHaveText('1 product');
-            });
+
+            def test_search_ignores_letter_case(page: Page):
+                page.goto("/shop")
+                page.get_by_label("Search").fill("ROSE")
+                expect(page.get_by_role("heading", name="Rose Bouquet")).to_be_visible()
+                expect(page.get_by_test_id("results-count")).to_have_text("1 product")
         - when: [case, stable]
           message:
-            en: "I used data-testid everywhere — test ids are the most stable locators! Hmm, red ❌: `getByTestId('search-input')` timed out. Maybe the page is slow?"
-            ru: "Я везде использовал data-testid — test id самые стабильные локаторы! Хм, красный ❌: `getByTestId('search-input')` не дождался элемента. Может, страница медленная?"
+            en: 'I used data-testid everywhere — test ids are the most stable locators! Hmm, red ❌: `get_by_test_id("search-input")` timed out. Maybe the page is slow?'
+            ru: 'Я везде использовал data-testid — test id самые стабильные локаторы! Хм, красный ❌: `get_by_test_id("search-input")` не дождался элемента. Может, страница медленная?'
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('search ignores letter case', async ({ page }) => {
-              await page.goto('/shop');
-              await page.getByTestId('search-input').fill('ROSE');
-              await expect(page.getByTestId('product-card')).toHaveCount(1);
-              await expect(page.getByTestId('results-count')).toHaveText('1 product');
-            });
+
+            def test_search_ignores_letter_case(page: Page):
+                page.goto("/shop")
+                page.get_by_test_id("search-input").fill("ROSE")
+                expect(page.get_by_test_id("product-card")).to_have_count(1)
+                expect(page.get_by_test_id("results-count")).to_have_text("1 product")
         - when: [case]
           message:
             en: "Done! I took the selectors straight from the HTML. Green ✅"
             ru: "Готово! Я взял селекторы прямо из HTML. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('search ignores letter case', async ({ page }) => {
-              await page.goto('/shop');
-              await page.locator('.toolbar input[type="search"]').fill('ROSE');
-              await expect(page.locator('.product-card h2')).toHaveText('Rose Bouquet');
-              await expect(page.locator('#results > p')).toHaveText('1 product');
-            });
+
+            def test_search_ignores_letter_case(page: Page):
+                page.goto("/shop")
+                page.locator('.toolbar input[type="search"]').fill("ROSE")
+                expect(page.locator(".product-card h2")).to_have_text("Rose Bouquet")
+                expect(page.locator("#results > p")).to_have_text("1 product")
         - when: []
           message:
             en: "I wasn't sure what to check, so I searched for “rose” and checked that some card is visible. Green ✅"
             ru: "Я не был уверен, что проверять, поэтому поискал «rose» и проверил, что видна какая-нибудь карточка. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('search works', async ({ page }) => {
-              await page.goto('/shop');
-              await page.locator('input').first().fill('rose');
-              await expect(page.locator('.product-card').first()).toBeVisible();
-            });
+
+            def test_search_works(page: Page):
+                page.goto("/shop")
+                page.locator("input").first.fill("rose")
+                expect(page.locator(".product-card").first).to_be_visible()
       missing:
         case:
           en: "Without the steps and the expected result Petal tested something else: lowercase “rose” and “some card is visible”. The point of TC-503 — upper case — is lost."
@@ -547,23 +547,23 @@ steps:
     keyPoint: kp-locator-priority
     title: { en: "Locator mistakes to catch in review", ru: "Ошибки в локаторах, которые ловят на ревью" }
     items:
-      - wrong: "page.locator('.btn.btn-primary')"
-        right: "page.getByRole('button', { name: 'Log in' })"
+      - wrong: 'page.locator(".btn.btn-primary")'
+        right: 'page.get_by_role("button", name="Log in")'
         why:
           en: "Classes are for styling, and Kai renames them next sprint. The user sees a button called “Log in”."
           ru: "Классы нужны для стилей, и Кай переименует их в следующем спринте. Пользователь видит кнопку «Log in»."
-      - wrong: "page.getByButton('Log in')"
-        right: "page.getByRole('button', { name: 'Log in' })"
+      - wrong: 'page.get_by_button("Log in")'
+        right: 'page.get_by_role("button", name="Log in")'
         why:
-          en: "There is no `getByButton` in Playwright — a typical agent invention. The role is the first argument of `getByRole`."
-          ru: "В Playwright нет `getByButton` — типичная выдумка агента. Роль — это первый аргумент `getByRole`."
-      - wrong: "page.getByPlaceholder('you@example.com')"
-        right: "page.getByLabel('Email')"
+          en: "There is no `get_by_button` in Playwright — a typical agent invention. The role is the first argument of `get_by_role`."
+          ru: "В Playwright нет `get_by_button` — типичная выдумка агента. Роль — это первый аргумент `get_by_role`."
+      - wrong: 'page.get_by_placeholder("you@example.com")'
+        right: 'page.get_by_label("Email")'
         why:
           en: "The field has a label. A placeholder is a hint that disappears as you type and changes freely — use it only when there's no label."
           ru: "У поля есть подпись. Плейсхолдер — подсказка, которая исчезает при вводе и легко меняется; используй его, только если подписи нет."
-      - wrong: "page.getByTestId('login-button')"
-        right: "page.getByRole('button', { name: 'Log in' })"
+      - wrong: 'page.get_by_test_id("login-button")'
+        right: 'page.get_by_role("button", name="Log in")'
         why:
           en: "It works, but it skips three rungs. Test ids are for elements with no role name or label; this button has both."
           ru: "Работает, но перепрыгивает через три ступеньки. Test id — для элементов без имени по роли и без подписи, а у этой кнопки есть и то, и другое."
@@ -571,20 +571,20 @@ steps:
   - type: explain
     keyPoint: kp-locator-priority
     prompt:
-      en: "In your own words: in what order do you choose a locator, and when is `getByTestId` the right choice?"
-      ru: "Своими словами: в каком порядке ты выбираешь локатор и когда `getByTestId` — правильный выбор?"
+      en: "In your own words: in what order do you choose a locator, and when is `get_by_test_id` the right choice?"
+      ru: "Своими словами: в каком порядке ты выбираешь локатор и когда `get_by_test_id` — правильный выбор?"
     model:
-      en: "I start from what the user sees: getByRole with a name for buttons, links, headings and checkboxes; getByLabel for form fields; then getByText or getByPlaceholder. I use getByTestId when an element has no role name and no label, like a count or a total. A test id is a contract with developers: stable, but invisible to users, so it won't notice when an element stops being accessible. CSS and XPath only as a last resort, because they describe the layout — and the layout changes with every redesign."
-      ru: "Я начинаю с того, что видит пользователь: getByRole с именем — для кнопок, ссылок, заголовков и чекбоксов; getByLabel — для полей формы; потом getByText или getByPlaceholder. getByTestId я использую, когда у элемента нет ни имени по роли, ни подписи, например у счётчика или итоговой суммы. Test id — это договорённость с разработчиками: стабильно, но невидимо для пользователей, поэтому такой локатор не заметит, если элемент станет недоступным. CSS и XPath — только в крайнем случае, потому что они описывают вёрстку, а вёрстка меняется с каждым редизайном."
+      en: "I start from what the user sees: get_by_role with a name for buttons, links, headings and checkboxes; get_by_label for form fields; then get_by_text or get_by_placeholder. I use get_by_test_id when an element has no role name and no label, like a count or a total. A test id is a contract with developers: stable, but invisible to users, so it won't notice when an element stops being accessible. CSS and XPath only as a last resort, because they describe the layout — and the layout changes with every redesign."
+      ru: "Я начинаю с того, что видит пользователь: get_by_role с именем — для кнопок, ссылок, заголовков и чекбоксов; get_by_label — для полей формы; потом get_by_text или get_by_placeholder. get_by_test_id я использую, когда у элемента нет ни имени по роли, ни подписи, например у счётчика или итоговой суммы. Test id — это договорённость с разработчиками: стабильно, но невидимо для пользователей, поэтому такой локатор не заметит, если элемент станет недоступным. CSS и XPath — только в крайнем случае, потому что они описывают вёрстку, а вёрстка меняется с каждым редизайном."
 
   - type: phrases
     items:
       - context: code-review
-        en: "Could we use getByRole('button', { name: 'Log in' }) here instead of .btn? The class names change next sprint."
-        ru: "Можем использовать здесь getByRole('button', { name: 'Log in' }) вместо .btn? В следующем спринте имена классов поменяются."
+        en: 'Could we use get_by_role("button", name="Log in") here instead of .btn? The class names change next sprint.'
+        ru: 'Можем использовать здесь get_by_role("button", name="Log in") вместо .btn? В следующем спринте имена классов поменяются.'
       - context: code-review
-        en: "This field has a label, so getByLabel('Email') is better than the placeholder."
-        ru: "У этого поля есть подпись, поэтому getByLabel('Email') лучше, чем плейсхолдер."
+        en: 'This field has a label, so get_by_label("Email") is better than the placeholder.'
+        ru: 'У этого поля есть подпись, поэтому get_by_label("Email") лучше, чем плейсхолдер.'
       - context: chat
         en: "Hi Kai! Could you add a data-testid to the products count? It has no role or label we can use."
         ru: "Привет, Кай! Можешь добавить data-testid к счётчику товаров? У него нет ни роли, ни подписи, за которые можно зацепиться."
@@ -595,8 +595,8 @@ steps:
         en: "Test ids are a contract: if a PR renames one, please tag QA."
         ru: "Test id — это договорённость: если PR переименовывает один из них, отметьте, пожалуйста, QA."
       - context: prompt
-        en: "Use getByRole with the accessible name and getByLabel for form fields; use getByTestId only where there's no role name or label."
-        ru: "Используй getByRole с доступным именем и getByLabel для полей формы; getByTestId — только там, где нет ни имени по роли, ни подписи."
+        en: "Use get_by_role with the accessible name and get_by_label for form fields; use get_by_test_id only where there's no role name or label."
+        ru: "Используй get_by_role с доступным именем и get_by_label для полей формы; get_by_test_id — только там, где нет ни имени по роли, ни подписи."
       - context: standup
         en: "Yesterday I moved the login tests to user-facing locators; today I'm doing the shop page."
         ru: "Вчера я {перевела|перевёл} тесты входа на пользовательские локаторы; сегодня занимаюсь страницей магазина."
@@ -611,20 +611,20 @@ checkPool:
       en: "Step: “Sort the products by Price: low to high.” Pick the locator for the highlighted dropdown."
       ru: "Шаг: «Отсортировать товары по Price: low to high». Выбери локатор для подсвеченного выпадающего списка."
     options:
-      - text: "page.getByLabel('Sort by')"
+      - text: 'page.get_by_label("Sort by")'
         correct: true
         why:
           en: "The dropdown has the label “Sort by”: rung 2, exactly one match, and it reads like the step."
           ru: "У выпадающего списка подпись «Sort by»: ступенька 2, ровно одно совпадение, и читается как шаг."
-      - text: "page.getByRole('combobox')"
+      - text: 'page.get_by_role("combobox")'
         why:
           en: "A role without a name: the shop has two dropdowns, Category and Sort by. Which one?"
           ru: "Роль без имени: в магазине два выпадающих списка, Category и Sort by. Какой из них?"
-      - text: "page.locator('#sort')"
+      - text: 'page.locator("#sort")'
         why:
           en: "It works and even survives the redesign — ids don't change there. But users never see ids, and nothing promises it stays: it's CSS, the last rung. The label is right there."
           ru: "Работает и даже переживёт редизайн — id там не меняются. Но пользователи не видят id, и никто не обещает, что он останется: это CSS, последняя ступенька. А подпись — вот она."
-      - text: "page.locator('.toolbar select:last-child')"
+      - text: 'page.locator(".toolbar select:last-child")'
         why:
           en: "A class and a position. Add a filter to the toolbar or rename the class, and it points elsewhere."
           ru: "Класс и позиция. Добавят фильтр в панель или переименуют класс — и он укажет на другое."
@@ -633,11 +633,11 @@ checkPool:
         ru: "Есть ли у выпадающего списка подпись?"
       - en: "A role without a name may match more than one element."
         ru: "Роль без имени может найти больше одного элемента."
-      - en: "Fields → `getByLabel`."
-        ru: "Поля → `getByLabel`."
+      - en: "Fields → `get_by_label`."
+        ru: "Поля → `get_by_label`."
     explain:
-      en: "Fields → `getByLabel`: it reads like the step and finds exactly one element. `getByRole('combobox', { name: 'Sort by' })` would be fine too — the name is what makes a role locator precise."
-      ru: "Поля → `getByLabel`: читается как шаг и находит ровно один элемент. `getByRole('combobox', { name: 'Sort by' })` тоже подошёл бы — точным локатор по роли делает именно имя."
+      en: 'Fields → `get_by_label`: it reads like the step and finds exactly one element. `get_by_role("combobox", name="Sort by")` would be fine too — the name is what makes a role locator precise.'
+      ru: 'Поля → `get_by_label`: читается как шаг и находит ровно один элемент. `get_by_role("combobox", name="Sort by")` тоже подошёл бы — точным локатор по роли делает именно имя.'
 
   - id: c5-l1-k2
     kind: choice
@@ -648,20 +648,20 @@ checkPool:
       ru: "Страница корзины. Какой локатор ты попробуешь первым для кнопки «Proceed to checkout»?"
     optionsCode: true
     options:
-      - text: "page.getByRole('button', { name: 'Proceed to checkout' })"
+      - text: 'page.get_by_role("button", name="Proceed to checkout")'
         correct: true
         why:
           en: "Rung 1: a button with a visible name. Nothing beats what the user sees."
           ru: "Ступенька 1: кнопка с видимым именем. Ничто не надёжнее того, что видит пользователь."
-      - text: "page.getByTestId('checkout-button')"
+      - text: 'page.get_by_test_id("checkout-button")'
         why:
           en: "It exists and it's stable — but it's rung 4. Use it when there's no role name; this button has one."
           ru: "Он существует и стабилен — но это ступенька 4. Его берут, когда нет имени по роли, а у этой кнопки оно есть."
-      - text: "page.getByText('Proceed')"
+      - text: 'page.get_by_text("Proceed")'
         why:
           en: "Rung 3, and only half the name. It doesn't say it's a button, and “Proceed” may appear somewhere else tomorrow."
           ru: "Ступенька 3, да ещё и половина имени. Он не говорит, что это кнопка, а «Proceed» завтра может появиться где-то ещё."
-      - text: "page.locator('.row-actions .btn:last-child')"
+      - text: 'page.locator(".row-actions .btn:last-child")'
         why:
           en: "Classes and a position — exactly what the design system changes."
           ru: "Классы и позиция — ровно то, что меняет дизайн-система."
@@ -693,45 +693,45 @@ checkPool:
         - { action: "Accept the Terms of Service" }
         - { action: "Click \"Create account\"", expected: "\"Account created!\" is shown" }
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('new user can create an account', async ({ page }) => {
-        await page.goto('/signup');
-        await page.getByLabel('Full name').fill('Nina Kowalska');
-        await page.getByTestId('signup-email').fill('nina@bloomly.app');
-        await page.getByLabel('Password').fill('petals2026');
-        await page.getByLabel('Country').selectOption('Poland');
-        await page.locator('xpath=//form/label[last()]/input').check();
-        await page.getByRole('submit', { name: 'Create account' }).click();
-        await expect(page.getByRole('heading', { name: 'Account created!' })).toBeVisible();
-      });
+
+      def test_new_user_can_create_an_account(page: Page):
+          page.goto("/signup")
+          page.get_by_label("Full name").fill("Nina Kowalska")
+          page.get_by_test_id("signup-email").fill("nina@bloomly.app")
+          page.get_by_label("Password").fill("petals2026")
+          page.get_by_label("Country").select_option("Poland")
+          page.locator("xpath=//form/label[last()]/input").check()
+          page.get_by_role("submit", name="Create account").click()
+          expect(page.get_by_role("heading", name="Account created!")).to_be_visible()
     issues:
-      - line: 6
+      - line: 7
         type: hallucination
         note:
-          en: "The signup Email field has no test id — Petal invented one. It has a label: `getByLabel('Email')`."
-          ru: "У поля Email на странице регистрации нет test id — Petal его выдумал. Зато есть подпись: `getByLabel('Email')`."
-      - line: 9
+          en: 'The signup Email field has no test id — Petal invented one. It has a label: `get_by_label("Email")`.'
+          ru: 'У поля Email на странице регистрации нет test id — Petal его выдумал. Зато есть подпись: `get_by_label("Email")`.'
+      - line: 10
         type: fragile-locator
         note:
-          en: "“The last label in the form” is a position. Add one more checkbox at the end, and the test ticks the wrong box. Use `getByRole('checkbox', { name: 'I agree to the Terms of Service' })`."
-          ru: "«Последняя подпись в форме» — это позиция. Добавят ещё один чекбокс в конец — и тест отметит не тот. Используй `getByRole('checkbox', { name: 'I agree to the Terms of Service' })`."
-      - line: 10
+          en: '“The last label in the form” is a position. Add one more checkbox at the end, and the test ticks the wrong box. Use `get_by_role("checkbox", name="I agree to the Terms of Service")`.'
+          ru: '«Последняя подпись в форме» — это позиция. Добавят ещё один чекбокс в конец — и тест отметит не тот. Используй `get_by_role("checkbox", name="I agree to the Terms of Service")`.'
+      - line: 11
         type: hallucination
         note:
-          en: "`submit` is the button's `type`, not a role. The role is `button`: `getByRole('button', { name: 'Create account' })`."
-          ru: "`submit` — это `type` кнопки, а не роль. Роль — `button`: `getByRole('button', { name: 'Create account' })`."
+          en: "`submit` is the button's `type`, not a role. The role is `button`: `get_by_role(\"button\", name=\"Create account\")`."
+          ru: '`submit` — это `type` кнопки, а не роль. Роль — `button`: `get_by_role("button", name="Create account")`.'
     types: [hallucination, fragile-locator, wrong-data, weak-assertion, hard-wait]
     hints:
       - en: "Check every test id and every role against the real signup page."
         ru: "Сверь каждый test id и каждую роль с настоящей страницей регистрации."
       - en: "One invented test id, one invented role, one locator that depends on position."
         ru: "Один выдуманный test id, одна выдуманная роль, один локатор, зависящий от позиции."
-      - en: "Lines 6, 9 and 10."
-        ru: "Строки 6, 9 и 10."
+      - en: "Lines 7, 10 and 11."
+        ru: "Строки 7, 10 и 11."
     explain:
-      en: "Petal mixed three habits: a test id that “should” exist, counting positions in the form, and confusing the button's `type=\"submit\"` with its role. The ladder fixes all three: `getByLabel('Email')`, `getByRole('checkbox', { name: 'I agree to the Terms of Service' })`, `getByRole('button', { name: 'Create account' })`."
-      ru: "Petal смешал три привычки: test id, который «должен» быть, отсчёт позиций в форме и путаницу между `type=\"submit\"` кнопки и её ролью. Лестница исправляет все три: `getByLabel('Email')`, `getByRole('checkbox', { name: 'I agree to the Terms of Service' })`, `getByRole('button', { name: 'Create account' })`."
+      en: "Petal mixed three habits: a test id that “should” exist, counting positions in the form, and confusing the button's `type=\"submit\"` with its role. The ladder fixes all three: `get_by_label(\"Email\")`, `get_by_role(\"checkbox\", name=\"I agree to the Terms of Service\")`, `get_by_role(\"button\", name=\"Create account\")`."
+      ru: 'Petal смешал три привычки: test id, который «должен» быть, отсчёт позиций в форме и путаницу между `type="submit"` кнопки и её ролью. Лестница исправляет все три: `get_by_label("Email")`, `get_by_role("checkbox", name="I agree to the Terms of Service")`, `get_by_role("button", name="Create account")`.'
 
   - id: c5-l1-k4
     kind: predict
@@ -740,20 +740,20 @@ checkPool:
     app: { variant: sign-in }
     context:
       en: "Sofia's copy change has shipped: the login button now says “Sign in”. Kai kept its `data-testid=\"login-button\"`."
-      ru: "Правка текста от Софии уже в продакшене: кнопка входа теперь называется «Sign in». Кай сохранил у неё `data-testid=\"login-button\"`."
+      ru: 'Правка текста от Софии уже в продакшене: кнопка входа теперь называется «Sign in». Кай сохранил у неё `data-testid="login-button"`.'
     prompt:
       en: "Will this test pass or fail after the change?"
       ru: "Этот тест пройдёт или упадёт после изменения?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('registered user can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('bloom123');
-        await page.getByTestId('login-button').click();
-        await expect(page).toHaveURL('/account');
-      });
+
+      def test_registered_user_can_log_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_test_id("login-button").click()
+          expect(page).to_have_url("http://localhost:3000/account")
     outcome: pass
     reasons:
       - text:
@@ -764,8 +764,8 @@ checkPool:
           en: "Fail: the button text changed, so the locator breaks."
           ru: "Упадёт: текст кнопки изменился, значит, локатор сломается."
         why:
-          en: "That would happen with `getByRole('button', { name: 'Log in' })`. A test id doesn't care about the text."
-          ru: "Так было бы с `getByRole('button', { name: 'Log in' })`. Локатору по test id всё равно, какой текст на кнопке."
+          en: "That would happen with `get_by_role(\"button\", name=\"Log in\")`. A test id doesn't care about the text."
+          ru: 'Так было бы с `get_by_role("button", name="Log in")`. Локатору по test id всё равно, какой текст на кнопке.'
       - text:
           en: "Fail: after the change, login no longer opens /account."
           ru: "Упадёт: после изменения вход больше не открывает /account."
@@ -778,8 +778,8 @@ checkPool:
       - en: "Does any line of the test read the button's text?"
         ru: "Читает ли хоть одна строка теста текст кнопки?"
     explain:
-      en: "Kai kept the contract, so the test is stable through a text change. But notice what it can't see: if your test case says the button reads “Log in”, nothing here tells you it changed. `getByRole('button', { name: 'Log in' })` would fail and send you back to the test case. Stable or user-facing — choose on purpose."
-      ru: "Кай сохранил договорённость, поэтому тест пережил смену текста. Но обрати внимание, чего он не видит: если в тест-кейсе кнопка называется «Log in», здесь ничто не скажет, что она изменилась. `getByRole('button', { name: 'Log in' })` упал бы и вернул тебя к тест-кейсу. Стабильность или взгляд пользователя — выбирай осознанно."
+      en: "Kai kept the contract, so the test is stable through a text change. But notice what it can't see: if your test case says the button reads “Log in”, nothing here tells you it changed. `get_by_role(\"button\", name=\"Log in\")` would fail and send you back to the test case. Stable or user-facing — choose on purpose."
+      ru: 'Кай сохранил договорённость, поэтому тест пережил смену текста. Но обрати внимание, чего он не видит: если в тест-кейсе кнопка называется «Log in», здесь ничто не скажет, что она изменилась. `get_by_role("button", name="Log in")` упал бы и вернул тебя к тест-кейсу. Стабильность или взгляд пользователя — выбирай осознанно.'
 
   - id: c5-l1-k5
     kind: fill
@@ -797,16 +797,16 @@ checkPool:
         - { action: "Enter the promo code", data: "BLOOM10" }
         - { action: "Click \"Apply\"", expected: "Message \"Promo code BLOOM10 applied: −10%.\"" }
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('BLOOM10 promo code is accepted', async ({ page }) => {
-        await page.goto('/cart');
-        await page.___('Promo code').fill('BLOOM10');
-        await page.getByRole('___', { name: 'Apply' }).click();
-        await expect(page.getByTestId('promo-message')).toContainText('BLOOM10 applied');
-      });
+
+      def test_bloom10_promo_code_is_accepted(page: Page):
+          page.goto("/cart")
+          page.___("Promo code").fill("BLOOM10")
+          page.get_by_role("___", name="Apply").click()
+          expect(page.get_by_test_id("promo-message")).to_contain_text("BLOOM10 applied")
     blanks:
-      - { answers: [getByLabel] }
+      - { answers: [get_by_label] }
       - { answers: [button] }
     checks: { expect: pass }
     hints:
@@ -814,19 +814,19 @@ checkPool:
         ru: "У поля подпись «Promo code»."
       - en: "“Apply” is something you click to submit."
         ru: "«Apply» — это то, на что нажимают, чтобы применить код."
-      - en: "getByLabel, then button."
-        ru: "getByLabel, затем button."
+      - en: "get_by_label, then button."
+        ru: "get_by_label, затем button."
     explain:
-      en: "A field with a label → `getByLabel('Promo code')`; something you click → role `button` with its name. The message has no name of its own, so the test id `promo-message` reads it."
-      ru: "Поле с подписью → `getByLabel('Promo code')`; то, на что нажимают, → роль `button` с именем. У сообщения нет собственного имени, поэтому его читает test id `promo-message`."
+      en: 'A field with a label → `get_by_label("Promo code")`; something you click → role `button` with its name. The message has no name of its own, so the test id `promo-message` reads it.'
+      ru: 'Поле с подписью → `get_by_label("Promo code")`; то, на что нажимают, → роль `button` с именем. У сообщения нет собственного имени, поэтому его читает test id `promo-message`.'
 
   - id: c5-l1-k6
     kind: inspect
     keyPoint: kp-testid-contract
     app: { route: /shop }
     prompt:
-      en: "Four elements on the shop page: the “Shop” heading, the Search field, the products count “6 products” and the “Rose Bouquet” heading. Only one of them needs `getByTestId`. Click it."
-      ru: "Четыре элемента на странице магазина: заголовок «Shop», поле Search, счётчик «6 products» и заголовок «Rose Bouquet». Только одному из них нужен `getByTestId`. Нажми на него."
+      en: "Four elements on the shop page: the “Shop” heading, the Search field, the products count “6 products” and the “Rose Bouquet” heading. Only one of them needs `get_by_test_id`. Click it."
+      ru: "Четыре элемента на странице магазина: заголовок «Shop», поле Search, счётчик «6 products» и заголовок «Rose Bouquet». Только одному из них нужен `get_by_test_id`. Нажми на него."
     target: "[data-testid='results-count']"
     view: both
     show: [role, name]
@@ -839,7 +839,7 @@ checkPool:
         ru: "Счётчик «6 products»."
     explain:
       en: "The count is a plain `<p>`: role `paragraph`, no name, no label. A user reads it but can't point to it by name — so Kai gave it `data-testid=\"results-count\"`. The other three have a role and a name or a label, so they don't need a test id."
-      ru: "Счётчик — обычный `<p>`: роль `paragraph`, ни имени, ни подписи. Пользователь его читает, но не может указать на него по имени, — поэтому Кай дал ему `data-testid=\"results-count\"`. У остальных трёх есть роль и имя или подпись, им test id не нужен."
+      ru: 'Счётчик — обычный `<p>`: роль `paragraph`, ни имени, ни подписи. Пользователь его читает, но не может указать на него по имени, — поэтому Кай дал ему `data-testid="results-count"`. У остальных трёх есть роль и имя или подпись, им test id не нужен.'
 
   - id: c5-l1-k7
     kind: fix
@@ -858,25 +858,25 @@ checkPool:
         - { action: "Enter email and a wrong password", data: "anna@bloomly.app / wrong-pass" }
         - { action: "Click \"Log in\"", expected: "Alert \"Invalid email or password.\"" }
     starter: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('wrong password shows an error', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByTestId('email-input').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('wrong-pass');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
-      });
+
+      def test_wrong_password_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_test_id("email-input").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("wrong-pass")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
     solution: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('wrong password shows an error', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('wrong-pass');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
-      });
+
+      def test_wrong_password_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("wrong-pass")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
     checks:
       expect: pass
       static: [noFragile, hasAssertion]
@@ -885,11 +885,11 @@ checkPool:
         ru: "Какой локатор ссылается на то, чего нет на /login?"
       - en: "The Email field has no test id — but it has a label."
         ru: "У поля Email нет test id — зато есть подпись."
-      - en: "`page.getByLabel('Email')` on line 5."
-        ru: "`page.getByLabel('Email')` в строке 5."
+      - en: '`page.get_by_label("Email")` on line 6.'
+        ru: '`page.get_by_label("Email")` в строке 6.'
     explain:
-      en: "Bloomly's login field has no test id — Petal invented one that “should” be there, and a longer timeout wouldn't help. The field has a label, so `getByLabel('Email')` is the natural choice: rung 2, and it reads like the step."
-      ru: "У поля входа в Bloomly нет test id — Petal выдумал тот, который «должен» быть, и таймаут подлиннее тут не поможет. У поля есть подпись, поэтому `getByLabel('Email')` — естественный выбор: ступенька 2, и читается как шаг."
+      en: "Bloomly's login field has no test id — Petal invented one that “should” be there, and a longer timeout wouldn't help. The field has a label, so `get_by_label(\"Email\")` is the natural choice: rung 2, and it reads like the step."
+      ru: 'У поля входа в Bloomly нет test id — Petal выдумал тот, который «должен» быть, и таймаут подлиннее тут не поможет. У поля есть подпись, поэтому `get_by_label("Email")` — естественный выбор: ступенька 2, и читается как шаг.'
 
   - id: c5-l1-k8
     kind: choice
@@ -907,8 +907,8 @@ checkPool:
         <p data-testid="product-count">6 products</p>
     options:
       - text:
-          en: "“Our tests use getByTestId('results-count'), so this rename breaks them. Please keep the old id, or update the tests in the same PR.”"
-          ru: "«Наши тесты используют getByTestId('results-count'), так что это переименование их сломает. Пожалуйста, оставь старый id или обнови тесты в этом же PR.»"
+          en: '“Our tests use get_by_test_id("results-count"), so this rename breaks them. Please keep the old id, or update the tests in the same PR.”'
+          ru: '«Наши тесты используют get_by_test_id("results-count"), так что это переименование их сломает. Пожалуйста, оставь старый id или обнови тесты в этом же PR.»'
         correct: true
         why:
           en: "A test id is a contract: renaming it is a breaking change for tests, even though users see no difference."
@@ -934,8 +934,8 @@ checkPool:
     hints:
       - en: "What exactly do the tests search for?"
         ru: "Что именно ищут тесты?"
-      - en: "Would `getByTestId('results-count')` still find anything after this PR?"
-        ru: "Найдёт ли `getByTestId('results-count')` хоть что-то после этого PR?"
+      - en: 'Would `get_by_test_id("results-count")` still find anything after this PR?'
+        ru: 'Найдёт ли `get_by_test_id("results-count")` хоть что-то после этого PR?'
     explain:
       en: "Users see no change, so a role or text locator wouldn't care. A test id locator does: the contract is the attribute value itself. That's why test id renames go into one PR together with the tests — or don't happen at all."
       ru: "Пользователи изменений не видят, поэтому локатору по роли или тексту было бы всё равно. А локатору по test id — нет: договорённость — это само значение атрибута. Поэтому переименование test id делают в одном PR вместе с тестами — или не делают вовсе."

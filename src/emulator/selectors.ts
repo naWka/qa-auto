@@ -213,9 +213,10 @@ function resolveWithin(root: Element, parts: Part[]): Element[] {
   return current;
 }
 
-/** Playwright-style description: getByRole('button', { name: 'Log in' }).first() */
+/** Playwright for Python description: get_by_role("button", name="Log in").first */
 export function describeParts(parts: Part[]): string {
   const out: string[] = [];
+  const kw = (exact?: boolean) => (exact ? ', exact=True' : '');
   for (const p of parts) {
     switch (p.kind) {
       case 'css': out.push(`locator(${quote(p.selector)})`); break;
@@ -226,29 +227,29 @@ export function describeParts(parts: Part[]): string {
           if (p.opts[k] !== undefined) o[k] = p.opts[k];
         }
         const opts = fmtOptions(o);
-        out.push(`getByRole(${quote(p.role)}${opts ? ', ' + opts : ''})`);
+        out.push(`get_by_role(${quote(p.role)}${opts ? ', ' + opts : ''})`);
         break;
       }
-      case 'text': out.push(`getByText(${fmtTextArg(p.text)}${p.exact ? ', { exact: true }' : ''})`); break;
-      case 'label': out.push(`getByLabel(${fmtTextArg(p.text)}${p.exact ? ', { exact: true }' : ''})`); break;
-      case 'placeholder': out.push(`getByPlaceholder(${fmtTextArg(p.text)}${p.exact ? ', { exact: true }' : ''})`); break;
-      case 'alt': out.push(`getByAltText(${fmtTextArg(p.text)}${p.exact ? ', { exact: true }' : ''})`); break;
-      case 'title': out.push(`getByTitle(${fmtTextArg(p.text)}${p.exact ? ', { exact: true }' : ''})`); break;
-      case 'testid': out.push(`getByTestId(${fmtTextArg(p.id)})`); break;
-      case 'nth': out.push(p.index === 0 ? 'first()' : p.index === -1 ? 'last()' : `nth(${p.index})`); break;
+      case 'text': out.push(`get_by_text(${fmtTextArg(p.text)}${kw(p.exact)})`); break;
+      case 'label': out.push(`get_by_label(${fmtTextArg(p.text)}${kw(p.exact)})`); break;
+      case 'placeholder': out.push(`get_by_placeholder(${fmtTextArg(p.text)}${kw(p.exact)})`); break;
+      case 'alt': out.push(`get_by_alt_text(${fmtTextArg(p.text)}${kw(p.exact)})`); break;
+      case 'title': out.push(`get_by_title(${fmtTextArg(p.text)}${kw(p.exact)})`); break;
+      case 'testid': out.push(`get_by_test_id(${fmtTextArg(p.id)})`); break;
+      case 'nth': out.push(p.index === 0 ? 'first' : p.index === -1 ? 'last' : `nth(${p.index})`); break;
       case 'filter': {
         const o = p.opts;
         const items: string[] = [];
-        if (o.hasText !== undefined) items.push(`hasText: ${fmtTextArg(o.hasText)}`);
-        if (o.hasNotText !== undefined) items.push(`hasNotText: ${fmtTextArg(o.hasNotText)}`);
-        if (o.has) items.push(`has: ${describeParts(o.has._parts)}`);
-        if (o.hasNot) items.push(`hasNot: ${describeParts(o.hasNot._parts)}`);
-        if (o.visible !== undefined) items.push(`visible: ${o.visible}`);
-        out.push(`filter({ ${items.join(', ')} })`);
+        if (o.hasText !== undefined) items.push(`has_text=${fmtTextArg(o.hasText)}`);
+        if (o.hasNotText !== undefined) items.push(`has_not_text=${fmtTextArg(o.hasNotText)}`);
+        if (o.has) items.push(`has=${describeParts(o.has._parts)}`);
+        if (o.hasNot) items.push(`has_not=${describeParts(o.hasNot._parts)}`);
+        if (o.visible !== undefined) items.push(`visible=${o.visible ? 'True' : 'False'}`);
+        out.push(`filter(${items.join(', ')})`);
         break;
       }
-      case 'and': out.push(`and(${describeParts(p.other)})`); break;
-      case 'or': out.push(`or(${describeParts(p.other)})`); break;
+      case 'and': out.push(`and_(${describeParts(p.other)})`); break;
+      case 'or': out.push(`or_(${describeParts(p.other)})`); break;
     }
   }
   return out.join('.');

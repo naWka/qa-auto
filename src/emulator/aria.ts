@@ -300,24 +300,24 @@ export function headingLevel(el: Element): number | undefined {
 
 /** The best user-facing locator for an element, like Playwright's "aka" hints and codegen. */
 export function suggestLocator(el: Element): string {
-  const q = (s: string) => `'${s.replace(/'/g, "\\'")}'`;
+  const q = (s: string) => JSON.stringify(s);
   const role = getRole(el);
   const name = role ? accessibleName(el) : '';
   if (role && name && role !== 'paragraph' && role !== 'generic') {
     const short = name.length > 60 ? name.slice(0, 60) : name;
-    return `getByRole(${q(role)}, { name: ${q(short)} })`;
+    return `get_by_role(${q(role)}, name=${q(short)})`;
   }
   const labels = labelTexts(el).filter(Boolean);
-  if (labels.length) return `getByLabel(${q(labels[0])})`;
+  if (labels.length) return `get_by_label(${q(labels[0])})`;
   const ph = el.getAttribute('placeholder');
-  if (ph) return `getByPlaceholder(${q(ph)})`;
+  if (ph) return `get_by_placeholder(${q(ph)})`;
   const testId = el.getAttribute('data-testid');
-  if (testId) return `getByTestId(${q(testId)})`;
+  if (testId) return `get_by_test_id(${q(testId)})`;
   const alt = el.getAttribute('alt');
-  if (alt) return `getByAltText(${q(alt)})`;
+  if (alt) return `get_by_alt_text(${q(alt)})`;
   const text = normalizeWhitespace(elementText(el));
-  if (text && text.length <= 60) return `getByText(${q(text)})`;
-  if (role) return `getByRole(${q(role)})`;
+  if (text && text.length <= 60) return `get_by_text(${q(text)})`;
+  if (role) return `get_by_role(${q(role)})`;
   if (el.id) return `locator(${q('#' + el.id)})`;
   return `locator(${q(tag(el))})`;
 }
@@ -449,12 +449,12 @@ function sameLocatorCount(el: Element, loc: string): number {
 }
 
 const CONTAINERS: Array<{ match: (e: Element) => boolean; base: (e: Element) => string }> = [
-  { match: (e) => getRole(e) === 'row', base: () => "getByRole('row')" },
-  { match: (e) => !!e.getAttribute('data-testid') && /card|row|item/.test(e.getAttribute('data-testid')!), base: (e) => `getByTestId('${e.getAttribute('data-testid')}')` },
-  { match: (e) => getRole(e) === 'listitem' || getRole(e) === 'article', base: (e) => `getByRole('${getRole(e)}')` },
+  { match: (e) => getRole(e) === 'row', base: () => 'get_by_role("row")' },
+  { match: (e) => !!e.getAttribute('data-testid') && /card|row|item/.test(e.getAttribute('data-testid')!), base: (e) => `get_by_test_id("${e.getAttribute('data-testid')}")` },
+  { match: (e) => getRole(e) === 'listitem' || getRole(e) === 'article', base: (e) => `get_by_role("${getRole(e)}")` },
 ];
 
-/** A locator that matches exactly this element: the suggested one, or scoped by its row / card via filter({ hasText }). */
+/** A locator that matches exactly this element: the suggested one, or scoped by its row / card via filter(has_text=…). */
 export function uniqueLocator(el: Element): string {
   const base = suggestLocator(el);
   if (sameLocatorCount(el, base) <= 1) return base;
@@ -464,7 +464,7 @@ export function uniqueLocator(el: Element): string {
     const label = p.querySelector('h1, h2, h3, td, th, [data-testid$="name"]');
     const text = normalizeWhitespace(label ? elementText(label) : '');
     if (!text) continue;
-    return `${c.base(p)}.filter({ hasText: '${text.replace(/'/g, "\\'")}' }).${base}`;
+    return `${c.base(p)}.filter(has_text=${JSON.stringify(text)}).${base}`;
   }
   const same = Array.from(el.ownerDocument.body.querySelectorAll('*')).filter((e) => suggestLocator(e) === base);
   return `${base}.nth(${same.indexOf(el)})`;

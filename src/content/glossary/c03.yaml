@@ -1,12 +1,12 @@
-# Glossary entries owned by chapter 3 (Reading code without fear).
+# Glossary entries owned by chapter 3 (Reading Python without fear).
 - id: code
   en: code
   ipa: /koʊd/
   ru: код
   pos: noun
   def:
-    en: "Instructions for a computer written in a programming language. A Playwright test file is code."
-    ru: "Инструкции для компьютера на языке программирования. Файл с Playwright-тестом — тоже код."
+    en: "Instructions for a computer written in a programming language. A pytest test file is Python code."
+    ru: "Инструкции для компьютера на языке программирования. Файл с pytest-тестами — это код на Python."
   example:
     en: "I don't write much code by hand, but I review every line the agent generates."
     ru: "Я почти не пишу код руками, но проверяю каждую строку, которую генерирует агент."
@@ -19,11 +19,11 @@
   ru: синтаксис
   pos: noun
   def:
-    en: "The grammar of a programming language: where brackets, commas, quotes and keywords go. A syntax error stops the whole file."
-    ru: "Грамматика языка программирования: где ставить скобки, запятые, кавычки и ключевые слова. Синтаксическая ошибка останавливает весь файл."
+    en: "The grammar of a programming language: where brackets, colons, quotes and indents go. A syntax error stops the whole file."
+    ru: "Грамматика языка программирования: где ставить скобки, двоеточия, кавычки и отступы. Синтаксическая ошибка останавливает весь файл."
   example:
-    en: "The file didn't even start — there's a syntax error on line 3."
-    ru: "Файл даже не запустился — в строке 3 синтаксическая ошибка."
+    en: "The file didn't even start — there's a syntax error on line 3: a bracket is never closed."
+    ru: "Файл даже не запустился — в строке 3 синтаксическая ошибка: скобка так и не закрыта."
   context: code-review
   chapter: 3
 
@@ -33,8 +33,8 @@
   ru: переменная
   pos: noun
   def:
-    en: "A named place for a value in code. `let` creates one whose value can change; `const` creates a constant."
-    ru: "Именованное место для значения в коде. `let` создаёт переменную, значение которой можно поменять; `const` — константу."
+    en: "A name for a value in code: `email = \"anna@bloomly.app\"`. The `=` sign gives the name its value; later lines use the name instead of the value."
+    ru: "Имя для значения в коде: `email = \"anna@bloomly.app\"`. Знак `=` присваивает имени значение; дальше в коде используется имя вместо самого значения."
   example:
     en: "Could you rename the variable `pwd` to `password`? It's easier to read."
     ru: "Можешь переименовать переменную `pwd` в `password`? Так легче читать."
@@ -47,10 +47,10 @@
   ru: константа
   pos: noun
   def:
-    en: "A named value that stays the same after it is set, created with `const`. Tests keep their test data in constants."
-    ru: "Именованное значение, которое не меняется после того, как его задали; создаётся через `const`. В тестах в константах хранят тестовые данные."
+    en: "A value that should stay the same while the tests run. Python has no special keyword for it: by convention its name is in UPPER_CASE, like `ANNA_EMAIL = \"anna@bloomly.app\"`."
+    ru: "Значение, которое не должно меняться во время прогона. Специального слова для этого в Python нет: по соглашению имя пишут ЗАГЛАВНЫМИ буквами, например `ANNA_EMAIL = \"anna@bloomly.app\"`."
   example:
-    en: "Let's move the email into a constant at the top, so all five tests reuse it."
+    en: "Let's move the email into a constant at the top of the file, so all five tests reuse it."
     ru: "Давай вынесем email в константу в начале файла, чтобы все пять тестов её использовали."
   context: code-review
   chapter: 3
@@ -61,11 +61,25 @@
   ru: строка
   pos: noun
   def:
-    en: "A piece of text in quotes: 'Log in', \"Log in\" or `Log in`. Code compares strings exactly, character by character."
-    ru: "Кусок текста в кавычках: 'Log in', \"Log in\" или `Log in`. Код сравнивает строки точно, посимвольно."
+    en: "A piece of text in quotes: \"Log in\" or 'Log in' (our code style uses double quotes). Code compares strings exactly, character by character."
+    ru: "Кусок текста в кавычках: \"Log in\" или 'Log in' (в нашем стиле кода — двойные кавычки). Код сравнивает строки точно, посимвольно."
   example:
     en: "The expected string has a capital B, but the page says \"Welcome back\"."
     ru: "В ожидаемой строке заглавная B, а на странице написано «Welcome back»."
+  context: code-review
+  chapter: 3
+
+- id: f-string
+  en: f-string
+  ipa: /ˈef strɪŋ/
+  ru: f-строка (f-string)
+  pos: noun
+  def:
+    en: "A string with the letter f before the quotes: values in curly braces are put into the text, as in `f\"Welcome back, {name}!\"`. Without the f, the braces stay as plain text."
+    ru: "Строка с буквой f перед кавычками: значения в фигурных скобках подставляются в текст, как в `f\"Welcome back, {name}!\"`. Без f фигурные скобки так и останутся обычным текстом."
+  example:
+    en: "The expected heading should be an f-string: without the f, the test looks for the text `{name}` instead of Anna."
+    ru: "Ожидаемый заголовок должен быть f-строкой: без f тест ищет текст `{name}` вместо Anna."
   context: code-review
   chapter: 3
 
@@ -75,11 +89,11 @@
   ru: число
   pos: noun
   def:
-    en: "A numeric value, written without quotes: `2`, `35.5`, `1043`."
-    ru: "Числовое значение, пишется без кавычек: `2`, `35.5`, `1043`."
+    en: "A numeric value, written without quotes: `2`, `35.5`, `1043`. `2` and `\"2\"` are different things: the second one is a string."
+    ru: "Числовое значение, пишется без кавычек: `2`, `35.5`, `1043`. `2` и `\"2\"` — разные вещи: второе — это строка."
   example:
-    en: "The quantity is a number, so it has no quotes: `qty: 2`."
-    ru: "Количество — это число, поэтому оно без кавычек: `qty: 2`."
+    en: "The quantity is a number, so it has no quotes: `qty = 2`."
+    ru: "Количество — это число, поэтому оно без кавычек: `qty = 2`."
   context: general
   chapter: 3
 
@@ -89,11 +103,25 @@
   ru: логическое значение (boolean)
   pos: noun
   def:
-    en: "A yes/no value: `true` or `false`, written without quotes."
-    ru: "Значение «да/нет»: `true` или `false`, пишется без кавычек."
+    en: "A yes/no value: `True` or `False`, with a capital letter and without quotes."
+    ru: "Значение «да/нет»: `True` или `False` — с заглавной буквы и без кавычек."
   example:
-    en: "`exact` takes a boolean: `{ exact: true }`."
-    ru: "`exact` принимает логическое значение: `{ exact: true }`."
+    en: "`exact` takes a boolean: `exact=True`. A lowercase `true` is JavaScript, and Python stops with a NameError."
+    ru: "`exact` принимает логическое значение: `exact=True`. `true` со строчной буквы — это JavaScript, и Python остановится с NameError."
+  context: code-review
+  chapter: 3
+
+- id: none
+  en: None
+  ipa: /nʌn/
+  ru: None (нет значения)
+  pos: noun
+  def:
+    en: "Python's special value for \"nothing here\". A function without `return` gives back None, and `get_attribute(\"href\")` returns None when the element has no such attribute."
+    ru: "Особое значение Python, которое значит «здесь ничего нет». Функция без `return` возвращает None, а `get_attribute(\"href\")` возвращает None, если у элемента нет такого атрибута."
+  example:
+    en: "The helper has no return line, so it gives back None, and the assertion compares None with \"€70.00\"."
+    ru: "В функции-помощнике нет строки с return, поэтому она возвращает None, и проверка сравнивает None с «€70.00»."
   context: code-review
   chapter: 3
 
@@ -103,25 +131,11 @@
   ru: функция
   pos: noun
   def:
-    en: "A named, reusable sequence of steps. Defining it changes nothing; the steps run only when the function is called."
-    ru: "Именованная последовательность шагов, которую можно переиспользовать. Объявление функции ничего не делает; шаги выполняются, только когда функцию вызывают."
+    en: "A named, reusable group of steps, created with `def`: `def log_in(page, email, password):`. Defining it changes nothing; the steps run only when the function is called."
+    ru: "Именованная группа шагов, которую можно переиспользовать; создаётся через `def`: `def log_in(page, email, password):`. Объявление функции ничего не делает; шаги выполняются, только когда функцию вызывают."
   example:
     en: "Let's extract the login steps into a function and call it in every test."
     ru: "Давай вынесем шаги логина в функцию и будем вызывать её в каждом тесте."
-  context: code-review
-  chapter: 3
-
-- id: arrow-function
-  en: arrow function
-  ipa: /ˈæroʊ ˌfʌŋkʃn/
-  ru: стрелочная функция
-  pos: noun
-  def:
-    en: "A short way to write a function: `(parameters) => { steps }`. The body of every Playwright test is an arrow function."
-    ru: "Короткая запись функции: `(параметры) => { шаги }`. Тело каждого Playwright-теста — стрелочная функция."
-  example:
-    en: "The test body is an async arrow function that receives `{ page }`."
-    ru: "Тело теста — асинхронная стрелочная функция, которая получает `{ page }`."
   context: code-review
   chapter: 3
 
@@ -131,8 +145,8 @@
   ru: параметр
   pos: noun
   def:
-    en: "A name in a function's definition for a value the function needs, e.g. `email` in `logIn(page, email, password)`."
-    ru: "Имя в объявлении функции для значения, которое ей нужно, например `email` в `logIn(page, email, password)`."
+    en: "A name in a function's definition for a value the function needs, e.g. `email` in `def log_in(page, email, password):`."
+    ru: "Имя в объявлении функции для значения, которое ей нужно, например `email` в `def log_in(page, email, password):`."
   example:
     en: "The helper has three parameters: page, email and password."
     ru: "У функции-помощника три параметра: page, email и password."
@@ -145,11 +159,25 @@
   ru: аргумент
   pos: noun
   def:
-    en: "The actual value passed when a function is called, e.g. 'tom@bloomly.app'. Arguments go to parameters by position."
-    ru: "Конкретное значение, которое передают при вызове функции, например 'tom@bloomly.app'. Аргументы попадают в параметры по порядку."
+    en: "The actual value passed when a function is called, e.g. \"tom@bloomly.app\" in `log_in(page, \"tom@bloomly.app\", \"tulips42\")`. Plain arguments go to parameters by position."
+    ru: "Конкретное значение, которое передают при вызове функции, например \"tom@bloomly.app\" в `log_in(page, \"tom@bloomly.app\", \"tulips42\")`. Обычные аргументы попадают в параметры по порядку."
   example:
     en: "The arguments are swapped: the password is passed where the email should be."
     ru: "Аргументы перепутаны: пароль передан туда, где должен быть email."
+  context: code-review
+  chapter: 3
+
+- id: keyword-argument
+  en: keyword argument
+  ipa: /ˈkiːwɜːrd ˈɑːrɡjəmənt/
+  ru: именованный аргумент (keyword argument)
+  pos: noun
+  def:
+    en: "An argument passed together with its name, like `name=\"Log in\"` in `get_by_role(\"button\", name=\"Log in\")`. The name says what the value means, so the order doesn't matter."
+    ru: "Аргумент, переданный вместе с именем, например `name=\"Log in\"` в `get_by_role(\"button\", name=\"Log in\")`. Имя говорит, что означает значение, поэтому порядок не важен."
+  example:
+    en: "The test crashed with \"unexpected keyword argument 'label'\": `get_by_role` takes `name`, not `label`."
+    ru: "Тест упал с «unexpected keyword argument 'label'»: `get_by_role` принимает `name`, а не `label`."
   context: code-review
   chapter: 3
 
@@ -159,11 +187,11 @@
   ru: объект
   pos: noun
   def:
-    en: "A set of labelled values in curly braces: `{ name: 'Log in', exact: true }`. In Playwright, objects usually hold settings."
-    ru: "Набор подписанных значений в фигурных скобках: `{ name: 'Log in', exact: true }`. В Playwright в объектах обычно передают настройки."
+    en: "Anything code works with: a string, a list, the page, a locator. Each object has its own properties and methods — `page` has `goto()`, a locator has `click()`."
+    ru: "Всё, с чем работает код: строка, список, страница, локатор. У каждого объекта свои свойства и методы — у `page` есть `goto()`, у локатора — `click()`."
   example:
-    en: "Pass the options as an object: `{ name: 'Log in' }`."
-    ru: "Передай настройки объектом: `{ name: 'Log in' }`."
+    en: "The agent called a method the Page object doesn't have, so the test failed with an AttributeError."
+    ru: "Агент вызвал метод, которого у объекта Page нет, поэтому тест упал с AttributeError."
   context: code-review
   chapter: 3
 
@@ -173,11 +201,11 @@
   ru: свойство
   pos: noun
   def:
-    en: "One labelled value inside an object, e.g. `name: 'Log in'`. You read it with a dot: `user.email`."
-    ru: "Одно подписанное значение внутри объекта, например `name: 'Log in'`. Читается через точку: `user.email`."
+    en: "A value that belongs to an object and is read with a dot, without brackets: `page.url`, `locator.first`, `response.status`."
+    ru: "Значение, которое принадлежит объекту и читается через точку, без скобок: `page.url`, `locator.first`, `response.status`."
   example:
-    en: "`getByRole` has no `label` property — use `name`."
-    ru: "У `getByRole` нет свойства `label` — используй `name`."
+    en: "`response.status` is a property, so `response.status()` fails with \"'int' object is not callable\"."
+    ru: "`response.status` — это свойство, поэтому `response.status()` падает с «'int' object is not callable»."
   context: code-review
   chapter: 3
 
@@ -187,25 +215,39 @@
   ru: метод
   pos: noun
   def:
-    en: "A function that belongs to an object and is called with a dot: `page.goto()`, `locator.click()`."
-    ru: "Функция, которая принадлежит объекту и вызывается через точку: `page.goto()`, `locator.click()`."
+    en: "A function that belongs to an object and is called with a dot and brackets: `page.goto(\"/login\")`, `locator.click()`. Without the brackets nothing runs."
+    ru: "Функция, которая принадлежит объекту и вызывается через точку и скобки: `page.goto(\"/login\")`, `locator.click()`. Без скобок ничего не выполняется."
   example:
     en: "`page.open()` isn't a real method — the agent invented it."
     ru: "`page.open()` — несуществующий метод, агент его выдумал."
   context: code-review
   chapter: 3
 
-- id: array
-  en: array
-  ipa: /əˈreɪ/
-  ru: массив
+- id: list
+  en: list
+  ipa: /lɪst/
+  ru: список (list)
   pos: noun
   def:
-    en: "An ordered list of values in square brackets. Positions (indexes) start at 0."
-    ru: "Упорядоченный список значений в квадратных скобках. Позиции (индексы) считаются с 0."
+    en: "An ordered collection of values in square brackets: `[\"Rose Bouquet\", \"Sunny Tulips\"]`. Positions (indexes) start at 0, and `len()` gives the number of items."
+    ru: "Упорядоченный набор значений в квадратных скобках: `[\"Rose Bouquet\", \"Sunny Tulips\"]`. Позиции (индексы) считаются с 0, а `len()` возвращает количество элементов."
   example:
-    en: "The test data is an array of three users, so the loop creates three tests."
-    ru: "Тестовые данные — массив из трёх пользователей, поэтому цикл создаёт три теста."
+    en: "The test data is a list of three users, so parametrize creates three tests."
+    ru: "Тестовые данные — список из трёх пользователей, поэтому parametrize создаёт три теста."
+  context: code-review
+  chapter: 3
+
+- id: dictionary
+  en: dictionary
+  ipa: /ˈdɪkʃəneri/
+  ru: словарь (dictionary, dict)
+  pos: noun
+  def:
+    en: "Labelled values in curly braces, `dict` for short: `{\"email\": \"anna@bloomly.app\", \"password\": \"bloom123\"}`. You read a value by its key: `user[\"email\"]`. JSON from an API looks the same."
+    ru: "Подписанные значения в фигурных скобках, сокращённо `dict`: `{\"email\": \"anna@bloomly.app\", \"password\": \"bloom123\"}`. Значение читают по ключу: `user[\"email\"]`. JSON из API выглядит так же."
+  example:
+    en: "The test failed with a KeyError: the dictionary has the key `email`, but the test reads `mail`."
+    ru: "Тест упал с KeyError: в словаре есть ключ `email`, а тест читает `mail`."
   context: code-review
   chapter: 3
 
@@ -215,53 +257,53 @@
   ru: цикл
   pos: noun
   def:
-    en: "Code that repeats the same steps for each item of a list, e.g. `for (const user of users) { ... }`."
-    ru: "Код, который повторяет одни и те же шаги для каждого элемента списка, например `for (const user of users) { ... }`."
+    en: "Code that repeats the same steps for each item of a list, e.g. `for user in users:` with the steps indented below it."
+    ru: "Код, который повторяет одни и те же шаги для каждого элемента списка, например `for user in users:` с шагами под ним с отступом."
   example:
-    en: "The loop creates one login test per row of test data."
-    ru: "Цикл создаёт по одному тесту логина на каждую строку тестовых данных."
+    en: "The loop checks all five promo codes in one test, so the report won't tell us which code failed."
+    ru: "Цикл проверяет все пять промокодов в одном тесте, поэтому по отчёту не понять, на каком коде он упал."
   context: code-review
   chapter: 3
 
-- id: async
-  en: async
-  ipa: /ˈeɪsɪŋk/
-  ru: async (асинхронная функция)
-  pos: keyword
-  def:
-    en: "A keyword that marks a function whose steps take time. Only inside an async function can you use `await`."
-    ru: "Ключевое слово, которое помечает функцию с долгими шагами. Только внутри async-функции можно использовать `await`."
-  example:
-    en: "The helper uses await, so it has to be declared async."
-    ru: "В функции-помощнике есть await, значит, её нужно объявить как async."
-  context: code-review
-  chapter: 3
-
-- id: await
-  en: await
-  ipa: /əˈweɪt/
-  ru: await (дождаться)
-  pos: keyword
-  def:
-    en: "A keyword that means \"wait until this step is finished before going on\". Every browser action and every assertion needs it."
-    ru: "Ключевое слово: «дождись, пока этот шаг закончится, и только потом иди дальше». Нужно перед каждым действием в браузере и каждой проверкой."
-  example:
-    en: "Missing await on line 7 — the click may not finish before the check."
-    ru: "В строке 7 не хватает await — клик может не закончиться до проверки."
-  context: code-review
-  chapter: 3
-
-- id: promise
-  en: promise
-  ipa: /ˈprɑːmɪs/
-  ru: промис (обещание)
+- id: indentation
+  en: indentation
+  ipa: /ˌɪndenˈteɪʃn/
+  ru: отступ (indentation)
   pos: noun
   def:
-    en: "A value that says \"the result will come later\". Browser steps return promises, and `await` waits for them."
-    ru: "Значение, которое говорит: «результат будет позже». Шаги в браузере возвращают промисы, а `await` их дожидается."
+    en: "The spaces at the start of a line. In Python they show which lines belong to a test, an `if` or a `for` — 4 spaces per level."
+    ru: "Пробелы в начале строки. В Python они показывают, какие строки относятся к тесту, к `if` или к `for`, — по 4 пробела на уровень."
   example:
-    en: "`click()` returns a promise, so the test has to await it."
-    ru: "`click()` возвращает промис, поэтому тест должен его дождаться через await."
+    en: "After the copy-paste the last line lost its indentation, so it's no longer part of the test."
+    ru: "После копирования последняя строка потеряла отступ и больше не относится к тесту."
+  context: code-review
+  chapter: 3
+
+- id: import
+  en: import
+  ipa: /ˈɪmpɔːrt/
+  ru: импорт (import)
+  pos: noun, keyword
+  def:
+    en: "A line at the top of a file that brings in names from other code: `from playwright.sync_api import Page, expect`. Without it Python doesn't know the name."
+    ru: "Строка в начале файла, которая подключает имена из другого кода: `from playwright.sync_api import Page, expect`. Без неё Python это имя не знает."
+  example:
+    en: "NameError: name 'expect' is not defined — the agent forgot the import line."
+    ru: "NameError: name 'expect' is not defined — агент забыл строку импорта."
+  context: code-review
+  chapter: 3
+
+- id: decorator
+  en: decorator
+  ipa: /ˈdekəreɪtər/
+  ru: декоратор (decorator)
+  pos: noun
+  def:
+    en: "A line starting with @ right above a function that changes how pytest treats it: `@pytest.fixture`, `@pytest.mark.skip(reason=\"BUG-123\")`, `@pytest.mark.parametrize(...)`."
+    ru: "Строка с @ прямо над функцией, которая меняет то, как pytest с ней обращается: `@pytest.fixture`, `@pytest.mark.skip(reason=\"BUG-123\")`, `@pytest.mark.parametrize(...)`."
+  example:
+    en: "Don't approve it yet: the `@pytest.mark.skip` decorator means the test never runs."
+    ru: "Пока не одобряй: из-за декоратора `@pytest.mark.skip` тест вообще не запускается."
   context: code-review
   chapter: 3
 
@@ -271,8 +313,8 @@
   ru: комментарий
   pos: noun
   def:
-    en: "A note for humans inside code; the computer skips it. In JavaScript a comment starts with `//`."
-    ru: "Заметка для людей внутри кода; компьютер её пропускает. В JavaScript комментарий начинается с `//`."
+    en: "A note for humans inside code; Python skips it. A comment starts with `#`."
+    ru: "Заметка для людей внутри кода; Python её пропускает. Комментарий начинается с `#`."
   example:
     en: "Please add a comment explaining why this test uses Tom's account."
     ru: "Добавь, пожалуйста, комментарий, почему этот тест использует аккаунт Тома."
@@ -288,21 +330,21 @@
     en: "Text that explains what went wrong — shown by the app to users, or by the test runner to you."
     ru: "Текст, который объясняет, что пошло не так: приложение показывает его пользователю, а раннер тестов — тебе."
   example:
-    en: "The error message says \"await is only valid in async functions\" — the helper isn't async."
-    ru: "В сообщении об ошибке написано «await is only valid in async functions» — функция-помощник не async."
+    en: "The error message says \"'await' outside async function\" — the agent brought a JavaScript habit into a Python test."
+    ru: "В сообщении об ошибке написано «'await' outside async function» — агент принёс в Python-тест привычку из JavaScript."
   context: bug-report
   chapter: 3
 
-- id: console
-  en: console
-  ipa: /ˈkɑːnsoʊl/
-  ru: консоль
+- id: traceback
+  en: traceback
+  ipa: /ˈtreɪsbæk/
+  ru: трейсбек, стек вызовов (traceback)
   pos: noun
   def:
-    en: "The place where code prints messages with `console.log(...)`. Handy for seeing a value while you investigate."
-    ru: "Место, куда код выводит сообщения через `console.log(...)`. Удобно, чтобы посмотреть значение, пока разбираешься."
+    en: "The part of an error report that shows where the error happened: the file, the line number and the code around it. In pytest output the failing line is marked with `>` and the error follows on `E` lines."
+    ru: "Часть отчёта об ошибке, которая показывает, где она произошла: файл, номер строки и код вокруг. В выводе pytest упавшая строка отмечена `>`, а ошибка идёт ниже в строках с `E`."
   example:
-    en: "Add a console.log to see which user the loop is on when it fails."
-    ru: "Добавь console.log, чтобы увидеть, на каком пользователе цикл падает."
+    en: "Read the traceback from the bottom: `test_login.py` line 14, the alert text didn't match."
+    ru: "Читай трейсбек снизу: `test_login.py`, строка 14 — текст alert не совпал."
   context: chat
   chapter: 3

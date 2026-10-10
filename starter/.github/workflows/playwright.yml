@@ -10,18 +10,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-python@v5
       with:
-        node-version: lts/*
+        python-version: '3.12'
+        cache: pip
     - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
+      run: pip install -r requirements.txt
+    - name: Start Bloomly on http://localhost:3000
+      # Runs in the background for the rest of the job (pytest would also start it by itself, see conftest.py)
+      run: python serve_app.py &
+    - name: Install Playwright browsers
+      run: python -m playwright install --with-deps chromium
+    - name: Run tests
+      run: pytest
+    - name: Upload traces of failed tests
+      uses: actions/upload-artifact@v4
+      if: ${{ failure() }}
       with:
-        name: playwright-report
-        path: playwright-report/
+        name: playwright-traces
+        path: test-results/
         retention-days: 30

@@ -8,8 +8,8 @@
     en: "An assertion that keeps retrying until the page reaches the expected state or the timeout ends."
     ru: "Проверка, которая повторяется, пока страница не придёт в ожидаемое состояние или не истечёт тайм-аут."
   example:
-    en: "Swap `expect(await toast.isVisible()).toBeTruthy()` for a web-first assertion: `await expect(toast).toBeVisible()`."
-    ru: "Замени `expect(await toast.isVisible()).toBeTruthy()` на web-first проверку: `await expect(toast).toBeVisible()`."
+    en: "Swap `assert toast.is_visible()` for a web-first assertion: `expect(toast).to_be_visible()`."
+    ru: "Замени `assert toast.is_visible()` на web-first проверку: `expect(toast).to_be_visible()`."
   context: code-review
   chapter: 6
 
@@ -19,8 +19,8 @@
   ru: повтор, повторная попытка (retry)
   pos: noun, verb
   def:
-    en: "Trying again automatically: assertions retry until they pass, and the runner can rerun a failed test."
-    ru: "Автоматическая повторная попытка: проверки повторяются, пока не пройдут, а раннер может перезапустить упавший тест."
+    en: "Trying again automatically: web-first assertions retry until they pass, and with the pytest-rerunfailures plugin pytest can rerun a failed test."
+    ru: "Автоматическая повторная попытка: web-first проверки повторяются, пока не пройдут, а с плагином pytest-rerunfailures pytest может перезапустить упавший тест."
   example:
     en: "It passed only on retry, so it's flaky — let's not call it green at the standup."
     ru: "Он прошёл только с повторной попытки, значит, он флаки — не будем называть его зелёным на стендапе."
@@ -33,8 +33,8 @@
   ru: мягкая проверка (soft assertion)
   pos: noun
   def:
-    en: "An assertion (expect.soft) that records a failure but lets the test continue to the next check."
-    ru: "Проверка (expect.soft), которая фиксирует падение, но даёт тесту перейти к следующей проверке."
+    en: "An assertion that records a failure but lets the test continue to the next check. Playwright for Python has no `expect.soft`; the pytest-check plugin adds soft assertions."
+    ru: "Проверка, которая фиксирует падение, но даёт тесту перейти к следующей проверке. В Playwright для Python нет `expect.soft`; мягкие проверки добавляет плагин pytest-check."
   example:
     en: "Use soft assertions for the order summary, so one run shows every wrong number."
     ru: "Используй мягкие проверки для сводки заказа, чтобы за один прогон увидеть все неверные суммы."

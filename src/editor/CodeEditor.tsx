@@ -1,9 +1,9 @@
-// CodeMirror 6 editor in the pastel theme, with Playwright autocompletion and run/error line marks.
+// CodeMirror 6 editor (Python) in the pastel theme, with Playwright autocompletion and run/error line marks.
 import { useEffect, useRef } from 'react';
 import { EditorState, Compartment, StateEffect, StateField, type Extension } from '@codemirror/state';
 import { EditorView, Decoration, type DecorationSet, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
-import { javascript } from '@codemirror/lang-javascript';
+import { python } from '@codemirror/lang-python';
 import { HighlightStyle, syntaxHighlighting, bracketMatching, indentOnInput } from '@codemirror/language';
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete';
 import { tags as t } from '@lezer/highlight';
@@ -15,7 +15,8 @@ const pastelHighlight = HighlightStyle.define([
   { tag: t.regexp, color: 'var(--tok-regexp)' },
   { tag: [t.function(t.variableName), t.function(t.propertyName)], color: 'var(--tok-function)' },
   { tag: [t.number, t.bool, t.null], color: 'var(--tok-number)' },
-  { tag: [t.lineComment, t.blockComment], color: 'var(--tok-comment)', fontStyle: 'italic' },
+  { tag: [t.lineComment, t.blockComment, t.comment], color: 'var(--tok-comment)', fontStyle: 'italic' },
+  { tag: [t.self, t.className, t.typeName], color: 'var(--tok-property)' },
   { tag: t.propertyName, color: 'var(--tok-property)' },
   { tag: [t.punctuation, t.bracket, t.operator], color: 'var(--tok-punct)' },
   { tag: [t.variableName, t.definition(t.variableName)], color: 'var(--tok-variable)' },
@@ -86,7 +87,7 @@ export function CodeEditor({ value, onChange, readOnly = false, runLine = null, 
       indentOnInput(),
       bracketMatching(),
       closeBrackets(),
-      javascript(),
+      python(),
       syntaxHighlighting(pastelHighlight),
       autocompletion({ override: [playwrightCompletions], icons: false }),
       keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, ...completionKeymap, indentWithTab]),

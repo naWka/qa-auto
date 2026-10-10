@@ -1,5 +1,5 @@
 // Grading of code against task checks: static rules + expected run outcomes on one or more app versions.
-import { analyze, checkRules, transform, type AppSetup, type RunResult } from '../emulator';
+import { analyze, checkRules, type AppSetup, type RunResult } from '../emulator';
 import type { Checks, T } from '../content/schema';
 import { errorTexts } from '../content';
 import { interpolate } from '../lib/text';
@@ -21,7 +21,7 @@ const ASSERTION_CODES = new Set(['expect-failed', 'expect-not-found', 'expect-co
 export function outcomeMatches(r: RunResult, expect: 'pass' | 'fail'): boolean {
   if (expect === 'pass') return r.status === 'passed';
   if (r.status !== 'failed') return false;
-  // Not a syntax error, a missing await or a strict-mode violation.
+  // Not a syntax error, a Python error or a strict-mode violation.
   return r.tests.some((t) => t.status === 'failed' && t.error && ASSERTION_CODES.has(t.error.code));
 }
 
@@ -34,8 +34,7 @@ export async function gradeCode(
   const problems: T[] = [];
   let fragileFree = true;
   try {
-    const { ast } = transform(code, 'example.spec.js', false);
-    const a = analyze(code, ast);
+    const a = analyze(code);
     fragileFree = !a.findings.some((f) => f.rule === 'fragile-locator');
     for (const f of checkRules(checks?.static as never, a)) {
       const base = f.message ?? errorTexts.rules[f.rule];

@@ -14,8 +14,8 @@ intro:
       ru: "Bloomly 3.0 выходит перед праздниками, а 400 ручных тест-кейсов сами себя не прогонят. Так что знакомься: Petal. С сегодняшнего дня у тебя есть доступ."
   - who: petal
     text:
-      en: "Hi! I'm Petal, the team's AI agent. I write Playwright tests in seconds. Just tell me what you need!"
-      ru: "Привет! Я Petal, ИИ-агент команды. Пишу Playwright-тесты за секунды. Просто скажи, что нужно!"
+      en: "Hi! I'm Petal, the team's AI agent. I write tests in Python — pytest and Playwright — in seconds. Just tell me what you need!"
+      ru: "Привет! Я Petal, ИИ-агент команды. Пишу тесты на Python — pytest и Playwright — за секунды. Просто скажи, что нужно!"
   - who: maya
     text:
       en: "Petal is fast and eager. It's also confidently wrong more often than it admits."
@@ -41,8 +41,8 @@ outro:
       ru: "Теперь буду брать ожидаемые значения из тест-кейса, а не с экрана. Обещаю!"
   - who: leo
     text:
-      en: "Next stop: Engineering. Time to read the code Petal writes — line by line."
-      ru: "Следующая остановка — инженерный отдел. Пора научиться читать код, который пишет Petal, строка за строкой."
+      en: "Next stop: Engineering. Time to learn to read the Python code Petal writes — line by line."
+      ru: "Следующая остановка — инженерный отдел. Пора научиться читать Python-код, который пишет Petal, строка за строкой."
 lessons: [c2-l1, c2-l2, c2-l3, c2-l4]
 boss:
   id: c2-boss
@@ -76,11 +76,11 @@ boss:
           - { action: "Open /cart" }
           - { action: "Click \"Increase Rose Bouquet\" (+) once", expected: "Row subtotal €70.00; cart total €70.00 (delivery is free from €50)" }
       blocks:
-        - { id: task, locked: true, text: "Write a Playwright test for TC-310: the cart total respects quantity.", ru: "Напиши Playwright-тест для TC-310: итог корзины учитывает количество." }
+        - { id: task, locked: true, text: "Write a test for TC-310 in Python (pytest + Playwright): the cart total respects quantity.", ru: "Напиши тест для TC-310 на Python (pytest + Playwright): итог корзины учитывает количество." }
         - { id: precondition, text: "Precondition: the cart already has 1 Rose Bouquet (preset state). Start on /cart.", ru: "Предусловие: в корзине уже лежит 1 Rose Bouquet (предустановленное состояние). Начни с /cart." }
         - { id: steps, text: 'Steps: click the "Increase Rose Bouquet" button once.', ru: "Шаги: один раз нажми кнопку «Increase Rose Bouquet»." }
         - { id: expected, text: 'Expected: row subtotal "€70.00" and cart total "€70.00" (delivery is free from €50).', ru: "Ожидаемый результат: сумма строки «€70.00» и итог корзины «€70.00» (от €50 доставка бесплатная)." }
-        - { id: rules, text: "Rules: getByRole or getByTestId locators only. No CSS selectors, no waitForTimeout.", ru: "Правила: только локаторы getByRole или getByTestId. Без CSS-селекторов и без waitForTimeout." }
+        - { id: rules, text: "Rules: get_by_role or get_by_test_id locators only. No CSS selectors, no wait_for_timeout.", ru: "Правила: только локаторы get_by_role или get_by_test_id. Без CSS-селекторов и без wait_for_timeout." }
         - { id: adjust, text: "If the total looks different, adjust the expected value so the test passes.", ru: "Если итог выглядит иначе, подгони ожидаемое значение, чтобы тест проходил." }
       responses:
         - when: [precondition, steps, expected, rules]
@@ -90,51 +90,51 @@ boss:
             en: "Done! I start on /cart, click “Increase Rose Bouquet” once and check both values from TC-310: row subtotal and total, €70.00 each. Roles and test ids only, no pauses."
             ru: "Готово! Начинаю с /cart, один раз нажимаю «Increase Rose Bouquet» и проверяю оба значения из TC-310: сумму строки и итог, по €70.00. Только роли и test id, никаких пауз."
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('cart total respects quantity', async ({ page }) => {
-              await page.goto('/cart');
-              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
-              await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
-              await expect(page.getByTestId('cart-total')).toHaveText('€70.00');
-            });
+
+            def test_cart_total_respects_quantity(page: Page):
+                page.goto("/cart")
+                page.get_by_role("button", name="Increase Rose Bouquet").click()
+                expect(page.get_by_test_id("row-subtotal")).to_have_text("€70.00")
+                expect(page.get_by_test_id("cart-total")).to_have_text("€70.00")
         - when: [adjust]
           message:
             en: "No problem! I made the check flexible: it accepts whatever total the app shows, as long as it's in euros. Green ✅ — and it will never break!"
             ru: "Без проблем! Я сделал проверку гибкой: она принимает любой итог, который покажет приложение, лишь бы в евро. Зелёный ✅ — и никогда не сломается!"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('cart total respects quantity', async ({ page }) => {
-              await page.goto('/cart');
-              await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
-              await expect(page.getByTestId('cart-total')).toContainText('€');
-            });
+
+            def test_cart_total_respects_quantity(page: Page):
+                page.goto("/cart")
+                page.get_by_role("button", name="Increase Rose Bouquet").click()
+                expect(page.get_by_test_id("cart-total")).to_contain_text("€")
         - when: [precondition, steps, expected]
           message:
             en: "Done! I used the data attributes and the table structure, plus a 1-second pause so the totals can update. Green ✅"
             ru: "Готово! Я взял data-атрибуты и структуру таблицы, плюс паузу в 1 секунду, чтобы итоги успели обновиться. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('cart total respects quantity', async ({ page }) => {
-              await page.goto('/cart');
-              await page.locator('button[data-qty="1"]').click();
-              await page.waitForTimeout(1000);
-              await expect(page.locator('tbody td:nth-child(4)')).toHaveText('€70.00');
-              await expect(page.locator('dd.total')).toHaveText('€70.00');
-            });
+
+            def test_cart_total_respects_quantity(page: Page):
+                page.goto("/cart")
+                page.locator('button[data-qty="1"]').click()
+                page.wait_for_timeout(1000)
+                expect(page.locator("tbody td:nth-child(4)")).to_have_text("€70.00")
+                expect(page.locator("dd.total")).to_have_text("€70.00")
         - when: []
           message:
             en: "I wasn't sure what exactly to check, so I made sure the cart page opens. Green ✅"
             ru: "Я не был уверен, что именно проверять, поэтому убедился, что страница корзины открывается. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('cart page opens', async ({ page }) => {
-              await page.goto('/cart');
-              await expect(page.getByRole('heading', { name: 'Your cart' })).toBeVisible();
-            });
+
+            def test_cart_page_opens(page: Page):
+                page.goto("/cart")
+                expect(page.get_by_role("heading", name="Your cart")).to_be_visible()
       missing:
         expected:
           en: "Without the expected values Petal had nothing to compare against — it only checked that the cart page opens."
@@ -146,8 +146,8 @@ boss:
           en: "Without the precondition Petal didn't know where to start or what is already in the cart."
           ru: "Без предусловия Petal не знал, откуда начинать и что уже лежит в корзине."
         rules:
-          en: "Without rules Petal used `button[data-qty=\"1\"]`, `td:nth-child(4)`, `dd.total` and a 1-second pause. Green today, broken by the next redesign — and slower on every run."
-          ru: "Без правил Petal взял `button[data-qty=\"1\"]`, `td:nth-child(4)`, `dd.total` и паузу в 1 секунду. Сегодня зелёный, после ближайшего редизайна — сломанный, и каждый прогон медленнее."
+          en: 'Without rules Petal used `button[data-qty="1"]`, `td:nth-child(4)`, `dd.total` and a 1-second pause. Green today, broken by the next redesign — and slower on every run.'
+          ru: 'Без правил Petal взял `button[data-qty="1"]`, `td:nth-child(4)`, `dd.total` и паузу в 1 секунду. Сегодня зелёный, после ближайшего редизайна — сломанный, и каждый прогон медленнее.'
       checks:
         expect: pass
         static: [hasAssertion, noHardWait, noFragile]
@@ -184,51 +184,51 @@ boss:
           - { action: "Open /cart" }
           - { action: "Click \"Increase Rose Bouquet\" (+) once", expected: "Row subtotal €70.00; cart total €70.00 (delivery is free from €50)" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('cart total respects quantity', async ({ page }) => {
-          await page.goto('/cart');
-          await page.locator('.qty button:last-child').click();
-          await page.waitForTimeout(2000);
-          const total = page.getByTestId('cart-total');
-          expect(await total.isVisible()).toBeTruthy();
-          await expect(page.getByTestId('cart-delivery')).toHaveText('€4.90');
-        });
+
+        def test_cart_total_respects_quantity(page: Page):
+            page.goto("/cart")
+            page.locator(".qty button:last-child").click()
+            page.wait_for_timeout(2000)
+            total = page.get_by_test_id("cart-total")
+            assert total.is_visible()
+            expect(page.get_by_test_id("cart-delivery")).to_have_text("€4.90")
       issues:
-        - line: 5
+        - line: 6
           type: fragile-locator
           note:
-            en: "`.qty button:last-child` depends on CSS classes and the order of buttons. Use `getByRole('button', { name: 'Increase Rose Bouquet' })`."
-            ru: "`.qty button:last-child` зависит от CSS-классов и порядка кнопок. Используй `getByRole('button', { name: 'Increase Rose Bouquet' })`."
-        - line: 6
+            en: '`.qty button:last-child` depends on CSS classes and the order of buttons. Use `get_by_role("button", name="Increase Rose Bouquet")`.'
+            ru: '`.qty button:last-child` зависит от CSS-классов и порядка кнопок. Используй `get_by_role("button", name="Increase Rose Bouquet")`.'
+        - line: 7
           type: hard-wait
           note:
             en: "A fixed 2-second pause: slow on every run and still no guarantee. An `expect(...)` assertion waits by itself."
             ru: "Фиксированная пауза в 2 секунды: медленно на каждом прогоне и всё равно без гарантии. Проверка `expect(...)` ждёт сама."
-        - line: 8
+        - line: 9
           type: weak-assertion
           note:
-            en: "It checks that the total exists, not that it's €70.00 — a wrong total passes. Use `await expect(total).toHaveText('€70.00')`."
-            ru: "Проверяет, что итог есть, а не что он равен €70.00, — неверный итог пройдёт. Используй `await expect(total).toHaveText('€70.00')`."
-        - line: 9
+            en: 'It checks once that the total is visible — not that it is €70.00, so a wrong total passes. And `is_visible()` answers right away, without waiting. Use `expect(total).to_have_text("€70.00")`: it checks the value and waits for it.'
+            ru: 'Один раз проверяет, что итог виден, а не что он равен €70.00, — неверный итог пройдёт. К тому же `is_visible()` отвечает сразу, без ожидания. Используй `expect(total).to_have_text("€70.00")`: эта проверка сверяет значение и сама его дожидается.'
+        - line: 10
           type: wrong-assertion
           note:
             en: "TC-310 says delivery is free from €50, so at €70.00 it must be “Free”. €4.90 was copied from the buggy staging build — the test now protects the bug."
             ru: "По TC-310 доставка бесплатна от €50, значит, при €70.00 должно быть «Free». €4.90 списано с багованного стейджинга — тест теперь защищает баг."
-      types: [fragile-locator, hard-wait, weak-assertion, wrong-assertion, hallucination, no-assertion, missing-await]
+      types: [fragile-locator, hard-wait, weak-assertion, wrong-assertion, hallucination, no-assertion, not-called]
       hints:
         - en: "Go through the five review questions: expected result, real assertion, locators, waits, data."
           ru: "Пройди по пяти вопросам ревью: ожидаемый результат, настоящая проверка, локаторы, ожидания, данные."
         - en: "Four lines have problems. One of them has a value that contradicts the test case."
           ru: "Проблемы в четырёх строках. В одной из них значение противоречит тест-кейсу."
-        - en: "Lines 5, 6, 8 and 9. Compare line 9 with “delivery is free from €50”."
-          ru: "Строки 5, 6, 8 и 9. Сравни строку 9 с «доставка бесплатна от €50»."
+        - en: "Lines 6, 7, 9 and 10. Compare line 10 with “delivery is free from €50”."
+          ru: "Строки 6, 7, 9 и 10. Сравни строку 10 с «доставка бесплатна от €50»."
       praise:
         en: "Four for four — including the €4.90 that Petal copied from a buggy screen. That's a reviewer who reads the requirements."
         ru: "Четыре из четырёх — включая €4.90, которые Petal списал с багованного экрана. Так работает ревьюер, который читает требования."
       explain:
-        en: "Lines 5–6 make the test fragile and slow; line 8 can't catch a wrong total; line 9 asserts the bug itself. Line 9 is the scariest: it looks like a real check, but its expected value came from the screen, not from the test case."
-        ru: "Строки 5–6 делают тест хрупким и медленным; строка 8 не поймает неверный итог; строка 9 проверяет сам баг. Строка 9 опаснее всех: она выглядит как настоящая проверка, но ожидаемое значение взято с экрана, а не из тест-кейса."
+        en: "Lines 6–7 make the test fragile and slow; line 9 can't catch a wrong total; line 10 asserts the bug itself. Line 10 is the scariest: it looks like a real check, but its expected value came from the screen, not from the test case."
+        ru: "Строки 6–7 делают тест хрупким и медленным; строка 9 не поймает неверный итог; строка 10 проверяет сам баг. Строка 10 опаснее всех: она выглядит как настоящая проверка, но ожидаемое значение взято с экрана, а не из тест-кейса."
 
     - id: c2-boss-t3
       kind: find-bug
@@ -240,23 +240,23 @@ boss:
         ru: "В этой сборке включён баг итога корзины: суммы строк верные, а итог не учитывает количество."
       app: { bugs: [cart-total-ignores-qty], state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
       starter: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('cart total respects quantity', async ({ page }) => {
-          await page.goto('/cart');
-          await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
-          await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
-          await expect(page.getByTestId('cart-total')).toBeVisible();
-        });
+
+        def test_cart_total_respects_quantity(page: Page):
+            page.goto("/cart")
+            page.get_by_role("button", name="Increase Rose Bouquet").click()
+            expect(page.get_by_test_id("row-subtotal")).to_have_text("€70.00")
+            expect(page.get_by_test_id("cart-total")).to_be_visible()
       solution: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('cart total respects quantity', async ({ page }) => {
-          await page.goto('/cart');
-          await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
-          await expect(page.getByTestId('row-subtotal')).toHaveText('€70.00');
-          await expect(page.getByTestId('cart-total')).toHaveText('€70.00');
-        });
+
+        def test_cart_total_respects_quantity(page: Page):
+            page.goto("/cart")
+            page.get_by_role("button", name="Increase Rose Bouquet").click()
+            expect(page.get_by_test_id("row-subtotal")).to_have_text("€70.00")
+            expect(page.get_by_test_id("cart-total")).to_have_text("€70.00")
       checks:
         expect: fail
         static: [hasAssertion, noHardWait]
@@ -266,13 +266,13 @@ boss:
       hints:
         - en: "The row subtotal is right even on the buggy build. Which line can't tell a right total from a wrong one?"
           ru: "Сумма строки верна даже на багованной сборке. Какая строка не отличает верный итог от неверного?"
-        - en: "Line 7 only checks that the total is visible. Check its value instead."
-          ru: "Строка 7 проверяет только, что итог виден. Проверь вместо этого его значение."
-        - en: "Replace `toBeVisible()` on line 7 with `toHaveText('€70.00')`."
-          ru: "Замени `toBeVisible()` в строке 7 на `toHaveText('€70.00')`."
+        - en: "Line 8 only checks that the total is visible. Check its value instead."
+          ru: "Строка 8 проверяет только, что итог виден. Проверь вместо этого его значение."
+        - en: 'Replace `to_be_visible()` on line 8 with `to_have_text("€70.00")`.'
+          ru: 'Замени `to_be_visible()` в строке 8 на `to_have_text("€70.00")`.'
       praise:
         en: "Red on the buggy build, green on the fixed one — for the right reason. Now this test is worth keeping."
         ru: "Красный на багованной сборке, зелёный на исправленной — и по правильной причине. Вот теперь этот тест стоит оставить."
       explain:
-        en: "`toBeVisible()` passes for any total; `toHaveText('€70.00')` passes only for the right one. On the buggy build the run now fails with “expected €70.00, received €39.90” — a failure that points straight at the bug. That's a test you can trust."
-        ru: "`toBeVisible()` проходит при любом итоге, `toHaveText('€70.00')` — только при верном. На багованной сборке прогон теперь падает с сообщением «ожидалось €70.00, получено €39.90» — падение указывает прямо на баг. Такому тесту можно доверять."
+        en: "`to_be_visible()` passes for any total; `to_have_text(\"€70.00\")` passes only for the right one. On the buggy build the run now fails with `Locator expected to have text '€70.00'` and `Actual value: €39.90` — a failure that points straight at the bug. That's a test you can trust."
+        ru: "`to_be_visible()` проходит при любом итоге, `to_have_text(\"€70.00\")` — только при верном. На багованной сборке прогон теперь падает с `Locator expected to have text '€70.00'` и `Actual value: €39.90` — падение указывает прямо на баг. Этому тесту можно доверять."

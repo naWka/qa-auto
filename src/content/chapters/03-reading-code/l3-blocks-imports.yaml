@@ -1,0 +1,829 @@
+id: c3-l3
+chapter: c3
+title: { en: "Indentation, imports and brackets", ru: "Отступы, импорты и скобки" }
+goal:
+  en: "Read the shape of a Python test: what belongs to the test, where its names come from, what the `@` lines change — and spot a method that never runs."
+  ru: "Читать форму Python-теста: что относится к тесту, откуда берутся имена, что меняют строки с `@`, — и замечать метод, который так и не выполняется."
+minutes: 10
+keyPoints:
+  - id: kp-indentation
+    title: { en: "Indentation shows what belongs to what", ru: "Отступ показывает, что чему принадлежит" }
+  - id: kp-imports
+    title: { en: "Imports say where names come from", ru: "Импорты говорят, откуда берутся имена" }
+  - id: kp-decorators
+    title: { en: "An @ line changes how pytest treats a function", ru: "Строка с @ меняет то, как pytest обращается с функцией" }
+  - id: kp-call-brackets
+    title: { en: "A method runs only with ()", ru: "Метод выполняется только со скобками ()" }
+terms: [indentation, import, decorator, method, function, syntax, error-message, traceback]
+
+steps:
+  - type: story
+    lines:
+      - who: kai
+        text:
+          en: "Petal pushed five new tests this morning. Two of them won't even start. And one is green on my test build — where I broke the login greeting on purpose."
+          ru: "Petal утром запушил пять новых тестов. Два даже не запускаются. А один зелёный на моей тестовой сборке — там, где я специально сломал приветствие после логина."
+      - who: petal
+        text:
+          en: "I took the best parts from an answer in a chat. Some of it was JavaScript, but the logic is identical!"
+          ru: "Я взял лучшие куски из ответа в чате. Часть была на JavaScript, но логика та же самая!"
+      - who: maya
+        text:
+          en: "The logic, maybe. But Python also cares about the *shape*: the spaces on the left, the imports at the top, the `@` lines and the brackets at the end. Let's learn to read all of them."
+          ru: "Логика — может быть. Но для Python важна ещё и *форма*: пробелы слева, импорты сверху, строки с `@` и скобки в конце. Давай научимся всё это читать."
+
+  - type: pretest
+    intro:
+      en: "Quick guess before we start. Wrong answers are fine — they help you remember."
+      ru: "Быстрая догадка перед началом. Ошибаться можно — так лучше запоминается."
+    items:
+      - id: c3-l3-p1
+        kind: choice
+        keyPoint: kp-indentation
+        prompt:
+          en: "A Python test has no curly braces around it. How does Python know which lines belong to the test?"
+          ru: "Вокруг Python-теста нет фигурных скобок. Как Python понимает, какие строки относятся к тесту?"
+        options:
+          - text: { en: "By the indentation: the lines shifted right under `def …:` are the test's lines", ru: "По отступу: строки, сдвинутые вправо под `def …:`, — это строки теста" }
+            correct: true
+            why: { en: "Exactly — the spaces on the left are the border of the test.", ru: "Именно — пробелы слева и есть граница теста." }
+          - text: { en: "By the empty line after the last step", ru: "По пустой строке после последнего шага" }
+            why: { en: "Empty lines are only for humans; Python skips them.", ru: "Пустые строки — только для людей, Python их пропускает." }
+          - text: { en: "By the word `end` after the last step", ru: "По слову `end` после последнего шага" }
+            why: { en: "Python has no `end`. A block ends where its indentation ends.", ru: "В Python нет `end`. Блок заканчивается там, где заканчивается его отступ." }
+          - text: { en: "It doesn't: the whole file is one test", ru: "Никак: весь файл — один тест" }
+            why: { en: "A file can hold many tests; each `def test_…` starts a new one.", ru: "В файле может быть много тестов; каждый `def test_…` начинает новый." }
+        hints:
+          - { en: "Look at how the lines under a `def` line start.", ru: "Посмотри, с чего начинаются строки под строкой `def`." }
+          - { en: "What is different at the left edge?", ru: "Что отличается у левого края?" }
+        explain:
+          en: "Python reads the left edge: the lines shifted right under `def …:` belong to the test, and the first line back at the left edge is outside it. Let's see why that matters so much."
+          ru: "Python читает левый край: строки, сдвинутые вправо под `def …:`, принадлежат тесту, а первая строка, вернувшаяся к левому краю, уже вне его. Сейчас разберёмся, почему это так важно."
+
+      - id: c3-l3-p2
+        kind: choice
+        keyPoint: kp-call-brackets
+        prompt:
+          en: "What does the second line do — `page.reload` without brackets?"
+          ru: "Что делает вторая строка — `page.reload` без скобок?"
+        code: |
+          page.goto("/cart")
+          page.reload
+        options:
+          - text: { en: "Nothing: it only names the method — without `()` it never runs", ru: "Ничего: она только называет метод — без `()` он не выполняется" }
+            correct: true
+            why: { en: "Right. Brackets are what makes a method run.", ru: "Верно. Выполняет метод именно пара скобок." }
+          - text: { en: "Reloads the page — brackets are optional", ru: "Перезагружает страницу — скобки необязательны" }
+            why: { en: "In Python, `()` is what runs a method. Without it, nothing happens.", ru: "В Python метод запускают именно `()`. Без них ничего не происходит." }
+          - text: { en: "Stops the test with an error", ru: "Останавливает тест с ошибкой" }
+            why: { en: "That would be kind. But for Python it's a valid line, so it quietly moves on.", ru: "Это было бы по-доброму. Но для Python это допустимая строка, и он молча идёт дальше." }
+        hints:
+          - { en: "Compare it with `page.goto(\"/cart\")` on the line above.", ru: "Сравни её с `page.goto(\"/cart\")` строкой выше." }
+          - { en: "What comes after `goto`, and what comes after `reload`?", ru: "Что стоит после `goto` и что — после `reload`?" }
+        explain:
+          en: "`page.reload` only *mentions* the method; `page.reload()` *calls* it. Python doesn't complain about the first one — and that silence is exactly what makes it dangerous."
+          ru: "`page.reload` только *упоминает* метод, а `page.reload()` его *вызывает*. На первое Python не жалуется — и именно это молчание делает его опасным."
+
+  - type: theory
+    keyPoint: kp-indentation
+    title: { en: "Spaces show what belongs where", ru: "Пробелы показывают, что чему принадлежит" }
+    body:
+      - en: "In a test case, the steps sit under the title. In Python, the steps of a test sit under the `def` line, shifted right by 4 spaces. That shift is called [[indentation]]."
+        ru: "В тест-кейсе шаги стоят под названием. В Python шаги теста стоят под строкой `def`, сдвинутые вправо на 4 пробела. Этот сдвиг называется [[отступом|indentation]]."
+      - en: "A colon at the end of a line — `def …:`, `if …:`, `for …:` — opens a block. Every line shifted right under it belongs to the block; the first line back at the left edge ends it. No braces, no `end` — just spaces."
+        ru: "Двоеточие в конце строки — `def …:`, `if …:`, `for …:` — открывает блок. Каждая строка, сдвинутая вправо под ним, принадлежит блоку; первая строка, вернувшаяся к левому краю, его закрывает. Никаких фигурных скобок и `end` — только пробелы."
+      - en: "So the spaces *are* the structure. If they get mangled when code is pasted from a chat, Python refuses to read the file (`IndentationError`). Worse, a line can slip to *another* valid level: out of an `if`, it runs every time; out of the test, it runs once while the file loads — where there is no `page` at all."
+        ru: "Значит, пробелы — это и *есть* структура. Если они поедут при вставке кода из чата, Python откажется читать файл (`IndentationError`). Хуже, если строка съедет на *другой* допустимый уровень: выпав из `if`, она выполняется всегда; выпав из теста — один раз при загрузке файла, где никакого `page` нет."
+    code: |
+      def test_cart_starts_empty(page: Page):     # ":" opens the test's block
+          page.goto("/cart")                       # inside: step 1
+          expect(page.get_by_test_id("cart-empty")).to_be_visible()  # inside: step 2
+
+
+      def test_shop_opens(page: Page):            # back at the left edge: a new test
+          page.goto("/shop")
+    mentor:
+      en: "In a review, run your eyes down the left edge first: which lines sit under which header? It takes two seconds and catches a whole class of bugs."
+      ru: "На ревью сначала пробеги взглядом по левому краю: какие строки под каким заголовком? Это две секунды — и целый класс багов пойман."
+
+  - type: theory
+    keyPoint: kp-imports
+    title: { en: "The first lines: where names come from", ru: "Первые строки: откуда берутся имена" }
+    body:
+      - en: "A test file starts with [[imports|import]]. `from playwright.sync_api import Page, expect` means: “from Playwright, take `Page` and `expect`”. It's like the preconditions of a test case: everything the steps rely on is listed up front."
+        ru: "Файл с тестами начинается с [[импортов|import]]. `from playwright.sync_api import Page, expect` значит: «возьми из Playwright `Page` и `expect`». Это как предусловия тест-кейса: всё, на что опираются шаги, перечислено заранее."
+      - en: "Use a name that wasn't imported, and the run stops on the first line that needs it: `NameError: name 'expect' is not defined`. The steps before that line did run — the test stops exactly where the missing name is needed."
+        ru: "Используй имя, которое не импортировали, — и прогон остановится на первой строке, где оно нужно: `NameError: name 'expect' is not defined`. Шаги до этой строки выполнятся — тест остановится ровно там, где понадобилось недостающее имя."
+      - en: "Agents that mix up languages bring JavaScript along — most often the word `await` in front of a step. Our tests use Playwright's *sync* API, where every step already waits on its own. In a normal `def`, `await` is a [[syntax]] error — `SyntaxError: 'await' outside async function` — and the file doesn't start at all."
+        ru: "Агенты, которые путают языки, приносят с собой JavaScript — чаще всего слово `await` перед шагом. Наши тесты используют *синхронный* API Playwright, где каждый шаг и так сам дожидается результата. В обычном `def` слово `await` — [[синтаксическая ошибка|syntax]]: `SyntaxError: 'await' outside async function`, и файл не запускается вовсе."
+    code: |
+      import re                                     # Python's own module for text patterns
+
+      import pytest                                 # pytest: marks and fixtures
+      from playwright.sync_api import Page, expect  # Playwright: the page type and expect
+    mentor:
+      en: "In an [[error message|error-message]], find the line that names the error — in pytest it starts with `E`. Its first word is the kind of problem: `NameError` → a missing import or a typo; `SyntaxError` or `IndentationError` → Python couldn't even read the file. The lines around it — the [[traceback]] — show where: the file, the line number and the line itself, marked with `>`."
+      ru: "В [[сообщении об ошибке|error-message]] найди строку, которая называет ошибку, — в pytest она начинается с `E`. Её первое слово — вид проблемы: `NameError` → забытый импорт или опечатка; `SyntaxError` или `IndentationError` → Python даже не смог прочитать файл. Строки вокруг — [[трейсбек|traceback]] — показывают, где это случилось: файл, номер строки и саму строку, отмеченную `>`."
+
+  - type: theory
+    keyPoint: kp-decorators
+    title: { en: "Lines that start with @", ru: "Строки, которые начинаются с @" }
+    body:
+      - en: "A line that starts with `@` right above a `def` is a [[decorator]]: a label that changes how pytest treats the [[function]] below it. Read it first — like the status of a test case (“Blocked”, “Known bug”) before its steps."
+        ru: "Строка, которая начинается с `@` прямо над `def`, — это [[декоратор|decorator]]: ярлык, который меняет то, как pytest обращается с [[функцией|function]] под ним. Читай его первым — как статус тест-кейса («Blocked», «Known bug») перед шагами."
+      - en: "The ones you'll meet most:\n- `@pytest.mark.skip(reason=\"…\")` — don't run this test; report it as SKIPPED with the reason.\n- `@pytest.fixture` — not a test but a preparation step; a test that names it in its brackets gets its result.\n- `@pytest.mark.parametrize(…)` — run the test once per row of data (next lesson)."
+        ru: "Чаще всего встретятся:\n- `@pytest.mark.skip(reason=\"…\")` — не запускать этот тест, показать его в отчёте как SKIPPED с причиной.\n- `@pytest.fixture` — это не тест, а шаг подготовки; тест, который назовёт его в своих скобках, получит его результат.\n- `@pytest.mark.parametrize(…)` — запустить тест по разу на каждую строку данных (в следующем уроке)."
+      - en: "Decorators come from pytest, so the file needs `import pytest`. And when an agent reports “all tests pass”, look for skip marks: a skipped test is not a passed one."
+        ru: "Декораторы берутся из pytest, поэтому файлу нужен `import pytest`. А когда агент докладывает «все тесты прошли», поищи пометки skip: пропущенный тест — не пройденный."
+    code: |
+      @pytest.mark.skip(reason="BLOOM-311: gift cards are not released yet")
+      def test_gift_card_can_be_added_to_cart(page: Page):
+          page.goto("/shop?q=gift")
+          expect(page.get_by_test_id("results-count")).to_have_text("1 product")
+    mentor:
+      en: "Agents sometimes “fix” a red test by adding a skip mark. That's hiding, not fixing. Ask for the reason, a ticket number and a plan to remove the mark."
+      ru: "Агенты иногда «чинят» красный тест, добавляя пометку skip. Это не исправление, а сокрытие. Спроси причину, номер тикета и когда пометку снимут."
+
+  - type: theory
+    keyPoint: kp-call-brackets
+    title: { en: "Brackets mean “do it”", ru: "Скобки значат «сделай»" }
+    body:
+      - en: "`page.reload()` reloads the page. `page.reload` without brackets only *names* the [[method]] — like reading the step “Reload the page” aloud and not doing it. Python sees nothing wrong, and nothing happens."
+        ru: "`page.reload()` перезагружает страницу. `page.reload` без скобок только *называет* [[метод|method]] — как прочитать вслух шаг «Перезагрузить страницу» и не сделать его. Python не видит тут ошибки, и ничего не происходит."
+      - en: "With an assertion this is dangerous: `expect(heading).to_be_visible` without `()` never checks anything, so the test stays green on any build. Its cousin `assert page.get_by_text(\"Saved\")` is always true: a locator is only a description of where to look, and a description always “exists”."
+        ru: "С проверкой это опасно: `expect(heading).to_be_visible` без `()` ничего не проверяет, и тест зелёный на любой сборке. Его родственник `assert page.get_by_text(\"Saved\")` верен всегда: локатор — лишь описание того, где искать, а описание «существует» всегда."
+      - en: "Not every name takes brackets: `.first`, `.last` and `page.url` are properties — values, not actions. In a review, check the *end* of each line: actions and checks end with `(…)`."
+        ru: "Скобки нужны не всем именам: `.first`, `.last` и `page.url` — свойства, то есть значения, а не действия. На ревью смотри на *конец* каждой строки: действия и проверки заканчиваются на `(…)`."
+    code: |
+      page.reload()                       # reloads the page
+      page.reload                         # only names the method: nothing happens
+      expect(heading).to_be_visible()     # checks
+      expect(heading).to_be_visible       # checks nothing: green on any build
+      assert page.get_by_text("Saved")    # always true
+    mentor:
+      en: "You met these in chapter 2. They are the most dangerous mistakes in this lesson because nothing turns red: the trainer adds a note under the report, but real pytest just prints PASSED."
+      ru: "Ты уже встречал{а|} их во второй главе. Это самые опасные ошибки урока, потому что ничего не краснеет: тренажёр добавит заметку под отчётом, а настоящий pytest просто напишет PASSED."
+
+  - type: example
+    title: { en: "One file, all four ideas", ru: "Один файл — все четыре идеи" }
+    intro:
+      en: "A whole test file, top to bottom: imports, a fixture, a test and a skipped test. Read the left edge, the `@` lines and the ends of the lines. Then run it."
+      ru: "Целый файл с тестами, сверху вниз: импорты, фикстура, тест и пропущенный тест. Читай левый край, строки с `@` и концы строк. Потом запусти."
+    code: |
+      import pytest
+      from playwright.sync_api import Page, expect
+
+
+      @pytest.fixture
+      def shop_page(page: Page):
+          page.goto("/shop")
+          return page
+
+
+      def test_search_finds_sunny_tulips(shop_page: Page):
+          shop_page.get_by_label("Search").fill("tulips")
+          expect(shop_page.get_by_test_id("results-count")).to_have_text("1 product")
+
+
+      @pytest.mark.skip(reason="BLOOM-311: gift cards are not released yet")
+      def test_gift_card_can_be_added_to_cart(page: Page):
+          page.goto("/shop?q=gift")
+          expect(page.get_by_test_id("results-count")).to_have_text("1 product")
+    notes:
+      - lines: [1, 2]
+        text:
+          en: "Imports: `pytest` for the `@` lines; `Page` and `expect` from Playwright. Short snippets in this trainer sometimes leave these lines out and get the usual names for free. A real file — and any snippet with its own imports — must import every name it uses."
+          ru: "Импорты: `pytest` — для строк с `@`, `Page` и `expect` — из Playwright. В коротких фрагментах тренажёра эти строки иногда опускают, и привычные имена подставляются сами. Настоящий файл — и любой фрагмент со своими импортами — должен импортировать каждое имя, которое использует."
+      - lines: 5
+        text:
+          en: "A decorator: the function below is a fixture — a preparation step, not a test."
+          ru: "Декоратор: функция ниже — фикстура, шаг подготовки, а не тест."
+      - lines: [7, 8]
+        text:
+          en: "Indented under the fixture's `def`: open the shop, then `return` hands the page to whoever asked for it."
+          ru: "Сдвинуты под `def` фикстуры: открыть магазин, а потом `return` отдаёт страницу тому, кто её попросил."
+      - lines: 11
+        text:
+          en: "The test asks for `shop_page` by name in its brackets. pytest runs the fixture first and passes the result in."
+          ru: "Тест просит `shop_page` по имени в своих скобках. pytest сначала выполняет фикстуру и передаёт результат в тест."
+      - lines: [12, 13]
+        text:
+          en: "The test's steps, 4 spaces in. Both lines end with `(…)`, so both really run."
+          ru: "Шаги теста, с отступом в 4 пробела. Обе строки заканчиваются на `(…)`, значит, обе действительно выполняются."
+      - lines: 16
+        text:
+          en: "A skip mark with a reason. pytest won't run this test; the report shows SKIPPED and the reason."
+          ru: "Пометка skip с причиной. pytest не запустит этот тест; в отчёте будет SKIPPED и причина."
+      - lines: [17, 18, 19]
+        text:
+          en: "This body never runs — today a search for “gift” finds 0 products. When the feature ships, someone deletes line 16 and the test runs again."
+          ru: "Это тело не выполняется: сегодня поиск по «gift» находит 0 товаров. Когда фича выйдет, строку 16 удалят — и тест снова начнёт запускаться."
+    runnable: true
+
+  - type: task
+    task:
+      id: c3-l3-t1
+      kind: choice
+      multi: true
+      keyPoint: kp-indentation
+      prompt:
+        en: "Which of these lines belong to the test? Pick all that apply."
+        ru: "Какие из этих строк относятся к тесту? Выбери все подходящие."
+      context:
+        en: "Petal pasted this test from a chat, and the spacing got lost on the way."
+        ru: "Petal вставил этот тест из чата, и отступы по дороге потерялись."
+      code: |
+        from playwright.sync_api import Page, expect
+
+
+        def test_bloom10_is_accepted(page: Page):
+            page.goto("/cart")
+            page.get_by_label("Promo code").fill("BLOOM10")
+            page.get_by_role("button", name="Apply").click()
+        expect(page.get_by_test_id("promo-message")).to_contain_text("BLOOM10 applied")
+      options:
+        - text: 'page.goto("/cart")'
+          correct: true
+          why: { en: "4 spaces in, under the `def` line: step 1.", ru: "Сдвинута на 4 пробела под строкой `def`: шаг 1." }
+        - text: 'page.get_by_label("Promo code").fill("BLOOM10")'
+          correct: true
+          why: { en: "Indented like the line above: step 2.", ru: "С тем же отступом, что и строка выше: шаг 2." }
+        - text: 'page.get_by_role("button", name="Apply").click()'
+          correct: true
+          why: { en: "Still indented: step 3.", ru: "Всё ещё с отступом: шаг 3." }
+        - text: 'expect(page.get_by_test_id("promo-message")).to_contain_text("BLOOM10 applied")'
+          why: { en: "It starts at the left edge — outside the test. Python would run it once while loading the file.", ru: "Она начинается у левого края — вне теста. Python выполнил бы её один раз, при загрузке файла." }
+      optionsCode: true
+      hints:
+        - { en: "Look only at the left edge of each line.", ru: "Смотри только на левый край каждой строки." }
+        - { en: "Three lines are shifted right under `def`. One isn't.", ru: "Три строки сдвинуты вправо под `def`. Одна — нет." }
+      praise:
+        en: "Right — and you noticed that the line that fell out is the most important one: the check."
+        ru: "Верно — и ты заметил{а|}, что выпала самая важная строка: проверка."
+      explain:
+        en: "Only the indented lines belong to the test. The assertion at the left edge runs while the file loads, and there is no `page` there — pytest stops with `NameError: name 'page' is not defined`, and no test runs at all. The fix: indent it by 4 spaces."
+        ru: "К тесту относятся только строки с отступом. Проверка у левого края выполняется при загрузке файла, а там никакого `page` нет — pytest останавливается с `NameError: name 'page' is not defined`, и не запускается ни один тест. Исправление: сдвинуть её на 4 пробела."
+
+  - type: task
+    task:
+      id: c3-l3-t2
+      kind: input
+      keyPoint: kp-indentation
+      prompt:
+        en: "Petal wrote a tiny script to work out the expected delivery fee for its test data. What will it print? Type the exact text."
+        ru: "Petal написал маленький скрипт, чтобы посчитать ожидаемую стоимость доставки для тестовых данных. Что он выведет? Напиши точный текст."
+      context:
+        en: "Bloomly's rule: delivery is free from €50; below that it costs €4.90."
+        ru: "Правило Bloomly: от €50 доставка бесплатная, ниже — €4.90."
+      code: |
+        subtotal = 42
+        delivery = "€4.90"
+        if subtotal >= 50:
+            print("Subtotal is €50 or more")
+        delivery = "Free"
+        print(f"Delivery: {delivery}")
+      answers: ["Delivery: Free"]
+      caseSensitive: true
+      run: script
+      placeholder: "Printed text"
+      hints:
+        - { en: "42 is less than 50, so the indented line under `if` is skipped. Which lines are *not* indented?", ru: "42 меньше 50, поэтому строка с отступом под `if` пропускается. Какие строки *без* отступа?" }
+        - { en: "Line 5 is at the left edge — outside the `if`.", ru: "Строка 5 у левого края — вне `if`." }
+        - { en: "It runs every time, so `delivery` becomes…", ru: "Она выполняется всегда, значит, `delivery` становится…" }
+      praise:
+        en: "Exactly. You read the structure, not the intention — that's how this bug gets caught."
+        ru: "Точно. Ты прочита{ла|л} структуру, а не намерение, — так этот баг и ловят."
+      explain:
+        en: "Line 5 slipped out of the `if`: it's at the left edge, so it runs for every order. A €42 order “gets” free delivery, and a test built on this data would expect the wrong fee. Petal meant to indent line 5 under the `if`."
+        ru: "Строка 5 выпала из `if`: она у левого края, поэтому выполняется для любого заказа. Заказ на €42 «получает» бесплатную доставку, и тест на этих данных ждал бы неверную стоимость. Petal хотел сдвинуть строку 5 под `if`."
+
+  - type: task
+    task:
+      id: c3-l3-t3
+      kind: fill
+      keyPoint: kp-decorators
+      prompt:
+        en: "Complete the two decorator lines. `cart_page` prepares the cart page for the test; the wedding-bouquet test must not run until the feature ships."
+        ru: "Допиши две строки с декораторами. `cart_page` готовит страницу корзины для теста; тест на свадебные букеты не должен запускаться, пока фича не вышла."
+      code: |
+        import pytest
+        from playwright.sync_api import Page, expect
+
+
+        @pytest.___
+        def cart_page(page: Page):
+            page.goto("/cart")
+            return page
+
+
+        def test_empty_cart_shows_a_message(cart_page: Page):
+            expect(cart_page.get_by_test_id("cart-empty")).to_have_text("Your cart is empty.")
+
+
+        @pytest.mark.___(reason="BLOOM-318: wedding bouquets are not in the shop yet")
+        def test_wedding_bouquet_is_listed(page: Page):
+            page.goto("/shop?q=wedding")
+            expect(page.get_by_test_id("results-count")).to_have_text("1 product")
+      blanks:
+        - { answers: [fixture], options: [fixture, mark.skip, test] }
+        - { answers: [skip] }
+      checks: { expect: pass }
+      hints:
+        - { en: "The first one is a preparation step that a test asks for by name.", ru: "Первый — шаг подготовки, который тест просит по имени." }
+        - { en: "The second mark is named after exactly what it does: don't run, report as skipped.", ru: "Вторая пометка называется ровно так, как работает: не запускать, показать как пропущенный." }
+        - { en: "`fixture`, then `skip`.", ru: "`fixture`, потом `skip`." }
+      praise:
+        en: "Both right. You read the `@` lines before the functions — the same order pytest uses."
+        ru: "Оба ответа верны. Ты читаешь строки с `@` раньше функций — в том же порядке, что и pytest."
+      explain:
+        en: "`@pytest.fixture` turns `cart_page` into a preparation step: the test asks for it by name and gets the opened cart. `@pytest.mark.skip(reason=…)` keeps the wedding test out of the run and shows it as SKIPPED. `xfail` would be wrong here: it means “run it, we expect it to fail because of a known bug”."
+        ru: "`@pytest.fixture` превращает `cart_page` в шаг подготовки: тест просит его по имени и получает открытую корзину. `@pytest.mark.skip(reason=…)` убирает свадебный тест из прогона и показывает его как SKIPPED. `xfail` здесь не подошёл бы: он значит «запусти, мы ждём падения из-за известного бага»."
+
+  - type: task
+    task:
+      id: c3-l3-t4
+      kind: predict
+      keyPoint: kp-call-brackets
+      prompt:
+        en: "This is Kai's test build: after login the heading says “Welcome back, Silva!” instead of “Welcome back, Anna!”. Will Petal's test pass or fail here?"
+        ru: "Это тестовая сборка Кая: после логина заголовок говорит «Welcome back, Silva!» вместо «Welcome back, Anna!». Тест Petal здесь пройдёт или упадёт?"
+      app: { bugs: [greeting-wrong-name] }
+      code: |
+        from playwright.sync_api import Page, expect
+
+
+        def test_anna_is_greeted_by_first_name(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible
+      outcome: pass
+      reasons:
+        - text:
+            en: "It passes: `to_be_visible` has no `()`, so the check never runs"
+            ru: "Пройдёт: у `to_be_visible` нет `()`, поэтому проверка не выполняется"
+          correct: true
+        - text:
+            en: "It fails: there is no heading “Welcome back, Anna!” on the page"
+            ru: "Упадёт: заголовка «Welcome back, Anna!» на странице нет"
+          why: { en: "That's what *should* happen — if the check ran. Look at the very end of line 9.", ru: "Так *должно* быть — если бы проверка выполнилась. Посмотри на самый конец строки 9." }
+        - text:
+            en: "It fails with a SyntaxError: the brackets are missing"
+            ru: "Упадёт с SyntaxError: не хватает скобок"
+          why: { en: "For Python it's a valid line: it just mentions the method. No error, no check.", ru: "Для Python это допустимая строка: она просто упоминает метод. Ни ошибки, ни проверки." }
+      hints:
+        - { en: "Read the end of the last line very carefully.", ru: "Очень внимательно прочитай конец последней строки." }
+        - { en: "Does the assertion actually *run*?", ru: "Проверка вообще *выполняется*?" }
+      praise:
+        en: "Right — and that's the scariest kind of green: a test that can't fail."
+        ru: "Верно — и это самый пугающий зелёный: тест, который не может упасть."
+      explain:
+        en: "Without `()`, Python only looks up the method `to_be_visible` and moves on. The test reaches its end with nothing checked, so pytest reports PASSED on a broken build. The trainer adds a “method never runs” note under the report; real pytest stays silent."
+        ru: "Без `()` Python только находит метод `to_be_visible` и идёт дальше. Тест доходит до конца, ничего не проверив, и pytest пишет PASSED на сломанной сборке. Тренажёр добавит под отчётом заметку «метод не выполняется»; настоящий pytest промолчит."
+
+  - type: task
+    task:
+      id: c3-l3-t5
+      kind: review
+      keyPoint: kp-call-brackets
+      prompt:
+        en: "Petal: “BLOOM10 test — green on the first run!” Flag every line that can't catch a broken discount, and pick the problem."
+        ru: "Petal: «Тест на BLOOM10 — зелёный с первого прогона!» Отметь каждую строку, которая не поймает сломанную скидку, и выбери проблему."
+      testCase:
+        id: TC-214
+        title: Promo code BLOOM10 gives 10% off
+        preconditions: ["Cart has 1 Rose Bouquet (€35.00)"]
+        steps:
+          - { action: "Open /cart" }
+          - { action: "Enter the promo code", data: "BLOOM10" }
+          - { action: "Click \"Apply\"", expected: "\"Promo code BLOOM10 applied: −10%.\" is shown; the total is €36.40" }
+      code: |
+        from playwright.sync_api import Page, expect
+
+
+        def test_bloom10_gives_10_percent_off(page: Page):
+            page.goto("/cart")
+            page.get_by_label("Promo code").fill("BLOOM10")
+            page.get_by_role("button", name="Apply").click
+            expect(page.get_by_test_id("promo-message")).to_be_visible
+            assert page.get_by_test_id("cart-total")
+      issues:
+        - line: 7
+          type: not-called
+          note:
+            en: "No `()` after `click`: the button is never pressed, so the promo code is never applied."
+            ru: "После `click` нет `()`: кнопку так и не нажимают, и промокод не применяется."
+        - line: 8
+          type: not-called
+          note:
+            en: "No `()` after `to_be_visible`: the check never runs. (And even with brackets, “visible” doesn't say *which* message — the case gives the exact text.)"
+            ru: "После `to_be_visible` нет `()`: проверка не выполняется. (И даже со скобками «видно» не говорит, *какое* сообщение, — а кейс даёт точный текст.)"
+        - line: 9
+          type: weak-assertion
+          note:
+            en: "`assert` on a bare locator is always true: a locator is a description, and a description always “exists”. The case expects `to_have_text(\"€36.40\")`."
+            ru: "`assert` на голом локаторе верен всегда: локатор — это описание, а описание «существует» всегда. Кейс ждёт `to_have_text(\"€36.40\")`."
+      types: [not-called, weak-assertion, hard-wait, fragile-locator, wrong-data, hallucination]
+      hints:
+        - { en: "Look at the *end* of each line with an action or a check.", ru: "Смотри на *конец* каждой строки с действием или проверкой." }
+        - { en: "Two lines are missing their brackets. One `assert` can never be false.", ru: "В двух строках не хватает скобок. Один `assert` никогда не бывает ложным." }
+        - { en: "Lines 7, 8 and 9.", ru: "Строки 7, 8 и 9." }
+      praise:
+        en: "All three. A test that's green on the first run deserves the closest look — and you gave it one."
+        ru: "Все три. Тест, зелёный с первого прогона, заслуживает самого пристального взгляда — и ты именно так на него и посмотре{ла|л}."
+      explain:
+        en: "Lines 7–9 look like a test but do nothing: the click never happens, the check never runs and the `assert` is always true. Fixed: `click()`, then `expect(page.get_by_test_id(\"promo-message\")).to_have_text(\"Promo code BLOOM10 applied: −10%.\")` and `expect(page.get_by_test_id(\"cart-total\")).to_have_text(\"€36.40\")` (€35.00 − 10% + €4.90 delivery)."
+        ru: "Строки 7–9 похожи на тест, но ничего не делают: клика нет, проверка не выполняется, а `assert` верен всегда. Исправленный вариант: `click()`, затем `expect(page.get_by_test_id(\"promo-message\")).to_have_text(\"Promo code BLOOM10 applied: −10%.\")` и `expect(page.get_by_test_id(\"cart-total\")).to_have_text(\"€36.40\")` (€35.00 − 10% + €4.90 доставка)."
+
+  - type: task
+    task:
+      id: c3-l3-t6
+      kind: predict
+      keyPoint: kp-imports
+      prompt:
+        en: "Petal translated this test from a JavaScript example in a chat. Will it pass or fail?"
+        ru: "Petal перевёл этот тест с примера на JavaScript из чата. Он пройдёт или упадёт?"
+      code: |
+        from playwright.sync_api import Page, expect
+
+
+        def open_cart(page: Page):
+            page.goto("/cart")
+
+
+        def test_empty_cart_shows_a_message(page: Page):
+            await open_cart(page)
+            expect(page.get_by_test_id("cart-empty")).to_have_text("Your cart is empty.")
+      outcome: fail
+      reasons:
+        - text:
+            en: "It fails before any step: `await` isn't allowed in our sync tests — `SyntaxError: 'await' outside async function`"
+            ru: "Упадёт до первого шага: `await` в наших синхронных тестах не разрешён — `SyntaxError: 'await' outside async function`"
+          correct: true
+        - text:
+            en: "It passes: `await` just waits a little longer, which is harmless"
+            ru: "Пройдёт: `await` просто подождёт чуть дольше, это безвредно"
+          why: { en: "In the sync API every step already waits on its own. Here `await` isn't extra safety — it's a word Python refuses to read in a normal `def`.", ru: "В синхронном API каждый шаг и так ждёт сам. Здесь `await` — не лишняя страховка, а слово, которое Python отказывается читать в обычном `def`." }
+        - text:
+            en: "It fails because the cart isn't empty"
+            ru: "Упадёт, потому что корзина не пустая"
+          why: { en: "Every test starts with a fresh browser and an empty cart. And this test never gets that far.", ru: "Каждый тест начинается с нового браузера и пустой корзины. Да и до проверки этот тест не доходит." }
+      hints:
+        - { en: "Which word on line 9 comes from JavaScript?", ru: "Какое слово в строке 9 пришло из JavaScript?" }
+        - { en: "Our tests use Playwright's *sync* API. Does a normal `def` allow `await`?", ru: "Наши тесты используют *синхронный* API Playwright. Разрешает ли обычный `def` слово `await`?" }
+      praise:
+        en: "Right. This one is loud: the whole file stops — easy to find, as long as you read the error message."
+        ru: "Верно. Эта ошибка громкая: останавливается весь файл — найти её легко, если читать сообщение об ошибке."
+      explain:
+        en: "`await` belongs to async code. In a normal `def` Python can't even read the file: `SyntaxError: 'await' outside async function`, and no test runs. The fix is to delete the word — the sync API waits for every step on its own."
+        ru: "`await` — слово из асинхронного кода. В обычном `def` Python даже не может прочитать файл: `SyntaxError: 'await' outside async function`, и не запускается ни один тест. Исправление — удалить это слово: синхронный API сам дожидается каждого шага."
+
+  - type: task
+    task:
+      id: c3-l3-t7
+      kind: choice
+      keyPoint: kp-imports
+      prompt:
+        en: "The run stops with `NameError: name 'expect' is not defined` on line 9. Petal offers four fixes. Which one do you approve?"
+        ru: "Прогон останавливается с `NameError: name 'expect' is not defined` в строке 9. Petal предлагает четыре исправления. Какое ты одобришь?"
+      code: |
+        from playwright.sync_api import Page
+
+
+        def test_anna_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
+      options:
+        - text: { en: "Line 1: `from playwright.sync_api import Page, expect`", ru: "Строка 1: `from playwright.sync_api import Page, expect`" }
+          correct: true
+          why: { en: "`expect` exists in Playwright — the file just didn't import it. One word fixes the cause.", ru: "`expect` в Playwright есть — файл просто его не импортировал. Одно слово устраняет причину." }
+        - text: { en: "Delete line 9 — then the error is gone", ru: "Удалить строку 9 — и ошибки не будет" }
+          why: { en: "The error goes, and so does the only check. The test would be green on any build.", ru: "Уйдёт ошибка — а вместе с ней и единственная проверка. Тест будет зелёным на любой сборке." }
+        - text: { en: "Line 9: `assert page.get_by_role(\"heading\", name=\"Welcome back, Anna!\")`", ru: "Строка 9: `assert page.get_by_role(\"heading\", name=\"Welcome back, Anna!\")`" }
+          why: { en: "No import needed — but it's always true. You'd swap a loud error for a silent lie.", ru: "Импорт не нужен — но это верно всегда. Громкая ошибка сменится тихим враньём." }
+        - text: { en: "A new line at the top: `import expect`", ru: "Новая строка сверху: `import expect`" }
+          why: { en: "There is no module called `expect` (`ModuleNotFoundError`). `expect` lives inside `playwright.sync_api`.", ru: "Модуля `expect` не существует (`ModuleNotFoundError`). `expect` живёт внутри `playwright.sync_api`." }
+      hints:
+        - { en: "Read the error: which name is missing?", ru: "Прочитай ошибку: какого имени не хватает?" }
+        - { en: "Where do `Page` and `expect` come from in every test file you've seen?", ru: "Откуда берутся `Page` и `expect` во всех файлах с тестами, которые ты видел{а|}?" }
+        - { en: "Pick the fix that keeps the check.", ru: "Выбери исправление, которое сохраняет проверку." }
+      praise:
+        en: "You approved the right one — the fix that keeps the check. Agents love fixes that make errors disappear; you look at what disappears with them."
+        ru: "Ты одобри{ла|л} правильное исправление — то, что сохраняет проверку. Агенты любят исправления, после которых исчезает ошибка; ты смотришь, что исчезает вместе с ней."
+      explain:
+        en: "`NameError` means Python doesn't know the name. `expect` comes from `playwright.sync_api`, so it goes into line 1 next to `Page`. Deleting or weakening the check would also silence the error — and leave a test that can't fail."
+        ru: "`NameError` значит, что Python не знает этого имени. `expect` берётся из `playwright.sync_api`, поэтому его дописывают в строку 1 рядом с `Page`. Удалить или ослабить проверку — тоже способ заглушить ошибку, но тогда останется тест, который не может упасть."
+
+  - type: mistakes
+    title: { en: "Small slips with big effects", ru: "Мелкие промахи с большими последствиями" }
+    items:
+      - wrong: 'expect(page.get_by_role("alert")).to_be_visible'
+        right: 'expect(page.get_by_role("alert")).to_be_visible()'
+        why:
+          en: "Without `()` the check never runs — the test is green on any build."
+          ru: "Без `()` проверка не выполняется — тест зелёный на любой сборке."
+      - wrong: 'assert page.get_by_text("Account created!")'
+        right: 'expect(page.get_by_text("Account created!")).to_be_visible()'
+        why:
+          en: "A locator is always truthy, so this `assert` can't fail. `expect(…)` really looks at the page — and waits for the text."
+          ru: "Локатор всегда «истинный», поэтому такой `assert` не может упасть. `expect(…)` действительно смотрит на страницу — и ждёт текст."
+      - wrong: "from playwright.sync_api import Page"
+        right: "from playwright.sync_api import Page, expect"
+        why:
+          en: "The file uses `expect` but doesn't import it: `NameError: name 'expect' is not defined` on the first check."
+          ru: "Файл использует `expect`, но не импортирует его: `NameError: name 'expect' is not defined` на первой же проверке."
+      - wrong: 'await log_in(page, "anna@bloomly.app", "bloom123")'
+        right: 'log_in(page, "anna@bloomly.app", "bloom123")'
+        why:
+          en: "A JavaScript habit. In our sync tests `await` is a SyntaxError — and the sync API already waits for every step."
+          ru: "Привычка из JavaScript. В наших синхронных тестах `await` — это SyntaxError, а синхронный API и так дожидается каждого шага."
+
+  - type: explain
+    keyPoint: kp-call-brackets
+    prompt:
+      en: "In your own words: one of Petal's test files doesn't start at all, and another test is green on a build with a known bug. What do you check first in each case?"
+      ru: "Своими словами: один файл с тестами от Petal вообще не запускается, а другой тест зелёный на сборке с известным багом. Что ты проверишь первым в каждом случае?"
+    model:
+      en: "If a file doesn't start, I read the error message: the line that names the error. `IndentationError` means the spaces got broken; `NameError` means something isn't imported or is misspelled; `SyntaxError: 'await' outside async function` is a JavaScript habit. If a test is green on a broken build, I look at the end of every assertion line: `expect(…).to_be_visible` without `()` never runs, and `assert` on a bare locator is always true. The loud errors are easy; the silent green is the dangerous one."
+      ru: "Если файл не запускается, я читаю сообщение об ошибке — строку, которая её называет. `IndentationError` значит, что поехали пробелы; `NameError` — что-то не импортировано или написано с опечаткой; `SyntaxError: 'await' outside async function` — привычка из JavaScript. Если тест зелёный на сломанной сборке, я смотрю на конец каждой строки с проверкой: `expect(…).to_be_visible` без `()` не выполняется, а `assert` на голом локаторе верен всегда. Громкие ошибки найти легко; опасен тихий зелёный."
+
+  - type: phrases
+    items:
+      - context: code-review
+        en: "Line 9 has no brackets: to_be_visible is never called, so this test checks nothing."
+        ru: "В строке 9 нет скобок: to_be_visible не вызывается, так что тест ничего не проверяет."
+      - context: code-review
+        en: "Please add expect to the import on line 1 — the run stops with a NameError."
+        ru: "Добавь, пожалуйста, expect в импорт в строке 1 — прогон падает с NameError."
+      - context: chat
+        en: "The file won't start: IndentationError on line 12. I think the spaces got lost when the code was pasted."
+        ru: "Файл не запускается: IndentationError в строке 12. Похоже, отступы потерялись при вставке кода."
+      - context: standup
+        en: "Two of yesterday's tests were green on the broken build because their assertions had no brackets. I fixed them, and now both catch the bug."
+        ru: "Два вчерашних теста были зелёными на сломанной сборке: в их проверках не было скобок. Я исправи{ла|л} их, и теперь оба ловят баг."
+      - context: prompt
+        en: "This is a pytest project with Playwright's sync API. Don't use async or await, import every name you use, and call every method with brackets."
+        ru: "Это проект на pytest с синхронным API Playwright. Не используй async и await, импортируй каждое имя, которое используешь, и вызывай каждый метод со скобками."
+        note:
+          en: "Put this into the project rules once, and the agent stops mixing up languages."
+          ru: "Запиши это один раз в правила проекта — и агент перестанет путать языки."
+
+checkPool:
+  - id: c3-l3-k1
+    kind: input
+    keyPoint: kp-indentation
+    placement: true
+    prompt:
+      en: "What will this script print? Type the exact text."
+      ru: "Что выведет этот скрипт? Напиши точный текст."
+    code: |
+      is_gift = False
+      if is_gift:
+          print("Typing the gift message")
+      print("Placing the order")
+    answers: ["Placing the order"]
+    caseSensitive: true
+    run: script
+    placeholder: "Printed text"
+    hints:
+      - { en: "`is_gift` is False, so the indented line is skipped.", ru: "`is_gift` равно False, поэтому строка с отступом пропускается." }
+      - { en: "Which line is back at the left edge, outside the `if`?", ru: "Какая строка вернулась к левому краю, за пределы `if`?" }
+    explain:
+      en: "Line 3 belongs to the `if` and runs only for gifts. Line 4 is back at the left edge, so it runs every time: “Placing the order”."
+      ru: "Строка 3 принадлежит `if` и выполняется только для подарков. Строка 4 снова у левого края, поэтому выполняется всегда: «Placing the order»."
+
+  - id: c3-l3-k2
+    kind: predict
+    keyPoint: kp-indentation
+    prompt:
+      en: "Petal pasted this test from a chat. Will it pass or fail?"
+      ru: "Petal вставил этот тест из чата. Он пройдёт или упадёт?"
+    code: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_shop_has_a_search_field(page: Page):
+          page.goto("/shop")
+        expect(page.get_by_label("Search")).to_be_visible()
+    outcome: fail
+    reasons:
+      - text:
+          en: "Line 6 has 2 spaces, the test's lines have 4: Python can't tell which block it belongs to, so the file doesn't start"
+          ru: "В строке 6 два пробела, а у строк теста — четыре: Python не понимает, к какому блоку она относится, и файл не запускается"
+        correct: true
+      - text:
+          en: "It passes: indentation is only for readability"
+          ru: "Пройдёт: отступы — только для читаемости"
+        why: { en: "In Python, indentation *is* the structure. Broken spaces mean a broken file.", ru: "В Python отступы и *есть* структура. Сломанные пробелы — сломанный файл." }
+      - text:
+          en: "It fails because the shop has no Search field"
+          ru: "Упадёт, потому что в магазине нет поля Search"
+        why: { en: "It has one — `get_by_label(\"Search\")` is right. The test never gets that far.", ru: "Есть — `get_by_label(\"Search\")` верный. Просто тест до него не доходит." }
+    hints:
+      - { en: "Count the spaces at the start of lines 5 and 6.", ru: "Посчитай пробелы в начале строк 5 и 6." }
+      - { en: "Do 2 spaces match any block that's open — the test (4) or the left edge (0)?", ru: "Подходят ли 2 пробела хоть к одному открытому блоку — к тесту (4) или к левому краю (0)?" }
+    explain:
+      en: "The test's lines are 4 spaces in; line 6 has 2. That matches neither the test nor the left edge, so Python can't read the file: `unindent does not match any outer indentation level`. Nothing runs. The fix: 4 spaces."
+      ru: "Строки теста сдвинуты на 4 пробела, а строка 6 — на 2. Это не совпадает ни с тестом, ни с левым краем, поэтому Python не может прочитать файл: `unindent does not match any outer indentation level`. Не выполняется ничего. Исправление: 4 пробела."
+
+  - id: c3-l3-k3
+    kind: fix
+    keyPoint: kp-imports
+    prompt:
+      en: "The run stops with `NameError: name 're' is not defined`. Fix the file so the test passes. Keep the check as it is."
+      ru: "Прогон останавливается с `NameError: name 're' is not defined`. Исправь файл, чтобы тест прошёл. Проверку оставь как есть."
+    starter: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_logged_out_visit_to_account_opens_login(page: Page):
+          page.goto("/account")
+          expect(page).to_have_url(re.compile(r"/login"))
+    solution: |
+      import re
+
+      from playwright.sync_api import Page, expect
+
+
+      def test_logged_out_visit_to_account_opens_login(page: Page):
+          page.goto("/account")
+          expect(page).to_have_url(re.compile(r"/login"))
+    checks:
+      expect: pass
+      static:
+        - rule: uses
+          value: "import re"
+          message: { en: "Import the module the check uses: `import re`.", ru: "Импортируй модуль, который использует проверка: `import re`." }
+        - rule: uses
+          value: "re.compile("
+          message: { en: "Keep the check as it is — with `re.compile(...)`.", ru: "Оставь проверку как есть — с `re.compile(...)`." }
+    hints:
+      - { en: "`re` is Python's own module for text patterns. Is it imported?", ru: "`re` — встроенный модуль Python для текстовых шаблонов. Он импортирован?" }
+      - { en: "Python's own modules are imported with `import <name>`.", ru: "Встроенные модули Python импортируют так: `import <имя>`." }
+      - { en: "Add `import re` as the very first line.", ru: "Добавь `import re` самой первой строкой." }
+    explain:
+      en: "`re.compile(...)` uses the `re` module, so the file needs `import re` at the top (Python's own modules first, then a blank line, then installed packages like Playwright). A logged-out visit to /account lands on `/login?next=%2Faccount`, and the pattern finds “/login” in it."
+      ru: "`re.compile(...)` использует модуль `re`, поэтому файлу нужен `import re` сверху (сначала встроенные модули Python, потом пустая строка, потом установленные пакеты вроде Playwright). Незалогиненный переход на /account приводит на `/login?next=%2Faccount`, и шаблон находит в адресе «/login»."
+
+  - id: c3-l3-k4
+    kind: predict
+    keyPoint: kp-imports
+    prompt:
+      en: "Petal marked a test as skipped. Will the run pass or fail?"
+      ru: "Petal пометил тест как пропущенный. Прогон пройдёт или упадёт?"
+    code: |
+      from playwright.sync_api import Page, expect
+
+
+      @pytest.mark.skip(reason="BLOOM-342: the Evening slot is being redesigned")
+      def test_evening_delivery_can_be_chosen(page: Page):
+          page.goto("/checkout")
+          page.get_by_label("Evening").check()
+          expect(page.get_by_label("Evening")).to_be_checked()
+    outcome: fail
+    reasons:
+      - text:
+          en: "It fails while loading the file: `pytest` is used on line 4 but never imported — `NameError`"
+          ru: "Упадёт ещё при загрузке файла: `pytest` используется в строке 4, но не импортирован — `NameError`"
+        correct: true
+      - text:
+          en: "It passes: a skipped test can't fail"
+          ru: "Пройдёт: пропущенный тест упасть не может"
+        why: { en: "True for a skip that works. This one is never applied — Python stops at line 4.", ru: "Верно для работающего skip. Этот так и не применяется — Python останавливается на строке 4." }
+      - text:
+          en: "It fails: the Evening option can't be checked"
+          ru: "Упадёт: вариант Evening нельзя выбрать"
+        why: { en: "The steps never run. Look at the top of the file.", ru: "Шаги не выполняются вовсе. Посмотри на начало файла." }
+    hints:
+      - { en: "Where does the name `pytest` on line 4 come from?", ru: "Откуда берётся имя `pytest` в строке 4?" }
+      - { en: "Compare line 1 with the imports in the lesson's example.", ru: "Сравни строку 1 с импортами из примера в уроке." }
+    explain:
+      en: "Decorators run while the file loads. Line 4 needs the name `pytest`, which was never imported, so pytest stops with `NameError: name 'pytest' is not defined` — the report shows an ERROR, not SKIPPED. The fix: `import pytest` at the top."
+      ru: "Декораторы выполняются при загрузке файла. Строке 4 нужно имя `pytest`, которое не импортировали, поэтому pytest останавливается с `NameError: name 'pytest' is not defined` — в отчёте будет ERROR, а не SKIPPED. Исправление: `import pytest` сверху."
+
+  - id: c3-l3-k5
+    kind: choice
+    keyPoint: kp-decorators
+    placement: true
+    prompt:
+      en: "What does `@pytest.mark.skip(reason=\"BLOOM-311\")` above a test do?"
+      ru: "Что делает `@pytest.mark.skip(reason=\"BLOOM-311\")` над тестом?"
+    options:
+      - text: { en: "pytest doesn't run the test and shows it as skipped, with the reason", ru: "pytest не запускает тест и показывает его как пропущенный, с причиной" }
+        correct: true
+        why: { en: "Exactly — the test stays in the file but stays out of the run.", ru: "Именно — тест остаётся в файле, но не попадает в прогон." }
+      - text: { en: "pytest runs the test but ignores a failure", ru: "pytest запускает тест, но не обращает внимания на падение" }
+        why: { en: "That's closer to `xfail` (expected to fail because of a known bug). `skip` doesn't run the test at all.", ru: "Это ближе к `xfail` (ожидаемое падение из-за известного бага). `skip` вообще не запускает тест." }
+      - text: { en: "It deletes the test from the file", ru: "Удаляет тест из файла" }
+        why: { en: "The code stays; only the run changes. Remove the line, and the test runs again.", ru: "Код остаётся, меняется только прогон. Убери строку — и тест снова запускается." }
+      - text: { en: "It's a comment for humans; pytest ignores it", ru: "Это комментарий для людей, pytest его не замечает" }
+        why: { en: "Comments start with `#`. A line with `@` changes how pytest treats the function.", ru: "Комментарии начинаются с `#`. Строка с `@` меняет то, как pytest обращается с функцией." }
+    hints:
+      - { en: "Read the mark's name literally.", ru: "Прочитай название пометки буквально." }
+    explain:
+      en: "A skip mark keeps a test out of the run and shows it as SKIPPED with the reason — handy for unreleased features. Skipped isn't passed: when an agent reports “all green”, ask how many were skipped."
+      ru: "Пометка skip убирает тест из прогона и показывает его как SKIPPED с причиной — удобно для невыпущенных фич. Пропущенный — не пройденный: когда агент докладывает «всё зелёное», спроси, сколько тестов пропущено."
+
+  - id: c3-l3-k6
+    kind: choice
+    keyPoint: kp-decorators
+    prompt:
+      en: "pytest stops with `fixture 'shop_page' not found`. What is missing?"
+      ru: "pytest останавливается с `fixture 'shop_page' not found`. Чего не хватает?"
+    code: |
+      import pytest
+      from playwright.sync_api import Page, expect
+
+
+      def shop_page(page: Page):
+          page.goto("/shop")
+          return page
+
+
+      def test_shop_lists_6_products(shop_page: Page):
+          expect(shop_page.get_by_test_id("results-count")).to_have_text("6 products")
+    options:
+      - text: { en: "`@pytest.fixture` on the line above `def shop_page`", ru: "`@pytest.fixture` в строке над `def shop_page`" }
+        correct: true
+        why: { en: "Without it, `shop_page` is an ordinary function, and pytest doesn't know it may hand it to tests.", ru: "Без него `shop_page` — обычная функция, и pytest не знает, что её можно передавать в тесты." }
+      - text: { en: "Brackets in the test header: `shop_page()`", ru: "Скобки в заголовке теста: `shop_page()`" }
+        why: { en: "In the header's brackets a test lists the *names* it asks for. No calls there.", ru: "В скобках заголовка тест перечисляет *имена*, которые просит. Вызовам там не место." }
+      - text: { en: "`import shop_page` at the top", ru: "`import shop_page` сверху" }
+        why: { en: "`shop_page` is defined right in this file, so there's nothing to import. It needs a label.", ru: "`shop_page` объявлена прямо в этом файле, импортировать нечего. Ей нужен ярлык." }
+      - text: { en: "`return page` at the end of `shop_page`", ru: "`return page` в конце `shop_page`" }
+        why: { en: "It's already there, on line 7.", ru: "Он уже есть — в строке 7." }
+    hints:
+      - { en: "The test asks for `shop_page` by name. How does pytest know which functions can be asked for?", ru: "Тест просит `shop_page` по имени. Как pytest узнаёт, какие функции можно просить?" }
+      - { en: "Compare with the lesson's example: what stands above `def shop_page` there?", ru: "Сравни с примером из урока: что там стоит над `def shop_page`?" }
+    explain:
+      en: "pytest only hands a test the things marked with `@pytest.fixture`. Add the decorator above line 5, and pytest will run `shop_page` first and pass its result into the test."
+      ru: "pytest передаёт тесту только то, что помечено `@pytest.fixture`. Добавь декоратор над строкой 5 — и pytest сначала выполнит `shop_page`, а потом передаст результат в тест."
+
+  - id: c3-l3-k7
+    kind: find-bug
+    keyPoint: kp-call-brackets
+    prompt:
+      en: "On this build a wrong password shows no error at all — and the test is still green. Change the last line so the test catches the bug."
+      ru: "На этой сборке при неверном пароле вообще нет сообщения об ошибке — а тест всё равно зелёный. Измени последнюю строку, чтобы тест поймал баг."
+    app: { bugs: [login-no-error] }
+    starter: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_wrong_password_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("wrong-pass")
+          page.get_by_role("button", name="Log in").click()
+          assert page.get_by_role("alert")
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_wrong_password_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("wrong-pass")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
+    checks:
+      expect: fail
+      also:
+        - app: {}
+          expect: pass
+      static: [hasAssertion, callsMethods]
+    hints:
+      - { en: "`assert` on a bare locator is always true. What should look at the page instead?", ru: "`assert` на голом локаторе верен всегда. Что должно посмотреть на страницу вместо него?" }
+      - { en: "Use `expect(…)` with a matcher — and don't forget its brackets.", ru: "Используй `expect(…)` с проверкой — и не забудь её скобки." }
+      - { en: "For example: `expect(page.get_by_role(\"alert\")).to_have_text(\"Invalid email or password.\")`", ru: "Например: `expect(page.get_by_role(\"alert\")).to_have_text(\"Invalid email or password.\")`" }
+    explain:
+      en: "`assert page.get_by_role(\"alert\")` only checks that a *description* exists — always true. `expect(…).to_have_text(…)` looks at the real page and waits for the message, so on the buggy build it goes red, as it should, and on a correct build it's green."
+      ru: "`assert page.get_by_role(\"alert\")` проверяет лишь, что существует *описание*, — это верно всегда. `expect(…).to_have_text(…)` смотрит на настоящую страницу и ждёт сообщение, поэтому на сломанной сборке тест краснеет, как и должен, а на исправной — зелёный."
+
+  - id: c3-l3-k8
+    kind: choice
+    keyPoint: kp-call-brackets
+    prompt:
+      en: "Petal: “I added brackets everywhere, just to be safe.” Which line is now broken?"
+      ru: "Petal: «Я на всякий случай поставил скобки везде». Какая строка теперь сломана?"
+    options:
+      - text: 'page.get_by_test_id("order-row").first().click()'
+        correct: true
+        why: { en: "`.first` is a property, not a method: it already *is* the first row. Calling it fails with `TypeError: 'Locator' object is not callable`.", ru: "`.first` — свойство, а не метод: это уже и *есть* первая строка. Вызов падает с `TypeError: 'Locator' object is not callable`." }
+      - text: "page.reload()"
+        why: { en: "A method — the brackets make it run. Correct.", ru: "Метод — скобки его запускают. Всё верно." }
+      - text: 'page.get_by_role("link", name="My orders").click()'
+        why: { en: "Correct: `click` is an action and needs `()`.", ru: "Верно: `click` — действие, ему нужны `()`." }
+      - text: 'expect(page.get_by_test_id("orders-summary")).to_have_text("Showing 6 of 6 orders")'
+        why: { en: "Correct: a matcher with its expected value in the brackets.", ru: "Верно: проверка с ожидаемым значением в скобках." }
+    optionsCode: true
+    hints:
+      - { en: "Brackets run a method. Which of these names is a value, not an action?", ru: "Скобки запускают метод. Какое из этих имён — значение, а не действие?" }
+      - { en: "Remember the names without brackets: `.first`, `.last`, `page.url`.", ru: "Вспомни имена без скобок: `.first`, `.last`, `page.url`." }
+    explain:
+      en: "Methods *do* something and need `()`. Properties *are* something: `.first`, `.last`, `page.url`. Brackets everywhere is as wrong as brackets nowhere — read each name."
+      ru: "Методы что-то *делают*, и им нужны `()`. Свойства чем-то *являются*: `.first`, `.last`, `page.url`. Скобки везде — такая же ошибка, как скобки нигде: читай каждое имя."

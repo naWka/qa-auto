@@ -1,20 +1,20 @@
 id: c3-l2
 chapter: c3
-title: { en: "Functions and the test header", ru: "Функции и заголовок теста" }
+title: { en: "Functions: def, arguments, return", ru: "Функции: def, аргументы, return" }
 goal:
-  en: "Read a test header and a helper function: what goes in, which steps run, and with which data."
-  ru: "Читать заголовок теста и функцию-помощник: что передаётся, какие шаги выполняются и с какими данными."
-minutes: 9
+  en: "Read a helper function and a test header: what goes in, which steps run, with which data — and what comes back."
+  ru: "Читать функцию-помощник и заголовок теста: что передаётся, какие шаги выполняются, с какими данными и что возвращается."
+minutes: 10
 keyPoints:
   - id: kp-function
-    title: { en: "A function is a named, reusable set of steps", ru: "Функция — именованный набор шагов для повторного использования" }
-  - id: kp-arrow
-    title: { en: "Reading `async ({ page }) => { ... }`", ru: "Читаем `async ({ page }) => { ... }`" }
+    title: { en: "`def` gives a set of steps a name; a call runs them", ru: "`def` даёт набору шагов имя, а вызов их выполняет" }
   - id: kp-page-fixture
-    title: { en: "`{ page }` is the fresh browser page Playwright gives the test", ru: "`{ page }` — новая страница браузера, которую Playwright даёт тесту" }
-  - id: kp-options-object
-    title: { en: "An object is a set of labelled settings", ru: "Объект — набор подписанных настроек" }
-terms: [function, arrow-function, parameter, argument, object, property, method, precondition]
+    title: { en: "A test is a function too: pytest passes in `page`", ru: "Тест — тоже функция: pytest передаёт в неё `page`" }
+  - id: kp-arguments
+    title: { en: "Positional arguments go by order, keyword arguments by name", ru: "Позиционные аргументы идут по порядку, именованные — по имени" }
+  - id: kp-return
+    title: { en: "`return` hands a value back; without it you get None", ru: "`return` отдаёт значение обратно, а без него приходит None" }
+terms: [function, parameter, argument, keyword-argument, method, none, fixture, precondition]
 
 steps:
   - type: story
@@ -25,8 +25,8 @@ steps:
           ru: "Доброе утро! Майя говорит, ты на этой неделе читаешь код Petal. Зови, как только строка покажется странной, — я для этого здесь."
       - who: petal
         text:
-          en: "Good news: I created a helper function `logIn` and used it in 12 tests. Very efficient!"
-          ru: "Хорошие новости: я создал функцию-помощник `logIn` и использовал её в 12 тестах. Очень эффективно!"
+          en: "Good news: I created a helper function `log_in` and used it in 12 tests. Very efficient!"
+          ru: "Хорошие новости: я создал функцию-помощник `log_in` и использовал её в 12 тестах. Очень эффективно!"
       - who: maya
         text:
           en: "Efficient — if it logs in as the right person. One helper, twelve tests: one mistake inside it breaks all twelve."
@@ -41,22 +41,49 @@ steps:
         kind: choice
         keyPoint: kp-function
         prompt:
-          en: "Inside a test, Petal wrote `await logIn(page, 'tom@bloomly.app', 'tulips42');`. What does this line most likely do?"
-          ru: "Внутри теста Petal написал `await logIn(page, 'tom@bloomly.app', 'tulips42');`. Что, скорее всего, делает эта строка?"
+          en: 'Inside a test, Petal wrote `log_in(page, "tom@bloomly.app", "tulips42")`. What does this line most likely do?'
+          ru: 'Внутри теста Petal написал `log_in(page, "tom@bloomly.app", "tulips42")`. Что, скорее всего, делает эта строка?'
         options:
           - text: { en: "Runs the login steps with Tom's email and password", ru: "Выполняет шаги логина с email и паролем Тома" }
             correct: true
-            why: { en: "`logIn` is a name for a set of steps; the values in brackets are the data for them.", ru: "`logIn` — имя набора шагов, а значения в скобках — данные для них." }
+            why: { en: "`log_in` is a name for a set of steps; the values in brackets are the data for them.", ru: "`log_in` — имя набора шагов, а значения в скобках — данные для них." }
           - text: { en: "Creates a new user called Tom", ru: "Создаёт нового пользователя Тома" }
             why: { en: "The name says \"log in\", and Tom already exists in Bloomly.", ru: "Имя говорит «войти», а Том в Bloomly уже существует." }
           - text: { en: "Describes how login works, without doing anything yet", ru: "Описывает, как работает логин, но пока ничего не делает" }
-            why: { en: "Describing is the *definition*. A line like this one, with values in brackets, is a *call* — it runs the steps.", ru: "Описание — это *объявление*. Строка вроде этой, со значениями в скобках, — *вызов*: она выполняет шаги." }
+            why: { en: "Describing is the *definition* — the `def` line and its steps. A line like this one, with values in brackets, is a *call*: it runs the steps.", ru: "Описание — это *объявление*: строка `def` и шаги под ней. Строка вроде этой, со значениями в скобках, — *вызов*: она выполняет шаги." }
         hints:
           - { en: "Read the name like a test step: \"log in\".", ru: "Прочитай имя как шаг тест-кейса: «войти»." }
           - { en: "What could the two strings in brackets be for?", ru: "Для чего могут быть нужны две строки в скобках?" }
         explain:
-          en: "This is a function call: it runs the steps saved under the name `logIn`, using Tom's data. Let's see how that works."
-          ru: "Это вызов функции: он выполняет шаги, сохранённые под именем `logIn`, с данными Тома. Сейчас разберёмся, как это устроено."
+          en: "This is a function call: it runs the steps saved under the name `log_in`, using Tom's data. Let's see how that works."
+          ru: "Это вызов функции: он выполняет шаги, сохранённые под именем `log_in`, с данными Тома. Сейчас разберёмся, как это устроено."
+      - id: c3-l2-p2
+        kind: choice
+        keyPoint: kp-return
+        prompt:
+          en: "And one more: what will this code print?"
+          ru: "И ещё одна: что напечатает этот код?"
+        code: |
+          def welcome_text(first_name):
+              text = f"Welcome back, {first_name}!"
+
+
+          print(welcome_text("Anna"))
+        options:
+          - text: "None"
+            correct: true
+            why: { en: "The function builds the text but never hands it back — there's no `return`. Then Python gives back None, \"no value\".", ru: "Функция собирает текст, но не отдаёт его обратно — `return` нет. Тогда Python возвращает None, «нет значения»." }
+          - text: "Welcome back, Anna!"
+            why: { en: "That's what `text` holds inside the function. But the text stays inside — nothing hands it back to `print`.", ru: "Это то, что лежит в `text` внутри функции. Но текст там и остаётся — ничто не передаёт его обратно в `print`." }
+          - text: "Welcome back, {first_name}!"
+            why: { en: "The `f` before the quotes does fill in the name. The catch is elsewhere: what does the function give back?", ru: "Буква `f` перед кавычками как раз подставляет имя. Подвох в другом: что функция отдаёт обратно?" }
+        optionsCode: true
+        run: script
+        hints:
+          - { en: "Look for the word `return` inside the function.", ru: "Поищи слово `return` внутри функции." }
+        explain:
+          en: "It prints `None`. A function hands a value back only with `return`; without it the caller gets None. We'll come back to this."
+          ru: "Напечатается `None`. Функция отдаёт значение обратно только через `return`, а без него вызывающий код получает None. Мы ещё к этому вернёмся."
 
   - type: theory
     keyPoint: kp-function
@@ -64,72 +91,82 @@ steps:
     body:
       - en: "In test cases you write a [[precondition]] once — \"User is logged in as Anna\" — and many cases refer to it. Code has the same trick: a [[function]], a named sequence of steps."
         ru: "В тест-кейсах ты один раз описываешь [[предусловие|precondition]] — «Пользователь залогинен как Анна» — и многие кейсы на него ссылаются. В коде тот же приём: [[функция|function]], именованная последовательность шагов."
-      - en: "First the function is *defined*: its name, what it needs, its steps. Nothing runs yet. Later it is *called* — `await logIn(page, ...)` — and only then the steps run."
-        ru: "Сначала функцию *объявляют*: имя, что ей нужно, её шаги. Пока ничего не выполняется. Потом её *вызывают* — `await logIn(page, ...)` — и только тогда шаги выполняются."
-      - en: "The values in brackets of a call are [[arguments|argument]]. Inside the function they arrive under the names from its definition — the [[parameters|parameter]]. They are matched by position: first to first, second to second."
-        ru: "Значения в скобках при вызове — это [[аргументы|argument]]. Внутрь функции они попадают под именами из объявления — [[параметрами|parameter]]. Сопоставляются по порядку: первый с первым, второй со вторым."
+      - en: "First the function is *defined*: `def`, its name, what it needs in brackets, a colon — and its steps, indented underneath. Nothing runs yet. Later it is *called* — `log_in(page, ...)` — and only then the steps run."
+        ru: "Сначала функцию *объявляют*: `def`, имя, в скобках — что ей нужно, двоеточие, а ниже с отступом — её шаги. Пока ничего не выполняется. Потом её *вызывают* — `log_in(page, ...)` — и только тогда шаги выполняются."
+      - en: "The values in brackets of a call are [[arguments|argument]]. Inside the function they arrive under the names from its definition — the [[parameters|parameter]]. Here they are matched by position: first to first, second to second."
+        ru: "Значения в скобках при вызове — это [[аргументы|argument]]. Внутрь функции они попадают под именами из объявления — [[параметрами|parameter]]. Здесь они сопоставляются по порядку: первый с первым, второй со вторым."
     code: |
-      async function logIn(page, email, password) {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill(email);
-        await page.getByLabel('Password').fill(password);
-        await page.getByRole('button', { name: 'Log in' }).click();
-      }
+      def log_in(page, email, password):
+          page.goto("/login")
+          page.get_by_label("Email").fill(email)
+          page.get_by_label("Password").fill(password)
+          page.get_by_role("button", name="Log in").click()
 
-      // later, inside a test:
-      await logIn(page, 'tom@bloomly.app', 'tulips42');
+
+      # later, inside a test:
+      log_in(page, "tom@bloomly.app", "tulips42")
     mentor:
-      en: "Read a call by lining it up with the definition: page → page, 'tom@bloomly.app' → email, 'tulips42' → password."
-      ru: "Читай вызов, прикладывая его к объявлению: page → page, 'tom@bloomly.app' → email, 'tulips42' → password."
-
-  - type: theory
-    keyPoint: kp-arrow
-    title: { en: "The test header, left to right", ru: "Заголовок теста слева направо" }
-    body:
-      - en: "Every Playwright test starts with the same header. It contains a function too — a short [[arrow function|arrow-function]] without a name."
-        ru: "Каждый Playwright-тест начинается с одинакового заголовка. В нём тоже есть функция — короткая [[стрелочная функция|arrow-function]] без имени."
-      - en: "Read it left to right: `test('title', ...)` — a test with this title; `async` — it waits for browser steps; `({ page })` — what it receives; `=>` — \"does this:\"; `{ ... }` — the steps."
-        ru: "Читай слева направо: `test('title', ...)` — тест с таким названием; `async` — он ждёт шаги в браузере; `({ page })` — что он получает; `=>` — «делает вот что:»; `{ ... }` — шаги."
-      - en: "The `});` at the very end belongs to the same header: `}` closes the steps, `)` closes `test(`."
-        ru: "`});` в самом конце относится к тому же заголовку: `}` закрывает шаги, `)` закрывает `test(`."
-    code: |
-      test('Anna can log in', async ({ page }) => {
-        // steps go here
-      });
+      en: 'Read a call by lining it up with the `def` line: page → page, "tom@bloomly.app" → email, "tulips42" → password.'
+      ru: 'Читай вызов, прикладывая его к строке `def`: page → page, "tom@bloomly.app" → email, "tulips42" → password.'
 
   - type: theory
     keyPoint: kp-page-fixture
-    title: { en: "`{ page }`: a fresh browser page for every test", ru: "`{ page }`: новая страница браузера для каждого теста" }
+    title: { en: "The test is a function too", ru: "Тест — тоже функция" }
     body:
-      - en: "Before each test, Playwright opens a fresh, clean browser page — like a new incognito window for every test case. It hands the page to the test in a bundle."
-        ru: "Перед каждым тестом Playwright открывает новую чистую страницу браузера — как новое окно инкогнито для каждого тест-кейса. И передаёт её тесту в «наборе»."
-      - en: "`{ page }` means: \"from what Playwright gives me, take the `page`\". After that, every step talks to the browser through it: `page.goto(...)`, `page.getByLabel(...)`."
-        ru: "`{ page }` значит: «из того, что даёт Playwright, возьми `page`». Дальше каждый шаг общается с браузером через неё: `page.goto(...)`, `page.getByLabel(...)`."
-      - en: "If the header forgets `{ page }`, the word `page` means nothing inside the test, and it crashes on the first step. A helper needs the page too — that's why `logIn(page, ...)` passes it on."
-        ru: "Если в заголовке забыли `{ page }`, слово `page` внутри теста ничего не значит, и тест падает на первом же шаге. Помощнику тоже нужна страница — поэтому `logIn(page, ...)` передаёт её дальше."
+      - en: "Look at the first line of any test: `def` again. A test is a function whose name starts with `test_`. Nobody calls it by hand — pytest finds every `test_…` function and calls it."
+        ru: "Посмотри на первую строку любого теста: снова `def`. Тест — это функция, имя которой начинается с `test_`. Вручную её никто не вызывает: pytest находит все функции `test_…` и вызывает их сам."
+      - en: "Before the call, pytest reads the parameters. The test asks for `page`, so pytest opens a fresh, clean browser page — like a new incognito window for every test case — and passes it in. Things pytest prepares by name like this are [[fixtures|fixture]]."
+        ru: "Перед вызовом pytest смотрит на параметры. Тест просит `page` — и pytest открывает новую чистую страницу браузера (как новое окно инкогнито для каждого тест-кейса) и передаёт её в тест. То, что pytest вот так готовит по имени, называется [[фикстурами|fixture]]."
+      - en: "`: Page` is a type hint — a label for readers and the editor: \"this is a Playwright page\". Python doesn't enforce it: `def test_x(page):` would run the same. What matters is the name in brackets. Without `page` there, the word `page` means nothing inside the test, and it crashes on the first step with `NameError`."
+        ru: "`: Page` — подсказка типа: ярлык для читателя и редактора кода, «это страница Playwright». Python её не проверяет: `def test_x(page):` работал бы точно так же. Важно имя в скобках. Если там нет `page`, слово `page` внутри теста ничего не значит, и тест падает на первом же шаге с `NameError`."
     code: |
-      test('shop shows 6 products', async ({ page }) => {
-        await page.goto('/shop');
-        await expect(page.getByTestId('results-count')).toHaveText('6 products');
-      });
+      def test_shop_shows_6_products(page: Page):
+          page.goto("/shop")
+          expect(page.get_by_test_id("results-count")).to_have_text("6 products")
+    mentor:
+      en: "A helper needs the page too, but pytest only serves tests — nobody hands the page to a helper automatically. That's why the test passes its own page on: `log_in(page, ...)`."
+      ru: "Помощнику тоже нужна страница, но pytest обслуживает только тесты — сама она к помощнику не попадёт. Поэтому тест передаёт свою страницу дальше: `log_in(page, ...)`."
 
   - type: theory
-    keyPoint: kp-options-object
-    title: { en: "Objects: labelled settings", ru: "Объекты: подписанные настройки" }
+    keyPoint: kp-arguments
+    title: { en: "Positional and keyword arguments", ru: "Позиционные и именованные аргументы" }
     body:
-      - en: "`{ name: 'Log in' }` is an [[object]] — labelled values in curly braces. Each `label: value` pair is a [[property]]."
-        ru: "`{ name: 'Log in' }` — это [[объект|object]]: подписанные значения в фигурных скобках. Каждая пара `подпись: значение` — [[свойство|property]]."
-      - en: "In Playwright, objects are mostly settings: `getByRole('button', { name: 'Log in' })` = \"a button whose name is Log in\"; `{ exact: true }` = \"match the whole text exactly\"."
-        ru: "В Playwright объекты — это в основном настройки: `getByRole('button', { name: 'Log in' })` = «кнопка с названием Log in»; `{ exact: true }` = «совпадение всего текста целиком»."
-      - en: "And the word after a dot — `page.goto`, `.click()` — is a [[method]]: an action that `page` or a locator knows how to do."
-        ru: "А слово после точки — `page.goto`, `.click()` — это [[метод|method]]: действие, которое умеет делать `page` или локатор."
+      - en: "Arguments come in two kinds. *Positional* ones are matched by order: in `get_by_role(\"button\", ...)`, `\"button\"` is the role because it comes first. *Keyword* ones carry a label: in `name=\"Log in\"` the label says which parameter gets the value. That's a [[keyword argument|keyword-argument]]."
+        ru: "Аргументы бывают двух видов. *Позиционные* сопоставляются по порядку: в `get_by_role(\"button\", ...)` строка `\"button\"` — это роль, потому что стоит первой. *Именованные* несут подпись: в `name=\"Log in\"` подпись говорит, какой параметр получит значение. Это [[именованный аргумент|keyword-argument]]."
+      - en: "Playwright [[methods|method]] — functions that belong to `page` or a locator — take their settings as keyword arguments: `name=\"Log in\"` = \"the one named Log in\", `exact=True` = \"match the whole text exactly\", `level=1` = \"an h1 heading\"."
+        ru: "[[Методы|method]] Playwright — функции, которые принадлежат `page` или локатору, — получают настройки именованными аргументами: `name=\"Log in\"` = «тот, что называется Log in», `exact=True` = «совпадение всего текста целиком», `level=1` = «заголовок h1»."
+      - en: "Python checks the labels. A label the function doesn't have is an instant crash: `get_by_role(\"button\", label=\"Log in\")` → `TypeError: Page.get_by_role() got an unexpected keyword argument 'label'`."
+        ru: "Python проверяет подписи. Подпись, которой у функции нет, — мгновенное падение: `get_by_role(\"button\", label=\"Log in\")` → `TypeError: Page.get_by_role() got an unexpected keyword argument 'label'`."
     code: |
-      page.getByRole('button', { name: 'Log in' })
-      page.getByRole('heading', { level: 1 })
-      page.getByText('Out of stock', { exact: true })
+      page.get_by_role("button", name="Log in")
+      page.get_by_role("heading", level=1)
+      page.get_by_text("Out of stock", exact=True)
+      log_in(page, email="tom@bloomly.app", password="tulips42")
     mentor:
-      en: "Curly braces have three jobs in a test: a block of steps `{ ... }`, a settings object `{ name: 'Log in' }`, and taking out `{ page }`. Look inside: steps, label: value, or just a name?"
-      ru: "У фигурных скобок в тесте три работы: блок шагов `{ ... }`, объект настроек `{ name: 'Log in' }` и «достать» `{ page }`. Смотри, что внутри: шаги, подпись: значение или просто имя?"
+      en: "Keyword arguments are a reviewer's friend: `log_in(page, email=..., password=...)` reads like test data with labels, and the email and password can't swap places unnoticed. When a helper takes several strings, ask the agent to call it with keywords."
+      ru: "Именованные аргументы — друзья ревьюера: `log_in(page, email=..., password=...)` читается как тестовые данные с подписями, и email с паролем уже не поменяются местами незаметно. Если помощник принимает несколько строк, попроси агента вызывать его с именами."
+
+  - type: theory
+    keyPoint: kp-return
+    title: { en: "return: what a function hands back", ru: "return: что функция отдаёт обратно" }
+    body:
+      - en: "Some functions only do steps, like `log_in`. Others also hand a result back — with `return`. The call is then replaced by that value, and you can keep it in a variable: `card = product_card(page, \"Sunny Tulips\")`."
+        ru: "Одни функции только выполняют шаги, как `log_in`. Другие ещё и отдают результат — через `return`. Тогда вызов заменяется этим значением, и его можно сохранить в переменную: `card = product_card(page, \"Sunny Tulips\")`."
+      - en: "It's like writing down the actual result of one step to use in the next. Playwright methods work the same way: `page.title()` returns the page title, `get_by_role(...)` returns a locator."
+        ru: "Это как записать фактический результат одного шага, чтобы использовать его в следующем. Методы Playwright работают так же: `page.title()` возвращает заголовок страницы, `get_by_role(...)` — локатор."
+      - en: "No `return` → the function hands back [[None|none]], Python's \"no value\". A typical AI slip: the helper finds the element but forgets `return`, and the test crashes with `AttributeError: 'NoneType' object has no attribute …`."
+        ru: "Нет `return` → функция возвращает [[None|none]], в Python это «нет значения». Типичный промах ИИ: помощник находит элемент, но забывает `return`, и тест падает с `AttributeError: 'NoneType' object has no attribute …`."
+    code: |
+      def product_card(page: Page, name: str):
+          return page.get_by_test_id("product-card").filter(has_text=name)
+
+
+      # inside a test:
+      card = product_card(page, "Sunny Tulips")
+      expect(card.get_by_test_id("product-price")).to_have_text("€24.00")
+    mentor:
+      en: "When an error mentions `'NoneType'`, ask: which function produced this value — and does it really `return` it?"
+      ru: "Если в ошибке есть `'NoneType'`, спроси себя: какая функция дала это значение — и правда ли она его возвращает через `return`?"
 
   - type: example
     keyPoint: kp-function
@@ -138,119 +175,88 @@ steps:
       en: "Petal's refactoring: the login steps moved into a helper, and two tests call it with different data."
       ru: "Рефакторинг от Petal: шаги логина переехали в функцию-помощник, и два теста вызывают её с разными данными."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      async function logIn(page, email, password) {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill(email);
-        await page.getByLabel('Password').fill(password);
-        await page.getByRole('button', { name: 'Log in' }).click();
-      }
 
-      test('Anna sees her full name', async ({ page }) => {
-        await logIn(page, 'anna@bloomly.app', 'bloom123');
-        await expect(page.getByTestId('account-name')).toHaveText('Anna Silva');
-      });
+      def log_in(page: Page, email: str, password: str):
+          page.goto("/login")
+          page.get_by_label("Email").fill(email)
+          page.get_by_label("Password").fill(password)
+          page.get_by_role("button", name="Log in").click()
 
-      test('Tom sees his city', async ({ page }) => {
-        await logIn(page, 'tom@bloomly.app', 'tulips42');
-        await expect(page.getByTestId('account-city')).toHaveText('Berlin');
-      });
+
+      def test_anna_sees_her_full_name(page: Page):
+          log_in(page, "anna@bloomly.app", "bloom123")
+          expect(page.get_by_test_id("account-name")).to_have_text("Anna Silva")
+
+
+      def test_tom_sees_his_city(page: Page):
+          log_in(page, email="tom@bloomly.app", password="tulips42")
+          expect(page.get_by_test_id("account-city")).to_have_text("Berlin")
     notes:
-      - lines: 3
+      - lines: 4
         text:
-          en: "The definition: name `logIn`, three parameters — `page`, `email`, `password`."
-          ru: "Объявление: имя `logIn`, три параметра — `page`, `email`, `password`."
-      - lines: [4, 5, 6, 7]
+          en: "The definition: name `log_in`, three parameters. `: Page` and `: str` (text) are type hints — labels for the reader."
+          ru: "Объявление: имя `log_in`, три параметра. `: Page` и `: str` (текст) — подсказки типа, ярлыки для читателя."
+      - lines: [5, 6, 7, 8]
         text:
-          en: "The shared steps. They don't run here — only when a test calls `logIn`."
-          ru: "Общие шаги. Здесь они не выполняются — только когда тест вызывает `logIn`."
-      - lines: 10
-        text:
-          en: "Test header: title, `async`, and `{ page }` — this test's own fresh page."
-          ru: "Заголовок теста: название, `async` и `{ page }` — собственная новая страница этого теста."
+          en: "The shared steps, indented under `def`. They don't run here — only when a test calls `log_in`."
+          ru: "Общие шаги, с отступом под `def`. Здесь они не выполняются — только когда тест вызывает `log_in`."
       - lines: 11
         text:
-          en: "The call. Arguments go to parameters by position: email = 'anna@bloomly.app', password = 'bloom123'. `page` hands the browser page to the helper."
-          ru: "Вызов. Аргументы попадают в параметры по порядку: email = 'anna@bloomly.app', password = 'bloom123'. `page` передаёт помощнику страницу браузера."
+          en: "A test is a function too. pytest calls it and passes in this test's own fresh `page`."
+          ru: "Тест — тоже функция. pytest вызывает её и передаёт собственную новую `page` этого теста."
       - lines: 12
+        text:
+          en: "The call with positional arguments: email = \"anna@bloomly.app\", password = \"bloom123\". `page` hands the browser page on to the helper."
+          ru: "Вызов с позиционными аргументами: email = \"anna@bloomly.app\", password = \"bloom123\". `page` передаёт помощнику страницу браузера."
+      - lines: 13
         text:
           en: "The assertion stays in the test: the helper does the precondition, the test checks the result."
           ru: "Проверка остаётся в тесте: помощник выполняет предусловие, тест проверяет результат."
-      - lines: 16
+      - lines: 17
         text:
-          en: "Same steps, different data — like one precondition reused with another user."
-          ru: "Те же шаги, другие данные — как одно предусловие, переиспользованное с другим пользователем."
+          en: "Same steps, other data — this time with keyword arguments: each value says which parameter it's for."
+          ru: "Те же шаги, другие данные — на этот раз именованными аргументами: каждое значение само говорит, для какого оно параметра."
     runnable: true
 
   - type: task
     task:
       id: c3-l2-t1
       kind: choice
-      keyPoint: kp-function
+      keyPoint: kp-arguments
       prompt:
         en: "Petal calls the helper like this. What will be typed into the Email field?"
         ru: "Petal вызывает помощника вот так. Что будет введено в поле Email?"
       code: |
-        async function logIn(page, email, password) {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill(email);
-          await page.getByLabel('Password').fill(password);
-          await page.getByRole('button', { name: 'Log in' }).click();
-        }
+        def log_in(page, email, password):
+            page.goto("/login")
+            page.get_by_label("Email").fill(email)
+            page.get_by_label("Password").fill(password)
+            page.get_by_role("button", name="Log in").click()
 
-        // in a test:
-        await logIn(page, 'tulips42', 'tom@bloomly.app');
+
+        # in a test:
+        log_in(page, "tulips42", "tom@bloomly.app")
       options:
         - text: "tulips42"
           correct: true
           why: { en: "The second argument goes to the second parameter, `email` — whatever it is.", ru: "Второй аргумент попадает во второй параметр, `email`, — что бы в нём ни было." }
         - text: "tom@bloomly.app"
-          why: { en: "That's what was meant, but code doesn't read intentions — it matches by position.", ru: "Так задумывалось, но код не читает намерения — он сопоставляет по порядку." }
+          why: { en: "That's what was meant, but code doesn't read intentions — positional arguments are matched by order.", ru: "Так задумывалось, но код не читает намерения — позиционные аргументы сопоставляются по порядку." }
         - text: "email"
           why: { en: "`email` is the parameter's name; its value comes from the call.", ru: "`email` — имя параметра, а значение приходит из вызова." }
       optionsCode: true
       hints:
-        - { en: "Line up the call with the definition: page, email, password.", ru: "Приложи вызов к объявлению: page, email, password." }
+        - { en: "Line up the call with the `def` line: page, email, password.", ru: "Приложи вызов к строке `def`: page, email, password." }
         - { en: "Which argument is in the second position?", ru: "Какой аргумент стоит на втором месте?" }
         - { en: "Second argument → second parameter → `email`.", ru: "Второй аргумент → второй параметр → `email`." }
       praise:
         en: "Exactly — you read what the code does, not what it meant to do."
         ru: "Именно — ты прочита{ла|л}, что код делает, а не что он собирался сделать."
       explain:
-        en: "Arguments are matched by position, not by meaning. Here they are swapped: the password goes into Email and the email into Password. Bloomly will say \"Please enter a valid email address.\""
-        ru: "Аргументы сопоставляются по порядку, а не по смыслу. Здесь они перепутаны: пароль уходит в Email, а email — в Password. Bloomly ответит «Please enter a valid email address.»"
-
-  - type: task
-    task:
-      id: c3-l2-t2
-      kind: fill
-      keyPoint: kp-arrow
-      prompt:
-        en: "Complete the test header."
-        ru: "Допиши заголовок теста."
-      code: |
-        import { test, expect } from '@playwright/test';
-
-        test('home page shows the main heading', ___ ({ ___ }) ___ {
-          await page.goto('/');
-          await expect(page.getByRole('heading', { level: 1 })).toHaveText('Fresh flowers, delivered with love');
-        });
-      blanks:
-        - { answers: [async], options: [async, await, function] }
-        - { answers: [page], options: [page, browser, test] }
-        - { answers: ["=>"], options: ["=>", "->", "=="] }
-      checks: { expect: pass }
-      hints:
-        - { en: "The header reads: async — parameters — arrow — steps.", ru: "Заголовок читается так: async — параметры — стрелка — шаги." }
-        - { en: "The steps use `page`, so the test must take it from Playwright.", ru: "Шаги используют `page`, значит, тест должен взять её у Playwright." }
-        - { en: "`async ({ page }) => {`", ru: "`async ({ page }) => {`" }
-      praise:
-        en: "That header will look familiar in every test file you open from now on."
-        ru: "Этот заголовок теперь будет узнаваться в каждом тестовом файле, который ты откроешь."
-      explain:
-        en: "`async ({ page }) => {` — an async arrow function that receives the page. Every Playwright test you'll review starts like this."
-        ru: "`async ({ page }) => {` — асинхронная стрелочная функция, которая получает страницу. Так начинается каждый Playwright-тест, который ты будешь ревьюить."
+        en: "Positional arguments are matched by order, not by meaning. Here they are swapped: the password goes into Email and the email into Password. Bloomly will say \"Please enter a valid email address.\" With keyword arguments — `email=\"tom@bloomly.app\", password=\"tulips42\"` — a mix-up like this is visible at a glance."
+        ru: "Позиционные аргументы сопоставляются по порядку, а не по смыслу. Здесь они перепутаны: пароль уходит в Email, а email — в Password. Bloomly ответит «Please enter a valid email address.» С именованными аргументами — `email=\"tom@bloomly.app\", password=\"tulips42\"` — такая путаница видна сразу."
 
   - type: task
     task:
@@ -261,63 +267,58 @@ steps:
         en: "Put the helper and the test in order. Two lines are wrong — leave them out."
         ru: "Расставь помощника и тест по порядку. Две строки неверные — не используй их."
       lines:
-        - "async function logIn(page, email, password) {"
-        - "  await page.goto('/login');"
-        - "  await page.getByLabel('Email').fill(email);"
-        - "  await page.getByLabel('Password').fill(password);"
-        - "  await page.getByRole('button', { name: 'Log in' }).click();"
-        - "}"
-        - "test('Maya can log in', async ({ page }) => {"
-        - "  await logIn(page, 'maya@bloomly.app', 'qa-rocks');"
-        - "  await expect(page.getByRole('heading', { name: 'Welcome back, Maya!' })).toBeVisible();"
-        - "});"
-      alt:
-        - [0, 1, 3, 2, 4, 5, 6, 7, 8, 9]
-        - [6, 7, 8, 9, 0, 1, 2, 3, 4, 5]
-        - [6, 7, 8, 9, 0, 1, 3, 2, 4, 5]
+        - "def log_in(page, email, password):"
+        - '    page.goto("/login")'
+        - '    page.get_by_label("Email").fill(email)'
+        - '    page.get_by_label("Password").fill(password)'
+        - '    page.get_by_role("button", name="Log in").click()'
+        - "def test_maya_can_log_in(page: Page):"
+        - '    log_in(page, "maya@bloomly.app", "qa-rocks")'
+        - '    expect(page.get_by_role("heading", name="Welcome back, Maya!")).to_be_visible()'
+      alt: [[0, 1, 3, 2, 4, 5, 6, 7], [5, 6, 7, 0, 1, 2, 3, 4], [5, 6, 7, 0, 1, 3, 2, 4]]
       distractors:
-        - "  await logIn('maya@bloomly.app', 'qa-rocks');"
-        - "test('Maya can log in', async () => {"
+        - '    log_in("maya@bloomly.app", "qa-rocks")'
+        - "def test_maya_can_log_in():"
       checks: { expect: pass }
       hints:
-        - { en: "First the definition (name + steps + `}`), then the test that calls it.", ru: "Сначала объявление (имя + шаги + `}`), потом тест, который его вызывает." }
+        - { en: "First the definition (the `def log_in` line and its indented steps), then the test that calls it.", ru: "Сначала объявление (строка `def log_in` и шаги под ней с отступом), потом тест, который её вызывает." }
         - { en: "The helper needs the page, and the test must receive it — check both wrong lines for a missing `page`.", ru: "Помощнику нужна страница, а тест должен её получить — проверь обе неверные строки: где пропала `page`?" }
         - { en: "Steps inside the helper: open /login → email → password → click.", ru: "Шаги внутри помощника: открыть /login → email → пароль → клик." }
       praise:
         en: "Assembled and green. You placed the call exactly where the precondition belongs."
         ru: "Собрано и зелёное. Ты постави{ла|л} вызов ровно туда, где место предусловию."
       explain:
-        en: "Both distractors lose `page`: one doesn't pass it to the helper, the other doesn't receive it in the header. Agents produce both after a refactoring."
-        ru: "Обе лишние строки теряют `page`: одна не передаёт её помощнику, другая не получает её в заголовке. Агенты делают обе ошибки после рефакторинга."
+        en: "Both distractors lose `page`. A test without `page` in its brackets crashes with `NameError: name 'page' is not defined`. A call without it crashes with `TypeError: log_in() missing 1 required positional argument: 'password'` — Python counts the arguments, and one is short. Agents produce both after a refactoring."
+        ru: "Обе лишние строки теряют `page`. Тест без `page` в скобках падает с `NameError: name 'page' is not defined`. Вызов без неё падает с `TypeError: log_in() missing 1 required positional argument: 'password'` — Python считает аргументы, и одного не хватает. Агенты делают обе ошибки после рефакторинга."
 
   - type: task
     task:
       id: c3-l2-t4
       kind: choice
-      keyPoint: kp-options-object
+      keyPoint: kp-arguments
       prompt:
-        en: "What will `page.getByText('Rose', { exact: true })` find on the Shop page?"
-        ru: "Что найдёт `page.getByText('Rose', { exact: true })` на странице Shop?"
+        en: 'What will `page.get_by_text("Rose", exact=True)` find on the Shop page?'
+        ru: 'Что найдёт `page.get_by_text("Rose", exact=True)` на странице Shop?'
       context:
-        en: "On the Shop page, `page.getByText('Rose')` finds the card title \"Rose Bouquet\": by default `getByText` looks for the text anywhere inside an element."
-        ru: "На странице Shop `page.getByText('Rose')` находит заголовок карточки «Rose Bouquet»: по умолчанию `getByText` ищет текст где угодно внутри элемента."
+        en: 'On the Shop page, `page.get_by_text("Rose")` finds the card title "Rose Bouquet": by default `get_by_text` looks for the text anywhere inside an element.'
+        ru: 'На странице Shop `page.get_by_text("Rose")` находит заголовок карточки «Rose Bouquet»: по умолчанию `get_by_text` ищет текст где угодно внутри элемента.'
       options:
         - text: { en: "Nothing: no element's whole text is exactly \"Rose\"", ru: "Ничего: нет элемента, весь текст которого — ровно «Rose»" }
           correct: true
-          why: { en: "`exact: true` asks for the whole text to match, case included.", ru: "`exact: true` требует совпадения всего текста, с учётом регистра." }
+          why: { en: "`exact=True` asks for the whole text to match, case included.", ru: "`exact=True` требует совпадения всего текста, с учётом регистра." }
         - text: { en: "The card title \"Rose Bouquet\", as before", ru: "Заголовок карточки «Rose Bouquet», как и раньше" }
-          why: { en: "That's the default behaviour. The setting changes it.", ru: "Это поведение по умолчанию. Настройка его меняет." }
+          why: { en: "That's the default behaviour. The keyword argument changes it.", ru: "Это поведение по умолчанию. Именованный аргумент его меняет." }
         - text: { en: "Every element that contains \"rose\" in any letter case", ru: "Все элементы, где есть «rose» в любом регистре" }
-          why: { en: "That's closer to the default. `exact: true` makes the match stricter, not looser.", ru: "Это ближе к поведению по умолчанию. `exact: true` делает поиск строже, а не мягче." }
+          why: { en: "That's closer to the default. `exact=True` makes the match stricter, not looser.", ru: "Это ближе к поведению по умолчанию. `exact=True` делает поиск строже, а не мягче." }
       hints:
-        - { en: "The object `{ exact: true }` is a setting. What does the word \"exact\" suggest?", ru: "Объект `{ exact: true }` — это настройка. На что намекает слово «exact»?" }
-        - { en: "With `exact: true` the element's whole text must equal \"Rose\".", ru: "С `exact: true` весь текст элемента должен равняться «Rose»." }
+        - { en: '`exact=True` is a keyword argument — a setting. What does the word "exact" suggest?', ru: "`exact=True` — именованный аргумент, то есть настройка. На что намекает слово «exact»?" }
+        - { en: "With `exact=True` the element's whole text must equal \"Rose\".", ru: "С `exact=True` весь текст элемента должен равняться «Rose»." }
       praise:
-        en: "Right. You read the object as a setting and predicted its effect."
-        ru: "Верно. Ты прочита{ла|л} объект как настройку и предсказа{ла|л} её эффект."
+        en: "Right. You read the keyword argument as a setting and predicted its effect."
+        ru: "Верно. Ты прочита{ла|л} именованный аргумент как настройку и предсказа{ла|л} её эффект."
       explain:
-        en: "`{ exact: true }` is an object with one property: `exact` set to the boolean `true`. It switches `getByText` to whole-text, case-sensitive matching. \"Rose Bouquet\" is not exactly \"Rose\", so nothing is found."
-        ru: "`{ exact: true }` — объект с одним свойством: `exact` со значением `true`. Он переключает `getByText` на совпадение всего текста с учётом регистра. «Rose Bouquet» — не ровно «Rose», поэтому ничего не найдётся."
+        en: '`exact=True` is a keyword argument: the parameter `exact` gets the boolean `True`. It switches `get_by_text` to whole-text, case-sensitive matching. "Rose Bouquet" is not exactly "Rose", so nothing is found.'
+        ru: "`exact=True` — именованный аргумент: параметр `exact` получает логическое значение `True`. Оно переключает `get_by_text` на совпадение всего текста с учётом регистра. «Rose Bouquet» — не ровно «Rose», поэтому ничего не найдётся."
 
   - type: task
     task:
@@ -335,35 +336,35 @@ steps:
           - { action: "Log in", data: "tom@bloomly.app / tulips42" }
           - { action: "Look at the account details", expected: "City: Berlin" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        async function logIn(page, email, password) {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill(email);
-          await page.getByLabel('Password').fill(password);
-          await page.getByRole('button', { name: 'Log in' }).click();
-        }
 
-        test('Tom sees his city on the account page', async ({ page }) => {
-          await logIn(page, 'tulips42', 'tom@bloomly.app');
-          await expect(page.getByTestId('account-city')).toHaveText('Lisbon');
-        });
+        def log_in(page, email, password):
+            page.goto("/login")
+            page.get_by_label("Email").fill(email)
+            page.get_by_label("Password").fill(password)
+            page.get_by_role("button", name="Log in").click()
+
+
+        def test_tom_sees_his_city_on_the_account_page(page: Page):
+            log_in(page, "tulips42", "tom@bloomly.app")
+            expect(page.get_by_test_id("account-city")).to_have_text("Lisbon")
       issues:
-        - line: 11
+        - line: 12
           type: wrong-data
           note:
-            en: "The arguments are swapped: `logIn` expects the email first, then the password."
-            ru: "Аргументы перепутаны: `logIn` ждёт сначала email, потом пароль."
-        - line: 12
+            en: "The arguments are swapped: `log_in` expects the email first, then the password. Keyword arguments would make this visible."
+            ru: "Аргументы перепутаны: `log_in` ждёт сначала email, потом пароль. С именованными аргументами это было бы видно сразу."
+        - line: 13
           type: wrong-assertion
           note:
-            en: "Tom lives in Berlin. 'Lisbon' is Anna's city — probably copied from another test."
-            ru: "Том живёт в Берлине. 'Lisbon' — город Анны, видимо, скопирован из другого теста."
-      types: [wrong-data, wrong-assertion, missing-await, hallucination, no-assertion]
+            en: "Tom lives in Berlin. \"Lisbon\" is Anna's city — probably copied from another test."
+            ru: "Том живёт в Берлине. \"Lisbon\" — город Анны, видимо, скопирован из другого теста."
+      types: [wrong-data, wrong-assertion, not-called, hallucination, no-assertion]
       hints:
-        - { en: "Line up the call on line 11 with the definition on line 3.", ru: "Приложи вызов в строке 11 к объявлению в строке 3." }
+        - { en: "Line up the call on line 12 with the definition on line 4.", ru: "Приложи вызов в строке 12 к объявлению в строке 4." }
         - { en: "Compare the expected city with the test case.", ru: "Сравни ожидаемый город с тест-кейсом." }
-        - { en: "Line 11: which value lands in `email`? Line 12: where does Tom live?", ru: "Строка 11: какое значение попадает в `email`? Строка 12: где живёт Том?" }
+        - { en: "Line 12: which value lands in `email`? Line 13: where does Tom live?", ru: "Строка 12: какое значение попадает в `email`? Строка 13: где живёт Том?" }
       praise:
         en: "Both found. Swapped arguments are invisible unless you line the call up with the definition — and you did."
         ru: "Обе найдены. Перепутанные аргументы не видны, пока не приложишь вызов к объявлению, — а ты приложи{ла|л}."
@@ -377,38 +378,82 @@ steps:
       kind: predict
       keyPoint: kp-page-fixture
       prompt:
-        en: "Will this test pass or fail? Read the header carefully."
-        ru: "Этот тест пройдёт или упадёт? Внимательно прочитай заголовок."
+        en: "Will this test pass or fail? Read the `def` line carefully."
+        ru: "Этот тест пройдёт или упадёт? Внимательно прочитай строку `def`."
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('shop shows all 6 products', async () => {
-          await page.goto('/shop');
-          await expect(page.getByTestId('results-count')).toHaveText('6 products');
-        });
+
+        def test_shop_shows_all_6_products():
+            page.goto("/shop")
+            expect(page.get_by_test_id("results-count")).to_have_text("6 products")
       outcome: fail
       reasons:
         - text:
-            en: "`{ page }` is missing in the header, so `page` is not defined inside the test"
-            ru: "В заголовке нет `{ page }`, поэтому `page` внутри теста не определена"
+            en: "The test doesn't ask for `page` in its brackets, so `page` is an unknown name inside"
+            ru: "Тест не просит `page` в скобках, поэтому внутри `page` — незнакомое имя"
           correct: true
         - text:
             en: "The shop has 5 products"
             ru: "В магазине 5 товаров"
           why: { en: "Bloomly's shop shows 6 products. The test never gets that far.", ru: "В магазине Bloomly 6 товаров. Тест до этого даже не доходит." }
         - text:
-            en: "`async` is missing"
-            ru: "Не хватает `async`"
-          why: { en: "`async` is there. What's missing is between the brackets.", ru: "`async` на месте. Не хватает того, что между скобками." }
+            en: "The type hint `: Page` is missing"
+            ru: "Не хватает подсказки типа `: Page`"
+          why: { en: "A type hint is only a label — `(page)` without it would pass. What's missing is the parameter `page` itself.", ru: "Подсказка типа — только ярлык: `(page)` без неё прошёл бы. Не хватает самого параметра `page`." }
       hints:
-        - { en: "Compare the header with `async ({ page }) => {`.", ru: "Сравни заголовок с `async ({ page }) => {`." }
+        - { en: "Compare the `def` line with `def test_shop_shows_6_products(page: Page):`.", ru: "Сравни строку `def` с `def test_shop_shows_6_products(page: Page):`." }
         - { en: "What's inside `()` here?", ru: "Что здесь внутри `()`?" }
       praise:
-        en: "Correct — the test crashes on line 4 before touching the browser."
-        ru: "Верно — тест падает в строке 4, даже не коснувшись браузера."
+        en: "Correct — the test crashes on line 5 before touching the browser."
+        ru: "Верно — тест падает в строке 5, даже не коснувшись браузера."
       explain:
-        en: "The test never received the page from Playwright, so `page` is an unknown name: the error message is \"page is not defined\". Fix: `async ({ page }) => {`."
-        ru: "Тест не получил страницу от Playwright, поэтому `page` — незнакомое имя; сообщение об ошибке: «page is not defined». Исправление: `async ({ page }) => {`."
+        en: "pytest hands fixtures to a test only by name, and this test asks for nothing. So `page` is an unknown name: `NameError: name 'page' is not defined`. Fix: `def test_shop_shows_all_6_products(page: Page):`."
+        ru: "pytest передаёт фикстуры тесту только по имени, а этот тест ничего не просит. Поэтому `page` — незнакомое имя: `NameError: name 'page' is not defined`. Исправление: `def test_shop_shows_all_6_products(page: Page):`."
+
+  - type: task
+    task:
+      id: c3-l2-t8
+      kind: predict
+      keyPoint: kp-return
+      prompt:
+        en: "Petal moved the card lookup into a helper. Will this test pass or fail?"
+        ru: "Petal вынес поиск карточки в помощника. Этот тест пройдёт или упадёт?"
+      code: |
+        from playwright.sync_api import Page, expect
+
+
+        def product_card(page: Page, name: str):
+            page.get_by_test_id("product-card").filter(has_text=name)
+
+
+        def test_white_orchid_cannot_be_added_to_cart(page: Page):
+            page.goto("/shop")
+            card = product_card(page, "White Orchid")
+            expect(card.get_by_role("button", name="Add to cart")).to_be_disabled()
+      outcome: fail
+      reasons:
+        - text:
+            en: "`product_card` has no `return`, so `card` is None"
+            ru: "В `product_card` нет `return`, поэтому `card` — это None"
+          correct: true
+        - text:
+            en: "White Orchid's \"Add to cart\" button is enabled"
+            ru: "Кнопка «Add to cart» у White Orchid активна"
+          why: { en: "White Orchid is out of stock, so its button really is disabled. The test fails before it can check that.", ru: "White Orchid нет в наличии, так что кнопка и правда неактивна. Тест падает раньше, чем успевает это проверить." }
+        - text:
+            en: "It passes: the helper found the card"
+            ru: "Пройдёт: помощник нашёл карточку"
+          why: { en: "It found it — and kept it to itself. Without `return` the caller gets None.", ru: "Нашёл — и оставил себе. Без `return` вызывающий код получает None." }
+      hints:
+        - { en: "Which line hands the card back to the test?", ru: "Какая строка отдаёт карточку обратно в тест?" }
+        - { en: "Look for `return` on line 5.", ru: "Поищи `return` в строке 5." }
+      praise:
+        en: "Right — you spotted the missing `return` without running anything."
+        ru: "Верно — ты замети{ла|л} пропущенный `return`, ничего не запуская."
+      explain:
+        en: "Line 5 builds the locator and throws it away. The test gets None and crashes on line 11: `AttributeError: 'NoneType' object has no attribute 'get_by_role'`. Fix: start line 5 with `return`."
+        ru: "Строка 5 собирает локатор и тут же его выбрасывает. Тест получает None и падает в строке 11: `AttributeError: 'NoneType' object has no attribute 'get_by_role'`. Исправление: начать строку 5 с `return`."
 
   - type: task
     task:
@@ -416,52 +461,63 @@ steps:
       kind: vocab
       mode: cloze
       sentence:
-        en: "In `logIn(page, 'tom@bloomly.app', 'tulips42')`, the value 'tulips42' is an ___."
-        ru: "В `logIn(page, 'tom@bloomly.app', 'tulips42')` значение 'tulips42' — это аргумент."
+        en: "In `get_by_role(\"button\", name=\"Log in\")`, the part `name=\"Log in\"` is a keyword ___."
+        ru: "В `get_by_role(\"button\", name=\"Log in\")` часть `name=\"Log in\"` — это именованный аргумент."
       answer: argument
       options: [argument, parameter, property]
 
   - type: mistakes
     title: { en: "Typical mistakes around functions", ru: "Типичные ошибки с функциями" }
     items:
-      - wrong: "test('cart is empty', async () => {"
-        right: "test('cart is empty', async ({ page }) => {"
+      - wrong: |-
+          def test_cart_is_empty():
+              page.goto("/cart")
+        right: |-
+          def test_cart_is_empty(page: Page):
+              page.goto("/cart")
         why:
-          en: "Without `{ page }` the test has no browser page: \"page is not defined\" on the first step."
-          ru: "Без `{ page }` у теста нет страницы браузера: «page is not defined» на первом же шаге."
-      - wrong: "await logIn('anna@bloomly.app', 'bloom123');"
-        right: "await logIn(page, 'anna@bloomly.app', 'bloom123');"
+          en: "Without `page` in the brackets pytest hands the test nothing: `NameError: name 'page' is not defined` on the first step."
+          ru: "Без `page` в скобках pytest ничего не передаёт тесту: `NameError: name 'page' is not defined` на первом же шаге."
+      - wrong: 'log_in(page, "bloom123", "anna@bloomly.app")'
+        right: 'log_in(page, email="anna@bloomly.app", password="bloom123")'
         why:
-          en: "The helper's first parameter is `page`. Without it, the email lands in `page` and everything shifts by one."
-          ru: "Первый параметр помощника — `page`. Без неё email попадает в `page`, и всё съезжает на одну позицию."
-      - wrong: "await logIn(page, 'bloom123', 'anna@bloomly.app');"
-        right: "await logIn(page, 'anna@bloomly.app', 'bloom123');"
+          en: "Positional arguments are matched by order, so the password went into Email. With keyword arguments every value says where it goes."
+          ru: "Позиционные аргументы сопоставляются по порядку, поэтому пароль ушёл в Email. С именованными аргументами каждое значение само говорит, куда оно идёт."
+      - wrong: 'page.get_by_role("button", label="Log in")'
+        right: 'page.get_by_role("button", name="Log in")'
         why:
-          en: "Arguments are matched by position. Check the order against the definition."
-          ru: "Аргументы сопоставляются по порядку. Сверяй порядок с объявлением."
-      - wrong: "page.getByRole('button', { label: 'Log in' })"
-        right: "page.getByRole('button', { name: 'Log in' })"
+          en: "`get_by_role` has no `label` parameter — an invented setting. Python stops at once: `TypeError: … got an unexpected keyword argument 'label'`."
+          ru: "У `get_by_role` нет параметра `label` — настройка выдумана. Python сразу останавливается: `TypeError: … got an unexpected keyword argument 'label'`."
+      - wrong: |-
+          def product_card(page, name):
+              page.get_by_test_id("product-card").filter(has_text=name)
+        right: |-
+          def product_card(page, name):
+              return page.get_by_test_id("product-card").filter(has_text=name)
         why:
-          en: "`getByRole` has no `label` setting — an invented property. Playwright ignores it, so the locator matches any button."
-          ru: "У `getByRole` нет настройки `label` — свойство выдумано. Playwright её игнорирует, и локатор находит любую кнопку."
+          en: "A helper that finds something must `return` it. Without `return` the test gets None and crashes on the next step."
+          ru: "Помощник, который что-то находит, должен вернуть это через `return`. Без `return` тест получает None и падает на следующем шаге."
 
   - type: explain
     keyPoint: kp-function
     prompt:
-      en: "In your own words: what happens when a test runs `await logIn(page, 'tom@bloomly.app', 'tulips42')`?"
-      ru: "Своими словами: что происходит, когда тест выполняет `await logIn(page, 'tom@bloomly.app', 'tulips42')`?"
+      en: 'In your own words: what happens when a test runs `log_in(page, "tom@bloomly.app", "tulips42")`?'
+      ru: 'Своими словами: что происходит, когда тест выполняет `log_in(page, "tom@bloomly.app", "tulips42")`?'
     model:
-      en: "The steps written inside `logIn` run now, in this test's own browser page. The arguments go to the parameters by position: `email` becomes 'tom@bloomly.app', `password` becomes 'tulips42'. So the test opens /login, types Tom's data and clicks \"Log in\" — like a shared precondition that many test cases reuse."
-      ru: "Сейчас выполняются шаги, записанные внутри `logIn`, — в собственной странице браузера этого теста. Аргументы попадают в параметры по порядку: `email` становится 'tom@bloomly.app', `password` — 'tulips42'. Значит, тест открывает /login, вводит данные Тома и нажимает «Log in» — как общее предусловие, которое переиспользуют многие тест-кейсы."
+      en: "The steps written under `def log_in` run now, in this test's own browser page — the one pytest gave the test, passed on as the first argument. The other arguments go to the parameters by position: `email` becomes \"tom@bloomly.app\", `password` becomes \"tulips42\". So the test opens /login, types Tom's data and clicks \"Log in\". `log_in` has no `return`, so nothing comes back — and nothing needs to: it's a shared precondition, like the ones many test cases reuse."
+      ru: "Сейчас выполняются шаги, записанные под `def log_in`, — в собственной странице браузера этого теста: pytest дал её тесту, а тест передал первым аргументом. Остальные аргументы попадают в параметры по порядку: `email` становится \"tom@bloomly.app\", `password` — \"tulips42\". Значит, тест открывает /login, вводит данные Тома и нажимает «Log in». В `log_in` нет `return`, поэтому обратно ничего не приходит — и не нужно: это общее предусловие, как те, что переиспользуют многие тест-кейсы."
 
   - type: phrases
     items:
       - context: code-review
-        en: "The arguments look swapped here: logIn expects the email first, then the password."
-        ru: "Кажется, аргументы перепутаны: logIn ждёт сначала email, потом пароль."
+        en: "The arguments look swapped here: log_in expects the email first, then the password. Could we pass them by keyword?"
+        ru: "Кажется, аргументы перепутаны: log_in ждёт сначала email, потом пароль. Может, передадим их по имени?"
       - context: code-review
-        en: "This test doesn't take { page } from the fixture, so page is undefined."
-        ru: "Этот тест не берёт { page } из фикстуры, поэтому page не определена."
+        en: "This test doesn't ask for the page fixture, so page is not defined."
+        ru: "Этот тест не запрашивает фикстуру page, поэтому page не определена."
+      - context: code-review
+        en: "This helper doesn't return anything, so the test gets None."
+        ru: "Этот помощник ничего не возвращает, поэтому тест получает None."
       - context: chat
         en: "Kai, could you walk me through what this helper does?"
         ru: "Кай, можешь пройтись со мной по этой функции-помощнику — что она делает?"
@@ -469,37 +525,36 @@ steps:
           en: "\"Walk me through\" = explain step by step. Very common and polite."
           ru: "«Walk me through» — объясни по шагам. Очень распространённо и вежливо."
       - context: prompt
-        en: "Extract the login steps into a helper function logIn(page, email, password) and reuse it in all login tests."
-        ru: "Вынеси шаги логина в функцию-помощник logIn(page, email, password) и используй её во всех тестах логина."
+        en: "Extract the login steps into a helper function log_in(page, email, password) and call it with keyword arguments in all login tests."
+        ru: "Вынеси шаги логина в функцию-помощник log_in(page, email, password) и вызывай её с именованными аргументами во всех тестах логина."
       - context: standup
-        en: "I'm reviewing Petal's refactoring today: the new logIn helper is used in twelve tests, so I'm checking every call."
-        ru: "Сегодня ревьюю рефакторинг от Petal: новый помощник logIn используется в двенадцати тестах, так что проверяю каждый вызов."
+        en: "I'm reviewing Petal's refactoring today: the new log_in helper is used in twelve tests, so I'm checking every call."
+        ru: "Сегодня ревьюю рефакторинг от Petal: новый помощник log_in используется в двенадцати тестах, так что проверяю каждый вызов."
 
 checkPool:
   - id: c3-l2-k1
-    kind: choice
-    keyPoint: kp-arrow
+    kind: input
+    keyPoint: kp-return
     placement: true
     prompt:
-      en: "Which line is a correct Playwright test header?"
-      ru: "Какая строка — правильный заголовок Playwright-теста?"
-    options:
-      - text: "test('cart is empty', async ({ page }) => {"
-        correct: true
-        why: { en: "Title, async, `{ page }`, arrow, opening brace of the steps.", ru: "Название, async, `{ page }`, стрелка, открывающая скобка шагов." }
-      - text: "test('cart is empty') async ({ page }) => {"
-        why: { en: "The function must be inside `test(...)`, after the title and a comma.", ru: "Функция должна быть внутри `test(...)`, после названия и запятой." }
-      - text: "test('cart is empty', async { page } => {"
-        why: { en: "The parameters need round brackets: `({ page })`.", ru: "Параметрам нужны круглые скобки: `({ page })`." }
-      - text: "test('cart is empty', await ({ page }) => {"
-        why: { en: "The header uses `async`. `await` goes before steps inside.", ru: "В заголовке пишут `async`. `await` ставят перед шагами внутри." }
-    optionsCode: true
+      en: "What does the last line print?"
+      ru: "Что напечатает последняя строка?"
+    code: |
+      def order_label(order_id):
+          print(f"Order #{order_id}")
+
+
+      label = order_label(1043)
+      print(label)
+    answers: ["None"]
+    run: script
+    placeholder: "Printed text"
     hints:
-      - { en: "Pattern: test('title', async ({ page }) => {", ru: "Шаблон: test('title', async ({ page }) => {" }
-      - { en: "Check the comma, the word async and both kinds of brackets.", ru: "Проверь запятую, слово async и оба вида скобок." }
+      - { en: "`print` shows text on the screen. Does it hand anything back to the code?", ru: "`print` показывает текст на экране. А отдаёт ли он что-нибудь обратно в код?" }
+      - { en: "Look for `return` in `order_label`.", ru: "Поищи `return` в `order_label`." }
     explain:
-      en: "Only the first line follows the pattern exactly. The others break the syntax — the file wouldn't even start."
-      ru: "Только первая строка точно следует шаблону. Остальные ломают синтаксис — файл даже не запустится."
+      en: "Line 5 runs the function: it prints \"Order #1043\" and returns nothing, because there's no `return`. So `label` is None, and line 6 prints `None`. Printing is not returning: `print` shows a value to people, `return` hands it to the code."
+      ru: "Строка 5 выполняет функцию: она печатает «Order #1043» и ничего не возвращает, потому что `return` нет. Значит, `label` — это None, и строка 6 печатает `None`. Напечатать — не то же самое, что вернуть: `print` показывает значение людям, а `return` отдаёт его коду."
 
   - id: c3-l2-k2
     kind: input
@@ -508,24 +563,23 @@ checkPool:
       en: "Which product will this test add to the cart?"
       ru: "Какой товар этот тест добавит в корзину?"
     code: |
-      async function addToCart(page, productName) {
-        await page.goto('/shop');
-        await page.getByTestId('product-card').filter({ hasText: productName })
-          .getByRole('button', { name: 'Add to cart' }).click();
-      }
+      def add_to_cart(page, product_name):
+          page.goto("/shop")
+          card = page.get_by_test_id("product-card").filter(has_text=product_name)
+          card.get_by_role("button", name="Add to cart").click()
 
-      test('cart shows the added plant', async ({ page }) => {
-        await addToCart(page, 'Lavender Pot');
-        // ...checks
-      });
+
+      def test_cart_shows_the_added_plant(page: Page):
+          add_to_cart(page, "Lavender Pot")
+          # ...checks
     answers: ["Lavender Pot"]
     placeholder: "Product name"
     hints:
       - { en: "Find the call inside the test.", ru: "Найди вызов внутри теста." }
-      - { en: "The second argument goes to `productName`.", ru: "Второй аргумент попадает в `productName`." }
+      - { en: "The second argument goes to `product_name`.", ru: "Второй аргумент попадает в `product_name`." }
     explain:
-      en: "`addToCart(page, 'Lavender Pot')` → `productName` = 'Lavender Pot', and the helper clicks \"Add to cart\" on that card."
-      ru: "`addToCart(page, 'Lavender Pot')` → `productName` = 'Lavender Pot', и помощник нажимает «Add to cart» на этой карточке."
+      en: "`add_to_cart(page, \"Lavender Pot\")` → `product_name` = \"Lavender Pot\", and the helper clicks \"Add to cart\" on that card."
+      ru: "`add_to_cart(page, \"Lavender Pot\")` → `product_name` = \"Lavender Pot\", и помощник нажимает «Add to cart» на этой карточке."
 
   - id: c3-l2-k3
     kind: predict
@@ -534,117 +588,126 @@ checkPool:
       en: "Will this test pass or fail?"
       ru: "Этот тест пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      async function addRoses(page) {
-        await page.goto('/shop');
-        await page.getByTestId('product-card').filter({ hasText: 'Rose Bouquet' })
-          .getByRole('button', { name: 'Add to cart' }).click();
-      }
 
-      test('cart count shows 1 after adding roses', async ({ page }) => {
-        await page.goto('/shop');
-        await expect(page.getByTestId('cart-count')).toHaveText('1');
-      });
+      def add_roses(page: Page):
+          page.goto("/shop")
+          card = page.get_by_test_id("product-card").filter(has_text="Rose Bouquet")
+          card.get_by_role("button", name="Add to cart").click()
+
+
+      def test_cart_count_shows_1_after_adding_roses(page: Page):
+          page.goto("/shop")
+          expect(page.get_by_test_id("cart-count")).to_have_text("1")
     outcome: fail
     reasons:
       - text:
-          en: "`addRoses` is defined but never called, so nothing is added and the count stays 0"
-          ru: "`addRoses` объявлена, но не вызвана, поэтому ничего не добавляется и счётчик остаётся 0"
+          en: "`add_roses` is defined but never called, so nothing is added and the count stays 0"
+          ru: "`add_roses` объявлена, но не вызвана, поэтому ничего не добавляется и счётчик остаётся 0"
         correct: true
       - text:
           en: "It passes: the helper is in the same file, so it runs automatically"
           ru: "Пройдёт: помощник в том же файле, значит, выполнится автоматически"
-        why: { en: "A definition never runs by itself. Only a call runs it.", ru: "Объявление само по себе не выполняется. Выполняет только вызов." }
+        why: { en: "A definition never runs by itself. Only a call runs it — and pytest calls only `test_…` functions.", ru: "Объявление само по себе не выполняется. Выполняет только вызов — а pytest вызывает только функции `test_…`." }
       - text:
           en: "Rose Bouquet is out of stock"
           ru: "Rose Bouquet нет в наличии"
         why: { en: "Only White Orchid is out of stock.", ru: "Нет в наличии только White Orchid." }
     hints:
-      - { en: "Look for the word `addRoses` inside the test.", ru: "Поищи слово `addRoses` внутри теста." }
+      - { en: "Look for the word `add_roses` inside the test.", ru: "Поищи слово `add_roses` внутри теста." }
       - { en: "Defined ≠ called.", ru: "Объявлена ≠ вызвана." }
     explain:
-      en: "The steps live in `addRoses`, but the test never calls it. A classic after an agent's refactoring: the helper exists, the call got lost. The cart count stays \"0\"."
-      ru: "Шаги живут в `addRoses`, но тест её не вызывает. Классика после рефакторинга агентом: помощник есть, вызов потерялся. Счётчик корзины остаётся «0»."
+      en: "The steps live in `add_roses`, but the test never calls it. A classic after an agent's refactoring: the helper exists, the call got lost. The cart count stays \"0\"."
+      ru: "Шаги живут в `add_roses`, но тест её не вызывает. Классика после рефакторинга агентом: помощник есть, вызов потерялся. Счётчик корзины остаётся «0»."
 
   - id: c3-l2-k4
     kind: fix
     keyPoint: kp-page-fixture
     prompt:
-      en: "This test crashes with \"page is not defined\". Fix the header so it passes."
-      ru: "Тест падает с «page is not defined». Исправь заголовок, чтобы он прошёл."
+      en: "This test crashes with `NameError: name 'page' is not defined`. Fix the `def` line so it passes."
+      ru: "Тест падает с `NameError: name 'page' is not defined`. Исправь строку `def`, чтобы он прошёл."
     starter: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('login page has a Remember me checkbox', async () => {
-        await page.goto('/login');
-        await expect(page.getByRole('checkbox', { name: 'Remember me' })).toBeVisible();
-      });
+
+      def test_login_page_has_a_remember_me_checkbox():
+          page.goto("/login")
+          expect(page.get_by_role("checkbox", name="Remember me")).to_be_visible()
     solution: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('login page has a Remember me checkbox', async ({ page }) => {
-        await page.goto('/login');
-        await expect(page.getByRole('checkbox', { name: 'Remember me' })).toBeVisible();
-      });
+
+      def test_login_page_has_a_remember_me_checkbox(page: Page):
+          page.goto("/login")
+          expect(page.get_by_role("checkbox", name="Remember me")).to_be_visible()
     checks: { expect: pass }
     hints:
-      - { en: "The test uses `page`, but where does it get it from?", ru: "Тест использует `page`, но откуда он её берёт?" }
-      - { en: "Put `{ page }` between the round brackets of the header.", ru: "Поставь `{ page }` в круглые скобки заголовка." }
+      - { en: "The test uses `page` — but does it ask pytest for it?", ru: "Тест использует `page` — но просит ли он её у pytest?" }
+      - { en: "Put `page: Page` between the brackets of the `def` line.", ru: "Поставь `page: Page` в скобки строки `def`." }
     explain:
-      en: "`async ({ page }) =>` takes the fresh browser page from Playwright. Now `page.goto` has a page to work with."
-      ru: "`async ({ page }) =>` берёт у Playwright новую страницу браузера. Теперь `page.goto` есть с чем работать."
+      en: "Now the test asks for the `page` fixture by name, pytest passes a fresh browser page in, and `page.goto` has something to work with."
+      ru: "Теперь тест просит фикстуру `page` по имени, pytest передаёт в него новую страницу браузера, и `page.goto` есть с чем работать."
 
   - id: c3-l2-k5
     kind: choice
-    keyPoint: kp-options-object
+    keyPoint: kp-arguments
     prompt:
-      en: "How many settings (properties) does the object in this locator have, and what are they?"
-      ru: "Сколько настроек (свойств) у объекта в этом локаторе и какие они?"
+      en: "How many keyword arguments does this call have, and which?"
+      ru: "Сколько именованных аргументов в этом вызове и какие?"
     code: |
-      page.getByRole('heading', { name: 'Shop', level: 1 })
+      page.get_by_role("heading", name="Shop", level=1)
     options:
-      - text: { en: "Two: `name` = 'Shop' and `level` = 1", ru: "Две: `name` = 'Shop' и `level` = 1" }
+      - text: { en: "Two: `name=\"Shop\"` and `level=1`", ru: "Два: `name=\"Shop\"` и `level=1`" }
         correct: true
-        why: { en: "Two `label: value` pairs inside the curly braces.", ru: "Две пары `подпись: значение` в фигурных скобках." }
-      - text: { en: "Three: 'heading', 'Shop' and 1", ru: "Три: 'heading', 'Shop' и 1" }
-        why: { en: "'heading' is a separate argument, outside the object.", ru: "'heading' — отдельный аргумент, он вне объекта." }
-      - text: { en: "One: 'Shop'", ru: "Одна: 'Shop'" }
-        why: { en: "`level: 1` is a setting too — the heading level, h1.", ru: "`level: 1` — тоже настройка: уровень заголовка, h1." }
+        why: { en: "Two `label=value` pairs. Each one names the parameter it sets.", ru: "Две пары `подпись=значение`. Каждая называет параметр, который задаёт." }
+      - text: { en: "Three: \"heading\", \"Shop\" and 1", ru: "Три: \"heading\", \"Shop\" и 1" }
+        why: { en: "\"heading\" has no label — it's a positional argument, the role, recognised by its place.", ru: "У \"heading\" нет подписи — это позиционный аргумент, роль, и узнаётся он по месту." }
+      - text: { en: "One: `name=\"Shop\"`", ru: "Один: `name=\"Shop\"`" }
+        why: { en: "`level=1` is a keyword argument too — the heading level, h1.", ru: "`level=1` — тоже именованный аргумент: уровень заголовка, h1." }
     hints:
-      - { en: "The object starts at `{` and ends at `}`.", ru: "Объект начинается с `{` и заканчивается `}`." }
-      - { en: "Count the `label:` parts inside.", ru: "Посчитай части `подпись:` внутри." }
+      - { en: "A keyword argument looks like `label=value`.", ru: "Именованный аргумент выглядит как `подпись=значение`." }
+      - { en: "Count the `=` signs inside the brackets.", ru: "Посчитай знаки `=` внутри скобок." }
     explain:
-      en: "The locator reads: \"a heading, named Shop, level 1\". `'heading'` is the role argument; the object adds two properties."
-      ru: "Локатор читается так: «заголовок с названием Shop, уровня 1». `'heading'` — аргумент-роль, а объект добавляет два свойства."
+      en: "The call reads: \"a heading, named Shop, level 1\". `\"heading\"` is positional — it's the role because it comes first. `name` and `level` are keyword arguments, so their order wouldn't matter."
+      ru: "Вызов читается так: «заголовок с названием Shop, уровня 1». `\"heading\"` — позиционный аргумент: это роль, потому что стоит первым. `name` и `level` — именованные, поэтому их порядок не важен."
 
   - id: c3-l2-k6
-    kind: review
-    keyPoint: kp-options-object
+    kind: fix
+    keyPoint: kp-arguments
     prompt:
-      en: "Petal's test is green. Review it anyway: one setting is invented."
-      ru: "Тест Petal зелёный. Всё равно сделай ревью: одна настройка выдумана."
-    code: |
-      import { test, expect } from '@playwright/test';
+      en: "Petal's test crashes: `TypeError: Page.get_by_role() got an unexpected keyword argument 'label'`. Fix the locator so the test passes."
+      ru: "Тест Petal падает: `TypeError: Page.get_by_role() got an unexpected keyword argument 'label'`. Исправь локатор, чтобы тест прошёл."
+    starter: |
+      from playwright.sync_api import Page, expect
 
-      test('empty email shows an error', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByRole('button', { label: 'Log in' }).click();
-        await expect(page.getByRole('alert')).toHaveText('Please enter your email.');
-      });
-    issues:
-      - line: 5
-        type: hallucination
-        note:
-          en: "`getByRole` has no `label` setting — it's `name`. Playwright ignores the unknown property, so this finds any button. It's green only because the login page has a single button."
-          ru: "У `getByRole` нет настройки `label` — правильно `name`. Playwright игнорирует незнакомое свойство, поэтому локатор находит любую кнопку. Тест зелёный только потому, что на странице логина одна кнопка."
-    types: [hallucination, wrong-data, wrong-assertion, missing-await, no-assertion]
+
+      def test_empty_email_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_role("button", label="Log in").click()
+          expect(page.get_by_role("alert")).to_have_text("Please enter your email.")
+    solution: |
+      from playwright.sync_api import Page, expect
+
+
+      def test_empty_email_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("alert")).to_have_text("Please enter your email.")
+    checks:
+      expect: pass
+      static:
+        - rule: regex
+          value: 'name\s*=\s*["'']Log in["'']'
+          message:
+            en: "Keep the button's name in the locator: `name=\"Log in\"`."
+            ru: "Оставь в локаторе имя кнопки: `name=\"Log in\"`."
     hints:
-      - { en: "Check each property name in the objects against what you know: `name`, `exact`, `level`…", ru: "Сверь имя каждого свойства в объектах с тем, что ты знаешь: `name`, `exact`, `level`…" }
-      - { en: "Line 5: is `label` a real `getByRole` setting?", ru: "Строка 5: `label` — настоящая настройка `getByRole`?" }
+      - { en: "Which keyword argument gives `get_by_role` the element's accessible name?", ru: "Какой именованный аргумент передаёт `get_by_role` доступное имя элемента?" }
+      - { en: "Replace `label=` with `name=`.", ru: "Замени `label=` на `name=`." }
     explain:
-      en: "Green doesn't mean right. An invented setting is silently ignored — the day a second button appears, this test breaks for a reason nobody understands."
-      ru: "Зелёный не значит правильный. Выдуманная настройка молча игнорируется — в день, когда появится вторая кнопка, тест сломается по непонятной никому причине."
+      en: "`get_by_role` takes the element's name as `name=`. `label` is not one of its parameters, so Python refuses the call before anything happens in the browser. Agents mix up `label`, `text` and `name` — the error message tells you which keyword is wrong."
+      ru: "`get_by_role` принимает имя элемента как `name=`. `label` среди его параметров нет, поэтому Python отказывается выполнять вызов ещё до того, как в браузере что-то произойдёт. Агенты путают `label`, `text` и `name` — сообщение об ошибке подсказывает, какой аргумент неверный."
 
   - id: c3-l2-k7
     kind: fill
@@ -654,40 +717,59 @@ checkPool:
       en: "Fill both gaps so that the test passes."
       ru: "Заполни оба пропуска, чтобы тест прошёл."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('cart page shows the empty state', async ({ ___ }) => {
-        await ___.goto('/cart');
-        await expect(page.getByTestId('cart-empty')).toHaveText('Your cart is empty.');
-      });
+
+      def test_cart_page_shows_the_empty_state(___: Page):
+          ___.goto("/cart")
+          expect(page.get_by_test_id("cart-empty")).to_have_text("Your cart is empty.")
     blanks:
       - { answers: [page] }
       - { answers: [page] }
     checks: { expect: pass }
     hints:
-      - { en: "Look at line 5: which name does the test use for the browser page?", ru: "Посмотри на строку 5: каким именем тест называет страницу браузера?" }
+      - { en: "Look at line 6: which name does the test use for the browser page?", ru: "Посмотри на строку 6: каким именем тест называет страницу браузера?" }
       - { en: "The same word goes into both gaps.", ru: "В оба пропуска идёт одно и то же слово." }
     explain:
-      en: "The test receives `{ page }` from Playwright and then uses `page` for every step."
-      ru: "Тест получает `{ page }` от Playwright и дальше использует `page` в каждом шаге."
+      en: "The test asks pytest for `page` in its brackets and then uses `page` in every step. The name matters: pytest finds fixtures by name."
+      ru: "Тест просит у pytest `page` в скобках и дальше использует `page` в каждом шаге. Имя важно: pytest находит фикстуры по имени."
 
   - id: c3-l2-k8
-    kind: choice
-    keyPoint: kp-arrow
+    kind: predict
+    keyPoint: kp-return
+    app: { state: { cart: [{ id: rose-bouquet, qty: 2 }, { id: sunny-tulips, qty: 1 }] } }
     prompt:
-      en: "In `test('Tom can log in', async ({ page }) => {`, what is 'Tom can log in'?"
-      ru: "Что такое 'Tom can log in' в строке `test('Tom can log in', async ({ page }) => {`?"
-    options:
-      - text: { en: "The test title shown in the report", ru: "Название теста, которое видно в отчёте" }
+      en: "Anna's cart has 2 × Rose Bouquet and 1 × Sunny Tulips. Will this test pass or fail?"
+      ru: "В корзине Анны 2 × Rose Bouquet и 1 × Sunny Tulips. Этот тест пройдёт или упадёт?"
+    code: |
+      from playwright.sync_api import Page, expect
+
+
+      def cart_row(page: Page, product: str):
+          return page.get_by_test_id("cart-row").filter(has_text=product)
+
+
+      def test_rose_bouquet_row_shows_the_subtotal_for_2(page: Page):
+          page.goto("/cart")
+          row = cart_row(page, "Rose Bouquet")
+          expect(row.get_by_test_id("row-subtotal")).to_have_text("€70.00")
+    outcome: pass
+    reasons:
+      - text:
+          en: "Pass: `cart_row` returns the Rose Bouquet row, and its subtotal is €70.00"
+          ru: "Пройдёт: `cart_row` возвращает строку Rose Bouquet, и её подытог — €70.00"
         correct: true
-        why: { en: "The first argument of `test(...)` is its title — like the title of a test case.", ru: "Первый аргумент `test(...)` — его название, как заголовок тест-кейса." }
-      - text: { en: "Text typed into the login page", ru: "Текст, который вводится на странице логина" }
-        why: { en: "Only `fill(...)` types text. The title is never sent to the app.", ru: "Текст вводит только `fill(...)`. Название в приложение не отправляется." }
-      - text: { en: "A parameter of the arrow function", ru: "Параметр стрелочной функции" }
-        why: { en: "The arrow function's parameter is `{ page }`.", ru: "Параметр стрелочной функции — `{ page }`." }
+      - text:
+          en: "Fail: `row` is None"
+          ru: "Упадёт: `row` — это None"
+        why: { en: "Line 5 starts with `return`, so the row comes back to the test.", ru: "Строка 5 начинается с `return`, так что строка таблицы возвращается в тест." }
+      - text:
+          en: "Fail: the filter matches both rows"
+          ru: "Упадёт: фильтр находит обе строки"
+        why: { en: "Only one row contains the text \"Rose Bouquet\".", ru: "Текст «Rose Bouquet» есть только в одной строке." }
     hints:
-      - { en: "It's the first thing inside `test(`.", ru: "Это первое, что стоит внутри `test(`." }
-      - { en: "Where do you see test names after a run?", ru: "Где ты видишь названия тестов после прогона?" }
+      - { en: "Find `return` in the helper. What does the test get back?", ru: "Найди `return` в помощнике. Что тест получает обратно?" }
+      - { en: "2 × €35.00 = ?", ru: "2 × €35.00 = ?" }
     explain:
-      en: "The title is for humans: it's what you read in the report. Good titles say what is checked — and you'll compare them with what the test really checks."
-      ru: "Название — для людей: его ты читаешь в отчёте. Хорошее название говорит, что проверяется, — и ты будешь сравнивать его с тем, что тест проверяет на самом деле."
+      en: "`cart_row` hands back a locator for one row; the test keeps it in `row` and looks for the subtotal inside it: 2 × €35.00 = €70.00. Helpers that return locators are common in AI-written tests — check that they really `return`."
+      ru: "`cart_row` отдаёт обратно локатор одной строки, тест сохраняет его в `row` и ищет подытог внутри неё: 2 × €35.00 = €70.00. Помощники, возвращающие локаторы, часто встречаются в тестах от ИИ — проверяй, что они действительно делают `return`."

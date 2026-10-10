@@ -33,8 +33,8 @@
   ru: автотест
   pos: noun
   def:
-    en: "A test case written as code that a test runner executes: a title, steps and checks of the expected result."
-    ru: "Тест-кейс, записанный кодом, который выполняет тест-раннер: название, шаги и проверки ожидаемого результата."
+    en: "A test case written as code that a test runner executes: a name (`def test_…`), steps and checks of the expected result."
+    ru: "Тест-кейс, записанный кодом, который выполняет тест-раннер: название (`def test_…`), шаги и проверки ожидаемого результата."
   example:
     en: "We added an automated test for the login smoke check yesterday."
     ru: "Вчера мы добавили автотест на смоук-проверку логина."
@@ -89,8 +89,8 @@
   ru: фактический результат
   pos: noun
   def:
-    en: "What really happened when the step was performed. In a Playwright error it is shown as \"Received\"."
-    ru: "Что на самом деле произошло при выполнении шага. В ошибке Playwright он показан как «Received»."
+    en: "What really happened when the step was performed. In a Playwright error it is shown as \"Actual value\"."
+    ru: "Что на самом деле произошло при выполнении шага. В ошибке Playwright он показан как «Actual value»."
   example:
     en: "Actual result: the heading says \"Welcome back, Silva!\"."
     ru: "Фактический результат: в заголовке написано «Welcome back, Silva!»."
@@ -125,17 +125,17 @@
   context: standup
   chapter: 1
 
-- id: spec-file
-  en: spec file
-  ipa: /spɛk faɪl/
-  ru: spec-файл (файл с тестами)
+- id: test-file
+  en: test file
+  ipa: /tɛst faɪl/
+  ru: файл с тестами (test file)
   pos: noun
   def:
-    en: "A file with automated tests, for example login.spec.js. The test runner runs every test inside it."
-    ru: "Файл с автотестами, например login.spec.js. Тест-раннер запускает все тесты внутри него."
+    en: "A Python file with automated tests, such as `tests/test_login.py`. pytest collects files named `test_*.py` and runs every `test_…` function inside them."
+    ru: "Python-файл с автотестами, например `tests/test_login.py`. pytest собирает файлы с именами `test_*.py` и запускает каждую функцию `test_…` внутри них."
   example:
-    en: "Let's put the signup tests in a separate spec file, signup.spec.js."
-    ru: "Давай вынесем тесты регистрации в отдельный spec-файл, signup.spec.js."
+    en: "Let's put the signup tests in a separate test file, test_signup.py."
+    ru: "Давай вынесем тесты регистрации в отдельный файл, test_signup.py."
   context: code-review
   chapter: 1
 
@@ -145,8 +145,8 @@
   ru: тест-раннер
   pos: noun
   def:
-    en: "The tool that finds tests, runs them and reports the results. For us it is Playwright Test."
-    ru: "Инструмент, который находит тесты, запускает их и сообщает результаты. У нас это Playwright Test."
+    en: "The tool that finds tests, runs them and reports the results. For us it is pytest with the pytest-playwright plugin."
+    ru: "Инструмент, который находит тесты, запускает их и сообщает результаты. У нас это pytest с плагином pytest-playwright."
   example:
     en: "The test runner found 40 tests and ran them in three minutes."
     ru: "Тест-раннер нашёл 40 тестов и прогнал их за три минуты."
@@ -159,8 +159,8 @@
   ru: действие
   pos: noun
   def:
-    en: "A command that does something on the page, like a manual step: fill, click, check, selectOption."
-    ru: "Команда, которая что-то делает на странице, как ручной шаг: fill, click, check, selectOption."
+    en: "A command that does something on the page, like a manual step: `fill()`, `click()`, `check()`, `select_option()`."
+    ru: "Команда, которая что-то делает на странице, как ручной шаг: `fill()`, `click()`, `check()`, `select_option()`."
   example:
     en: "The action is fine, but the locator points to the wrong button."
     ru: "Действие правильное, но локатор указывает не на ту кнопку."
@@ -173,8 +173,8 @@
   ru: проверка (assertion)
   pos: noun
   def:
-    en: "A line of code that checks the expected result, for example `await expect(page).toHaveURL('/account')`."
-    ru: "Строка кода, которая проверяет ожидаемый результат, например `await expect(page).toHaveURL('/account')`."
+    en: "A line of code that checks the expected result, for example `expect(page.get_by_role(\"alert\")).to_have_text(\"Invalid email or password.\")`."
+    ru: "Строка кода, которая проверяет ожидаемый результат, например `expect(page.get_by_role(\"alert\")).to_have_text(\"Invalid email or password.\")`."
   example:
     en: "The test has no assertion, so it can never fail."
     ru: "В тесте нет проверки, поэтому он никогда не упадёт."
@@ -187,8 +187,8 @@
   ru: локатор
   pos: noun
   def:
-    en: "A way to find an element on the page — \"which element\" in a step, for example `getByLabel('Email')`."
-    ru: "Способ найти элемент на странице — «какой элемент» в шаге, например `getByLabel('Email')`."
+    en: "A way to find an element on the page — \"which element\" in a step, for example `page.get_by_label(\"Email\")`."
+    ru: "Способ найти элемент на странице — «какой элемент» в шаге, например `page.get_by_label(\"Email\")`."
   example:
     en: "Use a role-based locator for the button, not a CSS class."
     ru: "Для кнопки используй локатор по роли, а не CSS-класс."
@@ -215,8 +215,8 @@
   ru: пройти (о тесте), зелёный
   pos: verb
   def:
-    en: "A test passes when all its steps and assertions succeed. Shown as green or ✓."
-    ru: "Тест проходит, когда все его шаги и проверки успешны. Показывается зелёным или ✓."
+    en: "A test passes when all its steps and assertions succeed. Shown as green, or PASSED in the pytest output."
+    ru: "Тест проходит, когда все его шаги и проверки успешны. Показывается зелёным, а в выводе pytest — как PASSED."
   example:
     en: "All login tests pass on staging."
     ru: "На стейджинге все тесты логина проходят."
@@ -229,8 +229,8 @@
   ru: упасть (о тесте), красный
   pos: verb
   def:
-    en: "A test fails when a step or an assertion doesn't succeed. Shown as red or ✘."
-    ru: "Тест падает, когда шаг или проверка не выполняются. Показывается красным или ✘."
+    en: "A test fails when a step or an assertion doesn't succeed. Shown as red, or FAILED in the pytest output."
+    ru: "Тест падает, когда шаг или проверка не выполняются. Показывается красным, а в выводе pytest — как FAILED."
   example:
     en: "The checkout test fails because the total is wrong."
     ru: "Тест оформления заказа падает, потому что итоговая сумма неверная."

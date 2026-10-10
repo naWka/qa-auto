@@ -1,20 +1,21 @@
 // Read-only code with syntax highlighting, line numbers and per-line decorations.
 import { Fragment, useMemo, type ReactNode } from 'react';
-import { parser } from '@lezer/javascript';
+import { parser } from '@lezer/python';
 import { classHighlighter, highlightTree } from '@lezer/highlight';
 
 type Tok = { text: string; cls: string };
 
-/** Plain-text snippets (Markdown plans, rules files, YAML workflows, shell commands) get a light highlighter. */
-export function detectLang(code: string): 'js' | 'md' | 'yaml' | 'shell' | 'html' {
+/** Plain-text snippets (Markdown plans, rules files, YAML workflows, shell commands, ini files) get a light highlighter. */
+export function detectLang(code: string): 'py' | 'md' | 'yaml' | 'shell' | 'html' {
   const lines = code.split('\n').filter((l) => l.trim());
-  if (!lines.length) return 'js';
-  if (/^\s*<[a-zA-Z!]/.test(lines[0]) && lines.every((l) => !/\b(await|const|test\(|=>)/.test(l))) return 'html';
-  const jsish = lines.filter((l) => /[;{}]|=>|\bawait\b|\bconst\b|\bimport\b|\bexport\b|\bfunction\b/.test(l)).length;
-  if (lines.every((l) => /^\s*(\$ |npx |npm |git |cd |code |claude |playwright-cli |node |mkdir |#)/.test(l)) && lines.some((l) => !/^\s*#/.test(l))) return 'shell';
+  if (!lines.length) return 'py';
+  if (/^\s*<[a-zA-Z!]/.test(lines[0]) && lines.every((l) => !/\b(def|import|assert|expect\()/.test(l))) return 'html';
+  const pyish = lines.filter((l) => /^\s*(def|class|import|from|assert|return|yield|with|for|if|elif|else|try|except|@)\b|[()[\]=]|:\s*$/.test(l)).length;
+  if (lines.every((l) => /^\s*(\$ |npx |npm |pip |pip3 |python |python3 |pytest|playwright |git |cd |code |claude |playwright-cli |node |mkdir |source |\.venv|#)/.test(l)) && lines.some((l) => !/^\s*#/.test(l))) return 'shell';
   if (/^(name|on|jobs|steps|runs-on):/m.test(code) && /^\s+- (uses|run|name):/m.test(code)) return 'yaml';
-  if (jsish / lines.length < 0.25 && lines.some((l) => /^\s*(#{1,4} |[-*] |\d+\. |\*\*)/.test(l))) return 'md';
-  return 'js';
+  if (/^\[(pytest|tool:pytest|tool\.pytest\.ini_options)\]/m.test(code)) return 'yaml';
+  if (pyish / lines.length < 0.25 && lines.some((l) => /^\s*(#{1,4} |[-*] |\d+\. |\*\*)/.test(l))) return 'md';
+  return 'py';
 }
 
 function simpleTokens(line: string, lang: 'md' | 'yaml' | 'shell' | 'html'): Tok[] {
@@ -65,7 +66,7 @@ function simpleTokens(line: string, lang: 'md' | 'yaml' | 'shell' | 'html'): Tok
 
 export function highlightLines(code: string): Tok[][] {
   const lang = detectLang(code);
-  if (lang !== 'js') return code.split('\n').map((l) => simpleTokens(l, lang));
+  if (lang !== 'py') return code.split('\n').map((l) => simpleTokens(l, lang));
   const tree = parser.parse(code);
   const marks: { from: number; to: number; cls: string }[] = [];
   highlightTree(tree, classHighlighter, (from, to, classes) => marks.push({ from, to, cls: classes }));

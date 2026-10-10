@@ -47,8 +47,8 @@
   ru: жёсткое ожидание, фиксированная пауза (hard wait)
   pos: noun
   def:
-    en: "A fixed pause like `waitForTimeout(3000)` that waits the same time whether the app is ready or not."
-    ru: "Фиксированная пауза вроде `waitForTimeout(3000)`, которая ждёт одно и то же время, готово приложение или нет."
+    en: "A fixed pause like `page.wait_for_timeout(3000)` or `time.sleep(3)` that waits the same time whether the app is ready or not."
+    ru: "Фиксированная пауза вроде `page.wait_for_timeout(3000)` или `time.sleep(3)`, которая ждёт одно и то же время, готово приложение или нет."
   example:
     en: "Requesting changes: please remove the hard wait and assert the toast instead."
     ru: "Запрашиваю изменения: пожалуйста, убери жёсткое ожидание и проверь вместо него тост."
@@ -75,11 +75,11 @@
   ru: отладка (debugging)
   pos: noun
   def:
-    en: "Finding out, step by step, why code or a test behaves wrong — before changing anything."
-    ru: "Поиск причины, почему код или тест работает неправильно, — шаг за шагом и до того, как что-то менять."
+    en: "Finding out, step by step, why code or a test behaves wrong — before changing anything. For example, `PWDEBUG=1 pytest -s` opens the Playwright Inspector."
+    ru: "Поиск причины, почему код или тест работает неправильно, — шаг за шагом и до того, как что-то менять. Например, `PWDEBUG=1 pytest -s` открывает Playwright Inspector."
   example:
-    en: "Debugging tip: run it with `--debug` and step through until the locator stops matching."
-    ru: "Совет по отладке: запусти тест с `--debug` и иди по шагам, пока локатор не перестанет находить элемент."
+    en: "Debugging tip: run it in the Playwright Inspector and step through until the locator stops matching."
+    ru: "Совет по отладке: запусти тест в Playwright Inspector и иди по шагам, пока локатор не перестанет находить элемент."
   context: chat
   chapter: 7
 

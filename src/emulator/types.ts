@@ -1,4 +1,4 @@
-export const SPEC_FILE = 'example.spec.js';
+export const SPEC_FILE = 'test_example.py';
 
 export type StepCategory = 'pw:api' | 'expect' | 'test.step' | 'hook' | 'fixture';
 
@@ -21,18 +21,27 @@ export interface ErrorInfo {
   data: Record<string, string | number>;
   line?: number;
   file?: string;
+  /** when the error happened in another file: the line of the test file that led there */
+  specLine?: number;
   emulatorNote?: boolean;
 }
 
 export interface TestResult {
   title: string;
+  /** [file, Class?, test name] */
   titlePath: string[];
+  /** pytest node id: test_example.py::TestLogin::test_ok[anna] */
+  nodeid: string;
   status: 'passed' | 'failed' | 'skipped' | 'timedOut';
   duration: number;
   steps: StepRecord[];
   error?: ErrorInfo;
   softErrors: ErrorInfo[];
   logs: string[];
+  /** pytest outcome label when it differs from status: XFAIL, XPASS, ERROR (setup/teardown) */
+  label?: string;
+  skipReason?: string;
+  phase?: 'setup' | 'teardown';
 }
 
 export interface StaticFinding {

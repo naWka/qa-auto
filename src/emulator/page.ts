@@ -1,5 +1,5 @@
 // Page and Locator: the student-facing Playwright API bound to the Bloomly iframe.
-import { isChecked, isDisabled, isEditable, isVisible, suggestLocator } from './aria';
+import { isChecked, isDisabled, isEditable, isVisible, uniqueLocator } from './aria';
 import { EmuError, callerLocation } from './errors';
 import { fmtValue, previewElement, quote } from './format';
 import { describeParts, resolveParts, type FilterOptions, type Part, type RoleOptions, type TextArg } from './selectors';
@@ -113,7 +113,7 @@ export class Page {
       const timer = setTimeout(() => {
         if (done) return;
         done = true;
-        reject(new EmuError('nav-timeout', `page.goto: Timeout ${rt.navigationTimeout}ms exceeded.`, { url: BASE_URL + path }));
+        reject(new EmuError('nav-timeout', `Page.goto: Timeout ${rt.navigationTimeout}ms exceeded.`, { url: BASE_URL + path }));
       }, rt.navigationTimeout);
       this._env.ctx.onReady = () => {
         if (done) return;
@@ -135,7 +135,7 @@ export class Page {
   goto(url: string, _opts?: unknown) {
     const loc = here();
     return this._rt.api(`Navigate to ${JSON.stringify(url)}`, 'pw:api', loc, async () => {
-      const path = this._resolveUrl(url, 'page.goto');
+      const path = this._resolveUrl(url, 'Page.goto');
       await this._rt.pace(`goto ${url}`, loc?.line);
       await this._load(path);
       return null;
@@ -191,7 +191,7 @@ export class Page {
       for (;;) {
         if (urlMatches(this.url(), url)) return;
         if (performance.now() > deadline) {
-          throw new EmuError('wait-url-timeout', `page.waitForURL: Timeout ${timeout}ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until "load"\n  navigated to "${this.url()}"\n============================================================`, { url: String(url), actual: this.url() });
+          throw new EmuError('wait-url-timeout', `Page.wait_for_url: Timeout ${timeout}ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until "load"\n  navigated to "${this.url()}"\n============================================================`, { url: String(url), actual: this.url() });
         }
         await this._rt.sleep(100);
       }
@@ -208,7 +208,7 @@ export class Page {
   screenshot() {
     const loc = here();
     return this._rt.api('Take screenshot', 'pw:api', loc, async () => {
-      throw new EmuError('unsupported', 'page.screenshot is not available in the emulator', { method: 'page.screenshot' }, { emulatorNote: true });
+      throw new EmuError('unsupported', 'Page.screenshot is not available in the emulator', { method: 'Page.screenshot' }, { emulatorNote: true });
     });
   }
 
@@ -238,8 +238,8 @@ export class Page {
   }
 
   // Shortcuts that real Playwright still supports (discouraged): page.click(selector) etc.
-  click(selector: string) { return this.locator(selector)._act('click', 'page.click', here()); }
-  fill(selector: string, value: string) { return this.locator(selector)._fill(value, 'page.fill', here()); }
+  click(selector: string) { return this.locator(selector)._act('click', 'Page.click', here()); }
+  fill(selector: string, value: string) { return this.locator(selector)._fill(value, 'Page.fill', here()); }
 
   // ---- highlight overlay inside the app ----
   _highlight(el: Element, label: string) {
@@ -339,7 +339,7 @@ export class Locator {
   // ---- waiting ----
   _strictError(method: string, els: Element[]): EmuError {
     const desc = describeParts(this._parts);
-    const lines = els.slice(0, 10).map((el, i) => `    ${i + 1}) ${previewElement(el)} aka ${suggestLocator(el)}`);
+    const lines = els.slice(0, 10).map((el, i) => `    ${i + 1}) ${previewElement(el)} aka ${uniqueLocator(el)}`);
     if (els.length > 10) lines.push(`    ...and ${els.length - 10} more`);
     return new EmuError(
       'strict-mode',
@@ -421,10 +421,10 @@ export class Locator {
     });
   }
 
-  click(opts?: { timeout?: number; force?: boolean }) { return this._act('click', 'locator.click', here(), opts); }
-  dblclick(opts?: { timeout?: number; force?: boolean }) { return this._act('dblclick', 'locator.dblclick', here(), opts); }
-  hover(opts?: { timeout?: number; force?: boolean }) { return this._act('hover', 'locator.hover', here(), opts); }
-  focus(opts?: { timeout?: number }) { return this._act('focus', 'locator.focus', here(), opts); }
+  click(opts?: { timeout?: number; force?: boolean }) { return this._act('click', 'Locator.click', here(), opts); }
+  dblclick(opts?: { timeout?: number; force?: boolean }) { return this._act('dblclick', 'Locator.dblclick', here(), opts); }
+  hover(opts?: { timeout?: number; force?: boolean }) { return this._act('hover', 'Locator.hover', here(), opts); }
+  focus(opts?: { timeout?: number }) { return this._act('focus', 'Locator.focus', here(), opts); }
 
   _fill(value: string, method: string, loc: Loc, opts: { timeout?: number } = {}) {
     const desc = describeParts(this._parts);
@@ -460,15 +460,15 @@ export class Locator {
     });
   }
 
-  fill(value: string, opts?: { timeout?: number }) { return this._fill(value, 'locator.fill', here(), opts); }
-  clear(opts?: { timeout?: number }) { return this._fill('', 'locator.clear', here(), opts); }
+  fill(value: string, opts?: { timeout?: number }) { return this._fill(value, 'Locator.fill', here(), opts); }
+  clear(opts?: { timeout?: number }) { return this._fill('', 'Locator.clear', here(), opts); }
 
   pressSequentially(text: string, opts: { delay?: number; timeout?: number } = {}) {
     const loc = here();
     const desc = describeParts(this._parts);
     return this._page._rt.api(`Type ${fmtValue(text)} ${desc}`, 'pw:api', loc, async () => {
-      const el = retarget(await this._waitFor('locator.pressSequentially', 'editable', opts));
-      await this._prepare('locator.pressSequentially', el, desc, loc);
+      const el = retarget(await this._waitFor('Locator.press_sequentially', 'editable', opts));
+      await this._prepare('Locator.press_sequentially', el, desc, loc);
       (el as HTMLElement).focus();
       await typeText(this._page, el as HTMLElement, text, opts.delay ?? 0);
       this._page._hideHighlight();
@@ -480,8 +480,8 @@ export class Locator {
     const loc = here();
     const desc = describeParts(this._parts);
     return this._page._rt.api(`Press "${key}" ${desc}`, 'pw:api', loc, async () => {
-      const el = await this._waitFor('locator.press', 'visible', opts);
-      await this._prepare('locator.press', el, desc, loc);
+      const el = await this._waitFor('Locator.press', 'visible', opts);
+      await this._prepare('Locator.press', el, desc, loc);
       (el as HTMLElement).focus();
       await pressKey(this._page, el as HTMLElement, key);
       this._page._hideHighlight();
@@ -510,9 +510,9 @@ export class Locator {
       this._page._hideHighlight();
     });
   }
-  check(opts?: { timeout?: number; force?: boolean }) { return this._setChecked(true, 'locator.check', here(), opts); }
-  uncheck(opts?: { timeout?: number; force?: boolean }) { return this._setChecked(false, 'locator.uncheck', here(), opts); }
-  setChecked(checked: boolean, opts?: { timeout?: number; force?: boolean }) { return this._setChecked(checked, 'locator.setChecked', here(), opts); }
+  check(opts?: { timeout?: number; force?: boolean }) { return this._setChecked(true, 'Locator.check', here(), opts); }
+  uncheck(opts?: { timeout?: number; force?: boolean }) { return this._setChecked(false, 'Locator.uncheck', here(), opts); }
+  setChecked(checked: boolean, opts?: { timeout?: number; force?: boolean }) { return this._setChecked(checked, 'Locator.set_checked', here(), opts); }
 
   selectOption(values: unknown, opts: { timeout?: number } = {}) {
     const loc = here();
@@ -521,9 +521,9 @@ export class Locator {
       const rt = this._page._rt;
       const timeout = opts.timeout ?? rt.actionTimeout;
       const deadline = performance.now() + timeout;
-      let el = retarget(await this._waitFor('locator.selectOption', 'enabled', { timeout }));
+      let el = retarget(await this._waitFor('Locator.select_option', 'enabled', { timeout }));
       if (el.tagName.toLowerCase() !== 'select') {
-        throw new EmuError('not-select', `locator.selectOption: Error: Element is not a <select> element\nCall log:\n  - waiting for ${desc}\n  - locator resolved to ${previewElement(el)}`, { locator: desc, element: previewElement(el) });
+        throw new EmuError('not-select', `Locator.select_option: Error: Element is not a <select> element\nCall log:\n  - waiting for ${desc}\n  - locator resolved to ${previewElement(el)}`, { locator: desc, element: previewElement(el) });
       }
       const select = el as HTMLSelectElement;
       const wanted = (Array.isArray(values) ? values : [values]) as unknown[];
@@ -547,7 +547,7 @@ export class Locator {
           else picked.push(o);
         }
         if (!missing) {
-          await this._prepare('locator.selectOption', select, desc, loc);
+          await this._prepare('Locator.select_option', select, desc, loc);
           options.forEach((o) => { o.selected = picked.includes(o); });
           if (!select.multiple && picked[0]) select.value = picked[0].value;
           dispatch(select, 'input');
@@ -558,10 +558,10 @@ export class Locator {
         }
         if (performance.now() > deadline) {
           const available = options.map((o) => `"${o.text.trim()}"`).join(', ');
-          throw new EmuError('select-missing', `locator.selectOption: Timeout ${timeout}ms exceeded.\nCall log:\n  - waiting for ${desc}\n  - locator resolved to ${previewElement(select)}\n  - did not find some options (${fmtValue(values)}). Available: ${available}`, { locator: desc, value: fmtValue(values), available });
+          throw new EmuError('select-missing', `Locator.select_option: Timeout ${timeout}ms exceeded.\nCall log:\n  - waiting for ${desc}\n  - locator resolved to ${previewElement(select)}\n  - did not find some options (${fmtValue(values)}). Available: ${available}`, { locator: desc, value: fmtValue(values), available });
         }
         await rt.sleep(100);
-        el = retarget(await this._waitFor('locator.selectOption', 'enabled', { timeout }));
+        el = retarget(await this._waitFor('Locator.select_option', 'enabled', { timeout }));
       }
     });
   }
@@ -571,15 +571,15 @@ export class Locator {
     const loc = here();
     return this._page._rt.api(`${title} ${describeParts(this._parts)}`, 'pw:api', loc, async () => fn(await this._waitFor(method, state, opts)));
   }
-  textContent(opts?: { timeout?: number }) { return this._query('Get text content', 'locator.textContent', 'attached', (el) => el.textContent, opts); }
-  innerText(opts?: { timeout?: number }) { return this._query('Get inner text', 'locator.innerText', 'attached', (el) => (el as HTMLElement).innerText, opts); }
-  innerHTML(opts?: { timeout?: number }) { return this._query('Get inner HTML', 'locator.innerHTML', 'attached', (el) => el.innerHTML, opts); }
-  getAttribute(name: string, opts?: { timeout?: number }) { return this._query(`Get attribute "${name}"`, 'locator.getAttribute', 'attached', (el) => el.getAttribute(name), opts); }
+  textContent(opts?: { timeout?: number }) { return this._query('Get text content', 'Locator.text_content', 'attached', (el) => el.textContent, opts); }
+  innerText(opts?: { timeout?: number }) { return this._query('Get inner text', 'Locator.inner_text', 'attached', (el) => (el as HTMLElement).innerText, opts); }
+  innerHTML(opts?: { timeout?: number }) { return this._query('Get inner HTML', 'Locator.inner_html', 'attached', (el) => el.innerHTML, opts); }
+  getAttribute(name: string, opts?: { timeout?: number }) { return this._query(`Get attribute "${name}"`, 'Locator.get_attribute', 'attached', (el) => el.getAttribute(name), opts); }
   inputValue(opts?: { timeout?: number }) {
-    return this._query('Get input value', 'locator.inputValue', 'attached', (el) => {
+    return this._query('Get input value', 'Locator.input_value', 'attached', (el) => {
       el = retarget(el);
       const t = el.tagName.toLowerCase();
-      if (t !== 'input' && t !== 'textarea' && t !== 'select') throw new EmuError('not-input', 'locator.inputValue: Error: Node is not an <input>, <textarea> or <select> element', { element: previewElement(el) });
+      if (t !== 'input' && t !== 'textarea' && t !== 'select') throw new EmuError('not-input', 'Locator.input_value: Error: Node is not an <input>, <textarea> or <select> element', { element: previewElement(el) });
       return (el as HTMLInputElement).value;
     }, opts);
   }
@@ -592,24 +592,24 @@ export class Locator {
       return fn(els);
     });
   }
-  isVisible() { return this._instant('Is visible', 'locator.isVisible', (els) => !!els[0] && isVisible(els[0])); }
-  isHidden() { return this._instant('Is hidden', 'locator.isHidden', (els) => !els[0] || !isVisible(els[0])); }
-  isEnabled() { return this._instant('Is enabled', 'locator.isEnabled', (els) => !!els[0] && !isDisabled(els[0])); }
-  isDisabled() { return this._instant('Is disabled', 'locator.isDisabled', (els) => !!els[0] && isDisabled(els[0])); }
-  isEditable() { return this._instant('Is editable', 'locator.isEditable', (els) => !!els[0] && isEditable(els[0])); }
+  isVisible() { return this._instant('Is visible', 'Locator.is_visible', (els) => !!els[0] && isVisible(els[0])); }
+  isHidden() { return this._instant('Is hidden', 'Locator.is_hidden', (els) => !els[0] || !isVisible(els[0])); }
+  isEnabled() { return this._instant('Is enabled', 'Locator.is_enabled', (els) => !!els[0] && !isDisabled(els[0])); }
+  isDisabled() { return this._instant('Is disabled', 'Locator.is_disabled', (els) => !!els[0] && isDisabled(els[0])); }
+  isEditable() { return this._instant('Is editable', 'Locator.is_editable', (els) => !!els[0] && isEditable(els[0])); }
   isChecked() {
-    return this._instant('Is checked', 'locator.isChecked', (els) => {
+    return this._instant('Is checked', 'Locator.is_checked', (els) => {
       const el = els[0] ? retarget(els[0]) : undefined;
-      if (!el) throw new EmuError('action-timeout', 'locator.isChecked: element not found', { locator: describeParts(this._parts) });
+      if (!el) throw new EmuError('action-timeout', 'Locator.is_checked: element not found', { locator: describeParts(this._parts) });
       const c = isChecked(el);
-      if (c === undefined) throw new EmuError('not-checkbox', 'locator.isChecked: Error: Not a checkbox or radio button', { locator: describeParts(this._parts) });
+      if (c === undefined) throw new EmuError('not-checkbox', 'Locator.is_checked: Error: Not a checkbox or radio button', { locator: describeParts(this._parts) });
       return c === true;
     });
   }
-  count() { return this._instant('Count', 'locator.count', (els) => els.length, false); }
-  all() { return this._instant('All', 'locator.all', (els) => els.map((_, i) => this.nth(i)), false); }
-  allTextContents() { return this._instant('All text contents', 'locator.allTextContents', (els) => els.map((e) => e.textContent || ''), false); }
-  allInnerTexts() { return this._instant('All inner texts', 'locator.allInnerTexts', (els) => els.map((e) => (e as HTMLElement).innerText), false); }
+  count() { return this._instant('Count', 'Locator.count', (els) => els.length, false); }
+  all() { return this._instant('All', 'Locator.all', (els) => els.map((_, i) => this.nth(i)), false); }
+  allTextContents() { return this._instant('All text contents', 'Locator.all_text_contents', (els) => els.map((e) => e.textContent || ''), false); }
+  allInnerTexts() { return this._instant('All inner texts', 'Locator.all_inner_texts', (els) => els.map((e) => (e as HTMLElement).innerText), false); }
 
   waitFor(opts: { state?: 'attached' | 'detached' | 'visible' | 'hidden'; timeout?: number } = {}) {
     const loc = here();
@@ -622,12 +622,12 @@ export class Locator {
       for (;;) {
         rt.checkAlive();
         const els = this._resolve();
-        if (els.length > 1 && (state === 'visible' || state === 'attached')) throw this._strictError('locator.waitFor', els);
+        if (els.length > 1 && (state === 'visible' || state === 'attached')) throw this._strictError('Locator.wait_for', els);
         const el = els[0];
         const ok = state === 'attached' ? !!el : state === 'detached' ? !el : state === 'visible' ? !!el && isVisible(el) : !el || !isVisible(el);
         if (ok) return;
         if (performance.now() > deadline) {
-          throw new EmuError('wait-timeout', `locator.waitFor: Timeout ${timeout}ms exceeded.\nCall log:\n  - waiting for ${desc} to be ${state}`, { locator: desc, state, timeout });
+          throw new EmuError('wait-timeout', `Locator.wait_for: Timeout ${timeout}ms exceeded.\nCall log:\n  - waiting for ${desc} to be ${state}`, { locator: desc, state, timeout });
         }
         await rt.sleep(100);
       }
@@ -637,14 +637,14 @@ export class Locator {
   scrollIntoViewIfNeeded() {
     const loc = here();
     return this._page._rt.api(`Scroll into view ${describeParts(this._parts)}`, 'pw:api', loc, async () => {
-      scrollIntoView(await this._waitFor('locator.scrollIntoViewIfNeeded', 'visible'));
+      scrollIntoView(await this._waitFor('Locator.scroll_into_view_if_needed', 'visible'));
     });
   }
 
   evaluate() {
     const loc = here();
     return this._page._rt.api('Evaluate', 'pw:api', loc, async () => {
-      throw new EmuError('unsupported', 'locator.evaluate is not available in the emulator', { method: 'locator.evaluate' }, { emulatorNote: true });
+      throw new EmuError('unsupported', 'Locator.evaluate is not available in the emulator', { method: 'Locator.evaluate' }, { emulatorNote: true });
     });
   }
 }

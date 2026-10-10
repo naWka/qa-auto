@@ -11,7 +11,7 @@ keyPoints:
   - id: kp-filter-chaining
     title: { en: "filter narrows a list, chaining searches inside", ru: "filter сужает список, цепочка ищет внутри" }
   - id: kp-first-nth-red-flag
-    title: { en: "first() and nth() hide “which one?”", ru: "first() и nth() прячут вопрос «какой именно?»" }
+    title: { en: ".first and .nth() hide “which one?”", ru: ".first и .nth() прячут вопрос «какой именно?»" }
 terms: [strict-mode, filter, chaining, locator, element, error-message, code-review]
 
 steps:
@@ -19,12 +19,12 @@ steps:
     lines:
       - who: petal
         text:
-          en: "Strict mode violation again — six “Add to cart” buttons on the shop page. Fixed it: I added `.first()` everywhere. All green!"
-          ru: "Опять нарушение строгого режима — шесть кнопок «Add to cart» на странице магазина. Я починил: везде добавил `.first()`. Всё зелёное!"
+          en: "Strict mode violation again — six “Add to cart” buttons on the shop page. Fixed it: I added `.first` everywhere. All green!"
+          ru: "Опять нарушение строгого режима — шесть кнопок «Add to cart» на странице магазина. Я починил: везде добавил `.first`. Всё зелёное!"
       - who: maya
         text:
-          en: "Green, yes. But TC-541 adds Sunny Tulips, and `.first()` adds Rose Bouquet — every single time. Playwright asked “which one?”, and Petal answered “whichever comes first”."
-          ru: "Зелёное, да. Но TC-541 добавляет Sunny Tulips, а `.first()` добавляет Rose Bouquet — каждый раз. Playwright спросил «какую именно?», а Petal ответил «ту, что первая»."
+          en: "Green, yes. But TC-541 adds Sunny Tulips, and `.first` adds Rose Bouquet — every single time. Playwright asked “which one?”, and Petal answered “whichever comes first”."
+          ru: "Зелёное, да. Но TC-541 добавляет Sunny Tulips, а `.first` добавляет Rose Bouquet — каждый раз. Playwright спросил «какую именно?», а Petal ответил «ту, что первая»."
       - who: kai
         text:
           en: "And next sprint the shop gets a “New in” sort. Then “first” is a different flower every week."
@@ -42,12 +42,12 @@ steps:
           en: "The login page opens normally. Will this test pass or fail?"
           ru: "Страница входа открывается как обычно. Этот тест пройдёт или упадёт?"
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('login page shows "Log in"', async ({ page }) => {
-            await page.goto('/login');
-            await expect(page.getByText('Log in')).toBeVisible();
-          });
+
+          def test_login_page_shows_log_in(page: Page):
+              page.goto("/login")
+              expect(page.get_by_text("Log in")).to_be_visible()
         outcome: fail
         reasons:
           - text:
@@ -61,19 +61,19 @@ steps:
               en: "It is visible — three times. That's exactly the problem."
               ru: "Он виден — трижды. В этом и проблема."
           - text:
-              en: "Fail: getByText can't find buttons and headings."
-              ru: "Упадёт: getByText не умеет находить кнопки и заголовки."
+              en: "Fail: get_by_text can't find buttons and headings."
+              ru: "Упадёт: get_by_text не умеет находить кнопки и заголовки."
             why:
-              en: "It can: getByText finds any element by its text. Here it finds too many."
-              ru: "Умеет: getByText находит любой элемент по тексту. Здесь он находит слишком много."
+              en: "It can: get_by_text finds any element by its text. Here it finds too many."
+              ru: "Умеет: get_by_text находит любой элемент по тексту. Здесь он находит слишком много."
         hints:
           - en: "Picture the login page: where does the text “Log in” appear?"
             ru: "Представь страницу входа: где встречается текст «Log in»?"
           - en: "Count them: the menu, the heading, the button."
             ru: "Посчитай: меню, заголовок, кнопка."
         explain:
-          en: "An assertion needs exactly one element. `getByText('Log in')` matches three, so Playwright stops with a *strict mode violation* instead of picking one. More on this in a minute."
-          ru: "Проверке нужен ровно один элемент. `getByText('Log in')` находит три, поэтому Playwright останавливается с *нарушением строгого режима* вместо того, чтобы выбрать один. Подробнее — через минуту."
+          en: 'An assertion needs exactly one element. `get_by_text("Log in")` matches three, so Playwright stops with a *strict mode violation* instead of picking one. More on this in a minute.'
+          ru: 'Проверке нужен ровно один элемент. `get_by_text("Log in")` находит три, поэтому Playwright останавливается с *нарушением строгого режима* вместо того, чтобы выбрать один. Подробнее — через минуту.'
       - id: c5-l3-p2
         kind: choice
         keyPoint: kp-filter-chaining
@@ -82,20 +82,20 @@ steps:
           ru: "Шесть карточек товаров, на каждой кнопка «Add to cart». Какой локатор нажмёт кнопку на карточке Sunny Tulips — и сегодня, и после следующего релиза?"
         optionsCode: true
         options:
-          - text: "page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' })"
+          - text: 'page.get_by_test_id("product-card").filter(has_text="Sunny Tulips").get_by_role("button", name="Add to cart")'
             correct: true
             why:
               en: "First the card with “Sunny Tulips” in it, then the button inside that card. The order of the cards doesn't matter."
               ru: "Сначала карточка, в которой есть «Sunny Tulips», потом кнопка внутри этой карточки. Порядок карточек не важен."
-          - text: "page.getByRole('button', { name: 'Add to cart' }).nth(1)"
+          - text: 'page.get_by_role("button", name="Add to cart").nth(1)'
             why:
               en: "It works today: Sunny Tulips is the second card (nth counts from 0). Change the sort or add a product — and it's another flower."
               ru: "Сегодня работает: Sunny Tulips — вторая карточка (nth считает с 0). Смени сортировку или добавь товар — и это уже другой цветок."
-          - text: "page.getByRole('button', { name: 'Add to cart' }).first()"
+          - text: 'page.get_by_role("button", name="Add to cart").first'
             why:
               en: "The first card is Rose Bouquet. This adds roses."
               ru: "Первая карточка — Rose Bouquet. Так добавятся розы."
-          - text: "page.getByRole('button', { name: 'Add to cart Sunny Tulips' })"
+          - text: 'page.get_by_role("button", name="Add to cart Sunny Tulips")'
             why:
               en: "No button has this name: every one is called just “Add to cart”. It finds nothing."
               ru: "Кнопки с таким именем нет: все называются просто «Add to cart». Не найдёт ничего."
@@ -114,17 +114,17 @@ steps:
     body:
       - en: "Imagine a test step: “Click ‘Log in’”. On Bloomly's login page “Log in” is written three times: the menu link, the heading and the button. A colleague running your case would ask: which one?"
         ru: "Представь шаг тест-кейса: «Нажми ‘Log in’». На странице входа Bloomly «Log in» написано трижды: ссылка в меню, заголовок и кнопка. Коллега, который проходит твой кейс, спросил бы: какое из трёх?"
-      - en: "Playwright asks the same. A [[locator]] used for an action or an assertion must match exactly one [[element]]. If it matches two or more, the step fails with a [[strict mode|strict-mode]] violation. The [[error message|error-message]] says how many elements were found and lists them."
-        ru: "Playwright спрашивает то же самое. [[Локатор|locator]] для действия или проверки должен находить ровно один [[элемент|element]]. Если он находит два или больше, шаг падает с нарушением [[строгого режима|strict-mode]]. [[Сообщение об ошибке|error-message]] говорит, сколько элементов найдено, и перечисляет их."
-      - en: "That's a feature, not a nuisance. A guess is the worst outcome: the test clicks *some* “Log in” and passes or fails for a reason nobody sees. Counting is fine, by the way: `toHaveCount(6)` is about many elements, so strict mode doesn't apply to it."
-        ru: "Это полезная функция, а не помеха. Угадывание — худший исход: тест нажимает *какое-то* «Log in» и проходит или падает по причине, которую никто не видит. А вот считать можно: `toHaveCount(6)` — про много элементов, поэтому строгий режим к нему не относится."
+      - en: "Playwright asks the same. A [[locator]] used for an action or an assertion must match exactly one [[element]]. If it matches two or more, the step fails with a [[strict mode|strict-mode]] violation. The [[error message|error-message]] says how many elements were found and lists them, each with an `aka` hint — a locator that would match only that one."
+        ru: "Playwright спрашивает то же самое. [[Локатор|locator]] для действия или проверки должен находить ровно один [[элемент|element]]. Если он находит два или больше, шаг падает с нарушением [[строгого режима|strict-mode]]. [[Сообщение об ошибке|error-message]] говорит, сколько элементов найдено, и перечисляет их, у каждого подсказка `aka` — локатор, который нашёл бы только его."
+      - en: "That's a feature, not a nuisance. A guess is the worst outcome: the test clicks *some* “Log in” and passes or fails for a reason nobody sees. Counting is fine, by the way: `to_have_count(6)` is about many elements, so strict mode doesn't apply to it."
+        ru: "Это полезная функция, а не помеха. Угадывание — худший исход: тест нажимает *какое-то* «Log in» и проходит или падает по причине, которую никто не видит. А вот считать можно: `to_have_count(6)` — про много элементов, поэтому строгий режим к нему не относится."
     code: |
-      await page.getByText('Log in').click();
-      // Error: locator.click: Error: strict mode violation:
-      // getByText('Log in') resolved to 3 elements:
-      //   1) <a href="/login">Log in</a>
-      //   2) <h1>Log in</h1>
-      //   3) <button type="submit" …>Log in</button>
+      page.get_by_text("Log in").click()
+      # playwright._impl._errors.Error: Locator.click: Error: strict mode violation:
+      # get_by_text("Log in") resolved to 3 elements:
+      #   1) <a href="/login">Log in</a> aka get_by_role("link", name="Log in")
+      #   2) <h1>Log in</h1> aka get_by_role("heading", name="Log in")
+      #   3) <button type="submit" …>Log in</button> aka get_by_role("button", name="Log in")
     figure: dom-tree
     mentor:
       en: "Read a strict mode error as a clarifying question from the test: “Which one did you mean?” The answer belongs in the locator — not in a workaround."
@@ -142,12 +142,12 @@ steps:
         en: "What is the error telling you?"
         ru: "О чём говорит эта ошибка?"
       code: |
-        await page.getByRole('button', { name: 'Remove' }).click();
-        // Error: locator.click: Error: strict mode violation:
-        // getByRole('button', { name: 'Remove' }) resolved to 3 elements:
-        //   1) <button … data-idx="0">Remove</button>
-        //   2) <button … data-idx="1">Remove</button>
-        //   3) <button … data-idx="2">Remove</button>
+        page.get_by_role("button", name="Remove").click()
+        # playwright._impl._errors.Error: Locator.click: Error: strict mode violation:
+        # get_by_role("button", name="Remove") resolved to 3 elements:
+        #   1) <button … data-idx="0">Remove</button> aka get_by_role("row").filter(has_text="Rose Bouquet").get_by_role("button", name="Remove")
+        #   2) <button … data-idx="1">Remove</button> aka get_by_role("row").filter(has_text="Sunny Tulips").get_by_role("button", name="Remove")
+        #   3) <button … data-idx="2">Remove</button> aka get_by_role("row").filter(has_text="Lavender Pot").get_by_role("button", name="Remove")
       options:
         - text: { en: "The locator is ambiguous: every row has a “Remove” button. The test has to say which row.", ru: "Локатор неоднозначный: кнопка «Remove» есть в каждой строке. Тест должен сказать, в какой." }
           correct: true
@@ -158,11 +158,11 @@ steps:
           why:
             en: "Nothing is broken: Playwright found all three buttons. The problem is in the test, not in the app."
             ru: "Ничего не сломано: Playwright нашёл все три кнопки. Проблема в тесте, а не в приложении."
-        - text: { en: "The cart loaded too slowly — add `waitForTimeout` before the click.", ru: "Корзина загрузилась слишком медленно — добавить `waitForTimeout` перед кликом." }
+        - text: { en: "The cart loaded too slowly — add `wait_for_timeout` before the click.", ru: "Корзина загрузилась слишком медленно — добавить `wait_for_timeout` перед кликом." }
           why:
             en: "Timing has nothing to do with it. The buttons are there — three of them. Waiting longer won't make two of them disappear."
             ru: "Время тут ни при чём. Кнопки на месте — целых три. Если подождать подольше, две из них не исчезнут."
-        - text: { en: "Add `.first()`, and the error will go away.", ru: "Добавить `.first()` — и ошибка пропадёт." }
+        - text: { en: "Add `.first`, and the error will go away.", ru: "Добавить `.first` — и ошибка пропадёт." }
           why:
             en: "It will go away — and the test will remove Rose Bouquet, whatever the test case says. The question “which one?” stays unanswered. We'll come back to this."
             ru: "Пропадёт — и тест будет удалять Rose Bouquet, что бы ни было написано в тест-кейсе. Вопрос «какую именно?» останется без ответа. Мы к этому ещё вернёмся."
@@ -174,11 +174,11 @@ steps:
         - en: "The test didn't say *which* row."
           ru: "Тест не сказал, *какая* строка."
       praise:
-        en: "You read the error as a clarifying question — and didn't fall for the quick `.first()` patch."
-        ru: "Ты прочита{ла|л} ошибку как уточняющий вопрос — и не повел{ась|ся} на быструю заплатку `.first()`."
+        en: "You read the error as a clarifying question — and didn't fall for the quick `.first` patch."
+        ru: "Ты прочита{ла|л} ошибку как уточняющий вопрос — и не повел{ась|ся} на быструю заплатку `.first`."
       explain:
-        en: "“resolved to 3 elements” is the key phrase: the locator works, it's just not specific enough. Every cart row has a “Remove” button with the same name, so the test has to name the row. That's the next screen."
-        ru: "Ключевая фраза — «resolved to 3 elements»: локатор работает, просто он недостаточно точный. В каждой строке корзины есть кнопка «Remove» с одинаковым именем, так что тест должен назвать строку. Об этом следующий экран."
+        en: "“resolved to 3 elements” is the key phrase: the locator works, it's just not specific enough. Every cart row has a “Remove” button with the same name, so the test has to name the row. The `aka` hints already show how: each one names its row first. That's the next screen."
+        ru: "Ключевая фраза — «resolved to 3 elements»: локатор работает, просто он недостаточно точный. В каждой строке корзины есть кнопка «Remove» с одинаковым именем, так что тест должен назвать строку. Подсказки `aka` уже показывают как: каждая сначала называет свою строку. Об этом следующий экран."
 
   - type: theory
     keyPoint: kp-filter-chaining
@@ -186,18 +186,18 @@ steps:
     body:
       - en: "How would you write the step in a test case? “On the Sunny Tulips card, click ‘Add to cart’.” Or: “In the Sunny Tulips row, click ‘Remove’.” First the container, then the element inside it. Nobody writes “click the second button”."
         ru: "Как бы ты записал{а|} шаг в тест-кейсе? «На карточке Sunny Tulips нажми ‘Add to cart’». Или: «В строке Sunny Tulips нажми ‘Remove’». Сначала контейнер, потом элемент внутри него. Никто не пишет «нажми вторую кнопку»."
-      - en: "In code it's the same two moves. A [[filter]], `filter({ hasText })`, keeps only the elements that contain the text — six cards become one. [[Chaining|chaining]] — calling `getByRole` on that card — searches only inside it, so there is one button."
-        ru: "В коде — те же два шага. [[Фильтр|filter]] `filter({ hasText })` оставляет только элементы, в которых есть этот текст, — из шести карточек остаётся одна. [[Цепочка|chaining]] — вызов `getByRole` у этой карточки — ищет только внутри неё, поэтому кнопка находится одна."
+      - en: "In code it's the same two moves. A [[filter]], `filter(has_text=\"…\")`, keeps only the elements that contain the text — six cards become one. [[Chaining|chaining]] — calling `get_by_role` on that card — searches only inside it, so there is one button."
+        ru: "В коде — те же два шага. [[Фильтр|filter]] `filter(has_text=\"…\")` оставляет только элементы, в которых есть этот текст, — из шести карточек остаётся одна. [[Цепочка|chaining]] — вызов `get_by_role` у этой карточки — ищет только внутри неё, поэтому кнопка находится одна."
       - en: "The pattern works everywhere: card → button, cart row → “Remove”, order row → status, menu → link. The Playwright docs recommend exactly this: use chaining and filtering to make a locator unique."
         ru: "Этот приём работает везде: карточка → кнопка, строка корзины → «Remove», строка заказа → статус, меню → ссылка. Документация Playwright советует именно это: делать локатор уникальным с помощью цепочек и фильтров."
     code: |
-      // card → button
-      const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
-      await card.getByRole('button', { name: 'Add to cart' }).click();
+      # card → button
+      card = page.get_by_test_id("product-card").filter(has_text="Sunny Tulips")
+      card.get_by_role("button", name="Add to cart").click()
 
-      // cart row → button
-      const row = page.getByRole('row').filter({ hasText: 'Sunny Tulips' });
-      await row.getByRole('button', { name: 'Remove' }).click();
+      # cart row → button
+      row = page.get_by_role("row").filter(has_text="Sunny Tulips")
+      row.get_by_role("button", name="Remove").click()
     mentor:
       en: "Read a chain from left to right, like a path in a test case: “product cards → the one with Sunny Tulips → its ‘Add to cart’ button”."
       ru: "Читай цепочку слева направо, как путь в тест-кейсе: «карточки товаров → та, где Sunny Tulips → её кнопка ‘Add to cart’»."
@@ -213,7 +213,7 @@ steps:
     view: both
     mentor:
       en: "The name alone can't tell the six buttons apart: in the agent's snapshot they are six `- button \"Add to cart\"` lines that differ only by their ref. What differs is the card around each one — its heading. So the suggested locator goes card → filter → button. Playwright's “Pick locator” and codegen do the same: they refine a locator until it's unique."
-      ru: "По одному имени шесть кнопок не различить: в снимке агента это шесть строк `- button \"Add to cart\"`, которые отличаются только ref. Различается карточка вокруг каждой кнопки — её заголовок. Поэтому предложенный локатор идёт по пути карточка → filter → кнопка. «Pick locator» и codegen в Playwright делают так же: уточняют локатор, пока он не станет уникальным."
+      ru: 'По одному имени шесть кнопок не различить: в снимке агента это шесть строк `- button "Add to cart"`, которые отличаются только ref. Различается карточка вокруг каждой кнопки — её заголовок. Поэтому предложенный локатор идёт по пути карточка → filter → кнопка. «Pick locator» и codegen в Playwright делают так же: уточняют локатор, пока он не станет уникальным.'
 
   - type: theory
     keyPoint: kp-filter-chaining
@@ -221,19 +221,19 @@ steps:
     body:
       - en: "Think of the filters in your test management tool: cases whose title contains “checkout”, cases that have an attachment, cases with no linked bug. `filter` has the same three flavours."
         ru: "Вспомни фильтры в твоей системе управления тестами: кейсы, в названии которых есть «checkout», кейсы с вложением, кейсы без привязанного бага. У `filter` те же три вида."
-      - en: "`hasText` — contains this text (any letter case, a part is enough). `has` — contains this element, e.g. the heading “Sunny Tulips”. `hasNot` — doesn't contain it: the cards *without* “Out of stock” are the five you can buy."
-        ru: "`hasText` — содержит этот текст (регистр не важен, достаточно части). `has` — содержит этот элемент, например заголовок «Sunny Tulips». `hasNot` — не содержит его: карточки *без* «Out of stock» — это пять товаров, которые можно купить."
-      - en: "Make the filter as precise as the test case. On Anna's orders page `hasText: 'Rose Bouquet'` matches two orders, #1042 and #1037 — and strict mode stops you again. Filter by what is unique: `hasText: '#1042'`."
-        ru: "Делай фильтр таким же точным, как тест-кейс. На странице заказов пользователя Anna `hasText: 'Rose Bouquet'` находит два заказа, #1042 и #1037, — и строгий режим снова тебя остановит. Фильтруй по уникальному: `hasText: '#1042'`."
+      - en: "`has_text` — contains this text (any letter case, a part is enough). `has` — contains this element, e.g. the heading “Sunny Tulips”. `has_not` — doesn't contain it: the cards *without* “Out of stock” are the five you can buy."
+        ru: "`has_text` — содержит этот текст (регистр не важен, достаточно части). `has` — содержит этот элемент, например заголовок «Sunny Tulips». `has_not` — не содержит его: карточки *без* «Out of stock» — это пять товаров, которые можно купить."
+      - en: 'Make the filter as precise as the test case. On Anna''s orders page `has_text="Rose Bouquet"` matches two orders, #1042 and #1037 — and strict mode stops you again. Filter by what is unique: `has_text="#1042"`.'
+        ru: 'Делай фильтр таким же точным, как тест-кейс. На странице заказов пользователя Anna `has_text="Rose Bouquet"` находит два заказа, #1042 и #1037, — и строгий режим снова тебя остановит. Фильтруй по уникальному: `has_text="#1042"`.'
     code: |
-      const cards = page.getByTestId('product-card');
-      cards.filter({ hasText: 'Sunny Tulips' });                                  // text inside
-      cards.filter({ has: page.getByRole('heading', { name: 'Sunny Tulips' }) }); // element inside
-      cards.filter({ hasNot: page.getByText('Out of stock') });                   // 5 cards
+      cards = page.get_by_test_id("product-card")
+      cards.filter(has_text="Sunny Tulips")  # text inside
+      cards.filter(has=page.get_by_role("heading", name="Sunny Tulips"))  # element inside
+      cards.filter(has_not=page.get_by_text("Out of stock"))  # 5 cards
 
-      const orders = page.getByTestId('order-row');
-      orders.filter({ hasText: 'Rose Bouquet' });  // 2 orders: still ambiguous
-      orders.filter({ hasText: '#1042' });         // exactly 1
+      orders = page.get_by_test_id("order-row")
+      orders.filter(has_text="Rose Bouquet")  # 2 orders: still ambiguous
+      orders.filter(has_text="#1042")  # exactly 1
 
   - type: task
     task:
@@ -249,33 +249,33 @@ steps:
         en: "Complete Petal's test: one filter by text, one chain, one filter by absence."
         ru: "Допиши тест Petal: один фильтр по тексту, одна цепочка, один фильтр по отсутствию."
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('out-of-stock product cannot be added', async ({ page }) => {
-          await page.goto('/shop');
-          const orchid = page.getByTestId('product-card').___({ hasText: 'White Orchid' });
-          await expect(orchid.___('button', { name: 'Add to cart' })).toBeDisabled();
-          const available = page.getByTestId('product-card').filter({ ___: page.getByText('Out of stock') });
-          await expect(available).toHaveCount(5);
-        });
+
+        def test_out_of_stock_product_cannot_be_added(page: Page):
+            page.goto("/shop")
+            orchid = page.get_by_test_id("product-card").___(has_text="White Orchid")
+            expect(orchid.___("button", name="Add to cart")).to_be_disabled()
+            available = page.get_by_test_id("product-card").filter(___=page.get_by_text("Out of stock"))
+            expect(available).to_have_count(5)
       blanks:
-        - { answers: [filter], options: [filter, nth, getByText] }
-        - { answers: [getByRole], options: [getByRole, getByText, locator] }
-        - { answers: [hasNot], options: [hasNot, has, hasText] }
+        - { answers: [filter], options: [filter, nth, get_by_text] }
+        - { answers: [get_by_role], options: [get_by_role, get_by_text, locator] }
+        - { answers: [has_not], options: [has_not, has, has_text] }
       checks: { expect: pass }
       hints:
         - en: "Blank 1 turns six cards into one. Blank 2 searches inside that card."
           ru: "Пропуск 1 превращает шесть карточек в одну. Пропуск 2 ищет внутри этой карточки."
         - en: "Blank 3: you need the cards that do *not* contain “Out of stock”."
           ru: "Пропуск 3: нужны карточки, в которых *нет* «Out of stock»."
-        - en: "The answer: filter, getByRole, hasNot."
-          ru: "Ответ: filter, getByRole, hasNot."
+        - en: "The answer: filter, get_by_role, has_not."
+          ru: "Ответ: filter, get_by_role, has_not."
       praise:
         en: "Filter, chain, and a filter by absence — all three moves of this lesson in one test."
         ru: "Фильтр, цепочка и фильтр по отсутствию — все три приёма урока в одном тесте."
       explain:
-        en: "Line 5 narrows six cards to one; line 6 finds the button only inside it — so it's White Orchid's button, not just any disabled button. Line 7 keeps the cards that have *no* “Out of stock” text. And `toHaveCount(5)` on five elements is fine: counting doesn't trigger strict mode."
-        ru: "Строка 5 сужает шесть карточек до одной; строка 6 ищет кнопку только внутри неё — значит, это кнопка White Orchid, а не любая отключённая кнопка. Строка 7 оставляет карточки, в которых *нет* текста «Out of stock». А `toHaveCount(5)` на пяти элементах — это нормально: подсчёт не включает строгий режим."
+        en: "Line 6 narrows six cards to one; line 7 finds the button only inside it — so it's White Orchid's button, not just any disabled button. Line 8 keeps the cards that have *no* “Out of stock” text. And `to_have_count(5)` on five elements is fine: counting doesn't trigger strict mode."
+        ru: "Строка 6 сужает шесть карточек до одной; строка 7 ищет кнопку только внутри неё — значит, это кнопка White Orchid, а не любая отключённая кнопка. Строка 8 оставляет карточки, в которых *нет* текста «Out of stock». А `to_have_count(5)` на пяти элементах — это нормально: подсчёт не включает строгий режим."
 
   - type: task
     task:
@@ -283,11 +283,11 @@ steps:
       kind: fix
       keyPoint: kp-filter-chaining
       context:
-        en: "Petal's test for TC-541 is red: strict mode violation, `getByRole('button', { name: 'Add to cart' })` resolved to 6 elements. Your fix must also pass on Kai's redesign."
-        ru: "Тест Petal для TC-541 красный: нарушение строгого режима, `getByRole('button', { name: 'Add to cart' })` нашёл 6 элементов. Твоё исправление должно проходить и на редизайне Кая."
+        en: "Petal's test for TC-541 is red: strict mode violation, `get_by_role(\"button\", name=\"Add to cart\")` resolved to 6 elements. Your fix must also pass on Kai's redesign."
+        ru: 'Тест Petal для TC-541 красный: нарушение строгого режима, `get_by_role("button", name="Add to cart")` нашёл 6 элементов. Твоё исправление должно проходить и на редизайне Кая.'
       prompt:
-        en: "Fix the click on line 5: “Add to cart” on the Sunny Tulips card. No `.first()`, `.last()` or `.nth()`."
-        ru: "Исправь клик в строке 5: «Add to cart» на карточке Sunny Tulips. Без `.first()`, `.last()` и `.nth()`."
+        en: "Fix the click on line 6: “Add to cart” on the Sunny Tulips card. No `.first`, `.last` or `.nth()`."
+        ru: "Исправь клик в строке 6: «Add to cart» на карточке Sunny Tulips. Без `.first`, `.last` и `.nth()`."
       testCase:
         id: TC-541
         title: Add Sunny Tulips to the cart from the shop
@@ -295,30 +295,30 @@ steps:
           - { action: "Open /shop" }
           - { action: "Click \"Add to cart\" on the Sunny Tulips card", expected: "Toast \"Sunny Tulips added to cart\"; cart count is 1" }
       starter: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('add Sunny Tulips to the cart', async ({ page }) => {
-          await page.goto('/shop');
-          await page.getByRole('button', { name: 'Add to cart' }).click();
-          await expect(page.getByTestId('toast')).toHaveText('Sunny Tulips added to cart');
-          await expect(page.getByTestId('cart-count')).toHaveText('1');
-        });
+
+        def test_add_sunny_tulips_to_the_cart(page: Page):
+            page.goto("/shop")
+            page.get_by_role("button", name="Add to cart").click()
+            expect(page.get_by_test_id("toast")).to_have_text("Sunny Tulips added to cart")
+            expect(page.get_by_test_id("cart-count")).to_have_text("1")
       solution: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('add Sunny Tulips to the cart', async ({ page }) => {
-          await page.goto('/shop');
-          const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
-          await card.getByRole('button', { name: 'Add to cart' }).click();
-          await expect(page.getByTestId('toast')).toHaveText('Sunny Tulips added to cart');
-          await expect(page.getByTestId('cart-count')).toHaveText('1');
-        });
+
+        def test_add_sunny_tulips_to_the_cart(page: Page):
+            page.goto("/shop")
+            card = page.get_by_test_id("product-card").filter(has_text="Sunny Tulips")
+            card.get_by_role("button", name="Add to cart").click()
+            expect(page.get_by_test_id("toast")).to_have_text("Sunny Tulips added to cart")
+            expect(page.get_by_test_id("cart-count")).to_have_text("1")
       checks:
         expect: pass
         static:
-          - awaitsActions
+          - callsMethods
           - rule: notRegex
-            value: '\.(first|last|nth)\('
+            value: '\.(first|last|nth)\b'
             message:
               en: "Don't pick the card by its position: filter it by its text."
               ru: "Не выбирай карточку по позиции: отфильтруй её по тексту."
@@ -326,12 +326,12 @@ steps:
           - app: { variant: redesign }
             expect: pass
       hints:
-        - en: "Start from the cards: `page.getByTestId('product-card')`."
-          ru: "Начни с карточек: `page.getByTestId('product-card')`."
-        - en: "Keep only the card that contains “Sunny Tulips” with `.filter({ hasText: ... })`, then look for the button inside it."
-          ru: "Оставь только карточку, где есть «Sunny Tulips», через `.filter({ hasText: ... })`, потом ищи кнопку внутри неё."
-        - en: "Like this: `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' })`"
-          ru: "Вот так: `page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' })`"
+        - en: 'Start from the cards: `page.get_by_test_id("product-card")`.'
+          ru: 'Начни с карточек: `page.get_by_test_id("product-card")`.'
+        - en: "Keep only the card that contains “Sunny Tulips” with `.filter(has_text=...)`, then look for the button inside it."
+          ru: "Оставь только карточку, где есть «Sunny Tulips», через `.filter(has_text=...)`, потом ищи кнопку внутри неё."
+        - en: 'Like this: `page.get_by_test_id("product-card").filter(has_text="Sunny Tulips").get_by_role("button", name="Add to cart")`'
+          ru: 'Вот так: `page.get_by_test_id("product-card").filter(has_text="Sunny Tulips").get_by_role("button", name="Add to cart")`'
       praise:
         en: "Green on both versions of the shop — your locator says *which* card, and the redesign doesn't care about anything else."
         ru: "Зелёный на обеих версиях магазина — твой локатор говорит, *какая* карточка, а всё остальное редизайну безразлично."
@@ -341,24 +341,24 @@ steps:
 
   - type: theory
     keyPoint: kp-first-nth-red-flag
-    title: { en: "first() and nth(): the error is gone, the question isn't", ru: "first() и nth(): ошибки нет, а вопрос остался" }
+    title: { en: ".first and .nth(): the error is gone, the question isn't", ru: ".first и .nth(): ошибки нет, а вопрос остался" }
     body:
-      - en: "A test step says “Click ‘Remove’”, and the cart has three rows. A careful tester asks “which one?”. A tester in a hurry clicks the top one and marks the step as passed. `.first()` is the tester in a hurry."
-        ru: "В шаге написано «Нажми ‘Remove’», а в корзине три строки. Внимательный тестировщик спросит: «какую?». Торопливый нажмёт верхнюю и отметит шаг пройденным. `.first()` — это торопливый тестировщик."
-      - en: "Agents love `.first()`, `.last()` and `.nth(i)`: the strict mode error disappears, the test turns green, and the agent's job looks done. But now the test picks by position, not by meaning. A new product, another sort order, one more cart row — and it clicks something else. (Also, `nth` counts from zero: `.nth(1)` is the *second*.) The Playwright docs don't recommend these methods for exactly this reason."
-        ru: "Агенты обожают `.first()`, `.last()` и `.nth(i)`: ошибка строгого режима исчезает, тест зеленеет, и задача агента выглядит выполненной. Но теперь тест выбирает по позиции, а не по смыслу. Новый товар, другая сортировка, ещё одна строка в корзине — и он нажимает что-то другое. (К тому же `nth` считает с нуля: `.nth(1)` — это *второй*.) Документация Playwright не рекомендует эти методы именно поэтому."
-      - en: "They are fine when the position *is* the requirement: “the newest order is on top” → `getByTestId('order-row').first()`. In a [[code review|code-review]], ask every `.first()` and `.nth()`: “which one, and why that one?” If the answer is a name, ask for a filter."
-        ru: "Они уместны, когда позиция и *есть* требование: «самый новый заказ — сверху» → `getByTestId('order-row').first()`. На [[код-ревью|code-review]] задавай каждому `.first()` и `.nth()` вопрос: «какой именно и почему этот?» Если ответ — название, проси фильтр."
+      - en: "A test step says “Click ‘Remove’”, and the cart has three rows. A careful tester asks “which one?”. A tester in a hurry clicks the top one and marks the step as passed. `.first` is the tester in a hurry."
+        ru: "В шаге написано «Нажми ‘Remove’», а в корзине три строки. Внимательный тестировщик спросит: «какую?». Торопливый нажмёт верхнюю и отметит шаг пройденным. `.first` — это торопливый тестировщик."
+      - en: "Agents love `.first`, `.last` and `.nth(i)`: the strict mode error disappears, the test turns green, and the agent's job looks done. But now the test picks by position, not by meaning. A new product, another sort order, one more cart row — and it clicks something else. (Also, `nth` counts from zero: `.nth(1)` is the *second*.) The Playwright docs don't recommend these methods for exactly this reason."
+        ru: "Агенты обожают `.first`, `.last` и `.nth(i)`: ошибка строгого режима исчезает, тест зеленеет, и задача агента выглядит выполненной. Но теперь тест выбирает по позиции, а не по смыслу. Новый товар, другая сортировка, ещё одна строка в корзине — и он нажимает что-то другое. (К тому же `nth` считает с нуля: `.nth(1)` — это *второй*.) Документация Playwright не рекомендует эти методы именно поэтому."
+      - en: 'They are fine when the position *is* the requirement: “the newest order is on top” → `get_by_test_id("order-row").first`. In a [[code review|code-review]], ask every `.first` and `.nth()`: “which one, and why that one?” If the answer is a name, ask for a filter.'
+        ru: 'Они уместны, когда позиция и *есть* требование: «самый новый заказ — сверху» → `get_by_test_id("order-row").first`. На [[код-ревью|code-review]] задавай каждому `.first` и `.nth()` вопрос: «какой именно и почему этот?» Если ответ — название, проси фильтр.'
     code: |
-      // by position: whatever is on top today
-      await page.getByRole('button', { name: 'Remove' }).first().click();
+      # by position: whatever is on top today
+      page.get_by_role("button", name="Remove").first.click()
 
-      // by meaning: the row the test case is about
-      const row = page.getByRole('row').filter({ hasText: 'Sunny Tulips' });
-      await row.getByRole('button', { name: 'Remove' }).click();
+      # by meaning: the row the test case is about
+      row = page.get_by_role("row").filter(has_text="Sunny Tulips")
+      row.get_by_role("button", name="Remove").click()
     mentor:
-      en: "When Petal adds `.first()`, I leave one comment in the PR: “Which product did the test case mean?” Nine times out of ten, the answer turns into a filter."
-      ru: "Когда Petal добавляет `.first()`, я оставляю в PR один комментарий: «Какой товар имелся в виду в тест-кейсе?» В девяти случаях из десяти ответ превращается в фильтр."
+      en: "When Petal adds `.first`, I leave one comment in the PR: “Which product did the test case mean?” Nine times out of ten, the answer turns into a filter."
+      ru: "Когда Petal добавляет `.first`, я оставляю в PR один комментарий: «Какой товар имелся в виду в тест-кейсе?» В девяти случаях из десяти ответ превращается в фильтр."
 
   - type: task
     task:
@@ -369,8 +369,8 @@ steps:
         bugs: [remove-wrong-item]
         state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] }
       context:
-        en: "Kai's latest build has a bug: “Remove” always deletes the *first* row of the cart. The cart: Rose Bouquet, then Sunny Tulips. Petal's test for TC-542 got rid of its strict mode error with `.first()`."
-        ru: "В свежей сборке Кая баг: «Remove» всегда удаляет *первую* строку корзины. В корзине: Rose Bouquet, потом Sunny Tulips. Тест Petal для TC-542 избавился от ошибки строгого режима с помощью `.first()`."
+        en: "Kai's latest build has a bug: “Remove” always deletes the *first* row of the cart. The cart: Rose Bouquet, then Sunny Tulips. Petal's test for TC-542 got rid of its strict mode error with `.first`."
+        ru: "В свежей сборке Кая баг: «Remove» всегда удаляет *первую* строку корзины. В корзине: Rose Bouquet, потом Sunny Tulips. Тест Petal для TC-542 избавился от ошибки строгого режима с помощью `.first`."
       prompt:
         en: "Will the test catch the bug? Pass or fail?"
         ru: "Поймает ли тест баг? Пройдёт или упадёт?"
@@ -382,14 +382,14 @@ steps:
           - { action: "Open /cart" }
           - { action: "Click \"Remove\" in the Sunny Tulips row", expected: "Only Rose Bouquet stays in the cart" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('remove Sunny Tulips from the cart', async ({ page }) => {
-          await page.goto('/cart');
-          await page.getByRole('button', { name: 'Remove' }).first().click();
-          await expect(page.getByTestId('cart-row')).toHaveCount(1);
-          await expect(page.getByTestId('toast')).toContainText('removed from cart');
-        });
+
+        def test_remove_sunny_tulips_from_the_cart(page: Page):
+            page.goto("/cart")
+            page.get_by_role("button", name="Remove").first.click()
+            expect(page.get_by_test_id("cart-row")).to_have_count(1)
+            expect(page.get_by_test_id("toast")).to_contain_text("removed from cart")
       outcome: pass
       reasons:
         - text:
@@ -400,17 +400,17 @@ steps:
             en: "Fail: the bug deletes Rose Bouquet instead of Sunny Tulips, and the test notices."
             ru: "Упадёт: баг удаляет Rose Bouquet вместо Sunny Tulips, и тест это замечает."
           why:
-            en: "Only if it checked which product stayed — and then it would be red on a healthy app too, because `.first()` itself clicks Rose Bouquet's “Remove”. As written, one row is left either way, and the toast says “removed from cart” either way."
-            ru: "Только если бы проверял, какой товар остался, — и тогда он был бы красным и на исправном приложении, ведь `.first()` сам нажимает «Remove» у Rose Bouquet. А в таком виде одна строка остаётся в любом случае, и уведомление «removed from cart» появляется в любом случае."
+            en: "Only if it checked which product stayed — and then it would be red on a healthy app too, because `.first` itself clicks Rose Bouquet's “Remove”. As written, one row is left either way, and the toast says “removed from cart” either way."
+            ru: "Только если бы проверял, какой товар остался, — и тогда он был бы красным и на исправном приложении, ведь `.first` сам нажимает «Remove» у Rose Bouquet. А в таком виде одна строка остаётся в любом случае, и уведомление «removed from cart» появляется в любом случае."
         - text:
             en: "Fail: strict mode — there are two “Remove” buttons."
             ru: "Упадёт: строгий режим — кнопок «Remove» две."
           why:
-            en: "`.first()` switches strict mode off for this locator: it always takes the first match."
-            ru: "`.first()` отключает строгий режим для этого локатора: он всегда берёт первое совпадение."
+            en: "`.first` switches strict mode off for this locator: it always takes the first match."
+            ru: "`.first` отключает строгий режим для этого локатора: он всегда берёт первое совпадение."
       hints:
-        - en: "Which row does `.first()` click? Which row does the bug delete?"
-          ru: "В какой строке `.first()` нажимает кнопку? Какую строку удаляет баг?"
+        - en: "Which row does `.first` click? Which row does the bug delete?"
+          ru: "В какой строке `.first` нажимает кнопку? Какую строку удаляет баг?"
         - en: "Now read the two assertions. Would their result be any different with the bug?"
           ru: "Теперь прочитай обе проверки. Изменился бы их результат из-за бага?"
         - en: "Both point at row 1, and the checks never name a product. It passes."
@@ -419,8 +419,8 @@ steps:
         en: "Right — green on a buggy build. You saw that this test can't tell one row from another."
         ru: "Верно — зелёный на сборке с багом. Ты увидел{а|}, что этот тест не отличает одну строку от другой."
       explain:
-        en: "`.first()` locks the test to row 1, and the bug lives exactly where the test never looks: in any row except the first. Worse, the test doesn't even follow TC-542 — on a healthy app it removes Rose Bouquet too. A test that never says *which one* can't notice that the app removed the wrong one."
-        ru: "`.first()` привязывает тест к строке 1, а баг живёт ровно там, куда тест не смотрит: в любой строке, кроме первой. Хуже того, тест даже не следует TC-542 — и на исправном приложении он удаляет Rose Bouquet. Тест, который никогда не говорит, *какой именно*, не заметит, что приложение удалило не то."
+        en: "`.first` locks the test to row 1, and the bug lives exactly where the test never looks: in any row except the first. Worse, the test doesn't even follow TC-542 — on a healthy app it removes Rose Bouquet too. A test that never says *which one* can't notice that the app removed the wrong one."
+        ru: "`.first` привязывает тест к строке 1, а баг живёт ровно там, куда тест не смотрит: в любой строке, кроме первой. Хуже того, тест даже не следует TC-542 — и на исправном приложении он удаляет Rose Bouquet. Тест, который никогда не говорит, *какой именно*, не заметит, что приложение удалило не то."
 
   - type: task
     task:
@@ -441,51 +441,51 @@ steps:
           - { action: "Add Rose Bouquet and Peony Dream to the cart" }
           - { action: "Open the cart", expected: "Rows \"Rose Bouquet\" and \"Peony Dream\"; total €77.00 (free delivery from €50)" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('two bouquets in the cart', async ({ page }) => {
-          await page.goto('/shop');
-          await page.getByRole('button', { name: 'Add to cart' }).first().click();
-          await page.getByRole('button', { name: 'Add to cart' }).nth(4).click();
-          await page.getByRole('link', { name: 'Cart' }).click();
-          await expect(page.getByTestId('cart-row').first()).toBeVisible();
-          await expect(page.getByTestId('cart-total')).toHaveText('€51.90');
-        });
+
+        def test_two_bouquets_in_the_cart(page: Page):
+            page.goto("/shop")
+            page.get_by_role("button", name="Add to cart").first.click()
+            page.get_by_role("button", name="Add to cart").nth(4).click()
+            page.get_by_role("link", name="Cart").click()
+            expect(page.get_by_test_id("cart-row").first).to_be_visible()
+            expect(page.get_by_test_id("cart-total")).to_have_text("€51.90")
       issues:
-        - line: 5
+        - line: 6
           type: fragile-locator
           note:
             en: "“The first card” is Rose Bouquet only in today's “Most popular” order. Filter the card by “Rose Bouquet”."
             ru: "«Первая карточка» — это Rose Bouquet только в сегодняшнем порядке «Most popular». Отфильтруй карточку по «Rose Bouquet»."
-        - line: 6
+        - line: 7
           type: wrong-step
           note:
             en: "`nth` counts from zero: `.nth(4)` is the fifth card — Mint Succulent, not Peony Dream. Filter by “Peony Dream” instead of counting."
             ru: "`nth` считает с нуля: `.nth(4)` — пятая карточка, Mint Succulent, а не Peony Dream. Вместо подсчёта отфильтруй по «Peony Dream»."
-        - line: 8
+        - line: 9
           type: weak-assertion
           note:
             en: "“Some row is visible” doesn't say which products are in the cart. TC-543 expects the rows Rose Bouquet and Peony Dream."
             ru: "«Какая-то строка видна» не говорит, какие товары в корзине. TC-543 ожидает строки Rose Bouquet и Peony Dream."
-        - line: 9
+        - line: 10
           type: wrong-assertion
           note:
             en: "€51.90 = Rose Bouquet + Mint Succulent + €4.90 delivery: Petal copied the total from the screen. The case expects €77.00."
             ru: "€51.90 = Rose Bouquet + Mint Succulent + €4.90 доставки: Petal переписал итог с экрана. Кейс ожидает €77.00."
       types: [fragile-locator, wrong-step, weak-assertion, wrong-assertion, hard-wait, hallucination]
       hints:
-        - en: "Ask every `.first()` and `.nth()`: which product, and why that one? Count the cards from zero."
-          ru: "Спроси каждый `.first()` и `.nth()`: какой товар и почему этот? Считай карточки с нуля."
+        - en: "Ask every `.first` and `.nth()`: which product, and why that one? Count the cards from zero."
+          ru: "Спроси каждый `.first` и `.nth()`: какой товар и почему этот? Считай карточки с нуля."
         - en: "Then compare both assertions with the expected result: which rows, which total?"
           ru: "Потом сравни обе проверки с ожидаемым результатом: какие строки, какой итог?"
-        - en: "Lines 5, 6, 8 and 9. Line 7 is fine."
-          ru: "Строки 5, 6, 8 и 9. Строка 7 в порядке."
+        - en: "Lines 6, 7, 9 and 10. Line 8 is fine."
+          ru: "Строки 6, 7, 9 и 10. Строка 8 в порядке."
       praise:
         en: "Four findings — including the off-by-one that turned Peony Dream into Mint Succulent. That's the review that stops a wrong green test."
         ru: "Четыре находки — включая сдвиг на единицу, из-за которого Peony Dream превратился в Mint Succulent. Такое ревью останавливает неправильный зелёный тест."
       explain:
-        en: "One shortcut led to the next: `.nth(4)` added the wrong product, the total went red, and Petal “fixed” it by copying the number from the screen. With filters (“Rose Bouquet”, “Peony Dream”) the test adds the right products, and the €77.00 check from the case passes. Line 7 is fine: only the menu link has “Cart” in its name."
-        ru: "Одна уловка потянула за собой другую: `.nth(4)` добавил не тот товар, итог покраснел, и Petal «починил» его, переписав число с экрана. С фильтрами («Rose Bouquet», «Peony Dream») тест добавляет нужные товары, и проверка €77.00 из кейса проходит. Строка 7 в порядке: «Cart» в имени есть только у ссылки в меню."
+        en: "One shortcut led to the next: `.nth(4)` added the wrong product, the total went red, and Petal “fixed” it by copying the number from the screen. With filters (“Rose Bouquet”, “Peony Dream”) the test adds the right products, and the €77.00 check from the case passes. Line 8 is fine: only the menu link has “Cart” in its name."
+        ru: "Одна уловка потянула за собой другую: `.nth(4)` добавил не тот товар, итог покраснел, и Petal «починил» его, переписав число с экрана. С фильтрами («Rose Bouquet», «Peony Dream») тест добавляет нужные товары, и проверка €77.00 из кейса проходит. Строка 8 в порядке: «Cart» в имени есть только у ссылки в меню."
 
   - type: task
     task:
@@ -497,25 +497,23 @@ steps:
         state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] }
       context:
         en: |
-          Back to Kai's buggy build and the TC-542 cart (Rose Bouquet, then Sunny Tulips). Petal's test in tests/cart.spec.ts is green — and blind to the bug:
-          ```js
-          test('remove Sunny Tulips from the cart', async ({ page }) => {
-            await page.goto('/cart');
-            await page.getByRole('button', { name: 'Remove' }).first().click();
-            await expect(page.getByTestId('cart-row')).toHaveCount(1);
-            await expect(page.getByTestId('toast')).toContainText('removed from cart');
-          });
+          Back to Kai's buggy build and the TC-542 cart (Rose Bouquet, then Sunny Tulips). Petal's test in tests/test_cart.py is green — and blind to the bug:
+          ```python
+          def test_remove_sunny_tulips_from_the_cart(page: Page):
+              page.goto("/cart")
+              page.get_by_role("button", name="Remove").first.click()
+              expect(page.get_by_test_id("cart-row")).to_have_count(1)
+              expect(page.get_by_test_id("toast")).to_contain_text("removed from cart")
           ```
           Petal is simulated, as everywhere in the trainer.
         ru: |
-          Возвращаемся к сборке Кая с багом и корзине из TC-542 (Rose Bouquet, потом Sunny Tulips). Тест Petal в tests/cart.spec.ts зелёный — и слепой к багу:
-          ```js
-          test('remove Sunny Tulips from the cart', async ({ page }) => {
-            await page.goto('/cart');
-            await page.getByRole('button', { name: 'Remove' }).first().click();
-            await expect(page.getByTestId('cart-row')).toHaveCount(1);
-            await expect(page.getByTestId('toast')).toContainText('removed from cart');
-          });
+          Возвращаемся к сборке Кая с багом и корзине из TC-542 (Rose Bouquet, потом Sunny Tulips). Тест Petal в tests/test_cart.py зелёный — и слепой к багу:
+          ```python
+          def test_remove_sunny_tulips_from_the_cart(page: Page):
+              page.goto("/cart")
+              page.get_by_role("button", name="Remove").first.click()
+              expect(page.get_by_test_id("cart-row")).to_have_count(1)
+              expect(page.get_by_test_id("toast")).to_contain_text("removed from cart")
           ```
           Petal, как и везде в тренажёре, симулирован.
       prompt:
@@ -529,8 +527,8 @@ steps:
           - { action: "Open /cart" }
           - { action: "Click \"Remove\" in the Sunny Tulips row", expected: "Only Rose Bouquet stays in the cart" }
       blocks:
-        - { id: task, locked: true, text: "Please rewrite the TC-542 test in tests/cart.spec.ts.", ru: "Пожалуйста, перепиши тест TC-542 в tests/cart.spec.ts." }
-        - { id: row, text: "Click Remove inside the Sunny Tulips row: filter the rows with hasText, then chain getByRole('button', { name: 'Remove' }). No .first() or .nth().", ru: "Нажимай Remove внутри строки Sunny Tulips: отфильтруй строки через hasText, потом цепочкой getByRole('button', { name: 'Remove' }). Без .first() и .nth()." }
+        - { id: task, locked: true, text: "Please rewrite the TC-542 test in tests/test_cart.py.", ru: "Пожалуйста, перепиши тест TC-542 в tests/test_cart.py." }
+        - { id: row, text: 'Click Remove inside the Sunny Tulips row: filter the rows with has_text, then chain get_by_role("button", name="Remove"). No .first or .nth().', ru: 'Нажимай Remove внутри строки Sunny Tulips: отфильтруй строки через has_text, потом цепочкой get_by_role("button", name="Remove"). Без .first и .nth().' }
         - { id: expected, text: "Assert the expected result of TC-542: exactly one row is left, and it is Rose Bouquet.", ru: "Проверь ожидаемый результат TC-542: осталась ровно одна строка, и это Rose Bouquet." }
         - { id: green, text: "If the test fails, adjust the assertions until it passes.", ru: "Если тест упадёт, подправь проверки, пока он не пройдёт." }
       responses:
@@ -541,86 +539,86 @@ steps:
             en: "Rewritten: the test clicks Remove in the Sunny Tulips row and checks that Rose Bouquet stays. It's red ❌ — after the click Sunny Tulips is still there and Rose Bouquet is gone. The locator points at the right row, so this looks like a bug in the app: Remove deleted the wrong item. Shall I draft a bug report?"
             ru: "Переписал: тест нажимает Remove в строке Sunny Tulips и проверяет, что Rose Bouquet остался. Красный ❌ — после клика Sunny Tulips на месте, а Rose Bouquet пропал. Локатор указывает на нужную строку, значит, похоже на баг в приложении: Remove удалил не тот товар. Набросать баг-репорт?"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('remove Sunny Tulips from the cart', async ({ page }) => {
-              await page.goto('/cart');
-              const tulips = page.getByRole('row').filter({ hasText: 'Sunny Tulips' });
-              await tulips.getByRole('button', { name: 'Remove' }).click();
-              await expect(page.getByTestId('cart-row')).toHaveCount(1);
-              await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');
-            });
+
+            def test_remove_sunny_tulips_from_the_cart(page: Page):
+                page.goto("/cart")
+                tulips = page.get_by_role("row").filter(has_text="Sunny Tulips")
+                tulips.get_by_role("button", name="Remove").click()
+                expect(page.get_by_test_id("cart-row")).to_have_count(1)
+                expect(page.get_by_test_id("cart-row")).to_contain_text("Rose Bouquet")
         - when: [row, expected, green]
           message:
             en: "The test failed at first: after the click Rose Bouquet disappeared and Sunny Tulips stayed. As you asked, I adjusted the assertion — it now expects Sunny Tulips. Green ✅"
             ru: "Сначала тест упал: после клика пропал Rose Bouquet, а Sunny Tulips остался. Как ты просил{а|}, я подправил проверку — теперь она ожидает Sunny Tulips. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('remove Sunny Tulips from the cart', async ({ page }) => {
-              await page.goto('/cart');
-              const tulips = page.getByRole('row').filter({ hasText: 'Sunny Tulips' });
-              await tulips.getByRole('button', { name: 'Remove' }).click();
-              await expect(page.getByTestId('cart-row')).toHaveCount(1);
-              await expect(page.getByTestId('cart-row')).toContainText('Sunny Tulips');
-            });
+
+            def test_remove_sunny_tulips_from_the_cart(page: Page):
+                page.goto("/cart")
+                tulips = page.get_by_role("row").filter(has_text="Sunny Tulips")
+                tulips.get_by_role("button", name="Remove").click()
+                expect(page.get_by_test_id("cart-row")).to_have_count(1)
+                expect(page.get_by_test_id("cart-row")).to_contain_text("Sunny Tulips")
         - when: [expected, green]
           message:
             en: "Added the Rose Bouquet check — it failed, so I adjusted it to Sunny Tulips, as you asked. Green ✅"
             ru: "Добавил проверку Rose Bouquet — она упала, поэтому я, как ты просил{а|}, поменял её на Sunny Tulips. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('remove Sunny Tulips from the cart', async ({ page }) => {
-              await page.goto('/cart');
-              await page.getByRole('button', { name: 'Remove' }).first().click();
-              await expect(page.getByTestId('cart-row')).toHaveCount(1);
-              await expect(page.getByTestId('cart-row')).toContainText('Sunny Tulips');
-            });
+
+            def test_remove_sunny_tulips_from_the_cart(page: Page):
+                page.goto("/cart")
+                page.get_by_role("button", name="Remove").first.click()
+                expect(page.get_by_test_id("cart-row")).to_have_count(1)
+                expect(page.get_by_test_id("cart-row")).to_contain_text("Sunny Tulips")
         - when: [row]
           message:
-            en: "Switched to the Sunny Tulips row — no more `.first()`. I kept the checks as they were. Green ✅"
-            ru: "Перешёл на строку Sunny Tulips — больше никакого `.first()`. Проверки оставил как были. Зелёный ✅"
+            en: "Switched to the Sunny Tulips row — no more `.first`. I kept the checks as they were. Green ✅"
+            ru: "Перешёл на строку Sunny Tulips — больше никакого `.first`. Проверки оставил как были. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('remove Sunny Tulips from the cart', async ({ page }) => {
-              await page.goto('/cart');
-              const tulips = page.getByRole('row').filter({ hasText: 'Sunny Tulips' });
-              await tulips.getByRole('button', { name: 'Remove' }).click();
-              await expect(page.getByTestId('cart-row')).toHaveCount(1);
-              await expect(page.getByTestId('toast')).toContainText('removed from cart');
-            });
+
+            def test_remove_sunny_tulips_from_the_cart(page: Page):
+                page.goto("/cart")
+                tulips = page.get_by_role("row").filter(has_text="Sunny Tulips")
+                tulips.get_by_role("button", name="Remove").click()
+                expect(page.get_by_test_id("cart-row")).to_have_count(1)
+                expect(page.get_by_test_id("toast")).to_contain_text("removed from cart")
         - when: [expected]
           message:
             en: "Added the check for Rose Bouquet. Now it's red ❌: Rose Bouquet is gone. Should I report a bug?"
             ru: "Добавил проверку Rose Bouquet. Теперь красный ❌: Rose Bouquet пропал. Сообщить о баге?"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('remove Sunny Tulips from the cart', async ({ page }) => {
-              await page.goto('/cart');
-              await page.getByRole('button', { name: 'Remove' }).first().click();
-              await expect(page.getByTestId('cart-row')).toHaveCount(1);
-              await expect(page.getByTestId('cart-row')).toContainText('Rose Bouquet');
-            });
+
+            def test_remove_sunny_tulips_from_the_cart(page: Page):
+                page.goto("/cart")
+                page.get_by_role("button", name="Remove").first.click()
+                expect(page.get_by_test_id("cart-row")).to_have_count(1)
+                expect(page.get_by_test_id("cart-row")).to_contain_text("Rose Bouquet")
         - when: []
           message:
             en: "The test is already green ✅ — I'm not sure what to change. Shall I leave it as it is?"
             ru: "Тест и так зелёный ✅ — не понимаю, что менять. Оставить как есть?"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('remove Sunny Tulips from the cart', async ({ page }) => {
-              await page.goto('/cart');
-              await page.getByRole('button', { name: 'Remove' }).first().click();
-              await expect(page.getByTestId('cart-row')).toHaveCount(1);
-              await expect(page.getByTestId('toast')).toContainText('removed from cart');
-            });
+
+            def test_remove_sunny_tulips_from_the_cart(page: Page):
+                page.goto("/cart")
+                page.get_by_role("button", name="Remove").first.click()
+                expect(page.get_by_test_id("cart-row")).to_have_count(1)
+                expect(page.get_by_test_id("toast")).to_contain_text("removed from cart")
       missing:
         row:
-          en: "Without the row block Petal kept `.first()`: the test removes Rose Bouquet itself and then complains that it's gone. It would be red on a healthy app too — a false alarm, not a bug report."
-          ru: "Без блока про строку Petal оставил `.first()`: тест сам удаляет Rose Bouquet и потом жалуется, что его нет. Он был бы красным и на исправном приложении — это ложная тревога, а не баг-репорт."
+          en: "Without the row block Petal kept `.first`: the test removes Rose Bouquet itself and then complains that it's gone. It would be red on a healthy app too — a false alarm, not a bug report."
+          ru: "Без блока про строку Petal оставил `.first`: тест сам удаляет Rose Bouquet и потом жалуется, что его нет. Он был бы красным и на исправном приложении — это ложная тревога, а не баг-репорт."
         expected:
           en: "Without the expected result Petal kept the old checks: one row and a toast. That's green on the buggy build — one row is left either way."
           ru: "Без ожидаемого результата Petal оставил старые проверки: одна строка и уведомление. На сборке с багом это зелёный тест — одна строка остаётся в любом случае."
@@ -628,7 +626,7 @@ steps:
         expect: fail
         static:
           - rule: notRegex
-            value: '\.(first|last|nth)\('
+            value: '\.(first|last|nth)\b'
         also:
           - app: { state: { cart: [{ id: rose-bouquet, qty: 1 }, { id: sunny-tulips, qty: 1 }] } }
             expect: pass
@@ -643,47 +641,47 @@ steps:
         en: "A red test that points straight at a real bug — and you didn't let Petal “fix” it back to green."
         ru: "Красный тест, который указывает прямо на настоящий баг, — и ты не дал{а|} Petal «починить» его обратно в зелёный."
       explain:
-        en: "Red is the right result here: the locator names the Sunny Tulips row, the assertion names what should stay, and the app removed the wrong row. That's a bug report, not a broken test. Notice the two traps: without the row block Petal kept `.first()` and raised a false alarm; with “adjust the assertions” Petal rewrote the expected result to match the bug. Expected results come from the test case, never from the screen."
-        ru: "Красный здесь — правильный результат: локатор называет строку Sunny Tulips, проверка называет, что должно остаться, а приложение удалило не ту строку. Это баг-репорт, а не сломанный тест. Обрати внимание на две ловушки: без блока про строку Petal оставил `.first()` и поднял ложную тревогу; с «подправь проверки» Petal переписал ожидаемый результат под баг. Ожидаемый результат берётся из тест-кейса, а не с экрана."
+        en: "Red is the right result here: the locator names the Sunny Tulips row, the assertion names what should stay, and the app removed the wrong row. That's a bug report, not a broken test. Notice the two traps: without the row block Petal kept `.first` and raised a false alarm; with “adjust the assertions” Petal rewrote the expected result to match the bug. Expected results come from the test case, never from the screen."
+        ru: "Красный здесь — правильный результат: локатор называет строку Sunny Tulips, проверка называет, что должно остаться, а приложение удалило не ту строку. Это баг-репорт, а не сломанный тест. Обрати внимание на две ловушки: без блока про строку Petal оставил `.first` и поднял ложную тревогу; с «подправь проверки» Petal переписал ожидаемый результат под баг. Ожидаемый результат берётся из тест-кейса, а не с экрана."
 
   - type: mistakes
     title: { en: "Locator shortcuts (often the agent's)", ru: "Уловки с локаторами (часто от агента)" }
     items:
-      - wrong: "await page.getByRole('button', { name: 'Add to cart' }).first().click();"
-        right: "await page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' }).click();"
+      - wrong: 'page.get_by_role("button", name="Add to cart").first.click()'
+        right: 'page.get_by_test_id("product-card").filter(has_text="Sunny Tulips").get_by_role("button", name="Add to cart").click()'
         why:
-          en: "`.first()` picks by position — Rose Bouquet today. The test case picks by product."
-          ru: "`.first()` выбирает по позиции — сегодня это Rose Bouquet. Тест-кейс выбирает по товару."
-      - wrong: "await page.getByRole('button', { name: 'Add to cart' }).nth(2).click(); // Sunny Tulips, 2nd card"
-        right: "await page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' }).click();"
+          en: "`.first` picks by position — Rose Bouquet today. The test case picks by product."
+          ru: "`.first` выбирает по позиции — сегодня это Rose Bouquet. Тест-кейс выбирает по товару."
+      - wrong: 'page.get_by_role("button", name="Add to cart").nth(2).click()  # Sunny Tulips, 2nd card'
+        right: 'page.get_by_test_id("product-card").filter(has_text="Sunny Tulips").get_by_role("button", name="Add to cart").click()'
         why:
           en: "`nth` counts from zero: `nth(2)` is the third card, Lavender Pot. And any new product or sort order moves it again."
           ru: "`nth` считает с нуля: `nth(2)` — третья карточка, Lavender Pot. А любой новый товар или другая сортировка снова её сдвинут."
-      - wrong: "await expect(page.getByTestId('order-row').filter({ hasText: 'Rose Bouquet' })).toContainText('Delivered');"
-        right: "await expect(page.getByTestId('order-row').filter({ hasText: '#1042' })).toContainText('Delivered');"
+      - wrong: 'expect(page.get_by_test_id("order-row").filter(has_text="Rose Bouquet")).to_contain_text("Delivered")'
+        right: 'expect(page.get_by_test_id("order-row").filter(has_text="#1042")).to_contain_text("Delivered")'
         why:
           en: "Two of Anna's orders contain Rose Bouquet — strict mode again. Filter by what is unique: the order number."
           ru: "Rose Bouquet есть в двух заказах Anna — снова строгий режим. Фильтруй по уникальному: по номеру заказа."
-      - wrong: "await page.getByText('Log in').click();"
-        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+      - wrong: 'page.get_by_text("Log in").click()'
+        right: 'page.get_by_role("button", name="Log in").click()'
         why:
-          en: "Not every strict mode error needs a filter. Sometimes a more specific getBy* is enough: there is only one *button* called “Log in”."
-          ru: "Не каждой ошибке строгого режима нужен фильтр. Иногда хватает более точного getBy*: *кнопка* «Log in» на странице одна."
+          en: "Not every strict mode error needs a filter. Sometimes a more specific `get_by_*` is enough: there is only one *button* called “Log in”."
+          ru: "Не каждой ошибке строгого режима нужен фильтр. Иногда хватает более точного `get_by_*`: *кнопка* «Log in» на странице одна."
 
   - type: explain
     keyPoint: kp-strict-mode
     prompt:
-      en: "Petal fixed a strict mode violation with `.first()`. In your own words: what does strict mode protect you from, and what would you write in the review?"
-      ru: "Petal исправил нарушение строгого режима через `.first()`. Своими словами: от чего тебя защищает строгий режим и что ты напишешь в ревью?"
+      en: "Petal fixed a strict mode violation with `.first`. In your own words: what does strict mode protect you from, and what would you write in the review?"
+      ru: "Petal исправил нарушение строгого режима через `.first`. Своими словами: от чего тебя защищает строгий режим и что ты напишешь в ревью?"
     model:
-      en: "Strict mode stops the test when a locator matches more than one element, so the test never acts on a guess. `.first()` silences that question instead of answering it: the test now picks by position, can click the wrong product, and can't notice bugs like “Remove deletes the wrong row”. In the review I'd write: “Line 5: `.first()` hides which product we add. TC-541 says Sunny Tulips — please filter the card: `getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' })`.” `.first()` is fine only when the position itself is the requirement, like “the newest order is on top”."
-      ru: "Строгий режим останавливает тест, когда локатор находит больше одного элемента, поэтому тест никогда не действует наугад. `.first()` глушит этот вопрос вместо того, чтобы на него ответить: тест выбирает по позиции, может нажать не тот товар и не заметит баги вроде «Remove удаляет не ту строку». В ревью я бы написал{а|}: «Line 5: `.first()` hides which product we add. TC-541 says Sunny Tulips — please filter the card: `getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByRole('button', { name: 'Add to cart' })`.» `.first()` уместен, только когда сама позиция и есть требование, например «самый новый заказ — сверху»."
+      en: "Strict mode stops the test when a locator matches more than one element, so the test never acts on a guess. `.first` silences that question instead of answering it: the test now picks by position, can click the wrong product, and can't notice bugs like “Remove deletes the wrong row”. In the review I'd write: “Line 6: `.first` hides which product we add. TC-541 says Sunny Tulips — please filter the card: `get_by_test_id(\"product-card\").filter(has_text=\"Sunny Tulips\").get_by_role(\"button\", name=\"Add to cart\")`.” `.first` is fine only when the position itself is the requirement, like “the newest order is on top”."
+      ru: 'Строгий режим останавливает тест, когда локатор находит больше одного элемента, поэтому тест никогда не действует наугад. `.first` глушит этот вопрос вместо того, чтобы на него ответить: тест выбирает по позиции, может нажать не тот товар и не заметит баги вроде «Remove удаляет не ту строку». В ревью я бы написал{а|}: «Line 6: `.first` hides which product we add. TC-541 says Sunny Tulips — please filter the card: `get_by_test_id("product-card").filter(has_text="Sunny Tulips").get_by_role("button", name="Add to cart")`.» `.first` уместен, только когда сама позиция и есть требование, например «самый новый заказ — сверху».'
 
   - type: phrases
     items:
       - context: code-review
-        en: "Line 5: .first() hides which product we add. Could you filter the card by 'Sunny Tulips' instead?"
-        ru: "Строка 5: .first() прячет, какой товар мы добавляем. Можешь вместо этого отфильтровать карточку по 'Sunny Tulips'?"
+        en: "Line 6: .first hides which product we add. Could you filter the card by 'Sunny Tulips' instead?"
+        ru: "Строка 6: .first прячет, какой товар мы добавляем. Можешь вместо этого отфильтровать карточку по 'Sunny Tulips'?"
         note:
           en: "Name the line, the problem and the fix — the same mini bug report as in chapter 2."
           ru: "Назови строку, проблему и исправление — тот же мини-баг-репорт, что во второй главе."
@@ -691,8 +689,8 @@ steps:
         en: "The test fails with a strict mode violation: the locator matches six 'Add to cart' buttons. I'll narrow it down to the right card."
         ru: "Тест падает с нарушением строгого режима: локатор находит шесть кнопок 'Add to cart'. Уточню его до нужной карточки."
       - context: prompt
-        en: "Don't silence strict mode with .first() or .nth(). Find the container by its text, then the element inside it."
-        ru: "Не глуши строгий режим через .first() или .nth(). Найди контейнер по тексту, потом элемент внутри него."
+        en: "Don't silence strict mode with .first or .nth(). Find the container by its text, then the element inside it."
+        ru: "Не глуши строгий режим через .first или .nth(). Найди контейнер по тексту, потом элемент внутри него."
         note:
           en: "A good line for your project rules file — more on that in the next lesson."
           ru: "Хорошая строка для файла правил проекта — подробнее в следующем уроке."
@@ -712,13 +710,13 @@ checkPool:
       en: "Will this test pass or fail?"
       ru: "Этот тест пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('home page links to the shop', async ({ page }) => {
-        await page.goto('/');
-        await page.getByRole('link', { name: 'Shop' }).click();
-        await expect(page).toHaveURL('/shop');
-      });
+
+      def test_home_page_links_to_the_shop(page: Page):
+          page.goto("/")
+          page.get_by_role("link", name="Shop").click()
+          expect(page).to_have_url("http://localhost:3000/shop")
     outcome: fail
     reasons:
       - text:
@@ -729,8 +727,8 @@ checkPool:
           en: "Pass: there is a “Shop” link in the menu."
           ru: "Пройдёт: в меню есть ссылка «Shop»."
         why:
-          en: "There is — and one more: “Shop now” on the home page. A name matches by part unless you add `exact: true`."
-          ru: "Есть — и ещё одна: «Shop now» на главной. Имя совпадает по части, если не добавить `exact: true`."
+          en: "There is — and one more: “Shop now” on the home page. A name matches by part unless you add `exact=True`."
+          ru: "Есть — и ещё одна: «Shop now» на главной. Имя совпадает по части, если не добавить `exact=True`."
       - text:
           en: "Fail: the home page has no link to the shop."
           ru: "Упадёт: на главной нет ссылки на магазин."
@@ -743,8 +741,8 @@ checkPool:
       - en: "By default a name matches by part, in any letter case."
         ru: "По умолчанию имя совпадает по части и без учёта регистра."
     explain:
-      en: "`{ name: 'Shop' }` matches “Shop” and “Shop now”. Two ways out: `{ name: 'Shop', exact: true }`, or a chain that names the container: `page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Shop' })`."
-      ru: "`{ name: 'Shop' }` подходит и к «Shop», и к «Shop now». Два выхода: `{ name: 'Shop', exact: true }` или цепочка, которая называет контейнер: `page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Shop' })`."
+      en: '`name="Shop"` matches “Shop” and “Shop now”. Two ways out: `page.get_by_role("link", name="Shop", exact=True)`, or a chain that names the container: `page.get_by_role("navigation", name="Main").get_by_role("link", name="Shop")`.'
+      ru: '`name="Shop"` подходит и к «Shop», и к «Shop now». Два выхода: `page.get_by_role("link", name="Shop", exact=True)` или цепочка, которая называет контейнер: `page.get_by_role("navigation", name="Main").get_by_role("link", name="Shop")`.'
 
   - id: c5-l3-k2
     kind: choice
@@ -758,25 +756,25 @@ checkPool:
       ru: "Какие строки остановятся с нарушением строгого режима? Выбери все подходящие."
     optionsCode: true
     options:
-      - text: "await expect(page.getByTestId('product-card')).toHaveCount(6);"
+      - text: 'expect(page.get_by_test_id("product-card")).to_have_count(6)'
         why:
           en: "Counting is about many elements — strict mode doesn't apply."
           ru: "Подсчёт — про много элементов, строгий режим к нему не относится."
-      - text: "await expect(page.getByTestId('product-price')).toHaveText('€35.00');"
+      - text: 'expect(page.get_by_test_id("product-price")).to_have_text("€35.00")'
         correct: true
         why:
           en: "Six cards, six prices. To check Rose Bouquet's price, filter the card first."
           ru: "Шесть карточек — шесть цен. Чтобы проверить цену Rose Bouquet, сначала отфильтруй карточку."
-      - text: "await expect(page.getByRole('button', { name: 'Add to cart' })).toBeEnabled();"
+      - text: 'expect(page.get_by_role("button", name="Add to cart")).to_be_enabled()'
         correct: true
         why:
           en: "Six buttons. Assertions need exactly one element too, not only clicks."
           ru: "Шесть кнопок. Ровно один элемент нужен не только кликам, но и проверкам."
-      - text: "await expect(page.getByText('Out of stock')).toBeVisible();"
+      - text: 'expect(page.get_by_text("Out of stock")).to_be_visible()'
         why:
           en: "Only the White Orchid card says it — one element."
           ru: "Это написано только на карточке White Orchid — один элемент."
-      - text: "await page.getByLabel('Search').fill('rose');"
+      - text: 'page.get_by_label("Search").fill("rose")'
         why:
           en: "There is one search field."
           ru: "Поле поиска одно."
@@ -788,8 +786,8 @@ checkPool:
       - en: "The price line and the button line."
         ru: "Строка с ценой и строка с кнопкой."
     explain:
-      en: "Strict mode applies to actions *and* to assertions about one element (`toHaveText`, `toBeEnabled`, `toBeVisible`…). Anything that repeats on every card gives six matches; `toHaveCount` is the exception because counting needs many."
-      ru: "Строгий режим действует на действия *и* на проверки одного элемента (`toHaveText`, `toBeEnabled`, `toBeVisible`…). Всё, что повторяется на каждой карточке, даёт шесть совпадений; `toHaveCount` — исключение, потому что для подсчёта нужно много."
+      en: "Strict mode applies to actions *and* to assertions about one element (`to_have_text`, `to_be_enabled`, `to_be_visible`…). Anything that repeats on every card gives six matches; `to_have_count` is the exception because counting needs many."
+      ru: "Строгий режим действует на действия *и* на проверки одного элемента (`to_have_text`, `to_be_enabled`, `to_be_visible`…). Всё, что повторяется на каждой карточке, даёт шесть совпадений; `to_have_count` — исключение, потому что для подсчёта нужно много."
 
   - id: c5-l3-k3
     kind: pick-locator
@@ -802,20 +800,20 @@ checkPool:
       en: "The cart has Rose Bouquet, Sunny Tulips and Lavender Pot. Pick the locator for “Remove” in the Lavender Pot row."
       ru: "В корзине Rose Bouquet, Sunny Tulips и Lavender Pot. Выбери локатор для «Remove» в строке Lavender Pot."
     options:
-      - text: "page.getByRole('row').filter({ hasText: 'Lavender Pot' }).getByRole('button', { name: 'Remove' })"
+      - text: 'page.get_by_role("row").filter(has_text="Lavender Pot").get_by_role("button", name="Remove")'
         correct: true
         why:
           en: "The row that contains “Lavender Pot”, then the button inside it. Exactly one element, whatever the order of rows."
           ru: "Строка, где есть «Lavender Pot», потом кнопка внутри неё. Ровно один элемент при любом порядке строк."
-      - text: "page.getByRole('button', { name: 'Remove' }).nth(3)"
+      - text: 'page.get_by_role("button", name="Remove").nth(3)'
         why:
           en: "`nth` counts from zero: the third row is `nth(2)`, so `nth(3)` finds nothing. And a position isn't a product anyway."
           ru: "`nth` считает с нуля: третья строка — это `nth(2)`, так что `nth(3)` не найдёт ничего. Да и позиция — это не товар."
-      - text: "page.getByRole('button', { name: 'Remove Lavender Pot' })"
+      - text: 'page.get_by_role("button", name="Remove Lavender Pot")'
         why:
           en: "The − and + buttons carry product names (“Increase Lavender Pot”), but “Remove” doesn't: it's just “Remove” in every row. This finds nothing."
           ru: "У кнопок − и + в имени есть товар («Increase Lavender Pot»), а у «Remove» — нет: в каждой строке она просто «Remove». Не найдёт ничего."
-      - text: "page.getByTestId('remove-item').last()"
+      - text: 'page.get_by_test_id("remove-item").last'
         why:
           en: "Lavender Pot is last today. Add one more product, and this removes that one instead."
           ru: "Сегодня Lavender Pot последний. Добавь ещё один товар — и удалится уже он."
@@ -843,27 +841,27 @@ checkPool:
       en: "Type the two missing words: keep only the row of order #1041."
       ru: "Впиши два пропущенных слова: оставь только строку заказа #1041."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('order #1041 is shipped', async ({ page }) => {
-        await page.goto('/orders');
-        const order = page.getByTestId('order-row').___({ ___: '#1041' });
-        await expect(order).toContainText('Shipped');
-      });
+
+      def test_order_1041_is_shipped(page: Page):
+          page.goto("/orders")
+          order = page.get_by_test_id("order-row").___(___="#1041")
+          expect(order).to_contain_text("Shipped")
     blanks:
       - { answers: [filter] }
-      - { answers: [hasText] }
+      - { answers: [has_text] }
     checks: { expect: pass }
     hints:
       - en: "Six order rows → one: which locator method keeps only some of them?"
         ru: "Шесть строк заказов → одна: какой метод локатора оставляет только часть из них?"
       - en: "The option for “contains this text”."
         ru: "Опция для «содержит этот текст»."
-      - en: "The answer: filter, hasText."
-        ru: "Ответ: filter, hasText."
+      - en: "The answer: filter, has_text."
+        ru: "Ответ: filter, has_text."
     explain:
-      en: "`filter({ hasText: '#1041' })` keeps the one row with that order number, and `toContainText` checks its status. The order number is unique; product names are not (Rose Bouquet is in two orders)."
-      ru: "`filter({ hasText: '#1041' })` оставляет одну строку с этим номером заказа, а `toContainText` проверяет её статус. Номер заказа уникален, а названия товаров — нет (Rose Bouquet есть в двух заказах)."
+      en: '`filter(has_text="#1041")` keeps the one row with that order number, and `to_contain_text` checks its status. The order number is unique; product names are not (Rose Bouquet is in two orders).'
+      ru: '`filter(has_text="#1041")` оставляет одну строку с этим номером заказа, а `to_contain_text` проверяет её статус. Номер заказа уникален, а названия товаров — нет (Rose Bouquet есть в двух заказах).'
 
   - id: c5-l3-k5
     kind: review
@@ -879,33 +877,33 @@ checkPool:
       steps:
         - { action: "Open /orders", expected: "Order #1038 has the status \"Cancelled\"" }
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('cancelled order is marked Cancelled', async ({ page }) => {
-        await page.goto('/orders');
-        await page.waitForTimeout(1000);
-        const order = page.getByTestId('order-row').nth(4);
-        await expect(order).toContainText('Cancelled');
-      });
+
+      def test_cancelled_order_is_marked_cancelled(page: Page):
+          page.goto("/orders")
+          page.wait_for_timeout(1000)
+          order = page.get_by_test_id("order-row").nth(4)
+          expect(order).to_contain_text("Cancelled")
     issues:
-      - line: 5
+      - line: 6
         type: hard-wait
         note:
-          en: "A fixed second on every run. `toContainText` already waits for the orders to load."
-          ru: "Фиксированная секунда на каждом прогоне. `toContainText` и так ждёт загрузки заказов."
-      - line: 6
+          en: "A fixed second on every run. `to_contain_text` already waits for the orders to load."
+          ru: "Фиксированная секунда на каждом прогоне. `to_contain_text` и так ждёт загрузки заказов."
+      - line: 7
         type: fragile-locator
         note:
-          en: "`.nth(4)` is #1038 only while Anna has exactly these orders, newest first. Her next order (#1043) shifts every row, and the test checks #1039 — “Delivered”, red for no reason. Use `.filter({ hasText: '#1038' })`."
-          ru: "`.nth(4)` — это #1038, только пока у Anna ровно эти заказы, от новых к старым. Следующий заказ (#1043) сдвинет все строки, и тест проверит #1039 — «Delivered», красный без причины. Используй `.filter({ hasText: '#1038' })`."
-    types: [hard-wait, fragile-locator, wrong-data, weak-assertion, missing-await, hallucination]
+          en: '`.nth(4)` is #1038 only while Anna has exactly these orders, newest first. Her next order (#1043) shifts every row, and the test checks #1039 — “Delivered”, red for no reason. Use `.filter(has_text="#1038")`.'
+          ru: '`.nth(4)` — это #1038, только пока у Anna ровно эти заказы, от новых к старым. Следующий заказ (#1043) сдвинет все строки, и тест проверит #1039 — «Delivered», красный без причины. Используй `.filter(has_text="#1038")`.'
+    types: [hard-wait, fragile-locator, wrong-data, weak-assertion, not-called, hallucination]
     hints:
       - en: "The test is green today. Ask the `.nth()`: which order, and why that one?"
         ru: "Сегодня тест зелёный. Спроси у `.nth()`: какой заказ и почему этот?"
       - en: "What happens to row 5 when a new order appears on top?"
         ru: "Что станет с пятой строкой, когда сверху появится новый заказ?"
-      - en: "Lines 5 and 6."
-        ru: "Строки 5 и 6."
+      - en: "Lines 6 and 7."
+        ru: "Строки 6 и 7."
     explain:
       en: "The case is about order #1038, so the locator should say #1038. A position-based locator turns into a false alarm the moment the data changes — and new orders are the most normal change there is."
       ru: "Кейс про заказ #1038, значит, и локатор должен говорить #1038. Локатор по позиции превращается в ложную тревогу, как только меняются данные, — а новые заказы — самое обычное изменение."
@@ -921,16 +919,16 @@ checkPool:
       ru: "Одобрить или запросить правки?"
     diff:
       before: |
-        await expect(page.getByTestId('order-row').filter({ hasText: '#1042' })).toBeVisible();
+        expect(page.get_by_test_id("order-row").filter(has_text="#1042")).to_be_visible()
       after: |
-        await expect(page.getByTestId('order-row').first()).toContainText('#1042');
+        expect(page.get_by_test_id("order-row").first).to_contain_text("#1042")
     options:
       - text: { en: "Approve: here the position is the requirement — “newest first” means #1042 must be the *first* row.", ru: "Одобрить: здесь позиция и есть требование — «новые сверху» значит, что #1042 должен быть *первой* строкой." }
         correct: true
         why:
-          en: "The old line passed wherever #1042 was in the table. `.first()` checks exactly what the case is about."
-          ru: "Старая строка проходила, где бы ни стоял #1042 в таблице. `.first()` проверяет ровно то, о чём кейс."
-      - text: { en: "Request changes: `.first()` in AI code is always wrong.", ru: "Запросить правки: `.first()` в коде агента всегда неправильный." }
+          en: "The old line passed wherever #1042 was in the table. `.first` checks exactly what the case is about."
+          ru: "Старая строка проходила, где бы ни стоял #1042 в таблице. `.first` проверяет ровно то, о чём кейс."
+      - text: { en: "Request changes: `.first` in AI code is always wrong.", ru: "Запросить правки: `.first` в коде агента всегда неправильный." }
         why:
           en: "A red flag means “ask why”, not “always reject”. Here the answer to “why the first one?” is the requirement itself."
           ru: "Тревожный знак значит «спроси почему», а не «всегда отклоняй». Здесь ответ на «почему первый?» — само требование."
@@ -938,7 +936,7 @@ checkPool:
         why:
           en: "Not depending on order is good — unless order is what you test. The old line would stay green if the sorting broke."
           ru: "Не зависеть от порядка — хорошо, если только порядок не то, что ты проверяешь. Старая строка осталась бы зелёной, даже если бы сортировка сломалась."
-      - text: { en: "Request changes: use `.nth(0)` instead of `.first()`.", ru: "Запросить правки: использовать `.nth(0)` вместо `.first()`." }
+      - text: { en: "Request changes: use `.nth(0)` instead of `.first`.", ru: "Запросить правки: использовать `.nth(0)` вместо `.first`." }
         why:
           en: "Same thing, just harder to read."
           ru: "То же самое, только читается хуже."
@@ -948,8 +946,8 @@ checkPool:
       - en: "What exactly does TC-546 check — that #1042 exists, or where it is?"
         ru: "Что именно проверяет TC-546 — что #1042 есть или где он стоит?"
     explain:
-      en: "`.first()` is a red flag when it hides *which product*. When the test case is about *order* — newest first, sorting by price — the position is the expected result, and `.first()` says it out loud."
-      ru: "`.first()` — тревожный знак, когда он прячет, *какой товар*. Когда тест-кейс про *порядок* — новые сверху, сортировка по цене, — позиция и есть ожидаемый результат, и `.first()` говорит об этом прямо."
+      en: "`.first` is a red flag when it hides *which product*. When the test case is about *order* — newest first, sorting by price — the position is the expected result, and `.first` says it out loud."
+      ru: "`.first` — тревожный знак, когда он прячет, *какой товар*. Когда тест-кейс про *порядок* — новые сверху, сортировка по цене, — позиция и есть ожидаемый результат, и `.first` говорит об этом прямо."
 
   - id: c5-l3-k7
     kind: find-bug
@@ -971,29 +969,29 @@ checkPool:
         - { action: "Open /cart" }
         - { action: "Click \"Remove\" in the Lavender Pot row", expected: "No Lavender Pot row; total €59.00 (free delivery)" }
     starter: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('remove Lavender Pot from the cart', async ({ page }) => {
-        await page.goto('/cart');
-        await page.getByRole('button', { name: 'Remove' }).last().click();
-        await expect(page.getByTestId('cart-row')).toHaveCount(2);
-        await expect(page.getByTestId('toast')).toBeVisible();
-      });
+
+      def test_remove_lavender_pot_from_the_cart(page: Page):
+          page.goto("/cart")
+          page.get_by_role("button", name="Remove").last.click()
+          expect(page.get_by_test_id("cart-row")).to_have_count(2)
+          expect(page.get_by_test_id("toast")).to_be_visible()
     solution: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('remove Lavender Pot from the cart', async ({ page }) => {
-        await page.goto('/cart');
-        const lavender = page.getByRole('row').filter({ hasText: 'Lavender Pot' });
-        await lavender.getByRole('button', { name: 'Remove' }).click();
-        await expect(page.getByRole('row').filter({ hasText: 'Lavender Pot' })).toHaveCount(0);
-        await expect(page.getByTestId('cart-total')).toHaveText('€59.00');
-      });
+
+      def test_remove_lavender_pot_from_the_cart(page: Page):
+          page.goto("/cart")
+          lavender = page.get_by_role("row").filter(has_text="Lavender Pot")
+          lavender.get_by_role("button", name="Remove").click()
+          expect(page.get_by_role("row").filter(has_text="Lavender Pot")).to_have_count(0)
+          expect(page.get_by_test_id("cart-total")).to_have_text("€59.00")
     checks:
       expect: fail
       static:
         - rule: notRegex
-          value: '\.(first|last|nth)\('
+          value: '\.(first|last|nth)\b'
           message:
             en: "Name the row instead of its position: filter the rows by 'Lavender Pot'."
             ru: "Назови строку, а не её позицию: отфильтруй строки по 'Lavender Pot'."
@@ -1003,21 +1001,21 @@ checkPool:
     hints:
       - en: "Two changes: the locator (which row?) and the assertions (what should the cart look like?)."
         ru: "Два изменения: локатор (какая строка?) и проверки (какой должна стать корзина?)."
-      - en: "Click Remove inside `page.getByRole('row').filter({ hasText: 'Lavender Pot' })`, then check that no Lavender Pot row is left and the total from the case."
-        ru: "Нажми Remove внутри `page.getByRole('row').filter({ hasText: 'Lavender Pot' })`, потом проверь, что строки Lavender Pot не осталось, и итог из кейса."
-      - en: "`await expect(page.getByRole('row').filter({ hasText: 'Lavender Pot' })).toHaveCount(0);` and `await expect(page.getByTestId('cart-total')).toHaveText('€59.00');`"
-        ru: "`await expect(page.getByRole('row').filter({ hasText: 'Lavender Pot' })).toHaveCount(0);` и `await expect(page.getByTestId('cart-total')).toHaveText('€59.00');`"
+      - en: 'Click Remove inside `page.get_by_role("row").filter(has_text="Lavender Pot")`, then check that no Lavender Pot row is left and the total from the case.'
+        ru: 'Нажми Remove внутри `page.get_by_role("row").filter(has_text="Lavender Pot")`, потом проверь, что строки Lavender Pot не осталось, и итог из кейса.'
+      - en: '`expect(page.get_by_role("row").filter(has_text="Lavender Pot")).to_have_count(0)` and `expect(page.get_by_test_id("cart-total")).to_have_text("€59.00")`'
+        ru: '`expect(page.get_by_role("row").filter(has_text="Lavender Pot")).to_have_count(0)` и `expect(page.get_by_test_id("cart-total")).to_have_text("€59.00")`'
     explain:
-      en: "On the buggy build the click in the Lavender Pot row deletes Rose Bouquet, so the Lavender Pot row is still there and the total is €46.90 instead of €59.00 — red. On a fixed build the same test is green. The old test couldn't see any of it: `.last()` doesn't say which product, and “2 rows + a toast” is true whichever row disappears."
-      ru: "На сборке с багом клик в строке Lavender Pot удаляет Rose Bouquet, поэтому строка Lavender Pot остаётся, а итог — €46.90 вместо €59.00: красный. На исправленной сборке тот же тест зелёный. Старый тест ничего этого не видел: `.last()` не говорит, какой товар, а «2 строки + уведомление» верно, какая бы строка ни исчезла."
+      en: "On the buggy build the click in the Lavender Pot row deletes Rose Bouquet, so the Lavender Pot row is still there and the total is €46.90 instead of €59.00 — red. On a fixed build the same test is green. The old test couldn't see any of it: `.last` doesn't say which product, and “2 rows + a toast” is true whichever row disappears."
+      ru: "На сборке с багом клик в строке Lavender Pot удаляет Rose Bouquet, поэтому строка Lavender Pot остаётся, а итог — €46.90 вместо €59.00: красный. На исправленной сборке тот же тест зелёный. Старый тест ничего этого не видел: `.last` не говорит, какой товар, а «2 строки + уведомление» верно, какая бы строка ни исчезла."
 
   - id: c5-l3-k8
     kind: inspect
     keyPoint: kp-first-nth-red-flag
     app: { route: /shop }
     context:
-      en: "Petal: “For TC-541 I used `page.getByRole('button', { name: 'Add to cart' }).nth(2)` — Sunny Tulips is the second card.”"
-      ru: "Petal: «Для TC-541 я использовал `page.getByRole('button', { name: 'Add to cart' }).nth(2)` — Sunny Tulips ведь вторая карточка»."
+      en: 'Petal: “For TC-541 I used `page.get_by_role("button", name="Add to cart").nth(2)` — Sunny Tulips is the second card.”'
+      ru: 'Petal: «Для TC-541 я использовал `page.get_by_role("button", name="Add to cart").nth(2)` — Sunny Tulips ведь вторая карточка».'
     prompt:
       en: "Click the element this locator really points to."
       ru: "Нажми на элемент, на который этот локатор указывает на самом деле."
@@ -1035,5 +1033,5 @@ checkPool:
       en: "Right — Lavender Pot, not Sunny Tulips. You counted the way the code counts."
       ru: "Верно — Lavender Pot, а не Sunny Tulips. Ты посчитал{а|} так, как считает код."
     explain:
-      en: "Petal counted from one; `nth` counts from zero. But the real fix isn't a different number — it's `filter({ hasText: 'Sunny Tulips' })`, which can't be miscounted and doesn't move when the order of the cards changes."
-      ru: "Petal считал с единицы, а `nth` считает с нуля. Но настоящее исправление — не другое число, а `filter({ hasText: 'Sunny Tulips' })`: его нельзя посчитать неправильно, и он не съедет, когда поменяется порядок карточек."
+      en: "Petal counted from one; `nth` counts from zero. But the real fix isn't a different number — it's `filter(has_text=\"Sunny Tulips\")`, which can't be miscounted and doesn't move when the order of the cards changes."
+      ru: 'Petal считал с единицы, а `nth` считает с нуля. Но настоящее исправление — не другое число, а `filter(has_text="Sunny Tulips")`: его нельзя посчитать неправильно, и он не съедет, когда поменяется порядок карточек.'

@@ -1,5 +1,5 @@
 // Per-test runtime: step recording, pacing (speed / step-by-step), await tracking.
-import { ClosedError, EmuError, locationFromStack } from './errors';
+import { ClosedError, EmuError, callerLocation } from './errors';
 import type { ErrorInfo, RunEvent, StepCategory, StepRecord } from './types';
 
 export interface Pacing {
@@ -155,7 +155,7 @@ export class TestRuntime {
   api<T>(title: string, category: StepCategory, loc: { line: number; file: string } | undefined, fn: (step: StepRecord) => Promise<T>): Pending<T> {
     const rec: Tracked = { title, line: loc?.line, file: loc?.file, awaited: false };
     this.tracked.push(rec);
-    const specLine = loc?.file === SPEC ? loc.line : locationFromStack(new Error().stack || '', SPEC)?.line;
+    const specLine = loc?.file === SPEC ? loc.line : callerLocation(SPEC)?.line;
     const run = async () => {
       this.checkAlive();
       const started = performance.now();
@@ -203,4 +203,4 @@ export class TestRuntime {
   }
 }
 
-export const SPEC = 'example.spec.js';
+export const SPEC = 'test_example.py';

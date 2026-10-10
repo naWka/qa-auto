@@ -5,7 +5,7 @@ In the trainer every test runs against a fresh "browser context" (empty storage,
 logged out, empty cart) unless the task sets `app.state`.
 
 Virtual base URL: `http://localhost:3000`. Tests use relative paths:
-`await page.goto('/login')`, `await expect(page).toHaveURL('/account')`.
+`page.goto("/login")`, `expect(page).to_have_url("http://localhost:3000/account")`.
 
 ## Test data
 
@@ -45,8 +45,8 @@ Maya has no orders. A new order (UI checkout or API) gets id 1043.
 - `banner`: link **"Bloomly home"** (logo).
 - `navigation` named **"Main"**: links **Shop**, **Orders**, **Cart** (accessible name "Cart 0" — contains the count),
   then either link **Log in** (logged out) or text `[data-testid=user-name]` "Anna" + button **Log out**.
-  Cart count: `getByTestId('cart-count')`.
-- Toast after cart actions: `getByRole('status')` / `getByTestId('toast')`, e.g. "Rose Bouquet added to cart" (disappears after 2.5 s).
+  Cart count: `get_by_test_id("cart-count")`.
+- Toast after cart actions: `get_by_role("status")` / `get_by_test_id("toast")`, e.g. "Rose Bouquet added to cart" (disappears after 2.5 s).
 
 ## Pages
 
@@ -54,14 +54,14 @@ Maya has no orders. A new order (UI checkout or API) gets id 1043.
 - heading h1 "Fresh flowers, delivered with love"; link **Shop now** → `/shop`; h2 "Why Bloomly?" + list of 3 features.
 
 ### `/login` — Log in (title "Log in · Bloomly")
-- h1 **"Log in"** (note: the text "Log in" also appears on the nav link and the submit button → `getByText('Log in')` is a strict-mode violation).
-- `getByLabel('Email')` — text input `#email`, placeholder "you@example.com".
-- `getByLabel('Password')` — password input `#password`, placeholder "Your password". Like in real Playwright, a password
-  input has the role `textbox` (`getByRole('textbox', { name: 'Password' })` works), so `getByRole('textbox')` on `/login`
+- h1 **"Log in"** (note: the text "Log in" also appears on the nav link and the submit button → `get_by_text("Log in")` is a strict-mode violation).
+- `get_by_label("Email")` — text input `#email`, placeholder "you@example.com".
+- `get_by_label("Password")` — password input `#password`, placeholder "Your password". Like in real Playwright, a password
+  input has the role `textbox` (`get_by_role("textbox", name="Password")` works), so `get_by_role("textbox")` on `/login`
   matches 2 elements.
 - checkbox **"Remember me"**.
 - button **"Log in"** (`data-testid=login-button`). While submitting (≈250 ms) it is disabled with text "Logging in…".
-- error box `getByRole('alert')` / `getByTestId('login-error')` (hidden until an error):
+- error box `get_by_role("alert")` / `get_by_test_id("login-error")` (hidden until an error):
   - empty email → "Please enter your email."
   - not an email → "Please enter a valid email address."
   - empty password → "Please enter your password."
@@ -73,25 +73,25 @@ Maya has no orders. A new order (UI checkout or API) gets id 1043.
 
 ### `/account` — My account (login required, title "My account · Bloomly")
 - h1 **"Welcome back, Anna!"** (first name).
-- `getByTestId('account-name')` "Anna Silva", `account-email` "anna@bloomly.app", `account-city` "Lisbon".
+- `get_by_test_id("account-name")` "Anna Silva", `account-email` "anna@bloomly.app", `account-city` "Lisbon".
 - links **Go to shop**, **My orders**.
 - Logged-out visit → redirect to `/login?next=%2Faccount`.
 
 ### `/signup` — Create account (title "Create account · Bloomly")
 - h1 "Create your account".
-- `getByLabel('Full name')`, `getByLabel('Email')`, `getByLabel('Password')` (placeholder "At least 8 characters").
-- `getByLabel('Country')` select: "Choose a country" (value ""), Portugal (PT), Germany (DE), Poland (PL), Spain (ES), France (FR).
+- `get_by_label("Full name")`, `get_by_label("Email")`, `get_by_label("Password")` (placeholder "At least 8 characters").
+- `get_by_label("Country")` select: "Choose a country" (value ""), Portugal (PT), Germany (DE), Poland (PL), Spain (ES), France (FR).
 - radio group (fieldset) "Account type": radios **Personal** (checked) / **Business**.
 - checkboxes **"Send me the Bloomly newsletter"**, **"I agree to the Terms of Service"**.
 - button **"Create account"**.
 - field errors (all shown at once, testids): `name-error` "Please enter your name." · `email-error` "Please enter a valid email address." / "This email is already registered." · `password-error` "Password must be at least 8 characters." · `country-error` "Please choose a country." · `terms-error` "You must accept the Terms of Service."
-- success (≈250 ms): form hidden, `getByRole('status')` / `getByTestId('signup-success')` contains heading **"Account created!"** and "Welcome to Bloomly, Anna." (first word of the name). User is logged in.
+- success (≈250 ms): form hidden, `get_by_role("status")` / `get_by_test_id("signup-success")` contains heading **"Account created!"** and "Welcome to Bloomly, Anna." (first word of the name). User is logged in.
 
 ### `/shop` — Shop (title "Shop · Bloomly")
-- h1 "Shop". `getByLabel('Search')` (searchbox, placeholder "Search flowers"), `getByLabel('Category')` select (all/bouquets/plants), `getByLabel('Sort by')` select (popular / price-asc "Price: low to high" / price-desc "Price: high to low").
+- h1 "Shop". `get_by_label("Search")` (searchbox, placeholder "Search flowers"), `get_by_label("Category")` select (all/bouquets/plants), `get_by_label("Sort by")` select (popular / price-asc "Price: low to high" / price-desc "Price: high to low").
 - "Loading products…" (`products-loading`) for ≈150 ms, then:
-- `getByTestId('results-count')` "6 products" ("1 product").
-- list `product-list` of `article` cards (`getByTestId('product-card')`), each: img (alt e.g. "Bouquet of pink roses"), h2 product name, `product-price` "€35.00", button **"Add to cart"** (`add-to-cart`). Every card has the same button name → use `.filter({ hasText: 'Sunny Tulips' })`.
+- `get_by_test_id("results-count")` "6 products" ("1 product").
+- list `product-list` of `article` cards (`get_by_test_id("product-card")`), each: img (alt e.g. "Bouquet of pink roses"), h2 product name, `product-price` "€35.00", button **"Add to cart"** (`add-to-cart`). Every card has the same button name → use `.filter(has_text="Sunny Tulips")`.
 - White Orchid: text "Out of stock", button disabled.
 - search is case-insensitive substring; no match → `no-results` "No flowers found for “xyz”." and "0 products".
 - `/shop?category=plants&q=rose&sort=price-asc` presets filters.
@@ -99,22 +99,22 @@ Maya has no orders. A new order (UI checkout or API) gets id 1043.
 ### `/cart` — Cart (title "Cart · Bloomly")
 - h1 "Your cart". Empty → `cart-empty` "Your cart is empty." + link "Continue shopping".
 - table `cart-table` (caption "Items in your cart"), one `row` per item (`cart-row`): name, price, quantity controls, `row-subtotal`, button **"Remove"** (`remove-item`, same name on every row).
-- quantity: buttons **"Decrease Rose Bouquet"** (−, disabled at 1) / **"Increase Rose Bouquet"** (+, disabled at 10), spinbutton `getByLabel('Quantity of Rose Bouquet')` (`qty-input`, 1–10; `fill('3')` updates totals).
-- promo: `getByLabel('Promo code')`, button **"Apply"**, message `promo-message` (role status):
+- quantity: buttons **"Decrease Rose Bouquet"** (−, disabled at 1) / **"Increase Rose Bouquet"** (+, disabled at 10), spinbutton `get_by_label("Quantity of Rose Bouquet")` (`qty-input`, 1–10; `fill("3")` updates totals).
+- promo: `get_by_label("Promo code")`, button **"Apply"**, message `promo-message` (role status):
   "Promo code BLOOM10 applied: −10%." / "This promo code is not valid." / "This promo code has expired." / "Please enter a promo code." (codes are case-insensitive).
 - summary: `cart-subtotal`, `cart-discount` ("−€3.50"), `cart-delivery` ("€4.90" or "Free"), `cart-total`.
 - button **"Proceed to checkout"** (`checkout-button`) → `/checkout`; link "Continue shopping".
 
 ### `/checkout` — Checkout (title "Checkout · Bloomly")
-- `getByLabel('Full name')` (prefilled when logged in), `getByLabel('Street address')`, `getByLabel('City')` select (Lisbon/Berlin/Warsaw), `getByLabel('Delivery date')` (type=date, value format `2026-12-24`).
+- `get_by_label("Full name")` (prefilled when logged in), `get_by_label("Street address")`, `get_by_label("City")` select (Lisbon/Berlin/Warsaw), `get_by_label("Delivery date")` (type=date, value format `2026-12-24`).
 - radios "Delivery time": **Morning** (checked) / **Afternoon** / **Evening**.
-- checkbox **"This is a gift"** → reveals `getByLabel('Gift message')` (textarea, max 200) and counter `gift-counter` "0/200". Hidden while unchecked.
+- checkbox **"This is a gift"** → reveals `get_by_label("Gift message")` (textarea, max 200) and counter `gift-counter` "0/200". Hidden while unchecked.
 - `order-total` "Total to pay: €39.90". Button **"Place order"**.
 - errors: `co-name-error`, `co-address-error`, `co-city-error`, `co-date-error` ("Please choose a delivery date." / "Delivery date can't be in the past.").
 - success (≈300 ms) → `/order-confirmation?id=1043`: h1 **"Thank you for your order!"**, `order-number` "Order #1043", `confirmation-total`. Cart is emptied.
 
 ### `/orders` — My orders (login required, title "My orders · Bloomly")
-- h1 "My orders". `getByLabel('Status')` select (all/Processing/Shipped/Delivered/Cancelled), `getByLabel('Search orders')`.
+- h1 "My orders". `get_by_label("Status")` select (all/Processing/Shipped/Delivered/Cancelled), `get_by_label("Search orders")`.
 - "Loading orders…" (`orders-loading`) for ≈400 ms.
 - table `orders-table` (caption "Your recent orders"), columns Order/Date/Items/Total/Status; rows `order-row`, first cell "#1042".
 - `orders-summary` "Showing 6 of 6 orders"; nothing matched → `orders-empty` "No orders match your filters.".
@@ -165,9 +165,9 @@ Header: `Authorization: Bearer <token>`. Any other path → 404 `{ error: "Not f
 | `checkout-past-date` | past delivery dates are accepted |
 | `orders-filter-wrong` | "Shipped" filter also shows Processing orders |
 | `orders-summary-wrong` | summary always counts all orders ("Showing 6 of 6") |
-| `a11y-add-to-cart-div` | "Add to cart" on product cards is a `<div class="btn small">` (no button role, out of stock = `aria-disabled="true"`): `getByRole('button', { name: 'Add to cart' })` finds nothing; `getByText`, `getByTestId` and a mouse click still work |
+| `a11y-add-to-cart-div` | "Add to cart" on product cards is a `<div class="btn small">` (no button role, out of stock = `aria-disabled="true"`): `get_by_role("button", name="Add to cart")` finds nothing; `get_by_text`, `get_by_test_id` and a mouse click still work |
 | `a11y-qty-unnamed` | cart −/+ buttons and the quantity field have no `aria-label`: the buttons are named "−" / "+", the spinbutton has no name |
-| `a11y-search-no-label` | the shop search field has no `<label>` (placeholder "Search flowers" only): `getByLabel('Search')` finds nothing; `getByRole('searchbox', { name: 'Search flowers' })` works (name from the placeholder) |
+| `a11y-search-no-label` | the shop search field has no `<label>` (placeholder "Search flowers" only): `get_by_label("Search")` finds nothing; `get_by_role("searchbox", name="Search flowers")` works (name from the placeholder) |
 | `api-orders-no-auth` | `GET /api/orders` without a token returns 200 with **all** users' orders (expected 401) |
 | `api-total-no-delivery` | `POST /api/orders` never adds the €4.90 delivery fee |
 | `api-login-locked` | `POST /api/login` for locked@bloomly.app returns 200 with a token (expected 423) |
@@ -180,9 +180,9 @@ Header: `Authorization: Bearer <token>`. Any other path → 404 `{ error: "Not f
 A "design-system migration" of the same app: every CSS class becomes a generated name (`btn` → `bl_btn__375kd`,
 `product-card` → `bl_productCard__lafxr`, …), form label+field pairs are wrapped in `<div class="bl_field__…">`,
 nav links are wrapped in a `<div>`, product cards show the price above the name and the image inside a wrapper div.
-**Unchanged:** all texts, roles, accessible names, labels, `id`s and `data-testid`s. So `locator('.btn')`,
-`locator('#login-form > input:nth-child(3)')`, `article > h2 + p` break; `getByRole`, `getByLabel`, `getByText`,
-`getByTestId`, `#email` keep working. Typical use: a task that must pass on both versions
+**Unchanged:** all texts, roles, accessible names, labels, `id`s and `data-testid`s. So `locator(".btn")`,
+`locator("#login-form > input:nth-child(3)")`, `article > h2 + p` break; `get_by_role`, `get_by_label`, `get_by_text`,
+`get_by_test_id`, `#email` keep working. Typical use: a task that must pass on both versions
 (`checks: { expect: pass, also: [{ app: { variant: redesign }, expect: pass }] }`).
 Standalone: `?variant=redesign`.
 
@@ -209,5 +209,5 @@ app:
     promo: BLOOM10
 ```
 
-Standalone (the final project, `npx serve -s app`): bugs and the variant come from the query string,
+Standalone (the final project, `python serve_app.py` from the starter — or started by its `conftest.py`): bugs and the variant come from the query string,
 `/?bugs=greeting-wrong-name,promo-stacks&variant=redesign`, and are remembered for the browser tab (sessionStorage).

@@ -8,7 +8,7 @@ import type { KindProps } from './types';
 
 type Review = Extract<Task, { kind: 'review' }>;
 
-const ALL_TYPES: IssueType[] = ['fragile-locator', 'no-assertion', 'weak-assertion', 'wrong-assertion', 'hard-wait', 'missing-await', 'hallucination', 'wrong-data', 'test-dependency', 'wrong-step'];
+const ALL_TYPES: IssueType[] = ['fragile-locator', 'no-assertion', 'weak-assertion', 'wrong-assertion', 'hard-wait', 'not-called', 'hallucination', 'wrong-data', 'test-dependency', 'wrong-step'];
 const TEST_LEVEL_DEFAULT: IssueType[] = ['no-assertion', 'wrong-assertion', 'wrong-step', 'test-dependency'];
 
 export function ReviewTask({ task, register, phase }: KindProps<Review>) {

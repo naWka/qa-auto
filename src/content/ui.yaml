@@ -197,7 +197,7 @@ issue:
   weak-assertion: { en: "Weak assertion", ru: "Слабая проверка" }
   wrong-assertion: { en: "Checks the wrong thing", ru: "Проверяет не то" }
   hard-wait: { en: "Hard wait", ru: "Жёсткое ожидание" }
-  missing-await: { en: "Missing await", ru: "Нет await" }
+  not-called: { en: "Method never runs (no brackets)", ru: "Метод не выполняется (нет скобок)" }
   hallucination: { en: "Invented method/element", ru: "Выдуманный метод/элемент" }
   wrong-data: { en: "Wrong test data", ru: "Неверные данные" }
   test-dependency: { en: "Depends on another test", ru: "Зависит от другого теста" }

@@ -1,4 +1,6 @@
-// Packs the final-project starter (starter/ + the Bloomly app from public/aut) into a zip for download.
+// Packs the final-project starter (starter/: a Python pytest + pytest-playwright project) together with
+// the Bloomly app (public/aut → app/) into a zip for download. Every file under starter/ is included,
+// except local leftovers (virtual environment, caches, test results) listed in SKIP.
 // Tiny zip writer (deflate, UTF-8 names) — no dependencies.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -22,9 +24,12 @@ function crc32(buf: Buffer): number {
   return (c ^ 0xffffffff) >>> 0;
 }
 
+// Never packed: OS junk and what a local `pytest` run or `python -m venv .venv` leaves in starter/
+const SKIP = new Set(['.DS_Store', 'node_modules', '.venv', 'venv', '__pycache__', '.pytest_cache', 'test-results', 'report.html']);
+
 function walk(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir).sort()) {
-    if (name === '.DS_Store' || name === 'node_modules') continue;
+    if (SKIP.has(name)) continue;
     const p = join(dir, name);
     if (statSync(p).isDirectory()) walk(p, out);
     else out.push(p);

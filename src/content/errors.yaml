@@ -1,33 +1,108 @@
 # Bilingual explanations for emulator errors and lint notes.
 # Placeholders in {braces} come from the error data. RU uses {f|m} gender variants.
 errors:
+  # ---------- Python itself ----------
   syntax:
-    title: { en: "The code can't be read", ru: "Код не читается" }
-    explain: { en: "JavaScript couldn't parse line {line}: “{message}”. Usually it's a missing bracket, quote or comma nearby.", ru: "JavaScript не смог разобрать строку {line}: «{message}». Обычно рядом не хватает скобки, кавычки или запятой." }
-  syntax-token:
-    title: { en: "Unexpected symbol", ru: "Неожиданный символ" }
-    explain: { en: "Something on line {line} is out of place — often a missing `)` or `}`, or an extra comma. Count the brackets: every `(` needs a `)`.", ru: "Что-то на строке {line} стоит не на месте — часто не хватает `)` или `}`, или лишняя запятая. Посчитай скобки: каждой `(` нужна своя `)`." }
-  syntax-string:
-    title: { en: "A string isn't closed", ru: "Строка не закрыта" }
-    explain: { en: "A text in quotes on line {line} has no closing quote. Strings start and end with the same quote: 'Log in'.", ru: "У текста в кавычках на строке {line} нет закрывающей кавычки. Строка начинается и заканчивается одной и той же кавычкой: 'Log in'." }
-  syntax-redeclare:
-    title: { en: "The same name twice", ru: "Одно имя дважды" }
-    explain: { en: "A `const` with this name already exists. Give the second one a different name or reuse the first.", ru: "`const` с таким именем уже есть. Дай второй переменной другое имя или используй первую." }
-  async-missing:
-    title: { en: "`await` without `async`", ru: "`await` без `async`" }
-    explain: { en: "`await` only works inside a function marked `async`. The test header must be `async ({ page }) => { … }`.", ru: "`await` работает только внутри функции с пометкой `async`. Заголовок теста должен быть `async ({ page }) => { … }`." }
-  reference:
+    title: { en: "Python can't read the code", ru: "Python не может прочитать код" }
+    explain: { en: "Python stopped on line {line}: “{message}”. Usually it's a missing bracket, quote, comma or colon nearby — or JavaScript habits like `{ name: 'x' }` or `//` comments.", ru: "Python остановился на строке {line}: «{message}». Обычно рядом не хватает скобки, кавычки, запятой или двоеточия — или проскочили привычки из JavaScript вроде `{ name: 'x' }` или комментариев `//`." }
+  indentation:
+    title: { en: "Indentation problem", ru: "Проблема с отступами" }
+    explain: { en: "In Python, indentation is part of the code: the body of `def`, `if`, `for` and `with` is shifted right by 4 spaces. Line {line}: “{message}”.", ru: "В Python отступы — часть кода: тело `def`, `if`, `for` и `with` сдвинуто вправо на 4 пробела. Строка {line}: «{message}»." }
+  name-error:
     title: { en: "Unknown name: {name}", ru: "Неизвестное имя: {name}" }
-    explain: { en: "The code uses `{name}`, but nothing with that name exists here. Check the spelling, or whether it was declared (e.g. `{ page }` in the test header).", ru: "Код использует `{name}`, но здесь нет ничего с таким именем. Проверь написание или объявлено ли оно (например, `{ page }` в заголовке теста)." }
-  not-a-function:
-    title: { en: "There is no method `{method}`", ru: "Метода `{method}` не существует" }
-    explain: { en: "`{target}.{method}` doesn't exist in Playwright. It's either a typo (methods are case-sensitive) or an invented method — a classic AI hallucination.{suggestion}", ru: "`{target}.{method}` в Playwright не существует. Это либо опечатка (регистр букв важен), либо выдуманный метод — классическая галлюцинация ИИ.{suggestion}" }
-  read-undefined:
-    title: { en: "Something is undefined", ru: "Что-то не определено" }
-    explain: { en: "The code tried to use `.{prop}` on something empty (undefined). Often a variable wasn't passed in, or a property name is misspelled.", ru: "Код попытался взять `.{prop}` у пустого значения (undefined). Часто переменную не передали или опечатались в имени свойства." }
+    explain: { en: "The code uses `{name}`, but nothing with that name exists here. Check the spelling, the import at the top of the file — or whether the test asks for this fixture in its arguments (`def test_x(page: Page):`).", ru: "Код использует `{name}`, но здесь нет ничего с таким именем. Проверь написание, импорт в начале файла — или просит ли тест эту фикстуру в аргументах (`def test_x(page: Page):`)." }
+  attribute-error:
+    title: { en: "`{target}` has no `{attr}`", ru: "У `{target}` нет `{attr}`" }
+    explain: { en: "`{attr}` doesn't exist on a {target} object. It's either a typo or an invented method — a classic AI hallucination. In Python, Playwright methods use snake_case: `get_by_role`, not `getByRole`.", ru: "У объекта {target} нет `{attr}`. Это либо опечатка, либо выдуманный метод — классическая галлюцинация ИИ. В Python методы Playwright пишутся через подчёркивание: `get_by_role`, а не `getByRole`." }
+  none-attribute:
+    title: { en: "The value is None", ru: "Значение — None" }
+    explain: { en: "The code called `.{attr}` on `None` — an empty value. Often a method like `text_content()` or `get_attribute()` returned None because there was no text or attribute, or a function forgot to `return`.", ru: "Код вызвал `.{attr}` у `None` — пустого значения. Часто это метод вроде `text_content()` или `get_attribute()` вернул None, потому что текста или атрибута не было, или функция забыла `return`." }
+  not-callable:
+    title: { en: "This is a value, not a method", ru: "Это значение, а не метод" }
+    explain: { en: "A `{target}` value was called with `()`. In Playwright for Python some things are properties without brackets: `page.url`, `response.status`, `response.ok`, `locator.first`.", ru: "Значение типа `{target}` вызвали со скобками `()`. В Playwright для Python некоторые вещи — свойства без скобок: `page.url`, `response.status`, `response.ok`, `locator.first`." }
+  missing-argument:
+    title: { en: "An argument is missing", ru: "Не хватает аргумента" }
+    explain: { en: "“{message}”. The function needs more values than it got. Compare the call with the `def` line.", ru: "«{message}». Функции нужно больше значений, чем ей передали. Сравни вызов со строкой `def`." }
+  unexpected-keyword:
+    title: { en: "No such parameter: {kw}", ru: "Нет такого параметра: {kw}" }
+    explain: { en: "“{message}”. Python parameters use snake_case (`has_text=`, not `hasText=`), and the names must match exactly.", ru: "«{message}». Параметры в Python пишутся через подчёркивание (`has_text=`, а не `hasText=`), и имя должно совпадать точно." }
+  too-many-args:
+    title: { en: "Too many arguments", ru: "Слишком много аргументов" }
+    explain: { en: "“{message}”. Options like `name` or `exact` are passed by name: `get_by_role(\"button\", name=\"Log in\")`.", ru: "«{message}». Опции вроде `name` или `exact` передаются по имени: `get_by_role(\"button\", name=\"Log in\")`." }
+  str-concat:
+    title: { en: "Text + number", ru: "Текст + число" }
+    explain: { en: "Python doesn't glue text and numbers on its own. Use an f-string: `f\"Total: {total}\"` or `str(total)`.", ru: "Python сам не склеивает текст и числа. Используй f-строку: `f\"Total: {total}\"` или `str(total)`." }
+  not-subscriptable:
+    title: { en: "Can't use [ ] here", ru: "Здесь нельзя [ ]" }
+    explain: { en: "Square brackets work with lists, dicts and strings, not with a {target}.", ru: "Квадратные скобки работают со списками, словарями и строками, а не с {target}." }
+  not-iterable:
+    title: { en: "Can't loop over this", ru: "По этому нельзя пройти циклом" }
+    explain: { en: "`for` needs a list (or similar). A Locator is not a list — use `locator.all()` to get one.", ru: "`for` нужен список (или похожее). Locator — не список: чтобы получить список, используй `locator.all()`." }
   type-error:
     title: { en: "Wrong kind of value", ru: "Не тот тип значения" }
-    explain: { en: "A value was used in a way it doesn't support. Look at the line and check what each name contains.", ru: "Значение использовали так, как оно не умеет. Посмотри на строку и проверь, что лежит в каждом имени." }
+    explain: { en: "“{message}”. A value was used in a way it doesn't support. Look at the line and check what each name contains.", ru: "«{message}». Значение использовали так, как оно не умеет. Посмотри на строку и проверь, что лежит в каждом имени." }
+  key-error:
+    title: { en: "No such key: {key}", ru: "Нет такого ключа: {key}" }
+    explain: { en: "The dict has no key {key}. Check the exact name in the JSON — `\"Name\"` and `\"name\"` are different keys. `data.get(\"name\")` returns None instead of failing.", ru: "В словаре нет ключа {key}. Проверь точное имя в JSON — `\"Name\"` и `\"name\"` — разные ключи. `data.get(\"name\")` вернёт None вместо падения." }
+  index-error:
+    title: { en: "Index out of range", ru: "Индекс за пределами списка" }
+    explain: { en: "The list is shorter than the code expects. Counting starts at 0: the first item is `items[0]`, the last is `items[-1]`.", ru: "Список короче, чем ожидает код. Счёт начинается с 0: первый элемент — `items[0]`, последний — `items[-1]`." }
+  float-parse:
+    title: { en: "Not a number", ru: "Это не число" }
+    explain: { en: "“{message}”. Text from the page often carries a currency sign or spaces. Clean it first: `float(text.replace(\"€\", \"\"))` — or compare the text itself with `to_have_text`.", ru: "«{message}». Текст со страницы часто содержит знак валюты или пробелы. Сначала очисти его: `float(text.replace(\"€\", \"\"))` — или сравнивай сам текст через `to_have_text`." }
+  int-parse:
+    title: { en: "Not a whole number", ru: "Это не целое число" }
+    explain: { en: "“{message}”. `int()` accepts only digits. Check what the text really contains.", ru: "«{message}». `int()` принимает только цифры. Проверь, что на самом деле в тексте." }
+  unpack:
+    title: { en: "Wrong number of values", ru: "Не то количество значений" }
+    explain: { en: "“{message}”. The left side of `a, b = …` needs exactly as many values as the right side has.", ru: "«{message}». Слева в `a, b = …` должно быть ровно столько имён, сколько значений справа." }
+  value-error:
+    title: { en: "Wrong value", ru: "Неподходящее значение" }
+    explain: { en: "“{message}”.", ru: "«{message}»." }
+  zero-division:
+    title: { en: "Division by zero", ru: "Деление на ноль" }
+    explain: { en: "Something divided by 0. Check where the divisor comes from.", ru: "Что-то поделили на 0. Проверь, откуда берётся делитель." }
+  module-not-found:
+    title: { en: "No module named {module}", ru: "Нет модуля {module}" }
+    explain: { en: "The import doesn't match any file in this task or any installed package. Files import by path with dots: `pages/login_page.py` → `from pages.login_page import LoginPage`. In the trainer, API tests use Playwright's `request`, not the `requests` package.", ru: "Импорт не совпадает ни с одним файлом задания или установленным пакетом. Файлы импортируются по пути через точку: `pages/login_page.py` → `from pages.login_page import LoginPage`. В тренажёре API-тесты используют `request` от Playwright, а не пакет `requests`." }
+  import-error:
+    title: { en: "Can't import that name", ru: "Не удаётся импортировать это имя" }
+    explain: { en: "“{message}”. The file exists, but the name is spelled differently there — or not defined at all.", ru: "«{message}». Файл есть, но имя в нём написано иначе — или вообще не объявлено." }
+  recursion:
+    title: { en: "A function calls itself forever", ru: "Функция бесконечно вызывает сама себя" }
+    explain: { en: "Check that the function doesn't call itself by mistake.", ru: "Проверь, не вызывает ли функция саму себя по ошибке." }
+  json-decode:
+    title: { en: "The response isn't JSON", ru: "Ответ — не JSON" }
+    explain: { en: "The response body is empty or not JSON, so `.json()` can't read it. Check the status code first: a 204 has no body.", ru: "Тело ответа пустое или не JSON, поэтому `.json()` не может его прочитать. Сначала проверь код ответа: у 204 тела нет." }
+  file-not-found:
+    title: { en: "File not found", ru: "Файл не найден" }
+    explain: { en: "“{message}”. Paths are relative to the project folder, e.g. `data/users.json`.", ru: "«{message}». Пути считаются от папки проекта, например `data/users.json`." }
+  exception:
+    title: { en: "{type}", ru: "{type}" }
+    explain: { en: "The code raised {type}: “{message}”.", ru: "Код выбросил {type}: «{message}»." }
+  # ---------- pytest ----------
+  assert-failed:
+    title: { en: "The assert failed", ru: "assert не прошёл" }
+    explain: { en: "pytest shows both sides of the comparison: `{left} {op} {right}`. Now triage like a manual tester: is this a bug in the app, or is the test expecting the wrong thing?", ru: "pytest показывает обе стороны сравнения: `{left} {op} {right}`. Дальше — как в ручном тестировании: это баг в приложении или тест ждёт не того?" }
+  fixture-not-found:
+    title: { en: "Unknown fixture “{name}”", ru: "Неизвестная фикстура «{name}»" }
+    explain: { en: "pytest fills every test argument with a fixture of the same name. `{name}` isn't one — check the spelling, or define it with `@pytest.fixture` (often in `conftest.py`).", ru: "pytest заполняет каждый аргумент теста фикстурой с тем же именем. `{name}` — не фикстура: проверь написание или объяви её через `@pytest.fixture` (часто в `conftest.py`)." }
+  scope-mismatch:
+    title: { en: "Fixture scopes don't fit", ru: "Области фикстур не совпадают" }
+    explain: { en: "`{fixture}` lives for the whole {requester}, but it needs `{name}`, which is created anew for every {scope}. A long-lived fixture can't use a short-lived one.", ru: "`{fixture}` живёт весь {requester}, а ей нужна `{name}`, которая создаётся заново на каждый {scope}. Долгоживущая фикстура не может использовать короткоживущую." }
+  fixture-cycle:
+    title: { en: "Fixtures depend on each other in a circle", ru: "Фикстуры зависят друг от друга по кругу" }
+    explain: { en: "`{name}` ends up needing itself. Break the circle.", ru: "`{name}` в итоге требует саму себя. Разорви круг." }
+  pytest-failed:
+    title: { en: "pytest.fail / pytest.raises", ru: "pytest.fail / pytest.raises" }
+    explain: { en: "“{message}”.", ru: "«{message}»." }
+  xpass-strict:
+    title: { en: "Expected to fail, but passed", ru: "Ожидали падение, а тест прошёл" }
+    explain: { en: "The test is marked `xfail(strict=True)` — a known bug — but it passed. Maybe the bug is fixed: remove the mark.", ru: "Тест помечен `xfail(strict=True)` — известный баг, — но прошёл. Возможно, баг исправили: убери пометку." }
+  no-tests:
+    title: { en: "No tests found", ru: "Тесты не найдены" }
+    explain: { en: "pytest collects only functions whose name starts with `test`: `def test_user_can_log_in(page: Page):`.", ru: "pytest собирает только функции, чьё имя начинается с `test`: `def test_user_can_log_in(page: Page):`." }
+  # ---------- Playwright ----------
   strict-mode:
     title: { en: "The locator matches {count} elements", ru: "Локатор нашёл {count} элемента(ов)" }
     explain: { en: "Playwright refuses to guess which of the {count} elements you meant (strict mode). Make the locator more specific — the error lists each element with a better locator after “aka”.", ru: "Playwright не угадывает, какой из {count} элементов ты имел{а|} в виду (strict mode). Сделай локатор точнее — в ошибке у каждого элемента после «aka» есть подсказка получше." }
@@ -38,7 +113,7 @@ errors:
     title: { en: "Element found, but not ready", ru: "Элемент найден, но не готов" }
     explain: { en: "`{locator}` exists, but Playwright couldn't act on it: {reason}. Auto-waiting kept retrying until the timeout.", ru: "`{locator}` есть на странице, но Playwright не смог с ним работать: {reason}. Автоожидание повторяло попытки до таймаута." }
   expect-failed:
-    title: { en: "Expected ≠ received", ru: "Ожидание ≠ реальность" }
+    title: { en: "Expected ≠ actual", ru: "Ожидание ≠ реальность" }
     explain: { en: "The assertion `{matcher}` failed: expected `{expected}`, but the page shows `{received}`. Now triage like a manual tester: is this a bug in the app, or is the test expecting the wrong thing?", ru: "Проверка `{matcher}` не прошла: ожидали `{expected}`, а на странице `{received}`. Дальше — как в ручном тестировании: это баг в приложении или тест ждёт не того?" }
   expect-not-found:
     title: { en: "The element for the check wasn't found", ru: "Элемент для проверки не найден" }
@@ -50,20 +125,17 @@ errors:
     title: { en: "Wrong page", ru: "Не та страница" }
     explain: { en: "Expected the URL `{expected}`, but the browser is at `{received}`. Did the action really navigate — or did the app redirect somewhere else?", ru: "Ожидали адрес `{expected}`, а браузер на `{received}`. Действие действительно перевело на страницу — или приложение увело в другое место?" }
   expect-generic:
-    title: { en: "Values don't match", ru: "Значения не совпали" }
-    explain: { en: "`{matcher}` compared two values: expected `{expected}`, received `{received}`. Even one letter, space or case difference counts.", ru: "`{matcher}` сравнил два значения: ожидали `{expected}`, получили `{received}`. Считается даже одна буква, пробел или регистр." }
-  matcher-wrong-target:
-    title: { en: "This check needs a locator", ru: "Этой проверке нужен локатор" }
-    explain: { en: "`{matcher}` works with a {target}, but it got a plain value. Pass the locator itself: `await expect(page.getByText('…')).{matcher}(…)` — not the text you already read.", ru: "`{matcher}` работает с объектом {target}, а получил обычное значение. Передай сам локатор: `await expect(page.getByText('…')).{matcher}(…)` — а не уже прочитанный текст." }
-  missing-await:
-    title: { en: "A step wasn't awaited", ru: "Шаг без await" }
-    explain: { en: "Line {line} starts “{call}” without `await`, so the test didn't wait for it and moved on. In real Playwright this gives random failures — or a green test that checked nothing. Add `await` at the start of the line.", ru: "Строка {line} запускает «{call}» без `await`, поэтому тест не дождался шага и пошёл дальше. В настоящем Playwright это даёт случайные падения — или зелёный тест, который ничего не проверил. Добавь `await` в начало строки." }
+    title: { en: "Wrong status code", ru: "Не тот код ответа" }
+    explain: { en: "`{matcher}` expected a 2xx status, but the API answered {received}. Read the response body under the message — it usually says why.", ru: "`{matcher}` ждал статус 2xx, а API ответил {received}. Прочитай тело ответа под сообщением — обычно там написано почему." }
+  expect-unsupported:
+    title: { en: "expect() needs a locator, page or response", ru: "expect() нужен локатор, страница или ответ" }
+    explain: { en: "Playwright's `expect` works with a Locator, a Page or an APIResponse — it got a plain {type}. Pass the locator itself: `expect(page.get_by_text(\"…\")).to_have_text(…)`. For plain values use `assert`.", ru: "`expect` из Playwright работает с Locator, Page или APIResponse, а получил обычный {type}. Передай сам локатор: `expect(page.get_by_text(\"…\")).to_have_text(…)`. Для обычных значений используй `assert`." }
   goto-external:
     title: { en: "The emulator only opens Bloomly", ru: "Эмулятор открывает только Bloomly" }
-    explain: { en: "`{url}` is outside the app. In the trainer Bloomly lives at http://localhost:3000 — use relative paths like `page.goto('/login')`.", ru: "`{url}` — вне приложения. В тренажёре Bloomly живёт на http://localhost:3000 — используй относительные пути вроде `page.goto('/login')`." }
+    explain: { en: "`{url}` is outside the app. In the trainer Bloomly lives at http://localhost:3000 (pytest runs with `--base-url http://localhost:3000`) — use relative paths like `page.goto(\"/login\")`.", ru: "`{url}` — вне приложения. В тренажёре Bloomly живёт на http://localhost:3000 (pytest запущен с `--base-url http://localhost:3000`) — используй относительные пути вроде `page.goto(\"/login\")`." }
   goto-invalid:
     title: { en: "Invalid address", ru: "Неверный адрес" }
-    explain: { en: "`{url}` isn't a valid URL. Use a path starting with a slash: '/login'.", ru: "`{url}` — некорректный адрес. Используй путь со слешем в начале: '/login'." }
+    explain: { en: "`{url}` isn't a valid URL. Use a path starting with a slash: \"/login\".", ru: "`{url}` — некорректный адрес. Используй путь со слешем в начале: \"/login\"." }
   nav-timeout:
     title: { en: "The page didn't load", ru: "Страница не загрузилась" }
     explain: { en: "Navigation to `{url}` took too long.", ru: "Переход на `{url}` занял слишком много времени." }
@@ -81,13 +153,13 @@ errors:
     explain: { en: "This field accepts only numbers, but got “{value}”.", ru: "Это поле принимает только числа, а получило «{value}»." }
   fill-date:
     title: { en: "Wrong date format", ru: "Неверный формат даты" }
-    explain: { en: "Date fields need the format YYYY-MM-DD, e.g. '2026-12-24'. Got “{value}”.", ru: "Полям даты нужен формат ГГГГ-ММ-ДД, например '2026-12-24'. Получено «{value}»." }
+    explain: { en: "Date fields need the format YYYY-MM-DD, e.g. \"2026-12-24\". Got “{value}”.", ru: "Полям даты нужен формат ГГГГ-ММ-ДД, например \"2026-12-24\". Получено «{value}»." }
   fill-not-string:
     title: { en: "fill needs text", ru: "fill нужен текст" }
-    explain: { en: "`fill` takes a string in quotes. Got a {got}. Wrap numbers in quotes: '3'.", ru: "`fill` принимает строку в кавычках, а получил {got}. Числа тоже в кавычки: '3'." }
+    explain: { en: "`fill` takes a string in quotes. Got a {got}. Wrap numbers in quotes: \"3\" — or use `str(3)`.", ru: "`fill` принимает строку в кавычках, а получил {got}. Числа тоже в кавычки: \"3\" — или `str(3)`." }
   not-select:
     title: { en: "Not a dropdown", ru: "Это не выпадающий список" }
-    explain: { en: "`selectOption` works only with `<select>`. The locator points to {element}.", ru: "`selectOption` работает только с `<select>`. Локатор указывает на {element}." }
+    explain: { en: "`select_option` works only with `<select>`. The locator points to {element}.", ru: "`select_option` работает только с `<select>`. Локатор указывает на {element}." }
   select-missing:
     title: { en: "No such option", ru: "Нет такого варианта" }
     explain: { en: "The dropdown has no option {value}. Available: {available}. Options match by value or by visible text.", ru: "В списке нет варианта {value}. Есть: {available}. Вариант ищется по value или по видимому тексту." }
@@ -100,84 +172,64 @@ errors:
   check-no-effect:
     title: { en: "The click didn't change the checkbox", ru: "Клик не поменял чекбокс" }
     explain: { en: "Playwright clicked, but the state stayed the same — something in the app blocks it.", ru: "Playwright кликнул, но состояние не изменилось — что-то в приложении это блокирует." }
-  no-tests:
-    title: { en: "No tests found", ru: "Тесты не найдены" }
-    explain: { en: "The file has no `test('…', async ({ page }) => { … })` call, so there is nothing to run.", ru: "В файле нет вызова `test('…', async ({ page }) => { … })`, поэтому запускать нечего." }
-  test-timeout:
-    title: { en: "The test took too long", ru: "Тест шёл слишком долго" }
-    explain: { en: "The whole test ran longer than {timeout} ms. Look for long waits or an endless loop.", ru: "Весь тест шёл дольше {timeout} мс. Поищи длинные ожидания или бесконечный цикл." }
-  fixture-unknown:
-    title: { en: "Unknown fixture “{name}”", ru: "Неизвестная фикстура «{name}»" }
-    explain: { en: "The test asks for `{ {name} }`, but Playwright doesn't provide it. Built-in fixtures: page, request, baseURL, browserName — or define your own with test.extend.", ru: "Тест просит `{ {name} }`, но Playwright такого не даёт. Встроенные фикстуры: page, request, baseURL, browserName — или объяви свою через test.extend." }
-  fixture-destructure:
-    title: { en: "Use { page } in the header", ru: "Нужно { page } в заголовке" }
-    explain: { en: "Playwright reads fixture names from curly braces: `async ({ page }) => …`. Without braces it can't tell what to pass.", ru: "Playwright читает имена фикстур из фигурных скобок: `async ({ page }) => …`. Без скобок он не знает, что передать." }
-  fixture-no-use:
-    title: { en: "The fixture didn't call use()", ru: "Фикстура не вызвала use()" }
-    explain: { en: "A custom fixture must call `await use(value)` to hand the value to the test.", ru: "Своя фикстура должна вызвать `await use(value)`, чтобы передать значение тесту." }
-  page-in-beforeAll:
-    title: { en: "No page in beforeAll", ru: "В beforeAll нет page" }
-    explain: { en: "`{name}` is created fresh for every test, so it isn't available in `{hook}`. Use beforeEach instead.", ru: "`{name}` создаётся заново для каждого теста, поэтому в `{hook}` его нет. Используй beforeEach." }
-  module-not-found:
-    title: { en: "File not found: {module}", ru: "Файл не найден: {module}" }
-    explain: { en: "The import path doesn't match any file in this task. Check the folder and file name.", ru: "Путь в import не совпадает ни с одним файлом задания. Проверь папку и имя файла." }
-  loop-guard:
-    title: { en: "Endless loop", ru: "Бесконечный цикл" }
-    explain: { en: "A loop ran too many times and was stopped. Check the loop condition.", ru: "Цикл выполнился слишком много раз и был остановлен. Проверь условие цикла." }
-  unsupported:
-    title: { en: "Not available in the trainer", ru: "Недоступно в тренажёре" }
-    explain: { en: "This works in real Playwright, but the browser emulator doesn't support it.", ru: "В настоящем Playwright это работает, но эмулятор браузера этого не умеет." }
-  test-inside-test:
-    title: { en: "test() inside a test", ru: "test() внутри теста" }
-    explain: { en: "Tests are declared at the top level or inside test.describe — not inside another test or hook.", ru: "Тесты объявляют на верхнем уровне или внутри test.describe — не внутри другого теста или хука." }
-  test-title:
-    title: { en: "The test needs a title", ru: "Тесту нужно название" }
-    explain: { en: "The first argument of test() is its title in quotes.", ru: "Первый аргумент test() — название в кавычках." }
-  test-fn:
-    title: { en: "The test needs a body", ru: "Тесту нужно тело" }
-    explain: { en: "After the title comes the function with steps: `async ({ page }) => { … }`.", ru: "После названия идёт функция с шагами: `async ({ page }) => { … }`." }
-  describe-async:
-    title: { en: "describe must not be async", ru: "describe не должен быть async" }
-    explain: { en: "Remove `async` from the test.describe callback.", ru: "Убери `async` из функции внутри test.describe." }
-  step-outside:
-    title: { en: "test.step outside a test", ru: "test.step вне теста" }
-    explain: { en: "test.step() can only be used inside a running test.", ru: "test.step() можно вызывать только внутри теста." }
-  expect-outside-test:
-    title: { en: "expect outside a test", ru: "expect вне теста" }
-    explain: { en: "Assertions run inside test(...).", ru: "Проверки выполняются внутри test(...)." }
-  expected-to-fail:
-    title: { en: "Expected to fail", ru: "Ожидалось падение" }
-    explain: { en: "This test is marked test.fail(), but it passed.", ru: "Тест помечен test.fail(), но прошёл." }
-  no-browser:
-    title: { en: "No browser here", ru: "Здесь нет браузера" }
-    explain: { en: "This task runs without a browser window.", ru: "Это задание выполняется без окна браузера." }
   api-json:
     title: { en: "Empty response", ru: "Пустой ответ" }
     explain: { en: "The response has no body to parse as JSON.", ru: "У ответа нет тела, которое можно разобрать как JSON." }
+  api-status:
+    title: { en: "The API answered with an error", ru: "API ответил ошибкой" }
+    explain: { en: "`fail_on_status_code=True` turns any non-2xx answer into an error. The status was {status}.", ru: "`fail_on_status_code=True` превращает любой ответ не из 2xx в ошибку. Статус был {status}." }
+  api-disposed:
+    title: { en: "The API context is closed", ru: "API-контекст уже закрыт" }
+    explain: { en: "The request context was disposed before this call — check where `dispose()` is called in the fixture.", ru: "Контекст запросов закрыли до этого вызова — проверь, где в фикстуре вызывается `dispose()`." }
+  # ---------- emulator ----------
+  test-timeout:
+    title: { en: "The test took too long", ru: "Тест шёл слишком долго" }
+    explain: { en: "The whole test ran longer than {timeout} ms. Look for long waits or an endless loop.", ru: "Весь тест шёл дольше {timeout} мс. Поищи длинные ожидания или бесконечный цикл." }
+  loop-guard:
+    title: { en: "Endless loop", ru: "Бесконечный цикл" }
+    explain: { en: "A loop ran too many times and was stopped. Check the loop condition.", ru: "Цикл выполнился слишком много раз и был остановлен. Проверь условие цикла." }
+  pw-unsupported:
+    title: { en: "Not available in the trainer", ru: "Недоступно в тренажёре" }
+    explain: { en: "`{method}` works in real Playwright, but the browser emulator doesn't support it.", ru: "`{method}` работает в настоящем Playwright, но эмулятор браузера этого не умеет." }
+  unsupported:
+    title: { en: "Not available in the trainer", ru: "Недоступно в тренажёре" }
+    explain: { en: "This works in real Playwright, but the browser emulator doesn't support it.", ru: "В настоящем Playwright это работает, но эмулятор браузера этого не умеет." }
+  expect-outside-test:
+    title: { en: "expect outside a test", ru: "expect вне теста" }
+    explain: { en: "Assertions run inside a test function.", ru: "Проверки выполняются внутри тестовой функции." }
+  no-browser:
+    title: { en: "No browser here", ru: "Здесь нет браузера" }
+    explain: { en: "This task runs without a browser window.", ru: "Это задание выполняется без окна браузера." }
   closed:
     title: { en: "The test already finished", ru: "Тест уже закончился" }
-    explain: { en: "This step ran after the test was over — usually because of a missing await.", ru: "Шаг выполнялся уже после конца теста — обычно из-за пропущенного await." }
+    explain: { en: "This step ran after the test was over.", ru: "Шаг выполнялся уже после конца теста." }
   unknown:
     title: { en: "Something went wrong", ru: "Что-то пошло не так" }
-    explain: { en: "Read the message above: the first line usually names the problem.", ru: "Прочитай сообщение выше: первая строка обычно называет проблему." }
+    explain: { en: "Read the message above: the last line usually names the problem.", ru: "Прочитай сообщение выше: последняя строка обычно называет проблему." }
 
 # Notes from static analysis, shown under the report even when tests pass
 lint:
   hard-wait:
-    en: "Line {line}: `waitForTimeout` is a hard wait — it slows tests down and still flakes. Wait for something visible instead: `await expect(locator).toBeVisible()`."
-    ru: "Строка {line}: `waitForTimeout` — жёсткое ожидание: замедляет тесты и всё равно флакает. Лучше ждать видимого результата: `await expect(locator).toBeVisible()`."
-  missing-await:
-    en: "Line {line}: `{call}` has no `await`."
-    ru: "Строка {line}: у `{call}` нет `await`."
+    en: "Line {line}: a fixed pause (`wait_for_timeout` / `time.sleep`) slows tests down and still flakes. Wait for something visible instead: `expect(locator).to_be_visible()`."
+    ru: "Строка {line}: фиксированная пауза (`wait_for_timeout` / `time.sleep`) замедляет тесты и всё равно флакает. Лучше ждать видимого результата: `expect(locator).to_be_visible()`."
+  not-called:
+    en: "Line {line}: `{call}` is written without `()`, so nothing happens — Python only mentions the method."
+    ru: "Строка {line}: `{call}` написан без `()`, поэтому ничего не происходит — Python только упоминает метод."
+  no-matcher:
+    en: "Line {line}: `expect(…)` without a check after it does nothing. Add a matcher: `.to_be_visible()`, `.to_have_text(…)`."
+    ru: "Строка {line}: `expect(…)` без проверки после него ничего не делает. Добавь проверку: `.to_be_visible()`, `.to_have_text(…)`."
+  always-true:
+    en: "Line {line}: `assert {expr}` always passes — a locator is just a description of how to find an element, and it is never empty. Use `expect(locator).to_be_visible()`."
+    ru: "Строка {line}: `assert {expr}` проходит всегда — локатор лишь описывает, как найти элемент, и он никогда не «пустой». Используй `expect(locator).to_be_visible()`."
   no-assertion:
     en: "Test “{title}” has no assertion — it can't catch a bug."
     ru: "В тесте «{title}» нет проверки — он не поймает баг."
   fragile-locator:
-    en: "Line {line}: `{selector}` is a CSS selector tied to markup. Prefer getByRole / getByLabel / getByTestId."
-    ru: "Строка {line}: `{selector}` — CSS-селектор, привязанный к вёрстке. Лучше getByRole / getByLabel / getByTestId."
+    en: "Line {line}: `{selector}` is a CSS selector tied to markup. Prefer get_by_role / get_by_label / get_by_test_id."
+    ru: "Строка {line}: `{selector}` — CSS-селектор, привязанный к вёрстке. Лучше get_by_role / get_by_label / get_by_test_id."
   weak-assertion:
-    en: "Line {line}: `{matcher}` on a one-off check doesn't wait or retry. Use a web-first assertion like `await expect(locator).toBeVisible()`."
-    ru: "Строка {line}: `{matcher}` на разовой проверке не ждёт и не повторяет. Используй web-first проверку вроде `await expect(locator).toBeVisible()`."
+    en: "Line {line}: `assert` on `{method}()` checks once and doesn't wait or retry. Use a web-first assertion like `expect(locator).to_be_visible()` or `to_have_text(…)`."
+    ru: "Строка {line}: `assert` по `{method}()` проверяет один раз и не ждёт, не повторяет. Используй web-first проверку вроде `expect(locator).to_be_visible()` или `to_have_text(…)`."
 
 # Messages for failed static grading rules (tasks' checks.static)
 rules:
@@ -185,14 +237,14 @@ rules:
     en: "The test has no assertion. Add a check of the expected result."
     ru: "В тесте нет проверки. Добавь проверку ожидаемого результата."
   noHardWait:
-    en: "Remove `waitForTimeout` — rely on auto-waiting and web-first assertions."
-    ru: "Убери `waitForTimeout` — положись на автоожидание и web-first проверки."
+    en: "Remove the fixed pause — rely on auto-waiting and web-first assertions."
+    ru: "Убери фиксированную паузу — положись на автоожидание и web-first проверки."
   noFragile:
     en: "Replace the CSS selector `{value}` with a user-facing locator."
     ru: "Замени CSS-селектор `{value}` на локатор, понятный пользователю."
-  awaitsActions:
-    en: "Every Playwright action and assertion needs `await` (see line {line})."
-    ru: "Каждому действию и проверке Playwright нужен `await` (см. строку {line})."
+  callsMethods:
+    en: "`{value}` on line {line} is missing its brackets — without `()` the method doesn't run."
+    ru: "У `{value}` на строке {line} не хватает скобок — без `()` метод не выполняется."
   uses:
     en: "The solution should use `{value}`."
     ru: "В решении должно быть `{value}`."

@@ -29,45 +29,48 @@ export function DevTaskPage({ id }: { id: string }) {
   );
 }
 
-const TRACE = `import { test, expect } from '@playwright/test';
+const TRACE = `from playwright.sync_api import Page, expect
 
-test('promo code gives 10% off', async ({ page }) => {
-  await page.goto('/cart');
-  await page.getByLabel('Promo code').fill('BLOOM100');
-  await page.getByRole('button', { name: 'Apply' }).click();
-  await expect(page.getByTestId('cart-total')).toHaveText('€36.40');
-});`;
 
-const PAGE_OBJECT = `export class LoginPage {
-  constructor(page) {
-    this.page = page;
-    this.email = page.getByLabel('Email');
-    this.password = page.getByLabel('Password');
-    this.submit = page.getByRole('button', { name: 'Log in' });
-  }
-  async goto() {
-    await this.page.goto('/login');
-  }
-  async login(email, password) {
-    await this.email.fill(email);
-    await this.password.fill(password);
-    await this.submit.click();
-  }
-}
+def test_promo_code_gives_10_percent_off(page: Page):
+    page.goto("/cart")
+    page.get_by_label("Promo code").fill("BLOOM100")
+    page.get_by_role("button", name="Apply").click()
+    expect(page.get_by_test_id("cart-total")).to_have_text("€36.40")
 `;
-const SPEC = `import { test, expect } from '@playwright/test';
-import { LoginPage } from './pages/LoginPage';
 
-test('registered user can log in', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login('anna@bloomly.app', 'bloom123');
-  await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-});`;
+const PAGE_OBJECT = `from playwright.sync_api import Page
+
+
+class LoginPage:
+    def __init__(self, page: Page):
+        self.page = page
+        self.email = page.get_by_label("Email")
+        self.password = page.get_by_label("Password")
+        self.submit = page.get_by_role("button", name="Log in")
+
+    def open(self):
+        self.page.goto("/login")
+
+    def log_in(self, email: str, password: str):
+        self.email.fill(email)
+        self.password.fill(password)
+        self.submit.click()
+`;
+const SPEC = `from playwright.sync_api import Page, expect
+from pages.login_page import LoginPage
+
+
+def test_registered_user_can_log_in(page: Page):
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.log_in("anna@bloomly.app", "bloom123")
+    expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
+`;
 
 export function DevLabPage() {
   const [code, setCode] = useState(SPEC);
-  const [files, setFiles] = useState<Record<string, string>>({ 'pages/LoginPage.js': PAGE_OBJECT });
+  const [files, setFiles] = useState<Record<string, string>>({ 'pages/login_page.py': PAGE_OBJECT });
   return (
     <div className="page page-wide">
       <h1 className="page-title">Lab components</h1>

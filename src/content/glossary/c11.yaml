@@ -8,8 +8,8 @@
     en: "Continuous integration and delivery: every change is built and tested automatically, then shipped."
     ru: "Непрерывная интеграция и доставка: каждое изменение автоматически собирается, тестируется и выкатывается."
   example:
-    en: "Our tests run in CI/CD on every pull request, so nobody merges a red build."
-    ru: "Наши тесты запускаются в CI/CD на каждый пул-реквест, поэтому никто не мёржит красную сборку."
+    en: "Our pytest suite runs in CI/CD on every pull request, so nobody merges a red build."
+    ru: "Наш набор тестов на pytest запускается в CI/CD на каждый пул-реквест, поэтому никто не мёржит красную сборку."
   context: meeting
   chapter: 11
 
@@ -19,11 +19,11 @@
   ru: пайплайн (pipeline)
   pos: noun
   def:
-    en: "The chain of automatic steps that runs on each change: install, build, test, report, deploy."
-    ru: "Цепочка автоматических шагов, которая запускается на каждое изменение: установка, сборка, тесты, отчёт, деплой."
+    en: "The chain of automatic steps that runs on each change: install the packages and browsers, run pytest, save the report and traces, deploy."
+    ru: "Цепочка автоматических шагов, которая запускается на каждое изменение: установить пакеты и браузеры, запустить pytest, сохранить отчёт и трейсы, выкатить."
   example:
-    en: "The pipeline is red on the e2e step — I'm checking the HTML report now."
-    ru: "Пайплайн красный на шаге e2e — сейчас смотрю HTML-отчёт."
+    en: "The pipeline is red on the e2e step — I'm downloading the traces of the failed tests now."
+    ru: "Пайплайн красный на шаге e2e — сейчас скачиваю трейсы упавших тестов."
   context: chat
   chapter: 11
 
@@ -33,8 +33,8 @@
   ru: codegen (запись кода по действиям)
   pos: noun
   def:
-    en: "A Playwright tool (npx playwright codegen) that records your clicks and typing in a browser and writes them as test code."
-    ru: "Инструмент Playwright (npx playwright codegen), который записывает твои клики и ввод в браузере и превращает их в код теста."
+    en: "A Playwright tool that records your clicks and typing in a browser and writes them as test code: `playwright codegen --target python-pytest http://localhost:3000`."
+    ru: "Инструмент Playwright, который записывает твои клики и ввод в браузере и превращает их в код теста: `playwright codegen --target python-pytest http://localhost:3000`."
   example:
     en: "Run codegen on the checkout page to see which locator Playwright suggests for the date field."
     ru: "Запусти codegen на странице оформления, чтобы увидеть, какой локатор Playwright предлагает для поля даты."
@@ -47,8 +47,8 @@
   ru: HTML-отчёт (HTML report)
   pos: noun
   def:
-    en: "The page Playwright creates after a run, with every test, its steps, errors, screenshots and trace."
-    ru: "Страница, которую Playwright создаёт после прогона: каждый тест, его шаги, ошибки, скриншоты и трейс."
+    en: "A web page with the results of a run: every test, its status, errors and duration. pytest prints results in the terminal; the pytest-html plugin also saves them as a page: `pytest --html=report.html`."
+    ru: "Веб-страница с результатами прогона: каждый тест, его статус, ошибки и длительность. pytest печатает результаты в терминал, а плагин pytest-html ещё и сохраняет их страницей: `pytest --html=report.html`."
   example:
     en: "I'll post the link to last night's HTML report in the release channel."
     ru: "Я скину ссылку на HTML-отчёт ночного прогона в канал релиза."
@@ -61,8 +61,8 @@
   ru: headless-режим, без окна браузера (headless)
   pos: adjective
   def:
-    en: "Running a browser without showing its window; the default for tests and for CI."
-    ru: "Запуск браузера без показа его окна; так по умолчанию работают тесты и CI."
+    en: "Running a browser without showing its window. pytest runs Playwright headless by default (that's how CI works too); add `--headed` to watch the browser."
+    ru: "Запуск браузера без показа его окна. pytest по умолчанию запускает Playwright в headless-режиме (так же работает и CI); добавь `--headed`, чтобы видеть браузер."
   example:
     en: "It passes headed but fails headless — let's compare the two traces."
     ru: "С окном браузера тест проходит, а в headless падает — давай сравним два трейса."
@@ -75,8 +75,8 @@
   ru: кроссбраузерное тестирование (cross-browser testing)
   pos: noun
   def:
-    en: "Running the same tests in several browsers, such as Chromium, Firefox and WebKit (the engine behind Safari)."
-    ru: "Запуск одних и тех же тестов в нескольких браузерах, например в Chromium, Firefox и WebKit (движок Safari)."
+    en: "Running the same tests in several browsers, such as Chromium, Firefox and WebKit (the engine behind Safari): `pytest --browser chromium --browser firefox --browser webkit`."
+    ru: "Запуск одних и тех же тестов в нескольких браузерах, например в Chromium, Firefox и WebKit (движок Safari): `pytest --browser chromium --browser firefox --browser webkit`."
   example:
     en: "Cross-browser testing found it: the date picker breaks only in WebKit."
     ru: "Это нашлось благодаря кроссбраузерному тестированию: выбор даты ломается только в WebKit."
@@ -145,10 +145,24 @@
   ru: конфигурационный файл, конфиг (config file)
   pos: noun
   def:
-    en: "A file with project settings. In Playwright it's playwright.config, with baseURL, browsers, retries, reporter and trace."
-    ru: "Файл с настройками проекта. В Playwright это playwright.config: baseURL, браузеры, повторы, репортер и трейс."
+    en: "A file with project settings. In a pytest project it's pytest.ini: default options in `addopts` such as `--base-url`, the browser and tracing, plus where the tests live."
+    ru: "Файл с настройками проекта. В pytest-проекте это pytest.ini: опции по умолчанию в `addopts` — например, `--base-url`, браузер и трейсинг, — а ещё где лежат тесты."
   example:
-    en: "Set `trace: 'on-first-retry'` in the config file, so CI keeps a trace for every flaky failure."
-    ru: "Поставь `trace: 'on-first-retry'` в конфиге, чтобы CI сохранял трейс для каждого нестабильного падения."
+    en: "Add `--tracing retain-on-failure` to the config file, so CI keeps a trace for every failed test."
+    ru: "Добавь `--tracing retain-on-failure` в конфиг, чтобы CI сохранял трейс для каждого упавшего теста."
   context: code-review
+  chapter: 11
+
+- id: virtual-environment
+  en: virtual environment
+  ipa: /ˈvɜːrtʃuəl ɪnˈvaɪrənmənt/
+  ru: виртуальное окружение (virtual environment, venv)
+  pos: noun
+  def:
+    en: "A separate folder with its own Python packages for one project, \"venv\" for short, created with `python -m venv .venv`. pytest and pytest-playwright are installed into it, so projects don't get in each other's way."
+    ru: "Отдельная папка с собственными Python-пакетами для одного проекта, сокращённо «venv»; создаётся командой `python -m venv .venv`. В неё устанавливают pytest и pytest-playwright, чтобы проекты не мешали друг другу."
+  example:
+    en: "The terminal says pytest isn't found because the virtual environment isn't active — activate it first."
+    ru: "Терминал пишет, что pytest не найден, потому что виртуальное окружение не активировано, — сначала активируй его."
+  context: chat
   chapter: 11

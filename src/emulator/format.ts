@@ -1,19 +1,26 @@
 // Formatting helpers that mimic Playwright's output.
 
+/** Python-style string literal as Playwright for Python prints it in locators: "Log in" */
 export function quote(s: string): string {
-  return `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+  return JSON.stringify(s);
+}
+
+/** re.compile(r"Welcome", re.IGNORECASE) */
+export function fmtRegex(r: RegExp): string {
+  const src = r.source.includes('"') ? `'${r.source}'` : `"${r.source}"`;
+  return `re.compile(r${src}${r.flags.includes('i') ? ', re.IGNORECASE' : ''})`;
 }
 
 export function fmtTextArg(t: string | RegExp): string {
-  return t instanceof RegExp ? String(t) : quote(t);
+  return t instanceof RegExp ? fmtRegex(t) : quote(t);
 }
 
 export function fmtValue(v: unknown, depth = 0): string {
-  if (v === undefined) return 'undefined';
-  if (v === null) return 'null';
+  if (v === undefined || v === null) return 'None';
   if (typeof v === 'string') return JSON.stringify(v);
-  if (typeof v === 'number' || typeof v === 'boolean' || typeof v === 'bigint') return String(v);
-  if (v instanceof RegExp) return String(v);
+  if (typeof v === 'boolean') return v ? 'True' : 'False';
+  if (typeof v === 'number' || typeof v === 'bigint') return String(v);
+  if (v instanceof RegExp) return fmtRegex(v);
   if (typeof v === 'function') return '[Function]';
   if (typeof v === 'object' && v && typeof (v as { toString(): string }).toString === 'function' && (v as { __pwDescription?: string }).__pwDescription) {
     return (v as { __pwDescription: string }).__pwDescription;
@@ -23,17 +30,19 @@ export function fmtValue(v: unknown, depth = 0): string {
   if (typeof v === 'object') {
     const entries = Object.entries(v as Record<string, unknown>);
     if (!entries.length) return '{}';
-    return `{ ${entries.map(([k, x]) => `${/^[a-zA-Z_$][\w$]*$/.test(k) ? k : JSON.stringify(k)}: ${fmtValue(x, depth + 1)}`).join(', ')} }`;
+    return `{${entries.map(([k, x]) => `${JSON.stringify(k)}: ${fmtValue(x, depth + 1)}`).join(', ')}}`;
   }
   return String(v);
 }
 
-/** Options object as Playwright prints it in locator descriptions: { name: 'Log in', exact: true } */
+const snake = (k: string) => k.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
+
+/** Keyword arguments as Playwright for Python prints them in locators: name="Log in", exact=True */
 export function fmtOptions(opts: Record<string, unknown> | undefined): string {
   if (!opts) return '';
   const entries = Object.entries(opts).filter(([, v]) => v !== undefined);
   if (!entries.length) return '';
-  return `{ ${entries.map(([k, v]) => `${k}: ${typeof v === 'string' ? quote(v) : v instanceof RegExp ? String(v) : String(v)}`).join(', ')} }`;
+  return entries.map(([k, v]) => `${snake(k)}=${typeof v === 'string' ? quote(v) : v instanceof RegExp ? fmtRegex(v) : typeof v === 'boolean' ? (v ? 'True' : 'False') : String(v)}`).join(', ');
 }
 
 export function normalizeWhitespace(s: string): string {

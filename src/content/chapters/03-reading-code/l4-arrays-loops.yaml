@@ -1,18 +1,20 @@
 id: c3-l4
 chapter: c3
-title: { en: "Arrays, loops and unfamiliar code", ru: "Массивы, циклы и незнакомый код" }
+title: { en: "Lists, dicts and loops", ru: "Списки, словари и циклы" }
 goal:
-  en: "Read data-driven tests, count the tests a loop creates, and use a strategy (and the agent) to understand code you've never seen."
-  ru: "Читать тесты на наборах данных, считать, сколько тестов создаёт цикл, и разбираться в незнакомом коде — по плану и с помощью агента."
-minutes: 10
+  en: "Read test data in lists and dicts, tell a loop inside one test from parametrize, and count how many tests a file really creates."
+  ru: "Читать тестовые данные в списках и словарях, отличать цикл внутри одного теста от parametrize и считать, сколько тестов файл создаёт на самом деле."
+minutes: 11
 keyPoints:
-  - id: kp-array
-    title: { en: "An array is a list of test data rows", ru: "Массив — список строк тестовых данных" }
+  - id: kp-list
+    title: { en: "A list is a column of test data; positions start at 0", ru: "Список — колонка тестовых данных; позиции считаются с 0" }
+  - id: kp-dict
+    title: { en: "A dict is one data row with named columns: user[\"email\"]", ru: "Словарь — одна строка данных с подписанными колонками: user[\"email\"]" }
   - id: kp-loop
-    title: { en: "for...of repeats the steps for each row", ru: "for...of повторяет шаги для каждой строки" }
-  - id: kp-read-strategy
-    title: { en: "Read unfamiliar code in four passes — and verify the agent's explanation", ru: "Читаем незнакомый код в четыре прохода — и проверяем объяснение агента" }
-terms: [array, loop, test-data, test-case, code-review, ai-agent]
+    title: { en: "for item in items: repeats steps — inside one test", ru: "for item in items: повторяет шаги — внутри одного теста" }
+  - id: kp-parametrize
+    title: { en: "@pytest.mark.parametrize turns each data row into its own test", ru: "@pytest.mark.parametrize превращает каждую строку данных в отдельный тест" }
+terms: [list, dictionary, loop, decorator, test-data, data-driven-testing, parameterization, test-report]
 
 steps:
   - type: story
@@ -23,12 +25,12 @@ steps:
           ru: "Мы доставляем в Лиссабон, Берлин и Варшаву. У нас есть тесты логина для пользователей из каждого города?"
       - who: petal
         text:
-          en: "Yes! One test, many users — I used a loop. Very elegant."
-          ru: "Да! Один тест, много пользователей — я использовал цикл. Очень элегантно."
+          en: "Yes! One test, all our users — I put them in a list and wrote a loop. Very elegant."
+          ru: "Да! Один тест, все наши пользователи — я сложил их в список и написал цикл. Очень элегантно."
       - who: maya
         text:
-          en: "A loop multiplies tests. It also multiplies a wrong data row. Let's learn to read it — and then to read anything Petal throws at us."
-          ru: "Цикл размножает тесты. И неверную строку данных — тоже. Научимся его читать, а потом — читать вообще всё, что выдаст Petal."
+          en: "Elegant until one user fails: then the whole test is red, and the report doesn't say who. Let's learn to read lists, dicts and loops — and pytest's way to give every user their own test."
+          ru: "Элегантно — пока не упадёт один пользователь: тогда красным станет весь тест, а по отчёту не понять, кто именно. Научимся читать списки, словари и циклы — и разберём способ pytest дать каждому пользователю собственный тест."
 
   - type: pretest
     intro:
@@ -37,126 +39,56 @@ steps:
     items:
       - id: c3-l4-p1
         kind: input
-        keyPoint: kp-loop
+        keyPoint: kp-parametrize
         prompt:
           en: "Guess: how many tests will this file show in the report?"
           ru: "Угадай: сколько тестов этот файл покажет в отчёте?"
         code: |
-          const users = ['anna@bloomly.app', 'tom@bloomly.app', 'maya@bloomly.app'];
-
-          for (const user of users) {
-            test(`${user} can open the account page`, async ({ page }) => {
-              // ...steps
-            });
-          }
+          @pytest.mark.parametrize("email", [
+              "anna@bloomly.app",
+              "tom@bloomly.app",
+              "maya@bloomly.app",
+          ])
+          def test_user_can_open_the_account_page(page: Page, email):
+              page.goto("/login")
+              # ...log in with this email, open the account page
         answers: ["3", "three"]
         placeholder: "Number of tests"
         hints:
-          - { en: "The block with `test(...)` repeats for each item of the list.", ru: "Блок с `test(...)` повторяется для каждого элемента списка." }
-          - { en: "Count the emails in square brackets.", ru: "Посчитай email-адреса в квадратных скобках." }
+          - { en: "The line with `@` above the function brings a list of data. pytest makes one test per item.", ru: "Строка с `@` над функцией приносит список данных. pytest делает по тесту на каждый элемент." }
+          - { en: "Count the emails in the square brackets.", ru: "Посчитай email-адреса в квадратных скобках." }
         explain:
-          en: "Three emails → the block runs three times → three tests, one per user. Let's see how to read this."
-          ru: "Три email → блок выполняется три раза → три теста, по одному на пользователя. Сейчас разберём, как это читать."
+          en: "Three emails → three tests: `test_user_can_open_the_account_page[anna@bloomly.app]`, `[tom@bloomly.app]` and `[maya@bloomly.app]`. One function, three lines in the report. Let's see how to read this."
+          ru: "Три email → три теста: `test_user_can_open_the_account_page[anna@bloomly.app]`, `[tom@bloomly.app]` и `[maya@bloomly.app]`. Одна функция — три строки в отчёте. Сейчас разберём, как это читать."
 
   - type: theory
-    keyPoint: kp-array
-    title: { en: "An array is a test data table", ru: "Массив — это таблица тестовых данных" }
+    keyPoint: kp-list
+    title: { en: "A list is a column of test data", ru: "Список — колонка тестовых данных" }
     body:
-      - en: "Remember the [[test data|test-data]] table in a [[test case|test-case]]: several rows, the same columns. In code, a list of values is an [[array]]: square brackets, items separated by commas."
-        ru: "Вспомни таблицу [[тестовых данных|test-data]] в [[тест-кейсе|test-case]]: несколько строк, одни и те же колонки. В коде список значений — это [[массив|array]]: квадратные скобки, элементы через запятую."
-      - en: "Each item has a position number — an index. Counting starts at **0**: `searches[0]` is the first item, `searches[1]` the second."
-        ru: "У каждого элемента есть номер позиции — индекс. Счёт начинается с **0**: `searches[0]` — первый элемент, `searches[1]` — второй."
-      - en: "Items can be simple strings — or whole rows with named columns, written as objects: `{ email: 'tom@bloomly.app', name: 'Tom' }`. You read a column with a dot: `user.email`."
-        ru: "Элементы могут быть простыми строками — или целыми строками таблицы с именованными колонками, записанными как объекты: `{ email: 'tom@bloomly.app', name: 'Tom' }`. Колонку читают через точку: `user.email`."
+      - en: "Remember the [[test data|test-data]] column in a test case: several values, one per row. In Python that's a [[list]]: square brackets, items separated by commas."
+        ru: "Вспомни колонку [[тестовых данных|test-data]] в тест-кейсе: несколько значений, по одному на строку. В Python это [[список|list]]: квадратные скобки, элементы через запятую."
+      - en: "Each item has a position number — an index. Counting starts at **0**: `searches[0]` is the first item, `searches[1]` the second. `len(searches)` tells you how many items there are."
+        ru: "У каждого элемента есть номер позиции — индекс. Счёт начинается с **0**: `searches[0]` — первый элемент, `searches[1]` — второй. А `len(searches)` говорит, сколько всего элементов."
+      - en: "Ask for a position that doesn't exist — `searches[3]` in a list of three — and Python stops with `IndexError: list index out of range`."
+        ru: "Если попросить позицию, которой нет, — `searches[3]` в списке из трёх, — Python остановится с ошибкой `IndexError: list index out of range`."
     code: |
-      const searches = ['rose', 'tulips', 'orchid'];
-      // searches[0] is 'rose', searches[2] is 'orchid'
+      searches = ["rose", "tulips", "orchid"]
 
-      const users = [
-        { email: 'anna@bloomly.app', name: 'Anna' },
-        { email: 'tom@bloomly.app', name: 'Tom' },
-      ];
-
-  - type: theory
-    keyPoint: kp-loop
-    title: { en: "A loop: the same steps for every row", ru: "Цикл: одни и те же шаги для каждой строки" }
-    body:
-      - en: "A data-driven test case says: \"Repeat steps 1–4 for each row of the table.\" In code that's a [[loop]]: `for (const user of users) { ... }`."
-        ru: "Тест-кейс на наборе данных говорит: «Повтори шаги 1–4 для каждой строки таблицы». В коде это [[цикл|loop]]: `for (const user of users) { ... }`."
-      - en: "Read it as: \"for each `user` of `users`, do the block\". On every round, `user` is the next row: first Anna, then Tom."
-        ru: "Читай так: «для каждого `user` из `users` выполни блок». В каждом проходе `user` — следующая строка: сначала Анна, потом Том."
-      - en: "If the block contains `test(...)`, the loop creates one test per row. Count the rows — that's how many tests you'll see in the report. A template literal in the title gives each test its own name."
-        ru: "Если в блоке есть `test(...)`, цикл создаёт по тесту на строку. Посчитай строки — столько тестов будет в отчёте. Шаблонная строка в названии даёт каждому тесту своё имя."
-    code: |
-      for (const user of users) {
-        test(`${user.name} can log in`, async ({ page }) => {
-          // ...steps using user.email
-        });
-      }
-      // creates: "Anna can log in", "Tom can log in"
-
-  - type: example
-    keyPoint: kp-loop
-    title: { en: "A data-driven login test", ru: "Тест логина на наборе данных" }
-    intro:
-      en: "Petal's loop for three users. One file — three tests in the report."
-      ru: "Цикл от Petal для трёх пользователей. Один файл — три теста в отчёте."
-    code: |
-      import { test, expect } from '@playwright/test';
-
-      const users = [
-        { email: 'anna@bloomly.app', password: 'bloom123', name: 'Anna' },
-        { email: 'tom@bloomly.app', password: 'tulips42', name: 'Tom' },
-        { email: 'maya@bloomly.app', password: 'qa-rocks', name: 'Maya' },
-      ];
-
-      for (const user of users) {
-        test(`${user.name} can log in`, async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill(user.email);
-          await page.getByLabel('Password').fill(user.password);
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByRole('heading', { level: 1 })).toHaveText(`Welcome back, ${user.name}!`);
-        });
-      }
-    notes:
-      - lines: [3, 4, 5, 6, 7]
-        text:
-          en: "The test data table: an array of 3 rows. Each row has 3 columns: email, password, name."
-          ru: "Таблица тестовых данных: массив из 3 строк. В каждой строке 3 колонки: email, password, name."
-      - lines: 9
-        text:
-          en: "The loop: for each row, `user` is that row."
-          ru: "Цикл: для каждой строки `user` — это она."
-      - lines: 10
-        text:
-          en: "One test per row; the title becomes \"Anna can log in\", \"Tom can log in\", \"Maya can log in\"."
-          ru: "По тесту на строку; названия — «Anna can log in», «Tom can log in», «Maya can log in»."
-      - lines: [12, 13]
-        text:
-          en: "`user.email` and `user.password` — the columns of the current row."
-          ru: "`user.email` и `user.password` — колонки текущей строки."
-      - lines: 15
-        text:
-          en: "The expected result is built from the same row — it changes with the data."
-          ru: "Ожидаемый результат собирается из той же строки — он меняется вместе с данными."
-      - lines: 17
-        text:
-          en: "The end of the loop block."
-          ru: "Конец блока цикла."
-    runnable: true
+      print(searches[0])    # rose
+      print(searches[2])    # orchid
+      print(len(searches))  # 3
 
   - type: task
     task:
       id: c3-l4-t1
       kind: choice
-      keyPoint: kp-array
+      keyPoint: kp-list
       prompt:
         en: "What will this script print?"
         ru: "Что выведет этот скрипт?"
       code: |
-        const cities = ['Lisbon', 'Berlin', 'Warsaw'];
-        console.log(cities[1]);
+        cities = ["Lisbon", "Berlin", "Warsaw"]
+        print(cities[1])
       options:
         - text: "Berlin"
           correct: true
@@ -177,42 +109,76 @@ steps:
         en: "`cities[1]` is the second item, \"Berlin\". Agents and humans both slip on this — `users[1]` is the second user, not the first."
         ru: "`cities[1]` — второй элемент, «Berlin». На этом спотыкаются и агенты, и люди: `users[1]` — второй пользователь, а не первый."
 
+  - type: theory
+    keyPoint: kp-dict
+    title: { en: "A dict is a data row with named columns", ru: "Словарь — строка данных с подписанными колонками" }
+    body:
+      - en: "A row of a test case often has several columns: email, password, expected name. In Python one such row is a [[dictionary]] (dict): curly braces, `\"key\": value` pairs."
+        ru: "Строка тест-кейса часто состоит из нескольких колонок: email, пароль, ожидаемое имя. В Python такая строка — [[словарь|dictionary]] (dict): фигурные скобки, пары `\"ключ\": значение`."
+      - en: "You read a value by its key in square brackets: `user[\"email\"]`. A key that isn't there — a typo, or a column the agent invented — stops the code with `KeyError: 'mail'`."
+        ru: "Значение читают по ключу в квадратных скобках: `user[\"email\"]`. Ключ, которого нет, — опечатка или колонка, которую придумал агент, — останавливает код с ошибкой `KeyError: 'mail'`."
+      - en: "A list of dicts is a whole test data table. And JSON from an API looks exactly the same — you'll meet it again in the API chapter."
+        ru: "Список словарей — это уже целая таблица тестовых данных. А JSON из API выглядит точно так же — ты ещё встретишь его в главе про API."
+    code: |
+      user = {"email": "tom@bloomly.app", "password": "tulips42", "name": "Tom"}
+      print(user["email"])     # tom@bloomly.app
+
+      users = [
+          {"email": "anna@bloomly.app", "name": "Anna"},
+          {"email": "tom@bloomly.app", "name": "Tom"},
+      ]
+      print(users[1]["name"])  # Tom
+      print(user["mail"])      # KeyError: 'mail'
+
   - type: task
     task:
       id: c3-l4-t2
       kind: input
-      keyPoint: kp-loop
+      keyPoint: kp-dict
       prompt:
-        en: "How many tests will this file show in the report?"
-        ru: "Сколько тестов этот файл покажет в отчёте?"
+        en: "Anna lives in Lisbon. What does the last line do? If it prints something, type it. If Python stops with an error, type the error's name."
+        ru: "Анна живёт в Лиссабоне. Что сделает последняя строка? Если она что-то напечатает — напиши это. Если Python остановится с ошибкой — напиши название ошибки."
       code: |
-        const searches = ['rose', 'tulips', 'lavender', 'peony'];
+        anna = {"email": "anna@bloomly.app", "password": "bloom123", "name": "Anna"}
 
-        for (const q of searches) {
-          test(`search finds ${q}`, async ({ page }) => {
-            await page.goto('/shop');
-            await page.getByLabel('Search').fill(q);
-            await expect(page.getByTestId('results-count')).toHaveText('1 product');
-          });
-        }
-
-        test('search with no match shows 0 products', async ({ page }) => {
-          await page.goto('/shop');
-          await page.getByLabel('Search').fill('cactus');
-          await expect(page.getByTestId('results-count')).toHaveText('0 products');
-        });
-      answers: ["5", "five"]
-      placeholder: "Number of tests"
+        print(anna["name"])
+        print(anna["city"])
+      answers: ["KeyError", "KeyError: 'city'"]
+      placeholder: "Printed text or error name"
+      run: script
       hints:
-        - { en: "Count the tests the loop creates, then look below the loop.", ru: "Посчитай тесты, которые создаёт цикл, а потом посмотри ниже цикла." }
-        - { en: "The loop: one test per search term. Below it: one more `test(...)`.", ru: "Цикл: по тесту на каждое слово поиска. Ниже — ещё один `test(...)`." }
-        - { en: "4 + 1", ru: "4 + 1" }
+        - { en: "Read the keys in the curly braces: which columns does this row have?", ru: "Прочитай ключи в фигурных скобках: какие колонки есть в этой строке?" }
+        - { en: "There is no key \"city\". Python doesn't guess — and doesn't know where Anna lives.", ru: "Ключа \"city\" нет. Python не угадывает — и не знает, где живёт Анна." }
+        - { en: "A missing key → `…Error`, as on the previous screen.", ru: "Нет ключа → `…Error`, как на прошлом экране." }
       praise:
-        en: "Exactly — you didn't stop at the end of the loop."
-        ru: "Именно — ты не останови{лась|лся} на конце цикла."
+        en: "Exactly — you read the keys, not what you know about Anna."
+        ru: "Именно — ты {прочитала|прочитал} ключи, а не то, что знаешь про Анну."
       explain:
-        en: "4 search terms → 4 tests from the loop, plus 1 separate negative test = 5. When you review a PR, this count tells you how much coverage it really adds."
-        ru: "4 слова поиска → 4 теста из цикла плюс 1 отдельный негативный тест = 5. На ревью PR это число говорит, сколько покрытия он реально добавляет."
+        en: "The first line prints \"Anna\". The dict has no key \"city\", so the second line stops with `KeyError: 'city'`. Python never returns an empty value for a missing key — and the error names the key. When a test fails with a KeyError, compare that key with the keys in the data: usually it's a typo or a column the agent invented."
+        ru: "Первая строка печатает «Anna». Ключа \"city\" в словаре нет, поэтому вторая строка останавливается с `KeyError: 'city'`. Для отсутствующего ключа Python никогда не возвращает пустое значение — а в ошибке называет сам ключ. Если тест упал с KeyError, сравни этот ключ с ключами в данных: обычно это опечатка или колонка, которую придумал агент."
+
+  - type: theory
+    keyPoint: kp-loop
+    title: { en: "A loop: the same steps for every item", ru: "Цикл: одни и те же шаги для каждого элемента" }
+    body:
+      - en: "A data-driven test case says: \"Repeat steps 1–3 for each row of the table.\" In code that's a [[loop]]: `for q in searches:` and the indented lines below it."
+        ru: "Тест-кейс на наборе данных говорит: «Повтори шаги 1–3 для каждой строки таблицы». В коде это [[цикл|loop]]: `for q in searches:` и строки с отступом под ним."
+      - en: "Read it as: \"for each `q` in `searches`, do the indented block\". On every round `q` is the next item: first \"rose\", then \"tulips\". Where the indentation ends, the block ends."
+        ru: "Читай так: «для каждого `q` из `searches` выполни блок с отступом». На каждом проходе `q` — следующий элемент: сначала \"rose\", потом \"tulips\". Где кончается отступ, там кончается и блок."
+      - en: "The catch: a loop inside a test is still **one** test. The first failing item stops it — the items after it never run — and the [[test report|test-report]] shows one red test without saying which item broke it."
+        ru: "Подвох: цикл внутри теста — это всё равно **один** тест. Первый упавший элемент его останавливает — следующие уже не выполняются, — а в [[отчёте|test-report]] один красный тест, и не сказано, на каком элементе он сломался."
+    code: |
+      def test_search_finds_each_flower(page: Page):
+          searches = ["rose", "tulips", "lavender"]
+          page.goto("/shop")
+          for q in searches:
+              page.get_by_label("Search").fill(q)
+              expect(page.get_by_test_id("results-count")).to_have_text("1 product")
+
+      # report: one line — test_search_finds_each_flower
+    mentor:
+      en: "It's like running a test case with a data table, stopping at the first failure and filing one bug called \"search is broken\". Which row? Go and find out."
+      ru: "Это как пройти тест-кейс с таблицей данных, остановиться на первой ошибке и завести один баг «поиск сломан». На какой строке? Разбирайся {сама|сам}."
 
   - type: task
     task:
@@ -220,49 +186,124 @@ steps:
       kind: predict
       keyPoint: kp-loop
       prompt:
-        en: "Will the whole run be green? (A run is green only if every test passes.)"
-        ru: "Весь прогон будет зелёным? (Прогон зелёный, только если проходит каждый тест.)"
+        en: "Petal checks four searches in one test with a loop. Will the test pass?"
+        ru: "Petal проверяет четыре поисковых запроса в одном тесте с помощью цикла. Тест пройдёт?"
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        const searches = ['rose', 'tulips', 'orchid', 'daisy'];
 
-        for (const q of searches) {
-          test(`search for ${q} finds 1 product`, async ({ page }) => {
-            await page.goto('/shop');
-            await page.getByLabel('Search').fill(q);
-            await expect(page.getByTestId('results-count')).toHaveText('1 product');
-          });
-        }
+        def test_search_finds_each_flower(page: Page):
+            page.goto("/shop")
+            for q in ["rose", "tulips", "daisy", "orchid"]:
+                page.get_by_label("Search").fill(q)
+                expect(page.get_by_test_id("results-count")).to_have_text("1 product")
       outcome: fail
       reasons:
         - text:
-            en: "The \"daisy\" test fails: Bloomly sells no daisies, so it shows \"0 products\""
-            ru: "Тест «daisy» упадёт: ромашек в Bloomly нет, будет «0 products»"
+            en: "No: on \"daisy\" the shop shows \"0 products\" — the test stops there, and \"orchid\" is never checked"
+            ru: "Нет: на «daisy» магазин покажет «0 products» — тест на этом остановится, а «orchid» так и не проверится"
           correct: true
         - text:
-            en: "The \"orchid\" test fails: White Orchid is out of stock"
-            ru: "Тест «orchid» упадёт: White Orchid нет в наличии"
-          why: { en: "Search still shows out-of-stock products: \"1 product\".", ru: "Поиск всё равно показывает товары не в наличии: «1 product»." }
+            en: "No: White Orchid is out of stock, so \"orchid\" finds nothing"
+            ru: "Нет: White Orchid нет в наличии, поэтому «orchid» ничего не найдёт"
+          why: { en: "Search still shows out-of-stock products: \"1 product\". And the test never even gets to \"orchid\".", ru: "Поиск всё равно показывает товары не в наличии: «1 product». И до «orchid» тест даже не доходит." }
         - text:
-            en: "Everything passes: a loop counts as one test"
-            ru: "Всё пройдёт: цикл считается одним тестом"
-          why: { en: "The loop creates 4 separate tests, each with its own result.", ru: "Цикл создаёт 4 отдельных теста, у каждого свой результат." }
+            en: "Yes: three of the four searches pass, and the loop counts the majority"
+            ru: "Да: три поиска из четырёх проходят, а цикл считает по большинству"
+          why: { en: "One failing check fails the whole test. A loop doesn't give its items separate results.", ru: "Одна упавшая проверка роняет весь тест. Цикл не даёт своим элементам отдельных результатов." }
       hints:
-        - { en: "Check each data row against Bloomly's products.", ru: "Сверь каждую строку данных с товарами Bloomly." }
+        - { en: "Check each search word against Bloomly's products.", ru: "Сверь каждое слово поиска с товарами Bloomly." }
         - { en: "Products: Rose Bouquet, Sunny Tulips, Lavender Pot, Peony Dream, Mint Succulent, White Orchid.", ru: "Товары: Rose Bouquet, Sunny Tulips, Lavender Pot, Peony Dream, Mint Succulent, White Orchid." }
+        - { en: "And what happens to the items after the first failure?", ru: "А что происходит с элементами после первой ошибки?" }
       praise:
-        en: "Right — you checked every data row against the app, like a data table in a test case."
-        ru: "Верно — ты сверил{а|} каждую строку данных с приложением, как таблицу в тест-кейсе."
+        en: "Right — you checked every data item against the app and noticed where the loop stops."
+        ru: "Верно — ты {сверила|сверил} каждый элемент данных с приложением и {заметила|заметил}, где цикл останавливается."
       explain:
-        en: "3 tests pass, \"search for daisy finds 1 product\" fails. The report names the failing row thanks to the template literal in the title. Here the data row is wrong, not the app."
-        ru: "3 теста проходят, «search for daisy finds 1 product» падает. Благодаря шаблонной строке в названии отчёт показывает, какая строка упала. Здесь ошибка в строке данных, а не в приложении."
+        en: "The test fails on \"daisy\": `Actual value: 0 products`. The report shows one red test, `test_search_finds_each_flower` — the word \"daisy\" isn't in its name, you have to work it out from the data. And \"orchid\" was never checked at all. That's the price of a loop inside one test."
+        ru: "Тест падает на «daisy»: `Actual value: 0 products`. В отчёте один красный тест, `test_search_finds_each_flower`, — слова «daisy» в его названии нет, догадываться приходится по данным. А «orchid» не проверился вовсе. Вот цена цикла внутри одного теста."
+
+  - type: theory
+    keyPoint: kp-parametrize
+    title: { en: "parametrize: one data row — one test", ru: "parametrize: одна строка данных — один тест" }
+    body:
+      - en: "pytest has a better tool for data tables: the [[decorator]] `@pytest.mark.parametrize` above the test. Its first argument names the columns, the second is the list of rows."
+        ru: "Для таблиц данных в pytest есть инструмент получше — [[декоратор|decorator]] `@pytest.mark.parametrize` над тестом. Его первый аргумент называет колонки, второй — список строк."
+      - en: "pytest runs the function once per row and passes the row's values into the parameters with the same names. Each run is a **separate test** with its own result and its own id in the report: `test_orders_filter[Shipped-1]`."
+        ru: "pytest запускает функцию по разу на каждую строку и передаёт значения строки в параметры с теми же именами. Каждый запуск — **отдельный тест** со своим результатом и своим id в отчёте: `test_orders_filter[Shipped-1]`."
+      - en: "So one red row doesn't hide the others, and the id tells you which row it was. This is [[data-driven testing|data-driven-testing]], pytest-style."
+        ru: "Поэтому одна красная строка не прячет остальные, а id сразу говорит, какая это строка. Это [[тестирование на основе данных|data-driven-testing]] в стиле pytest."
+    code: |
+      @pytest.mark.parametrize("status, count", [
+          ("Shipped", 1),
+          ("Delivered", 3),
+          ("Cancelled", 1),
+      ])
+      def test_orders_filter(page: Page, status, count):
+          page.goto("/orders")
+          page.get_by_label("Status").select_option(status)
+          expect(page.get_by_test_id("order-row")).to_have_count(count)
+
+      # report: test_orders_filter[Shipped-1] PASSED
+      #         test_orders_filter[Delivered-3] PASSED
+      #         test_orders_filter[Cancelled-1] PASSED
+    mentor:
+      en: "Read the decorator first: it's the data table. Count the rows — that's how many tests you'll see — and check each row against the app. Then read the function once: it runs for every row, so one hard-coded value there breaks all of them."
+      ru: "Сначала читай декоратор: это таблица данных. Посчитай строки — столько тестов и будет — и сверь каждую с приложением. Потом один раз прочитай функцию: она выполняется для каждой строки, поэтому одно жёстко прописанное значение в ней ломает их все."
+
+  - type: example
+    keyPoint: kp-parametrize
+    title: { en: "A data-driven login test", ru: "Тест логина на наборе данных" }
+    intro:
+      en: "Petal's login test for three users, rewritten with parametrize. One function — three tests in the report."
+      ru: "Тест логина от Petal для трёх пользователей, переписанный через parametrize. Одна функция — три теста в отчёте."
+    code: |
+      import pytest
+      from playwright.sync_api import Page, expect
+
+
+      @pytest.mark.parametrize("email, password, first_name", [
+          ("anna@bloomly.app", "bloom123", "Anna"),
+          ("tom@bloomly.app", "tulips42", "Tom"),
+          ("maya@bloomly.app", "qa-rocks", "Maya"),
+      ])
+      def test_user_can_log_in(page: Page, email, password, first_name):
+          page.goto("/login")
+          page.get_by_label("Email").fill(email)
+          page.get_by_label("Password").fill(password)
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("heading", level=1)).to_have_text(f"Welcome back, {first_name}!")
+    notes:
+      - lines: 1
+        text:
+          en: "The decorator comes from pytest, so the file imports it."
+          ru: "Декоратор берётся из pytest, поэтому файл его импортирует."
+      - lines: 5
+        text:
+          en: "The decorator. `\"email, password, first_name\"` names the three columns of the table."
+          ru: "Декоратор. `\"email, password, first_name\"` называет три колонки таблицы."
+      - lines: [6, 7, 8]
+        text:
+          en: "The test data table: 3 rows → 3 tests. Each row sits in round brackets, values in the same order as the column names."
+          ru: "Таблица тестовых данных: 3 строки → 3 теста. Каждая строка — в круглых скобках, значения в том же порядке, что и названия колонок."
+      - lines: 10
+        text:
+          en: "The test asks for the columns by name, and pytest fills them from the current row. In the report: `test_user_can_log_in[anna@bloomly.app-bloom123-Anna]` and two more."
+          ru: "Тест просит колонки по имени, и pytest подставляет их из текущей строки. В отчёте: `test_user_can_log_in[anna@bloomly.app-bloom123-Anna]` и ещё два."
+      - lines: [12, 13]
+        text:
+          en: "The values of the current row — no hard-coded email or password."
+          ru: "Значения текущей строки — никаких жёстко прописанных email и пароля."
+      - lines: 15
+        text:
+          en: "The expected result is built from the same row with an f-string, so it changes with the data."
+          ru: "Ожидаемый результат собирается из той же строки через f-строку — он меняется вместе с данными."
+    runnable: true
 
   - type: task
     task:
       id: c3-l4-t4
       kind: review
-      keyPoint: kp-array
+      keyPoint: kp-dict
       prompt:
         en: "Review Petal's data-driven login test. One data row is wrong, and one check only works for one row."
         ru: "Сделай ревью теста логина на наборе данных от Petal. Одна строка данных неверная, а одна проверка работает только для одной строки."
@@ -275,273 +316,320 @@ steps:
           - { action: "Log in with the user's email and password", data: "each user from the table" }
           - { action: "Look at the account heading", expected: "\"Welcome back, <first name>!\"" }
       code: |
-        import { test, expect } from '@playwright/test';
+        import pytest
+        from playwright.sync_api import Page, expect
 
-        const users = [
-          { email: 'anna@bloomly.app', password: 'bloom123', name: 'Anna' },
-          { email: 'tom@bloomly.app', password: 'bloom123', name: 'Tom' },
-        ];
+        USERS = [
+            {"email": "anna@bloomly.app", "password": "bloom123", "name": "Anna"},
+            {"email": "tom@bloomly.app", "password": "bloom123", "name": "Tom"},
+        ]
 
-        for (const user of users) {
-          test(`${user.name} can log in`, async ({ page }) => {
-            await page.goto('/login');
-            await page.getByLabel('Email').fill(user.email);
-            await page.getByLabel('Password').fill(user.password);
-            await page.getByRole('button', { name: 'Log in' }).click();
-            await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!');
-          });
-        }
+
+        @pytest.mark.parametrize("user", USERS, ids=["anna", "tom"])
+        def test_user_can_log_in(page: Page, user):
+            page.goto("/login")
+            page.get_by_label("Email").fill(user["email"])
+            page.get_by_label("Password").fill(user["password"])
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Anna!")
       issues:
-        - line: 5
+        - line: 6
           type: wrong-data
           note:
-            en: "Tom's password is 'tulips42'. 'bloom123' is Anna's — copy-pasted from the row above."
-            ru: "Пароль Тома — 'tulips42'. 'bloom123' — пароль Анны, скопирован из строки выше."
-        - line: 14
+            en: "Tom's password is \"tulips42\". \"bloom123\" is Anna's — copy-pasted from the row above."
+            ru: "Пароль Тома — \"tulips42\". \"bloom123\" — пароль Анны, скопирован из строки выше."
+        - line: 16
           type: wrong-assertion
           note:
-            en: "The expected text is hard-coded for Anna. It must come from the row: `` `Welcome back, ${user.name}!` ``."
-            ru: "Ожидаемый текст жёстко прописан для Анны. Он должен браться из строки: `` `Welcome back, ${user.name}!` ``."
-      types: [wrong-data, wrong-assertion, missing-await, fragile-locator, hard-wait]
+            en: "The expected text is hard-coded for Anna. It must come from the row: `f\"Welcome back, {user['name']}!\"`."
+            ru: "Ожидаемый текст жёстко прописан для Анны. Он должен браться из строки: `f\"Welcome back, {user['name']}!\"`."
+      types: [wrong-data, wrong-assertion, not-called, fragile-locator, hard-wait]
       hints:
-        - { en: "Compare each row with the test case table.", ru: "Сравни каждую строку с таблицей тест-кейса." }
-        - { en: "Inside the loop: does every line use `user.…` where the data should change?", ru: "Внутри цикла: каждая ли строка использует `user.…` там, где данные должны меняться?" }
-        - { en: "Line 5: Tom's password. Line 14: whose name is in the expected text?", ru: "Строка 5: пароль Тома. Строка 14: чьё имя в ожидаемом тексте?" }
+        - { en: "Compare each dict with the test case table.", ru: "Сравни каждый словарь с таблицей тест-кейса." }
+        - { en: "In the function: does every line use `user[\"…\"]` where the data should change?", ru: "В функции: каждая ли строка использует `user[\"…\"]` там, где данные должны меняться?" }
+        - { en: "Line 6: Tom's password. Line 16: whose name is in the expected text?", ru: "Строка 6: пароль Тома. Строка 16: чьё имя в ожидаемом тексте?" }
       praise:
-        en: "Both found. A loop multiplies mistakes — and your review just stopped two of them."
-        ru: "Обе найдены. Цикл размножает ошибки — а твоё ревью только что остановило две."
+        en: "Both found. Your review just stopped two bugs before they reached the nightly run."
+        ru: "Обе найдены. Твоё ревью только что остановило две ошибки до ночного прогона."
       explain:
-        en: "Two classic loop bugs: a copy-pasted data row, and a value inside the loop that should come from the row but is hard-coded. Tom's test would fail at login and, even with the right password, at the heading."
-        ru: "Две классические ошибки цикла: строка данных, скопированная из соседней, и значение внутри цикла, которое должно браться из строки, но прописано жёстко. Тест Тома упал бы на логине, а с верным паролем — на заголовке."
+        en: "Two classic data-table bugs: a row copy-pasted from its neighbour, and a value that should come from the row but is hard-coded. `test_user_can_log_in[tom]` would fail at login — and even with the right password, at the heading. Notice the `ids`: thanks to them the report says `[tom]`, not `[user1]`."
+        ru: "Две классические ошибки таблицы данных: строка, скопированная из соседней, и значение, которое должно браться из строки, но прописано жёстко. `test_user_can_log_in[tom]` упал бы на логине, а с верным паролем — на заголовке. Обрати внимание на `ids`: благодаря им в отчёте написано `[tom]`, а не `[user1]`."
 
   - type: task
     task:
       id: c3-l4-t5
       kind: fill
-      keyPoint: kp-loop
+      keyPoint: kp-parametrize
       prompt:
-        en: "Complete the loop so that it creates one checkout test per city."
-        ru: "Допиши цикл, чтобы он создавал по одному тесту оформления заказа на каждый город."
+        en: "Complete the test so that pytest creates one checkout test per city."
+        ru: "Допиши тест, чтобы pytest создал по одному тесту оформления заказа на каждый город."
       context:
         en: "The cart already has one Rose Bouquet, so the checkout page is available."
         ru: "В корзине уже лежит один Rose Bouquet, поэтому страница оформления заказа доступна."
       app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
       code: |
-        import { test, expect } from '@playwright/test';
+        import pytest
+        from playwright.sync_api import Page, expect
 
-        const cities = ['Lisbon', 'Berlin', 'Warsaw'];
 
-        ___ (const city ___ cities) {
-          test(`checkout delivers to ${city}`, async ({ page }) => {
-            await page.goto('/checkout');
-            await page.getByLabel('City').selectOption(city);
-            await expect(page.getByLabel('City')).toHaveValue(city);
-          });
-        }
+        @pytest.mark.___("city", ["Lisbon", "Berlin", "Warsaw"])
+        def test_checkout_delivers_to_city(page: Page, ___):
+            page.goto("/checkout")
+            page.get_by_label("City").select_option(city)
+            expect(page.get_by_label("City")).to_have_value(city)
       blanks:
-        - { answers: [for], options: [for, test, if] }
-        - { answers: [of], options: [of, in, from] }
+        - { answers: [parametrize], options: [parametrize, skip, fixture] }
+        - { answers: [city], options: [city, cities, Lisbon] }
       checks: { expect: pass, minTests: 3 }
       hints:
-        - { en: "The pattern is `for (const item of list) {`.", ru: "Шаблон: `for (const item of list) {`." }
-        - { en: "`in` exists too, but it gives positions (0, 1, 2), not the city names.", ru: "`in` тоже существует, но даёт позиции (0, 1, 2), а не названия городов." }
+        - { en: "Which mark turns a list of values into separate tests?", ru: "Какая метка превращает список значений в отдельные тесты?" }
+        - { en: "In the function's brackets, ask for the column by the exact name from the decorator.", ru: "В скобках функции попроси колонку по точному имени из декоратора." }
       praise:
-        en: "Three green tests from one block. Data-driven testing, read and verified."
-        ru: "Три зелёных теста из одного блока. Тестирование на наборах данных — прочитано и проверено."
+        en: "Three green tests from one function. Data-driven testing, read and verified."
+        ru: "Три зелёных теста из одной функции. Тестирование на основе данных — прочитано и проверено."
       explain:
-        en: "`for (const city of cities)` — for each city of the list. With `in`, `city` would be '0', '1', '2', and `selectOption` would fail."
-        ru: "`for (const city of cities)` — для каждого города из списка. С `in` в `city` попали бы '0', '1', '2', и `selectOption` бы упал."
-
-  - type: theory
-    keyPoint: kp-read-strategy
-    title: { en: "How to read code you didn't write", ru: "Как читать код, который писал{а|} не ты" }
-    body:
-      - en: "Petal's PR has 300 lines. Don't read it top to bottom like a novel. Read it like a test case from a colleague, in four passes:"
-        ru: "В PR от Petal 300 строк. Не читай его сверху вниз, как роман. Читай как тест-кейс коллеги — в четыре прохода:"
-      - en: "1) **Titles** — what does each test claim to check? 2) **Steps** — do the actions match the scenario? 3) **Assertions** — is every expected result really checked, with the right text? 4) **Data** — constants, arrays, arguments: is every value correct?"
-        ru: "1) **Названия** — что каждый тест обещает проверить? 2) **Шаги** — совпадают ли действия со сценарием? 3) **Проверки** — каждый ли ожидаемый результат действительно проверяется, и с верным текстом? 4) **Данные** — константы, массивы, аргументы: каждое ли значение верное?"
-      - en: "Stuck on a line? Ask the [[agent|ai-agent]]: \"Explain this test line by line.\" Then verify the explanation against the code and the app — an agent can explain its own bug with total confidence."
-        ru: "Застрял{а|} на строке? Спроси [[агента|ai-agent]]: «Explain this test line by line». А потом сверь объяснение с кодом и приложением — агент может с полной уверенностью объяснить собственный баг."
-    figure: review-checklist
-    mentor:
-      en: "You already do this with other people's test cases: title, steps, expected result, data. Same eyes, new format."
-      ru: "Ты уже делаешь это с чужими тест-кейсами: название, шаги, ожидаемый результат, данные. Те же глаза, новый формат."
+        en: "`@pytest.mark.parametrize(\"city\", [...])` plus a parameter named `city`: pytest runs the test three times — `test_checkout_delivers_to_city[Lisbon]`, `[Berlin]` and `[Warsaw]`. The name in quotes and the parameter name must match exactly, otherwise pytest refuses to run the test."
+        ru: "`@pytest.mark.parametrize(\"city\", [...])` плюс параметр с именем `city`: pytest запускает тест три раза — `test_checkout_delivers_to_city[Lisbon]`, `[Berlin]` и `[Warsaw]`. Имя в кавычках и имя параметра должны совпадать в точности, иначе pytest откажется запускать тест."
 
   - type: task
     task:
       id: c3-l4-t6
-      kind: choice
-      keyPoint: kp-read-strategy
+      kind: input
+      keyPoint: kp-parametrize
       prompt:
-        en: "You open a 120-line test file the agent generated overnight. What do you read first?"
-        ru: "Ты открываешь файл на 120 строк, который агент сгенерировал за ночь. Что читаешь первым?"
-      options:
-        - text: { en: "The test titles — to know what each test claims to check", ru: "Названия тестов — чтобы понять, что каждый обещает проверить" }
-          correct: true
-          why: { en: "Titles are the map. Then you check whether steps and assertions keep the promise.", ru: "Названия — это карта. Потом проверяешь, выполняют ли шаги и проверки это обещание." }
-        - text: { en: "Every line from top to bottom, very carefully", ru: "Каждую строку сверху вниз, очень внимательно" }
-          why: { en: "You'll get lost in details before you know what matters. Passes first, details later.", ru: "Утонешь в деталях раньше, чем поймёшь, что важно. Сначала проходы, детали потом." }
-        - text: { en: "Nothing — just run it. If it's green, it's fine", ru: "Ничего — просто запустить. Зелёный — значит, всё хорошо" }
-          why: { en: "Green tests can check nothing, or the wrong thing. You've seen both this week.", ru: "Зелёные тесты могут не проверять ничего — или проверять не то. На этой неделе ты видел{а|} и то, и другое." }
-        - text: { en: "The import line, to see which libraries are used", ru: "Строку import — посмотреть, какие библиотеки используются" }
-          why: { en: "It's almost always the same line. It tells you nothing about the tests.", ru: "Это почти всегда одна и та же строка. О тестах она ничего не говорит." }
+        en: "How many tests will this file show in the report?"
+        ru: "Сколько тестов этот файл покажет в отчёте?"
+      code: |
+        @pytest.mark.parametrize("q", ["rose", "tulips", "lavender", "peony"])
+        def test_search_finds_one_product(page: Page, q):
+            page.goto("/shop")
+            page.get_by_label("Search").fill(q)
+            expect(page.get_by_test_id("results-count")).to_have_text("1 product")
+
+
+        def test_search_with_no_match_shows_0_products(page: Page):
+            page.goto("/shop")
+            for q in ["cactus", "daisy", "fern"]:
+                page.get_by_label("Search").fill(q)
+                expect(page.get_by_test_id("results-count")).to_have_text("0 products")
+      answers: ["5", "five"]
+      placeholder: "Number of tests"
       hints:
-        - { en: "Think of how you review a colleague's test cases.", ru: "Вспомни, как ты ревьюишь тест-кейсы коллеги." }
-        - { en: "Pass 1 of the four passes.", ru: "Проход 1 из четырёх." }
+        - { en: "Count the tests parametrize creates, then look at the second function.", ru: "Посчитай тесты, которые создаёт parametrize, а потом посмотри на вторую функцию." }
+        - { en: "The loop in the second function runs inside one test — it doesn't add tests.", ru: "Цикл во второй функции работает внутри одного теста — тестов он не добавляет." }
+        - { en: "4 + 1", ru: "4 + 1" }
       praise:
-        en: "Yes — start with the map, then walk the streets."
-        ru: "Да — сначала карта, потом улицы."
+        en: "Exactly — the loop in the second test didn't fool you."
+        ru: "Именно — цикл во втором тесте тебя не обманул."
       explain:
-        en: "Titles first, then steps, assertions, data. The titles also become your checklist: every title is a promise the assertions must keep."
-        ru: "Сначала названия, потом шаги, проверки, данные. Названия заодно становятся чек-листом: каждое — обещание, которое должны выполнить проверки."
+        en: "4 rows in the decorator → 4 tests, plus 1 test with a loop inside = 5. The loop checks three words, but the report shows it as one line. When you review a PR, this count tells you how much the report will really show."
+        ru: "4 строки в декораторе → 4 теста, плюс 1 тест с циклом внутри = 5. Цикл проверяет три слова, но в отчёте это одна строка. На ревью PR это число говорит, сколько на самом деле покажет отчёт."
 
   - type: task
     task:
       id: c3-l4-t7
       kind: agent
-      keyPoint: kp-read-strategy
+      keyPoint: kp-parametrize
       prompt:
-        en: "Petal's test uses two things you haven't seen yet: `selectOption` and `toHaveCount`. Ask Petal to explain the test — without letting it change the code. Then run what you get back."
-        ru: "В тесте Petal есть две незнакомые вещи: `selectOption` и `toHaveCount`. Попроси Petal объяснить тест — и не дай ему поменять код. Потом запусти то, что получишь."
+        en: "If Petal's loop test fails, the report won't say which promo code broke. Ask Petal to turn it into one test per code — without changing what is checked. Then run what you get back."
+        ru: "Если тест Petal с циклом упадёт, по отчёту не понять, какой промокод сломался. Попроси Petal сделать по тесту на каждый код — не меняя того, что проверяется. Потом запусти то, что получишь."
       context:
         en: |
-          Petal's test `shop-sort.spec.js`:
-          ```js
-          import { test, expect } from '@playwright/test';
+          Petal's test `test_promo.py` (the cart already has one Rose Bouquet):
+          ```python
+          from playwright.sync_api import Page, expect
 
-          test('plants sorted by price start with the cheapest', async ({ page }) => {
-            await page.goto('/shop');
-            await page.getByLabel('Category').selectOption('plants');
-            await page.getByLabel('Sort by').selectOption('price-asc');
-            await expect(page.getByTestId('product-card')).toHaveCount(3);
-            await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
-          });
+          PROMOS = [
+              {"code": "BLOOM10", "message": "Promo code BLOOM10 applied: −10%."},
+              {"code": "SPRING20", "message": "This promo code has expired."},
+              {"code": "XYZ", "message": "This promo code is not valid."},
+          ]
+
+
+          def test_promo_codes(page: Page):
+              page.goto("/cart")
+              for promo in PROMOS:
+                  page.get_by_label("Promo code").fill(promo["code"])
+                  page.get_by_role("button", name="Apply").click()
+                  expect(page.get_by_test_id("promo-message")).to_have_text(promo["message"])
           ```
         ru: |
-          Тест Petal `shop-sort.spec.js`:
-          ```js
-          import { test, expect } from '@playwright/test';
+          Тест Petal `test_promo.py` (в корзине уже лежит один Rose Bouquet):
+          ```python
+          from playwright.sync_api import Page, expect
 
-          test('plants sorted by price start with the cheapest', async ({ page }) => {
-            await page.goto('/shop');
-            await page.getByLabel('Category').selectOption('plants');
-            await page.getByLabel('Sort by').selectOption('price-asc');
-            await expect(page.getByTestId('product-card')).toHaveCount(3);
-            await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
-          });
+          PROMOS = [
+              {"code": "BLOOM10", "message": "Promo code BLOOM10 applied: −10%."},
+              {"code": "SPRING20", "message": "This promo code has expired."},
+              {"code": "XYZ", "message": "This promo code is not valid."},
+          ]
+
+
+          def test_promo_codes(page: Page):
+              page.goto("/cart")
+              for promo in PROMOS:
+                  page.get_by_label("Promo code").fill(promo["code"])
+                  page.get_by_role("button", name="Apply").click()
+                  expect(page.get_by_test_id("promo-message")).to_have_text(promo["message"])
           ```
+      app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
       blocks:
         - id: task
           locked: true
-          text: "Here is the test shop-sort.spec.js from your PR."
-          ru: "Вот тест shop-sort.spec.js из твоего PR."
-        - id: explain
-          text: "Explain this test line by line."
-          ru: "Объясни этот тест построчно."
-        - id: asserts
-          text: "List every assertion and what it checks."
-          ru: "Перечисли все проверки и что каждая проверяет."
+          text: "Here is test_promo.py: one test that checks three promo codes in a loop."
+          ru: "Вот test_promo.py: один тест, который в цикле проверяет три промокода."
+        - id: split
+          text: "Rewrite it with @pytest.mark.parametrize: one test per promo code."
+          ru: "Перепиши его через @pytest.mark.parametrize: по тесту на каждый промокод."
+        - id: ids
+          text: "Give each test a readable id: the promo code itself."
+          ru: "Дай каждому тесту понятный id: сам промокод."
         - id: keep
-          text: "Put your explanation in comments. Don't change the code itself."
-          ru: "Запиши объяснение в комментариях. Сам код не меняй."
+          text: "Keep the same codes, the same expected messages and the same steps."
+          ru: "Оставь те же коды, те же ожидаемые сообщения и те же шаги."
         - id: noise
-          text: "Rewrite everything to make it better."
-          ru: "Перепиши всё, чтобы стало лучше."
+          text: "Make it shorter."
+          ru: "Сделай покороче."
       responses:
-        - when: [explain, asserts, keep]
+        - when: [split, ids, keep]
           unless: [noise]
           best: true
           message:
-            en: "Here's the same test with my explanation as comments — I didn't change any code. There are 2 assertions: 1) `toHaveCount(3)` — exactly 3 product cards are shown (the 3 plants); 2) the first card contains \"Mint Succulent\" — the cheapest plant (€12.00) comes first. Please double-check the prices against the shop."
-            ru: "Вот тот же тест с моими объяснениями в комментариях — код я не менял. Проверок две: 1) `toHaveCount(3)` — на странице ровно 3 карточки товаров (3 растения); 2) первая карточка содержит «Mint Succulent» — самое дешёвое растение (€12.00) идёт первым. Сверь, пожалуйста, цены с магазином."
+            en: "Done: the same three codes and messages, now one test each. The ids are the codes, so the report shows `[BLOOM10]`, `[SPRING20]` and `[XYZ]`."
+            ru: "Готово: те же три кода и сообщения, теперь по тесту на каждый. id — это сами коды, так что в отчёте будут `[BLOOM10]`, `[SPRING20]` и `[XYZ]`."
           code: |
-            import { test, expect } from '@playwright/test';
+            import pytest
+            from playwright.sync_api import Page, expect
 
-            test('plants sorted by price start with the cheapest', async ({ page }) => {
-              // Step 1: open the Shop page
-              await page.goto('/shop');
-              // Step 2: choose "Plants" in the Category dropdown (selectOption = pick an option)
-              await page.getByLabel('Category').selectOption('plants');
-              // Step 3: choose "Price: low to high" in the Sort by dropdown
-              await page.getByLabel('Sort by').selectOption('price-asc');
-              // Assertion 1: exactly 3 product cards (Lavender Pot, Mint Succulent, White Orchid)
-              await expect(page.getByTestId('product-card')).toHaveCount(3);
-              // Assertion 2: the first card is the cheapest plant, Mint Succulent (€12.00)
-              await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
-            });
+            PROMOS = [
+                {"code": "BLOOM10", "message": "Promo code BLOOM10 applied: −10%."},
+                {"code": "SPRING20", "message": "This promo code has expired."},
+                {"code": "XYZ", "message": "This promo code is not valid."},
+            ]
+
+
+            @pytest.mark.parametrize("promo", PROMOS, ids=["BLOOM10", "SPRING20", "XYZ"])
+            def test_promo_code_shows_its_message(page: Page, promo):
+                page.goto("/cart")
+                page.get_by_label("Promo code").fill(promo["code"])
+                page.get_by_role("button", name="Apply").click()
+                expect(page.get_by_test_id("promo-message")).to_have_text(promo["message"])
         - when: [noise]
           message:
-            en: "I rewrote the test to make it shorter and more robust! It now opens the shop with URL filters and checks the first price. Much better."
-            ru: "Я переписал тест, чтобы он стал короче и надёжнее! Теперь он открывает магазин с фильтрами в адресе и проверяет первую цену. Гораздо лучше."
+            en: "I made it shorter: one code is enough to show that promo codes work!"
+            ru: "Я сделал короче: одного кода достаточно, чтобы показать, что промокоды работают!"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('shop sorting works', async ({ page }) => {
-              await page.goto('/shop?category=plants&sort=price-asc');
-              await expect(page.getByTestId('product-price').first()).toHaveText('€12.00');
-            });
-        - when: [explain, asserts]
+
+            def test_promo_code(page: Page):
+                page.goto("/cart")
+                page.get_by_label("Promo code").fill("BLOOM10")
+                page.get_by_role("button", name="Apply").click()
+                expect(page.get_by_test_id("promo-message")).to_be_visible()
+        - when: [split, ids]
           message:
-            en: "Line 4 opens the shop. Lines 5–6 pick the Plants category and sort by price, low to high. Assertions: line 7 checks there are exactly 3 cards, line 8 checks the first card is Mint Succulent. (The code is unchanged.)"
-            ru: "Строка 4 открывает магазин. Строки 5–6 выбирают категорию Plants и сортировку по цене по возрастанию. Проверки: строка 7 — ровно 3 карточки, строка 8 — первая карточка Mint Succulent. (Код не изменён.)"
+            en: "Done: one test per code, with the codes as ids. I also replaced the expired code SPRING20 with FLASH50 — testing a code that doesn't work seemed pointless."
+            ru: "Готово: по тесту на код, коды — в id. Ещё я заменил просроченный SPRING20 на FLASH50: проверять код, который не работает, показалось бессмысленным."
           code: |
-            import { test, expect } from '@playwright/test';
+            import pytest
+            from playwright.sync_api import Page, expect
 
-            test('plants sorted by price start with the cheapest', async ({ page }) => {
-              await page.goto('/shop');
-              await page.getByLabel('Category').selectOption('plants');
-              await page.getByLabel('Sort by').selectOption('price-asc');
-              await expect(page.getByTestId('product-card')).toHaveCount(3);
-              await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
-            });
-        - when: [explain]
+            PROMOS = [
+                {"code": "BLOOM10", "message": "Promo code BLOOM10 applied: −10%."},
+                {"code": "FLASH50", "message": "Promo code FLASH50 applied: −50%."},
+                {"code": "XYZ", "message": "This promo code is not valid."},
+            ]
+
+
+            @pytest.mark.parametrize("promo", PROMOS, ids=["BLOOM10", "FLASH50", "XYZ"])
+            def test_promo_code_shows_its_message(page: Page, promo):
+                page.goto("/cart")
+                page.get_by_label("Promo code").fill(promo["code"])
+                page.get_by_role("button", name="Apply").click()
+                expect(page.get_by_test_id("promo-message")).to_have_text(promo["message"])
+        - when: [split, keep]
           message:
-            en: "The test opens the shop, selects some options and checks the products. selectOption chooses a value in a dropdown. It all looks correct to me!"
-            ru: "Тест открывает магазин, выбирает какие-то опции и проверяет товары. selectOption выбирает значение в выпадающем списке. По-моему, всё правильно!"
+            en: "Done: the same three codes and messages, now one test each."
+            ru: "Готово: те же три кода и сообщения, теперь по тесту на каждый."
           code: |
-            import { test, expect } from '@playwright/test';
+            import pytest
+            from playwright.sync_api import Page, expect
 
-            test('plants sorted by price start with the cheapest', async ({ page }) => {
-              await page.goto('/shop');
-              await page.getByLabel('Category').selectOption('plants');
-              await page.getByLabel('Sort by').selectOption('price-asc');
-              await expect(page.getByTestId('product-card')).toHaveCount(3);
-              await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
-            });
+            PROMOS = [
+                {"code": "BLOOM10", "message": "Promo code BLOOM10 applied: −10%."},
+                {"code": "SPRING20", "message": "This promo code has expired."},
+                {"code": "XYZ", "message": "This promo code is not valid."},
+            ]
+
+
+            @pytest.mark.parametrize("promo", PROMOS)
+            def test_promo_code_shows_its_message(page: Page, promo):
+                page.goto("/cart")
+                page.get_by_label("Promo code").fill(promo["code"])
+                page.get_by_role("button", name="Apply").click()
+                expect(page.get_by_test_id("promo-message")).to_have_text(promo["message"])
+        - when: [split]
+          message:
+            en: "Done: one test per code. I also replaced the expired code SPRING20 with FLASH50 — testing a code that doesn't work seemed pointless."
+            ru: "Готово: по тесту на код. Ещё я заменил просроченный SPRING20 на FLASH50: проверять код, который не работает, показалось бессмысленным."
+          code: |
+            import pytest
+            from playwright.sync_api import Page, expect
+
+            PROMOS = [
+                {"code": "BLOOM10", "message": "Promo code BLOOM10 applied: −10%."},
+                {"code": "FLASH50", "message": "Promo code FLASH50 applied: −50%."},
+                {"code": "XYZ", "message": "This promo code is not valid."},
+            ]
+
+
+            @pytest.mark.parametrize("promo", PROMOS)
+            def test_promo_code_shows_its_message(page: Page, promo):
+                page.goto("/cart")
+                page.get_by_label("Promo code").fill(promo["code"])
+                page.get_by_role("button", name="Apply").click()
+                expect(page.get_by_test_id("promo-message")).to_have_text(promo["message"])
         - when: []
           message:
-            en: "This test checks that the shop works. Looks good to me — ready to merge!"
-            ru: "Этот тест проверяет, что магазин работает. По-моему, всё отлично — можно мёржить!"
+            en: "The loop already checks all three codes in one place. I'd keep it as it is — it's elegant!"
+            ru: "Цикл и так проверяет все три кода в одном месте. Я бы оставил как есть — это элегантно!"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('plants sorted by price start with the cheapest', async ({ page }) => {
-              await page.goto('/shop');
-              await page.getByLabel('Category').selectOption('plants');
-              await page.getByLabel('Sort by').selectOption('price-asc');
-              await expect(page.getByTestId('product-card')).toHaveCount(3);
-              await expect(page.getByTestId('product-card').first()).toContainText('Mint Succulent');
-            });
+            PROMOS = [
+                {"code": "BLOOM10", "message": "Promo code BLOOM10 applied: −10%."},
+                {"code": "SPRING20", "message": "This promo code has expired."},
+                {"code": "XYZ", "message": "This promo code is not valid."},
+            ]
+
+
+            def test_promo_codes(page: Page):
+                page.goto("/cart")
+                for promo in PROMOS:
+                    page.get_by_label("Promo code").fill(promo["code"])
+                    page.get_by_role("button", name="Apply").click()
+                    expect(page.get_by_test_id("promo-message")).to_have_text(promo["message"])
       missing:
-        explain:
-          en: "Without \"line by line\", the agent gives a one-sentence summary — the parts you didn't understand stay unexplained."
-          ru: "Без «построчно» агент выдаёт резюме в одно предложение — непонятные места так и остаются непонятными."
-        asserts:
-          en: "Without asking for assertions, steps and checks get mixed together — and the checks are what you approve."
-          ru: "Если не спросить про проверки, шаги и проверки смешиваются — а одобряешь ты именно проверки."
+        split:
+          en: "Without asking for parametrize, Petal kept the loop: still one test, and one red line for three codes."
+          ru: "Без просьбы о parametrize Petal оставил цикл: это всё ещё один тест и одна красная строка на три кода."
+        ids:
+          en: "Without ids, pytest names tests with dict rows by position: `[promo0]`, `[promo1]`, `[promo2]`. Which one is the expired code? You'd have to count."
+          ru: "Без ids pytest называет тесты со строками-словарями по номеру: `[promo0]`, `[promo1]`, `[promo2]`. Какой из них просроченный код? Придётся считать."
         keep:
-          en: "Without \"don't change the code\", you risk getting a different test back. Comments keep the explanation next to the lines it explains."
-          ru: "Без «не меняй код» рискуешь получить обратно другой тест. Комментарии держат объяснение рядом со строками, к которым оно относится."
-      checks: { expect: pass }
+          en: "Without \"keep the same codes and messages\", Petal \"improved\" the data: the expired code SPRING20 is gone — and with it your negative case."
+          ru: "Без «оставь те же коды и сообщения» Petal «улучшил» данные: просроченный SPRING20 пропал — а вместе с ним и твой негативный кейс."
+      checks: { expect: pass, minTests: 3 }
       hints:
-        - { en: "You want understanding, not a new test. Which block would make Petal change the code?", ru: "Тебе нужно понимание, а не новый тест. Какой блок заставит Petal поменять код?" }
-        - { en: "Ask for three things: line by line, the list of assertions, and comments without code changes.", ru: "Попроси три вещи: построчно, список проверок и комментарии без изменения кода." }
+        - { en: "You need three things: parametrize, readable ids and no changes to the data.", ru: "Нужны три вещи: parametrize, понятные id и никаких изменений в данных." }
+        - { en: "Which block invites Petal to cut corners?", ru: "Какой блок провоцирует Petal срезать углы?" }
       praise:
-        en: "That's how to use an agent as a tutor: precise questions, no permission to rewrite, and you still verify the answer."
-        ru: "Вот так агент становится репетитором: точные вопросы, никаких разрешений переписывать — и ответ ты всё равно проверяешь."
+        en: "That's how you direct an agent: name the tool, describe the report you want, and set the limits."
+        ru: "Вот так и ставят задачу агенту: назвать инструмент, описать, какой нужен отчёт, и задать границы."
       explain:
-        en: "Now verify Petal's explanation against the app: plants are Lavender Pot €18.00, Mint Succulent €12.00, White Orchid €29.00 — so 3 cards, cheapest first = Mint Succulent. The explanation holds. (A real agent's wording will differ every time — the way you ask and verify stays the same.)"
-        ru: "Теперь сверь объяснение Petal с приложением: растения — Lavender Pot €18.00, Mint Succulent €12.00, White Orchid €29.00. Значит, 3 карточки, самое дешёвое первым — Mint Succulent. Объяснение верное. (Настоящий агент каждый раз ответит другими словами — но способ спрашивать и проверять остаётся тем же.)"
+        en: "The best prompt names the tool (parametrize), the report you want (readable ids) and the limits (same data, same steps). Now the run shows three lines — `[BLOOM10]`, `[SPRING20]`, `[XYZ]` — and if the expired-code message breaks, you'll see it at a glance. (A real agent's wording and code will differ every time — what you ask for and what you verify stay the same.)"
+        ru: "Лучший промпт называет инструмент (parametrize), нужный отчёт (понятные id) и границы (те же данные, те же шаги). Теперь в прогоне три строки — `[BLOOM10]`, `[SPRING20]`, `[XYZ]`, — и если сломается сообщение для просроченного кода, это будет видно сразу. (Настоящий агент каждый раз ответит другими словами и другим кодом — но то, что ты просишь и проверяешь, остаётся тем же.)"
 
   - type: task
     task:
@@ -549,124 +637,127 @@ steps:
       kind: vocab
       mode: cloze
       sentence:
-        en: "Petal put the test data into an ___ and used a loop to create one test per row."
-        ru: "Petal сложил тестовые данные в массив и с помощью цикла создал по тесту на каждую строку."
-      answer: array
-      options: [array, object, string]
+        en: "Petal put the test data into a ___ and used parametrize to create one test per item."
+        ru: "Petal сложил тестовые данные в список и с помощью parametrize создал по тесту на каждый элемент."
+      answer: list
+      options: [list, dictionary, loop]
 
   - type: mistakes
-    title: { en: "Typical loop and data mistakes", ru: "Типичные ошибки с циклами и данными" }
+    title: { en: "Typical list, dict and loop mistakes", ru: "Типичные ошибки со списками, словарями и циклами" }
     items:
-      - wrong: "for (const user in users) {"
-        right: "for (const user of users) {"
-        why:
-          en: "`in` gives positions (0, 1, 2), not the rows. Agents mix them up; one letter changes everything."
-          ru: "`in` даёт позиции (0, 1, 2), а не строки. Агенты их путают; одна буква меняет всё."
-      - wrong: "test('user can log in', async ({ page }) => {"
-        right: "test(`${user.name} can log in`, async ({ page }) => {"
-        why:
-          en: "Inside a loop every test gets the same title: Playwright reports duplicate titles, and you can't tell which row failed."
-          ru: "Внутри цикла все тесты получат одно название: Playwright сообщит о дублях, и не поймёшь, какая строка упала."
-      - wrong: "await expect(heading).toHaveText('Welcome back, Anna!');"
-        right: "await expect(heading).toHaveText(`Welcome back, ${user.name}!`);"
-        why:
-          en: "A hard-coded expected value inside a loop fits only one row."
-          ru: "Жёстко прописанное ожидаемое значение внутри цикла подходит только одной строке."
-      - wrong: "const firstUser = users[1];"
-        right: "const firstUser = users[0];"
+      - wrong: "first_user = users[1]"
+        right: "first_user = users[0]"
         why:
           en: "Indexes start at 0. `users[1]` is the second user."
           ru: "Индексы начинаются с 0. `users[1]` — второй пользователь."
+      - wrong: 'page.get_by_label("Email").fill(user.email)'
+        right: 'page.get_by_label("Email").fill(user["email"])'
+        why:
+          en: "`user.email` is a JavaScript habit that agents bring along. In Python a dict is read by key in square brackets; the dot stops the test with `AttributeError: 'dict' object has no attribute 'email'`."
+          ru: "`user.email` — привычка из JavaScript, которую приносят агенты. В Python словарь читают по ключу в квадратных скобках, а точка останавливает тест с ошибкой `AttributeError: 'dict' object has no attribute 'email'`."
+      - wrong: |
+          def test_orders_filter(page: Page):
+              for status in STATUSES:
+                  ...
+        right: |
+          @pytest.mark.parametrize("status", STATUSES)
+          def test_orders_filter(page: Page, status):
+              ...
+        why:
+          en: "A loop inside a test is one test: the first failing status stops it, and the report doesn't say which. parametrize gives every status its own test and id: `test_orders_filter[Shipped]`."
+          ru: "Цикл внутри теста — это один тест: первый упавший статус его останавливает, и по отчёту не понять какой. parametrize даёт каждому статусу свой тест и id: `test_orders_filter[Shipped]`."
+      - wrong: 'expect(heading).to_have_text("Welcome back, Anna!")'
+        right: 'expect(heading).to_have_text(f"Welcome back, {first_name}!")'
+        why:
+          en: "A hard-coded expected value in a parametrized test fits only one row."
+          ru: "Жёстко прописанное ожидаемое значение в параметризованном тесте подходит только одной строке."
 
   - type: explain
-    keyPoint: kp-read-strategy
+    keyPoint: kp-parametrize
     prompt:
-      en: "In your own words: how do you read a test file you've never seen, generated by an agent?"
-      ru: "Своими словами: как ты читаешь незнакомый тестовый файл, сгенерированный агентом?"
+      en: "In your own words: what's the difference between a loop inside a test and @pytest.mark.parametrize — and why does it matter in review?"
+      ru: "Своими словами: чем цикл внутри теста отличается от @pytest.mark.parametrize — и почему это важно на ревью?"
     model:
-      en: "I read it in passes, like a test case. First the titles: what does each test promise? Then the steps: do they match the scenario? Then the assertions: is every expected result checked, with the exact text? Then the data: constants, arrays and arguments — is every value right, and does a loop create the number of tests I expect? If a line is unclear, I ask the agent to explain it line by line without changing the code, and I check its explanation against the code and the app."
-      ru: "Я читаю его проходами, как тест-кейс. Сначала названия: что обещает каждый тест? Потом шаги: совпадают ли они со сценарием? Потом проверки: каждый ли ожидаемый результат проверяется, и с точным текстом? Потом данные: константы, массивы и аргументы — каждое ли значение верное и создаёт ли цикл столько тестов, сколько я жду? Если строка непонятна, прошу агента объяснить построчно, не меняя код, и сверяю его объяснение с кодом и приложением."
+      en: "A loop repeats steps inside one test: if one item fails, the whole test is red, the items after it don't run, and the report doesn't say which item broke. parametrize turns every data row into its own test with its own result and an id like `test_orders_filter[Shipped-1]`, so I see exactly which row failed, and the other rows still run. When I review a data-driven test, I read the decorator first — the data table — count the rows, check every value against the app, and make sure the steps and the expected result use the row's values, not hard-coded ones."
+      ru: "Цикл повторяет шаги внутри одного теста: если падает один элемент, красный весь тест, следующие элементы не выполняются, а по отчёту не понять, какой сломался. parametrize превращает каждую строку данных в отдельный тест со своим результатом и id вроде `test_orders_filter[Shipped-1]`, поэтому я точно вижу, какая строка упала, а остальные строки всё равно выполняются. На ревью теста на наборе данных я сначала читаю декоратор — таблицу данных, — считаю строки, сверяю каждое значение с приложением и проверяю, что шаги и ожидаемый результат берут значения из строки, а не прописаны жёстко."
 
   - type: phrases
     items:
       - context: code-review
-        en: "The data row for Tom has the wrong password; the rest of the loop looks good."
-        ru: "В строке данных Тома неверный пароль; остальной цикл выглядит хорошо."
+        en: "Tom's data row has the wrong password; the rest of the table looks good."
+        ru: "В строке данных Тома неверный пароль; остальная таблица в порядке."
       - context: code-review
-        en: "Could you make the test title unique per row, e.g. include the user's name?"
-        ru: "Можешь сделать название теста уникальным для каждой строки, например добавить имя пользователя?"
+        en: "Could you use parametrize instead of the loop, so that every status shows up as its own test in the report?"
+        ru: "Можешь заменить цикл на parametrize, чтобы каждый статус был в отчёте отдельным тестом?"
       - context: prompt
-        en: "Explain this test line by line. Don't change the code."
-        ru: "Объясни этот тест построчно. Код не меняй."
-      - context: prompt
-        en: "List every assertion in this file and what it checks."
-        ru: "Перечисли все проверки в этом файле и что каждая проверяет."
+        en: "Rewrite this test with @pytest.mark.parametrize: one test per promo code, with the code as the id. Keep the same data and steps."
+        ru: "Перепиши этот тест через @pytest.mark.parametrize: по тесту на промокод, сам код — в id. Данные и шаги оставь прежними."
+      - context: bug-report
+        en: "Only test_orders_filter[Shipped-1] fails: the Shipped filter also shows a Processing order."
+        ru: "Падает только test_orders_filter[Shipped-1]: фильтр Shipped показывает ещё и заказ в статусе Processing."
+        note:
+          en: "With parametrize, the failing data row is right in the test id — quote it in the bug report."
+          ru: "С parametrize упавшая строка данных видна прямо в id теста — процитируй его в баг-репорте."
       - context: standup
         en: "I reviewed Petal's data-driven login test: three rows, one had wrong data. I requested changes."
         ru: "Я посмотре{ла|л} тест логина на наборе данных от Petal: три строки, в одной неверные данные. Запроси{ла|л} изменения."
-      - context: meeting
-        en: "Before I approve it, I want to understand every line — I'll ask Petal to walk me through it first."
-        ru: "Прежде чем одобрить, хочу понимать каждую строку — сначала попрошу Petal пройтись со мной по коду."
-        note:
-          en: "A calm, professional way to say \"I won't approve what I don't understand\"."
-          ru: "Спокойный профессиональный способ сказать «я не одобряю то, чего не понимаю»."
 
 checkPool:
   - id: c3-l4-k1
     kind: input
-    keyPoint: kp-loop
+    keyPoint: kp-parametrize
     placement: true
     prompt:
       en: "How many tests will this file create?"
       ru: "Сколько тестов создаст этот файл?"
     code: |
-      const statuses = ['Processing', 'Shipped', 'Delivered', 'Cancelled'];
+      STATUSES = ["Processing", "Shipped", "Delivered", "Cancelled"]
 
-      for (const status of statuses) {
-        test(`orders can be filtered by ${status}`, async ({ page }) => {
-          // Anna is already logged in (saved login state)
-          await page.goto('/orders');
-          await page.getByLabel('Status').selectOption(status);
-          await expect(page.getByTestId('order-row').first()).toContainText(status);
-        });
-      }
+
+      @pytest.mark.parametrize("status", STATUSES)
+      def test_orders_can_be_filtered_by_status(page: Page, status):
+          # Anna is already logged in (saved login state)
+          page.goto("/orders")
+          page.get_by_label("Status").select_option(status)
+          expect(page.get_by_test_id("order-row").first).to_contain_text(status)
     answers: ["4", "four"]
     placeholder: "Number of tests"
     hints:
-      - { en: "One test per item of `statuses`.", ru: "По тесту на каждый элемент `statuses`." }
+      - { en: "One test per item of `STATUSES`.", ru: "По тесту на каждый элемент `STATUSES`." }
       - { en: "Count the strings in the square brackets.", ru: "Посчитай строки в квадратных скобках." }
     explain:
-      en: "4 statuses → 4 tests: \"orders can be filtered by Processing\", \"…Shipped\", \"…Delivered\", \"…Cancelled\"."
-      ru: "4 статуса → 4 теста: «orders can be filtered by Processing», «…Shipped», «…Delivered», «…Cancelled»."
+      en: "4 statuses → 4 tests: `test_orders_can_be_filtered_by_status[Processing]`, `[Shipped]`, `[Delivered]` and `[Cancelled]`."
+      ru: "4 статуса → 4 теста: `test_orders_can_be_filtered_by_status[Processing]`, `[Shipped]`, `[Delivered]` и `[Cancelled]`."
 
   - id: c3-l4-k2
     kind: choice
-    keyPoint: kp-array
+    keyPoint: kp-list
     prompt:
       en: "What will this script print?"
       ru: "Что выведет этот скрипт?"
     code: |
-      const products = ['Rose Bouquet', 'Sunny Tulips', 'Lavender Pot'];
-      console.log(products[0]);
+      products = ["Rose Bouquet", "Sunny Tulips", "Lavender Pot"]
+      print(products[0], len(products))
     options:
-      - text: "Rose Bouquet"
+      - text: "Rose Bouquet 3"
         correct: true
-        why: { en: "Index 0 is the first item.", ru: "Индекс 0 — первый элемент." }
-      - text: "Sunny Tulips"
-        why: { en: "That's `products[1]`.", ru: "Это `products[1]`." }
-      - text: "undefined"
-        why: { en: "Index 0 exists — it's the first item.", ru: "Индекс 0 существует — это первый элемент." }
+        why: { en: "Index 0 is the first item, and `len()` counts all three items.", ru: "Индекс 0 — первый элемент, а `len()` считает все три элемента." }
+      - text: "Sunny Tulips 3"
+        why: { en: "That's `products[1]`. Counting starts at 0.", ru: "Это `products[1]`. Счёт начинается с 0." }
+      - text: "Rose Bouquet 2"
+        why: { en: "`len()` counts the items — 3. The last *index* is 2, because counting starts at 0.", ru: "`len()` считает элементы — их 3. Последний *индекс* — 2, потому что счёт идёт с 0." }
     optionsCode: true
     run: script
     hints:
-      - { en: "Counting starts at 0.", ru: "Счёт начинается с 0." }
+      - { en: "Counting positions starts at 0.", ru: "Позиции считаются с 0." }
+      - { en: "`len()` counts items, not positions.", ru: "`len()` считает элементы, а не позиции." }
     explain:
-      en: "`products[0]` → \"Rose Bouquet\", the first item of the list."
-      ru: "`products[0]` → «Rose Bouquet», первый элемент списка."
+      en: "`products[0]` → \"Rose Bouquet\", the first item; `len(products)` → 3. `print` with two values puts a space between them."
+      ru: "`products[0]` → «Rose Bouquet», первый элемент; `len(products)` → 3. `print` с двумя значениями ставит между ними пробел."
 
   - id: c3-l4-k3
     kind: review
-    keyPoint: kp-array
+    keyPoint: kp-dict
     prompt:
       en: "Review Petal's data-driven search test. Flag the wrong data row and any other problem."
       ru: "Сделай ревью теста поиска на наборе данных от Petal. Отметь неверную строку данных и любые другие проблемы."
@@ -674,149 +765,166 @@ checkPool:
       en: "Bloomly's products: Rose Bouquet, Sunny Tulips, Lavender Pot, Peony Dream, Mint Succulent, White Orchid. Search looks for the text in product names."
       ru: "Товары Bloomly: Rose Bouquet, Sunny Tulips, Lavender Pot, Peony Dream, Mint Succulent, White Orchid. Поиск ищет текст в названиях товаров."
     code: |
-      import { test, expect } from '@playwright/test';
+      import pytest
+      from playwright.sync_api import Page, expect
 
-      const cases = [
-        { q: 'rose', expected: '1 product' },
-        { q: 'pot', expected: '1 product' },
-        { q: 'tulip', expected: '2 products' },
-      ];
+      CASES = [
+          {"q": "rose", "expected": "1 product"},
+          {"q": "pot", "expected": "1 product"},
+          {"q": "tulip", "expected": "2 products"},
+      ]
 
-      for (const c of cases) {
-        test(`search for ${c.q}`, async ({ page }) => {
-          await page.goto('/shop');
-          page.getByLabel('Search').fill(c.q);
-          await expect(page.getByTestId('results-count')).toHaveText(c.expected);
-        });
-      }
+
+      @pytest.mark.parametrize("case", CASES, ids=["rose", "pot", "tulip"])
+      def test_search_shows_the_right_count(page: Page, case):
+          page.goto("/shop")
+          page.get_by_label("Search").fill(case["q"])
+          assert page.get_by_test_id("results-count").text_content() == case["expected"]
     issues:
-      - line: 6
+      - line: 7
         type: wrong-data
         note:
-          en: "Only Sunny Tulips contains \"tulip\": the expected result is '1 product'."
-          ru: "«tulip» есть только в Sunny Tulips: ожидаемый результат — '1 product'."
-      - line: 12
-        type: missing-await
+          en: "Only Sunny Tulips contains \"tulip\": the expected result is \"1 product\"."
+          ru: "«tulip» есть только в Sunny Tulips: ожидаемый результат — \"1 product\"."
+      - line: 15
+        type: weak-assertion
         note:
-          en: "`fill` isn't awaited — the check can start before the search text is typed."
-          ru: "`fill` без await — проверка может начаться до того, как текст поиска введён."
-    types: [wrong-data, missing-await, wrong-assertion, hard-wait, no-assertion]
+          en: "`text_content()` reads the text once, with no retry: if the count updates a moment later, the test fails at random. Use `expect(page.get_by_test_id(\"results-count\")).to_have_text(case[\"expected\"])`."
+          ru: "`text_content()` читает текст один раз, без повторов: если счётчик обновится чуть позже, тест упадёт случайно. Нужно `expect(page.get_by_test_id(\"results-count\")).to_have_text(case[\"expected\"])`."
+    types: [wrong-data, weak-assertion, wrong-assertion, hard-wait, no-assertion]
     hints:
       - { en: "Check every row against the product list in the context.", ru: "Сверь каждую строку со списком товаров из контекста." }
-      - { en: "Then scan each step inside the loop for `await`.", ru: "Потом проверь каждый шаг внутри цикла на `await`." }
-      - { en: "Line 6 and line 12.", ru: "Строка 6 и строка 12." }
+      - { en: "Then look at how the count is checked: does it wait and retry?", ru: "Потом посмотри, как проверяется счётчик: ждёт ли проверка и повторяет ли попытки?" }
+      - { en: "Line 7 and line 15.", ru: "Строка 7 и строка 15." }
     explain:
-      en: "One wrong row breaks one test; one missing `await` inside the loop breaks every test the loop creates."
-      ru: "Одна неверная строка ломает один тест; один забытый `await` внутри цикла ломает каждый тест, который цикл создаёт."
+      en: "One wrong row breaks one test — `test_search_shows_the_right_count[tulip]`. One weak check in the function weakens every test the decorator creates."
+      ru: "Одна неверная строка ломает один тест — `test_search_shows_the_right_count[tulip]`. Одна слабая проверка в функции ослабляет каждый тест, который создаёт декоратор."
 
   - id: c3-l4-k4
+    kind: choice
+    multi: true
+    keyPoint: kp-parametrize
+    prompt:
+      en: "The nightly run of Petal's orders filter test printed this. Which statements are true? Pick all that apply."
+      ru: "Ночной прогон теста фильтра заказов от Petal вывел вот это. Какие утверждения верны? Выбери все подходящие."
+    code: |
+      $ pytest tests/test_orders.py -v
+      tests/test_orders.py::test_orders_filter[Processing-1] PASSED  [ 25%]
+      tests/test_orders.py::test_orders_filter[Shipped-1] FAILED     [ 50%]
+      tests/test_orders.py::test_orders_filter[Delivered-3] PASSED   [ 75%]
+      tests/test_orders.py::test_orders_filter[Cancelled-1] PASSED   [100%]
+    options:
+      - text: { en: "One function ran with four data rows — four separate tests", ru: "Одна функция выполнилась с четырьмя строками данных — это четыре отдельных теста" }
+        correct: true
+        why: { en: "Each line is one test; the part in square brackets is its data row.", ru: "Каждая строка — один тест; в квадратных скобках — его строка данных." }
+      - text: { en: "Only the Shipped row failed; the other statuses were still checked", ru: "Упала только строка Shipped; остальные статусы всё равно проверились" }
+        correct: true
+        why: { en: "That's the point of parametrize: one red row doesn't stop or hide the others.", ru: "В этом и смысл parametrize: одна красная строка не останавливает и не прячет остальные." }
+      - text: { en: "In `[Shipped-1]`, the 1 means \"first attempt\"", ru: "В `[Shipped-1]` единица значит «первая попытка»" }
+        why: { en: "The id is the row's values joined with \"-\": status \"Shipped\", expected count 1.", ru: "id — это значения строки через \"-\": статус \"Shipped\", ожидаемое количество 1." }
+      - text: { en: "The status filter is broken for every status", ru: "Фильтр по статусу сломан для всех статусов" }
+        why: { en: "Three rows passed. The id points straight at the one that didn't.", ru: "Три строки прошли. id указывает прямо на ту, что не прошла." }
+    hints:
+      - { en: "Each line of the report is one test. Count them.", ru: "Каждая строка отчёта — один тест. Посчитай их." }
+      - { en: "The part in square brackets is built from the data row.", ru: "Часть в квадратных скобках собрана из строки данных." }
+    explain:
+      en: "parametrize gave every status its own test and its own id, so the report itself tells you where to look: the Shipped filter. The FAILURES section would show why — for example, 2 rows instead of 1."
+      ru: "parametrize дал каждому статусу свой тест и свой id, поэтому отчёт сам говорит, куда смотреть: на фильтр Shipped. Почему — покажет раздел FAILURES, например 2 строки вместо 1."
+
+  - id: c3-l4-k5
     kind: predict
     keyPoint: kp-loop
     prompt:
-      en: "Will the whole run be green?"
-      ru: "Весь прогон будет зелёным?"
+      en: "Will this test pass?"
+      ru: "Этот тест пройдёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      const products = ['Rose Bouquet', 'Peony Dream', 'Mint Succulent'];
 
-      for (const product of products) {
-        test(`can add ${product} to the cart`, async ({ page }) => {
-          await page.goto('/shop');
-          await page.getByTestId('product-card').filter({ hasText: product })
-            .getByRole('button', { name: 'Add to cart' }).click();
-          await expect(page.getByTestId('cart-count')).toHaveText('1');
-        });
-      }
-    outcome: pass
+      def test_can_add_each_product_to_the_cart(page: Page):
+          page.goto("/shop")
+          for product in ["Rose Bouquet", "Peony Dream", "Mint Succulent"]:
+              card = page.get_by_test_id("product-card").filter(has_text=product)
+              card.get_by_role("button", name="Add to cart").click()
+              expect(page.get_by_test_id("cart-count")).to_have_text("1")
+    outcome: fail
     reasons:
       - text:
-          en: "Yes: each test gets a fresh browser page with an empty cart, so the count is 1 every time"
-          ru: "Да: каждый тест получает новую страницу браузера с пустой корзиной, поэтому счётчик каждый раз 1"
+          en: "No: all rounds of the loop share one page and one cart — after the second click the count is 2, not 1"
+          ru: "Нет: у всех проходов цикла одна страница и одна корзина — после второго клика счётчик 2, а не 1"
         correct: true
       - text:
-          en: "No: the third test sees 3 items, because the loop adds them one after another"
-          ru: "Нет: третий тест увидит 3 товара, потому что цикл добавляет их один за другим"
-        why: { en: "The loop creates separate tests. Each starts clean, like a fresh test environment.", ru: "Цикл создаёт отдельные тесты. Каждый начинается с чистого листа, как в новом окружении." }
+          en: "Yes: every round of the loop starts with an empty cart"
+          ru: "Да: каждый проход цикла начинается с пустой корзины"
+        why: { en: "Only separate tests start clean (with parametrize, each one gets a fresh `page`). Rounds of a loop share everything.", ru: "С чистого листа начинаются только отдельные тесты (с parametrize каждый получает новый `page`). У проходов цикла всё общее." }
       - text:
           en: "No: Mint Succulent is out of stock"
           ru: "Нет: Mint Succulent нет в наличии"
-        why: { en: "Only White Orchid is out of stock.", ru: "Нет в наличии только White Orchid." }
+        why: { en: "Only White Orchid is out of stock — and the test fails before it gets to Mint Succulent.", ru: "Нет в наличии только White Orchid — а тест падает раньше, чем доходит до Mint Succulent." }
     hints:
-      - { en: "Remember what `{ page }` gives every test.", ru: "Вспомни, что `{ page }` даёт каждому тесту." }
-      - { en: "Do the three tests share one cart?", ru: "У трёх тестов общая корзина?" }
+      - { en: "How many tests does this file have — and how many pages?", ru: "Сколько в этом файле тестов — и сколько страниц?" }
+      - { en: "What does the cart count show after the second click?", ru: "Что покажет счётчик корзины после второго клика?" }
     explain:
-      en: "Three independent tests, each with a fresh page and an empty cart. After one click the count is \"1\" in each of them."
-      ru: "Три независимых теста, у каждого новая страница и пустая корзина. После одного клика в каждом счётчик «1»."
-
-  - id: c3-l4-k5
-    kind: choice
-    keyPoint: kp-read-strategy
-    prompt:
-      en: "Petal explains its test: \"Line 8 checks that the order total is €39.90.\" What do you do?"
-      ru: "Petal объясняет свой тест: «Строка 8 проверяет, что сумма заказа — €39.90». Что ты делаешь?"
-    code: |
-      // line 8:
-      await expect(page.getByTestId('order-total')).toBeVisible();
-    options:
-      - text: { en: "Trust the code, not the explanation: line 8 only checks visibility. Flag it as a weak assertion and ask for `toHaveText`", ru: "Верить коду, а не объяснению: строка 8 проверяет только видимость. Отметить слабую проверку и попросить `toHaveText`" }
-        correct: true
-        why: { en: "The explanation describes what the line *should* do. The code shows what it does.", ru: "Объяснение описывает, что строка *должна* делать. Код показывает, что она делает." }
-      - text: { en: "Approve — Petal explained it clearly", ru: "Одобрить — Petal всё понятно объяснил" }
-        why: { en: "A confident explanation is not evidence. €39.90 appears nowhere in the code.", ru: "Уверенное объяснение — не доказательство. €39.90 в коде нигде нет." }
-      - text: { en: "Delete line 8 — it doesn't check anything useful", ru: "Удалить строку 8 — она ничего полезного не проверяет" }
-        why: { en: "Then nothing would be checked at all. Make the check stronger instead.", ru: "Тогда не проверялось бы вообще ничего. Лучше сделать проверку сильнее." }
-    hints:
-      - { en: "Find \"39.90\" in the code.", ru: "Найди «39.90» в коде." }
-      - { en: "What does `toBeVisible()` actually check?", ru: "Что на самом деле проверяет `toBeVisible()`?" }
-    explain:
-      en: "Always verify an explanation against the code. The right line would be `await expect(page.getByTestId('order-total')).toHaveText('Total to pay: €39.90');`."
-      ru: "Объяснение всегда сверяй с кодом. Правильная строка была бы такой: `await expect(page.getByTestId('order-total')).toHaveText('Total to pay: €39.90');`."
+      en: "One test, one page, one cart. Round 1: count \"1\" — pass. Round 2: Peony Dream joins Rose Bouquet, the count is \"2\" and the check fails. Round 3 never runs. With parametrize, each product would get its own fresh page and an empty cart."
+      ru: "Один тест, одна страница, одна корзина. Проход 1: счётчик «1» — проверка проходит. Проход 2: к Rose Bouquet добавляется Peony Dream, счётчик «2», проверка падает. Проход 3 не выполняется. С parametrize каждый товар получил бы свою новую страницу и пустую корзину."
 
   - id: c3-l4-k6
-    kind: choice
-    multi: true
-    keyPoint: kp-read-strategy
+    kind: predict
+    keyPoint: kp-dict
     prompt:
-      en: "Which prompts help you understand unfamiliar generated code? Pick all that apply."
-      ru: "Какие промпты помогают понять незнакомый сгенерированный код? Выбери все подходящие."
-    options:
-      - text: "Explain this test line by line. Don't change the code."
+      en: "Will this test pass?"
+      ru: "Этот тест пройдёт?"
+    code: |
+      from playwright.sync_api import Page, expect
+
+      ANNA = {"email": "anna@bloomly.app", "password": "bloom123", "name": "Anna"}
+
+
+      def test_anna_can_log_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill(ANNA["email"])
+          page.get_by_label("Password").fill(ANNA["pass"])
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Anna!")
+    outcome: fail
+    reasons:
+      - text:
+          en: "No: `KeyError: 'pass'` — the dict has no such key, so the password is never typed"
+          ru: "Нет: `KeyError: 'pass'` — такого ключа в словаре нет, поэтому пароль так и не вводится"
         correct: true
-        why: { en: "Specific, and it keeps the code as it is.", ru: "Конкретно, и код остаётся как есть." }
-      - text: "List every assertion in this file and what it checks."
-        correct: true
-        why: { en: "Assertions are what you approve — get them listed.", ru: "Одобряешь ты именно проверки — пусть их перечислят." }
-      - text: "Rewrite everything to make it better."
-        why: { en: "You'd get a new test to review instead of understanding the old one.", ru: "Получишь новый тест на ревью вместо понимания старого." }
-      - text: "Is this test good?"
-        why: { en: "Too vague — the agent will most likely just say yes.", ru: "Слишком размыто — агент, скорее всего, просто скажет «да»." }
-    optionsCode: true
+      - text:
+          en: "No: the app shows \"Invalid email or password.\""
+          ru: "Нет: приложение покажет «Invalid email or password.»"
+        why: { en: "The test never gets that far: Python stops on `ANNA[\"pass\"]` before anything is typed into the password field.", ru: "До этого тест не доходит: Python останавливается на `ANNA[\"pass\"]` раньше, чем что-то вводится в поле пароля." }
+      - text:
+          en: "Yes: Python finds the closest key, \"password\""
+          ru: "Да: Python найдёт ближайший ключ, \"password\""
+        why: { en: "Python never guesses keys. A key must match exactly.", ru: "Python никогда не угадывает ключи. Ключ должен совпадать в точности." }
     hints:
-      - { en: "Good prompts are specific and don't invite rewriting.", ru: "Хорошие промпты конкретные и не провоцируют переписывание." }
-      - { en: "Two prompts are good.", ru: "Хороших промптов два." }
+      - { en: "Compare every key the test reads with the keys in the dict.", ru: "Сравни каждый ключ, который читает тест, с ключами в словаре." }
+      - { en: "Line 9 asks for \"pass\". Is there such a key?", ru: "Строка 9 просит \"pass\". Есть такой ключ?" }
     explain:
-      en: "Ask for a line-by-line explanation and a list of assertions, keep the code unchanged — then verify the answer yourself."
-      ru: "Проси построчное объяснение и список проверок, код не меняй — а ответ проверяй {сама|сам}."
+      en: "The dict has \"password\", the test asks for \"pass\" — `KeyError: 'pass'` on line 9. A typical slip when an agent writes the data and the test in different places. The fix is one word: `ANNA[\"password\"]`."
+      ru: "В словаре ключ \"password\", а тест просит \"pass\" — `KeyError: 'pass'` на строке 9. Типичная ошибка, когда агент пишет данные и тест в разных местах. Исправление — одно слово: `ANNA[\"password\"]`."
 
   - id: c3-l4-k7
     kind: fill
-    keyPoint: kp-array
+    keyPoint: kp-list
     prompt:
       en: "Fill in the index so that this line logs in as Tom."
       ru: "Впиши индекс, чтобы эта строка входила как Том."
     code: |
-      const users = ['anna@bloomly.app', 'tom@bloomly.app', 'maya@bloomly.app'];
-      // Log in as Tom:
-      await page.getByLabel('Email').fill(users[___]);
+      users = ["anna@bloomly.app", "tom@bloomly.app", "maya@bloomly.app"]
+      # Log in as Tom:
+      page.get_by_label("Email").fill(users[___])
     blanks:
       - { answers: ["1"] }
     hints:
       - { en: "Tom is the second item.", ru: "Том — второй элемент." }
       - { en: "Indexes start at 0.", ru: "Индексы начинаются с 0." }
     explain:
-      en: "`users[1]` is the second item: 'tom@bloomly.app'."
-      ru: "`users[1]` — второй элемент: 'tom@bloomly.app'."
+      en: "`users[1]` is the second item: \"tom@bloomly.app\"."
+      ru: "`users[1]` — второй элемент: \"tom@bloomly.app\"."
 
   - id: c3-l4-k8
     kind: input
@@ -825,11 +933,10 @@ checkPool:
       en: "What will the second printed line be? Type the exact text."
       ru: "Какой будет вторая напечатанная строка? Напиши точный текст."
     code: |
-      const cities = ['Lisbon', 'Berlin', 'Warsaw'];
+      cities = ["Lisbon", "Berlin", "Warsaw"]
 
-      for (const city of cities) {
-        console.log(`Delivery to ${city}`);
-      }
+      for city in cities:
+          print(f"Delivery to {city}")
     answers: ["Delivery to Berlin"]
     run: script
     hints:

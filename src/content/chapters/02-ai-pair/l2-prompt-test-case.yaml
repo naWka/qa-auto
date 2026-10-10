@@ -55,8 +55,8 @@ steps:
               en: "Compliments add no facts. The agent still has to guess what to check."
               ru: "Комплименты не добавляют фактов. Агенту всё равно придётся гадать, что проверять."
         hints:
-          - en: "Which prompt would a junior tester be able to execute without questions?"
-            ru: "Какой промпт младший тестировщик смог бы выполнить без вопросов?"
+          - en: "Which prompt could a new teammate follow without asking questions?"
+            ru: "Какой промпт новый коллега смог бы выполнить без вопросов?"
           - en: "Look for an expected result."
             ru: "Ищи ожидаемый результат."
         explain:
@@ -72,31 +72,33 @@ steps:
       - en: "Every missing part becomes a guess. No expected result → no [[assertion]]. No data → an invented account. No preconditions → the test starts in the wrong state."
         ru: "Каждая пропущенная часть превращается в догадку. Нет ожидаемого результата → нет [[проверки|assertion]]. Нет данных → выдуманный аккаунт. Нет предусловий → тест стартует не из того состояния."
     code: |
-      Goal: TC-130 "Search finds tulips".
+      # TC-130 "Search finds tulips"
+      Goal: automate this case as a pytest test with Playwright for Python.
       Preconditions: none, the user can be logged out.
       Steps: open /shop, type "tulip" into the Search field.
-      Test data: search term "tulip" (lower case on purpose).
+      Test data: search term "tulip", lower case on purpose.
       Expected: results count shows "1 product"; the only card is "Sunny Tulips".
     mentor:
-      en: "If a junior tester could run your test case without asking you a single question — Petal can too."
-      ru: "Если младший тестировщик может пройти твой тест-кейс, не задав тебе ни одного вопроса, — Petal тоже сможет."
+      en: "If a new teammate could run your test case without asking you a single question — Petal can too."
+      ru: "Если новый коллега может пройти твой тест-кейс, не задав тебе ни одного вопроса, — Petal тоже сможет."
 
   - type: theory
     keyPoint: kp-prompt-rules
     title: { en: "Rules: the team's conventions", ru: "Правила: договорённости команды" }
     body:
-      - en: "Besides the case itself, tell the agent *how* your team writes tests. Without rules it does what it has seen most often on the internet — CSS classes and fixed pauses included."
-        ru: "Кроме самого кейса, скажи агенту, *как* ваша команда пишет тесты. Без правил он делает то, что чаще всего видел в интернете, — включая CSS-классы и фиксированные паузы."
-      - en: "Bloomly's rules: [[locators|locator]] by role, label or test id; no `waitForTimeout`; one scenario per test; English titles; existing test data only."
-        ru: "Правила Bloomly: [[локаторы|locator]] по роли, метке или test id; никаких `waitForTimeout`; один сценарий на тест; названия на английском; только существующие тестовые данные."
+      - en: "Besides the case itself, tell the agent *how* your team writes tests. Without rules it does what it has seen most often on the internet — CSS classes, fixed pauses, even JavaScript instead of Python."
+        ru: "Кроме самого кейса, скажи агенту, *как* ваша команда пишет тесты. Без правил он делает то, что чаще всего видел в интернете, — CSS-классы, фиксированные паузы и даже JavaScript вместо Python."
+      - en: "Bloomly's rules: Python with pytest; [[locators|locator]] by role, label or test id; no `wait_for_timeout`; one scenario per test; English test names; existing test data only."
+        ru: "Правила Bloomly: Python и pytest; [[локаторы|locator]] по роли, метке или test id; никаких `wait_for_timeout`; один сценарий на тест; названия тестов на английском; только существующие тестовые данные."
       - en: "In real projects these rules live in a file the agent reads every time — `CLAUDE.md`, `AGENTS.md` or `.github/copilot-instructions.md`. Like a test case template the whole team follows."
         ru: "В реальных проектах эти правила лежат в файле, который агент читает каждый раз, — `CLAUDE.md`, `AGENTS.md` или `.github/copilot-instructions.md`. Как шаблон тест-кейса, которому следует вся команда."
     code: |
-      Rules:
-      - Locators: getByRole, getByLabel or getByTestId. No CSS classes.
-      - No waitForTimeout: wait with expect(...) assertions.
-      - One scenario per test, title in English.
-      - Use existing test data (anna@bloomly.app / bloom123).
+      # Test rules
+      - Python + pytest, Playwright sync API.
+      - Locators: get_by_role, get_by_label or get_by_test_id. No CSS classes.
+      - No wait_for_timeout: wait with expect(...) assertions.
+      - One scenario per test, test name in English.
+      - Use existing test data: anna@bloomly.app / bloom123.
 
   - type: theory
     keyPoint: kp-prompt-context
@@ -104,8 +106,8 @@ steps:
     body:
       - en: "[[Context|context]] is everything the agent knows when it starts: your prompt, the page you point to, the files it can read. More relevant context means fewer guesses."
         ru: "[[Контекст|context]] — это всё, что агент знает на старте: твой промпт, страница, на которую ты указываешь, файлы, которые он может прочитать. Больше нужного контекста — меньше догадок."
-      - en: "Name the page or URL, the account, and an existing test to copy the style from: “Follow tests/login.spec.ts”."
-        ru: "Назови страницу или URL, аккаунт и существующий тест, с которого брать стиль: «Follow tests/login.spec.ts»."
+      - en: "Name the page or URL, the account, and an existing test to copy the style from: “Follow tests/test_login.py”."
+        ru: "Назови страницу или URL, аккаунт и существующий тест, с которого брать стиль: «Follow tests/test_login.py»."
       - en: "Compare “test the login” with “TC-102: a wrong password shows ‘Invalid email or password.’ and the user stays on /login”. The first gets *a* test. The second gets *your* test."
         ru: "Сравни «протестируй логин» и «TC-102: неверный пароль показывает ‘Invalid email or password.’, пользователь остаётся на /login». Первый промпт даст *какой-то* тест. Второй — *твой* тест."
     mentor:
@@ -119,12 +121,13 @@ steps:
       en: "Maya's prompt for the promo code case. Every line maps to a part of the test case."
       ru: "Промпт Майи для кейса с промокодом. Каждая строка соответствует части тест-кейса."
     code: |
-      Write a Playwright test for TC-205 "BLOOM10 gives 10% off".
-      Precondition: the cart has 1 Rose Bouquet (€35.00); the user is logged out.
+      # TC-205 "BLOOM10 gives 10% off"
+      Write a pytest test with Playwright for Python (sync API) for this case.
+      Precondition: the cart has 1 Rose Bouquet at €35.00; the user is logged out.
       Steps: open /cart, type BLOOM10 into "Promo code", click "Apply".
       Expected: message "Promo code BLOOM10 applied: −10%." and total "€36.40".
-      Rules: getByRole / getByLabel / getByTestId only, no waitForTimeout.
-      Follow the style of tests/cart.spec.ts. One test, English title.
+      Rules: get_by_role / get_by_label / get_by_test_id only, no wait_for_timeout.
+      Follow the style of tests/test_cart.py. One test, English test name.
     notes:
       - lines: 1
         text:
@@ -132,21 +135,25 @@ steps:
           ru: "Цель с номером тест-кейса. Потом любой сможет найти, из какого кейса вырос тест."
       - lines: 2
         text:
+          en: "What to write and in which language. Most Playwright examples on the internet are JavaScript — without this line the agent may well answer in JavaScript."
+          ru: "Что писать и на каком языке. Большинство примеров Playwright в интернете — на JavaScript, и без этой строки агент вполне может ответить на нём."
+      - lines: 3
+        text:
           en: "Preconditions: the starting state, so Petal doesn't have to invent one."
           ru: "Предусловия: стартовое состояние, чтобы Petal не пришлось его выдумывать."
-      - lines: 3
+      - lines: 4
         text:
           en: "Steps with the test data (BLOOM10) and the exact names of the field and the button."
           ru: "Шаги с тестовыми данными (BLOOM10) и точными названиями поля и кнопки."
-      - lines: 4
+      - lines: 5
         text:
           en: "Expected result: these two values become the assertions. €35.00 − 10% + €4.90 delivery = €36.40."
           ru: "Ожидаемый результат: эти два значения станут проверками. €35.00 − 10% + €4.90 доставки = €36.40."
-      - lines: 5
+      - lines: 6
         text:
           en: "Rules: how the team writes tests."
           ru: "Правила: как команда пишет тесты."
-      - lines: 6
+      - lines: 7
         text:
           en: "Context and scope: a file to copy conventions from, and exactly one test."
           ru: "Контекст и объём: файл, с которого брать соглашения, и ровно один тест."
@@ -161,15 +168,15 @@ steps:
         en: "Put the parts of the prompt in the order of a test case. Leave out the lines that don't belong."
         ru: "Расставь части промпта в порядке тест-кейса. Лишние строки не используй."
       lines:
-        - 'Write a Playwright test for TC-140 "Out-of-stock product can''t be added".'
+        - 'Write a pytest test with Playwright for Python (sync API) for TC-140 "Out-of-stock product can''t be added".'
         - "Precondition: the user is logged out, the cart is empty."
         - 'Steps: open /shop, find the "White Orchid" card.'
         - 'Expected: its "Add to cart" button is disabled and the card says "Out of stock".'
-        - "Rules: use getByRole and getByTestId, no waitForTimeout."
+        - "Rules: use get_by_role and get_by_test_id, no wait_for_timeout."
       alt: [[0, 4, 1, 2, 3]]
       distractors:
         - "Make it perfect!!!"
-        - "Use waitForTimeout(5000) to be safe."
+        - "Use wait_for_timeout(5000) to be safe."
       hints:
         - en: "Think of the fields of a test case template, top to bottom."
           ru: "Вспомни поля шаблона тест-кейса сверху вниз."
@@ -181,8 +188,8 @@ steps:
         en: "Clean structure — and you kept the noise out. That's a prompt Petal can't misread."
         ru: "Чистая структура — и никакого шума. Такой промпт Petal не поймёт неправильно."
       explain:
-        en: "A prompt in test case order is easy to check: is there a goal? a start state? an expected result? “Make it perfect!!!” carries no facts, and the waitForTimeout line breaks the team rule."
-        ru: "Промпт в порядке тест-кейса легко проверить: есть цель? стартовое состояние? ожидаемый результат? «Сделай идеально!!!» не несёт фактов, а строка с waitForTimeout нарушает правило команды."
+        en: "A prompt in test case order is easy to check: is there a goal? a start state? an expected result? “Make it perfect!!!” carries no facts, and the wait_for_timeout line breaks the team rule."
+        ru: "Промпт в порядке тест-кейса легко проверить: есть цель? стартовое состояние? ожидаемый результат? «Сделай идеально!!!» не несёт фактов, а строка с wait_for_timeout нарушает правило команды."
 
   - type: task
     task:
@@ -202,11 +209,11 @@ steps:
           - { action: "Open /shop" }
           - { action: "Type into Search", data: "tulip", expected: "Results count shows \"1 product\"; the only card is \"Sunny Tulips\"" }
       blocks:
-        - { id: task, locked: true, text: "Write a Playwright test for TC-130: search in the shop finds tulips.", ru: "Напиши Playwright-тест для TC-130: поиск в магазине находит тюльпаны." }
+        - { id: task, locked: true, text: "Write a pytest test with Playwright for Python (sync API) for TC-130: search in the shop finds tulips.", ru: "Напиши pytest-тест с Playwright для Python (sync API) по TC-130: поиск в магазине находит тюльпаны." }
         - { id: steps, text: 'Steps: open /shop and type "tulip" into the Search field.', ru: "Шаги: открой /shop и введи «tulip» в поле Search." }
         - { id: expected, text: 'Expected: the results count shows "1 product" and the only product card is "Sunny Tulips".', ru: "Ожидаемый результат: счётчик показывает «1 product», единственная карточка — «Sunny Tulips»." }
-        - { id: waitrule, text: "Wait with expect(...) assertions only, never with waitForTimeout.", ru: "Жди только через проверки expect(...), никогда через waitForTimeout." }
-        - { id: noise, text: "Add waitForTimeout(3000) after typing, the shop is slow.", ru: "Добавь waitForTimeout(3000) после ввода, магазин медленный." }
+        - { id: waitrule, text: "Wait with expect(...) assertions only, never with wait_for_timeout.", ru: "Жди только через проверки expect(...), никогда через wait_for_timeout." }
+        - { id: noise, text: "Add wait_for_timeout(3000) after typing, the shop is slow.", ru: "Добавь wait_for_timeout(3000) после ввода, магазин медленный." }
       responses:
         - when: [steps, expected, waitrule]
           unless: [noise]
@@ -215,51 +222,51 @@ steps:
             en: "Done! The test types “tulip” and checks the count, the number of cards and the card name. The assertions wait for the products by themselves. Green ✅"
             ru: "Готово! Тест вводит «tulip» и проверяет счётчик, количество карточек и название. Проверки сами дожидаются товаров. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('search finds tulips', async ({ page }) => {
-              await page.goto('/shop');
-              await page.getByLabel('Search').fill('tulip');
-              await expect(page.getByTestId('results-count')).toHaveText('1 product');
-              await expect(page.getByTestId('product-card')).toHaveCount(1);
-              await expect(page.getByTestId('product-card')).toContainText('Sunny Tulips');
-            });
+
+            def test_search_finds_tulips(page: Page):
+                page.goto("/shop")
+                page.get_by_label("Search").fill("tulip")
+                expect(page.get_by_test_id("results-count")).to_have_text("1 product")
+                expect(page.get_by_test_id("product-card")).to_have_count(1)
+                expect(page.get_by_test_id("product-card")).to_contain_text("Sunny Tulips")
         - when: [steps, expected]
           message:
             en: "Done! Products load with a delay, so I added a 3-second pause after typing to be safe. Green ✅"
             ru: "Готово! Товары грузятся с задержкой, поэтому я на всякий случай добавил паузу 3 секунды после ввода. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('search finds tulips', async ({ page }) => {
-              await page.goto('/shop');
-              await page.getByLabel('Search').fill('tulip');
-              await page.waitForTimeout(3000);
-              await expect(page.getByTestId('results-count')).toHaveText('1 product');
-              await expect(page.getByTestId('product-card')).toContainText('Sunny Tulips');
-            });
+
+            def test_search_finds_tulips(page: Page):
+                page.goto("/shop")
+                page.get_by_label("Search").fill("tulip")
+                page.wait_for_timeout(3000)
+                expect(page.get_by_test_id("results-count")).to_have_text("1 product")
+                expect(page.get_by_test_id("product-card")).to_contain_text("Sunny Tulips")
         - when: [steps]
           message:
             en: "Done! The test types “tulip” into the search. Green ✅"
             ru: "Готово! Тест вводит «tulip» в поиск. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('search finds tulips', async ({ page }) => {
-              await page.goto('/shop');
-              await page.getByLabel('Search').fill('tulip');
-            });
+
+            def test_search_finds_tulips(page: Page):
+                page.goto("/shop")
+                page.get_by_label("Search").fill("tulip")
         - when: []
           message:
             en: "I checked that the shop page opens. Green ✅"
             ru: "Я проверил, что страница магазина открывается. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('shop page opens', async ({ page }) => {
-              await page.goto('/shop');
-              await expect(page.getByRole('heading', { name: 'Shop' })).toBeVisible();
-            });
+
+            def test_shop_page_opens(page: Page):
+                page.goto("/shop")
+                expect(page.get_by_role("heading", name="Shop")).to_be_visible()
       missing:
         expected:
           en: "Without the expected result there was nothing to assert: the test types “tulip” and stops. It would stay green even if the search returned nothing."
@@ -303,10 +310,10 @@ steps:
           - { action: "Open /shop" }
           - { action: "Click \"Add to cart\" on the Sunny Tulips card", expected: "Cart counter in the header shows 1" }
       blocks:
-        - { id: task, locked: true, text: "Write a Playwright test for TC-141: adding a product updates the cart counter.", ru: "Напиши Playwright-тест для TC-141: добавление товара обновляет счётчик корзины." }
+        - { id: task, locked: true, text: "Write a pytest test with Playwright for Python (sync API) for TC-141: adding a product updates the cart counter.", ru: "Напиши pytest-тест с Playwright для Python (sync API) по TC-141: добавление товара обновляет счётчик корзины." }
         - { id: steps, text: 'Steps: open /shop, click "Add to cart" on the Sunny Tulips card.', ru: "Шаги: открой /shop, нажми «Add to cart» на карточке Sunny Tulips." }
         - { id: expected, text: 'Expected: the header cart counter (test id "cart-count") shows "1".', ru: "Ожидаемый результат: счётчик корзины в шапке (test id «cart-count») показывает «1»." }
-        - { id: locators, text: "Locators: getByRole, getByLabel or getByTestId only. No CSS classes, ids or positions.", ru: "Локаторы: только getByRole, getByLabel или getByTestId. Никаких CSS-классов, id и позиций." }
+        - { id: locators, text: "Locators: get_by_role, get_by_label or get_by_test_id only. No CSS classes, ids or positions.", ru: "Локаторы: только get_by_role, get_by_label или get_by_test_id. Никаких CSS-классов, id и позиций." }
         - { id: noise, text: "Make it perfect!!!", ru: "Сделай идеально!!!" }
       responses:
         - when: [steps, expected, locators]
@@ -315,48 +322,48 @@ steps:
             en: "Done! I find the Sunny Tulips card by test id and text, click its button by role and check the counter. Green ✅"
             ru: "Готово! Нахожу карточку Sunny Tulips по test id и тексту, нажимаю её кнопку по роли и проверяю счётчик. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('adding a product updates the cart counter', async ({ page }) => {
-              await page.goto('/shop');
-              const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
-              await card.getByRole('button', { name: 'Add to cart' }).click();
-              await expect(page.getByTestId('cart-count')).toHaveText('1');
-            });
+
+            def test_adding_a_product_updates_the_cart_counter(page: Page):
+                page.goto("/shop")
+                card = page.get_by_test_id("product-card").filter(has_text="Sunny Tulips")
+                card.get_by_role("button", name="Add to cart").click()
+                expect(page.get_by_test_id("cart-count")).to_have_text("1")
         - when: [steps, expected]
           message:
             en: "Done! Sunny Tulips is the second item in the list, so I click the button in the second `li`. The counter is the `.badge` element. Green ✅"
             ru: "Готово! Sunny Tulips — второй товар в списке, поэтому нажимаю кнопку во втором `li`. Счётчик — элемент `.badge`. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('adding a product updates the cart counter', async ({ page }) => {
-              await page.goto('/shop');
-              await page.locator('li:nth-child(2) .btn').click();
-              await expect(page.locator('.badge')).toHaveText('1');
-            });
+
+            def test_adding_a_product_updates_the_cart_counter(page: Page):
+                page.goto("/shop")
+                page.locator("li:nth-child(2) .btn").click()
+                expect(page.locator(".badge")).to_have_text("1")
         - when: [steps]
           message:
             en: "Done! The test clicks “Add to cart” on Sunny Tulips. Green ✅"
             ru: "Готово! Тест нажимает «Add to cart» на Sunny Tulips. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('adding a product updates the cart counter', async ({ page }) => {
-              await page.goto('/shop');
-              await page.locator('li:nth-child(2) .btn').click();
-            });
+
+            def test_adding_a_product_updates_the_cart_counter(page: Page):
+                page.goto("/shop")
+                page.locator("li:nth-child(2) .btn").click()
         - when: []
           message:
             en: "I checked that the shop shows all six products. Green ✅"
             ru: "Я проверил, что в магазине показаны все шесть товаров. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('shop shows products', async ({ page }) => {
-              await page.goto('/shop');
-              await expect(page.getByTestId('results-count')).toHaveText('6 products');
-            });
+
+            def test_shop_shows_products(page: Page):
+                page.goto("/shop")
+                expect(page.get_by_test_id("results-count")).to_have_text("6 products")
       missing:
         locators:
           en: "Without the locator rule Petal picked a position and CSS classes: `li:nth-child(2) .btn`, `.badge`. Green today — red as soon as the sorting or the styles change."
@@ -381,8 +388,8 @@ steps:
         en: "Your prompt carried the team's locator rule — Petal's test will survive the next redesign."
         ru: "В твоём промпте было правило команды про локаторы — тест Petal переживёт следующий редизайн."
       explain:
-        en: "Both versions are green today. The difference shows up later: `li:nth-child(2)` breaks when the sort order changes, `.badge` breaks when a designer renames a class. `getByTestId` and `getByRole` describe *what* the element is, not *where* it is."
-        ru: "Сегодня обе версии зелёные. Разница проявится позже: `li:nth-child(2)` сломается при смене сортировки, `.badge` — когда дизайнер переименует класс. `getByTestId` и `getByRole` описывают, *что* это за элемент, а не *где* он находится."
+        en: "Both versions are green today. The difference shows up later: `li:nth-child(2)` breaks when the sort order changes, `.badge` breaks when a designer renames a class. `get_by_test_id` and `get_by_role` describe *what* the element is, not *where* it is."
+        ru: "Сегодня обе версии зелёные. Разница проявится позже: `li:nth-child(2)` сломается при смене сортировки, `.badge` — когда дизайнер переименует класс. `get_by_test_id` и `get_by_role` описывают, *что* это за элемент, а не *где* он находится."
 
   - type: task
     task:
@@ -400,7 +407,7 @@ steps:
           - { action: "Log in", data: "anna@bloomly.app / bloom123" }
           - { action: "Open My orders", expected: "Summary shows \"Showing 6 of 6 orders\"" }
       blocks:
-        - { id: task, locked: true, text: "Write a Playwright test for TC-118: the orders page lists all orders of the customer.", ru: "Напиши Playwright-тест для TC-118: страница заказов показывает все заказы покупателя." }
+        - { id: task, locked: true, text: "Write a pytest test with Playwright for Python (sync API) for TC-118: the orders page lists all orders of the customer.", ru: "Напиши pytest-тест с Playwright для Python (sync API) по TC-118: страница заказов показывает все заказы покупателя." }
         - { id: steps, text: "Steps: log in on /login, wait for the account page, then open /orders.", ru: "Шаги: войди на /login, дождись страницы аккаунта, затем открой /orders." }
         - { id: data, text: "Test data: use the existing customer anna@bloomly.app / bloom123 — she has 6 orders.", ru: "Тестовые данные: используй существующего покупателя anna@bloomly.app / bloom123 — у неё 6 заказов." }
         - { id: expected, text: 'Expected: the summary (test id "orders-summary") says "Showing 6 of 6 orders".', ru: "Ожидаемый результат: в сводке (test id «orders-summary») написано «Showing 6 of 6 orders»." }
@@ -412,59 +419,59 @@ steps:
             en: "Done! I log in as Anna, wait for /account, open /orders and check the summary. Green ✅"
             ru: "Готово! Вхожу как Anna, жду /account, открываю /orders и проверяю сводку. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('orders page lists all orders of the customer', async ({ page }) => {
-              await page.goto('/login');
-              await page.getByLabel('Email').fill('anna@bloomly.app');
-              await page.getByLabel('Password').fill('bloom123');
-              await page.getByRole('button', { name: 'Log in' }).click();
-              await expect(page).toHaveURL('/account');
-              await page.goto('/orders');
-              await expect(page.getByTestId('orders-summary')).toHaveText('Showing 6 of 6 orders');
-            });
+
+            def test_orders_page_lists_all_orders_of_the_customer(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("anna@bloomly.app")
+                page.get_by_label("Password").fill("bloom123")
+                page.get_by_role("button", name="Log in").click()
+                expect(page).to_have_url("http://localhost:3000/account")
+                page.goto("/orders")
+                expect(page.get_by_test_id("orders-summary")).to_have_text("Showing 6 of 6 orders")
         - when: [steps, expected]
           message:
             en: "Done! I used a standard test account, test@example.com / password123. Hmm, the run is red ❌ — login didn't work. Should I add a longer timeout?"
             ru: "Готово! Я взял стандартный тестовый аккаунт test@example.com / password123. Хм, прогон красный ❌ — вход не сработал. Может, добавить таймаут подлиннее?"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('orders page lists all orders of the customer', async ({ page }) => {
-              await page.goto('/login');
-              await page.getByLabel('Email').fill('test@example.com');
-              await page.getByLabel('Password').fill('password123');
-              await page.getByRole('button', { name: 'Log in' }).click();
-              await expect(page).toHaveURL('/account');
-              await page.goto('/orders');
-              await expect(page.getByTestId('orders-summary')).toHaveText('Showing 6 of 6 orders');
-            });
+
+            def test_orders_page_lists_all_orders_of_the_customer(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("test@example.com")
+                page.get_by_label("Password").fill("password123")
+                page.get_by_role("button", name="Log in").click()
+                expect(page).to_have_url("http://localhost:3000/account")
+                page.goto("/orders")
+                expect(page.get_by_test_id("orders-summary")).to_have_text("Showing 6 of 6 orders")
         - when: [steps, data]
           message:
             en: "Done! The test logs in as Anna and opens the orders page. Green ✅"
             ru: "Готово! Тест входит как Anna и открывает страницу заказов. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('orders page lists all orders of the customer', async ({ page }) => {
-              await page.goto('/login');
-              await page.getByLabel('Email').fill('anna@bloomly.app');
-              await page.getByLabel('Password').fill('bloom123');
-              await page.getByRole('button', { name: 'Log in' }).click();
-              await expect(page).toHaveURL('/account');
-              await page.goto('/orders');
-            });
+
+            def test_orders_page_lists_all_orders_of_the_customer(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("anna@bloomly.app")
+                page.get_by_label("Password").fill("bloom123")
+                page.get_by_role("button", name="Log in").click()
+                expect(page).to_have_url("http://localhost:3000/account")
+                page.goto("/orders")
         - when: []
           message:
             en: "I wasn't sure which account to use, so I opened /orders directly and checked the heading. Hmm, red ❌ — the page shows “Log in” instead."
             ru: "Я не знал, какой аккаунт взять, поэтому открыл /orders напрямую и проверил заголовок. Хм, красный ❌ — вместо этого страница показывает «Log in»."
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('orders page opens', async ({ page }) => {
-              await page.goto('/orders');
-              await expect(page.getByRole('heading', { name: 'My orders' })).toBeVisible();
-            });
+
+            def test_orders_page_opens(page: Page):
+                page.goto("/orders")
+                expect(page.get_by_role("heading", name="My orders")).to_be_visible()
       missing:
         data:
           en: "Without test data Petal invented an account: test@example.com. It doesn't exist in Bloomly, so the test is red before it even reaches the orders — and Petal suggests a longer timeout, which wouldn't help."
@@ -473,8 +480,8 @@ steps:
           en: "Without steps Petal skipped the login. /orders needs a logged-in user, so the app redirected to the login page."
           ru: "Без шагов Petal пропустил вход. Для /orders нужен вошедший пользователь, поэтому приложение перенаправило на страницу входа."
         expected:
-          en: "Without the expected result the test logs in, opens the page and checks nothing."
-          ru: "Без ожидаемого результата тест входит, открывает страницу и ничего не проверяет."
+          en: "Without the expected result the test logs in, opens the orders page and checks nothing on it."
+          ru: "Без ожидаемого результата тест входит, открывает страницу заказов и ничего на ней не проверяет."
       checks:
         expect: pass
         static: [hasAssertion, noHardWait]
@@ -508,11 +515,12 @@ steps:
           - { action: "Open /cart" }
           - { action: "Enter the promo code and click \"Apply\"", data: "SPRING20", expected: "Message \"This promo code has expired.\"; total stays €39.90" }
       code: |
-        Write a Playwright test for TC-150 "Expired promo code is rejected".
+        # TC-150 "Expired promo code is rejected"
+        Write a pytest test with Playwright for Python (sync API) for this case.
         ___: the cart has 1 Rose Bouquet.
         Steps: open /cart, type ___ into "Promo code", click "Apply".
         Expected: the message "___" is shown and the total stays "€39.90".
-        Rules: getByRole / getByLabel / getByTestId only, no waitForTimeout.
+        Rules: get_by_role / get_by_label / get_by_test_id only, no wait_for_timeout.
       blanks:
         - { answers: [Precondition], options: [Precondition, Expected, Rules] }
         - { answers: [SPRING20], options: [SPRING20, BLOOM10, "spring 20"] }
@@ -548,7 +556,7 @@ steps:
           why:
             en: "Better, but “fails” how? Which message? The agent will pick something."
             ru: "Лучше, но «не получается» — как? Какое сообщение? Агент выберет что-нибудь сам."
-        - text: 'TC-102: on /login enter anna@bloomly.app with password nope123 and click "Log in". Expect the alert "Invalid email or password." and the URL to stay /login. Follow tests/login.spec.ts.'
+        - text: 'TC-102: on /login enter anna@bloomly.app with password nope123 and click "Log in". Expect the alert "Invalid email or password." and the URL to stay /login. Follow tests/test_login.py.'
           correct: true
           why:
             en: "Page, data, action, exact expected result and a style example. Nothing left to guess."
@@ -566,8 +574,8 @@ steps:
         en: "Specific beats vague — you picked the prompt that reads like a test case."
         ru: "Конкретика лучше размытости — ты выбрал{а|} промпт, который читается как тест-кейс."
       explain:
-        en: "The more specific the prompt, the less the agent improvises. Context like “Follow tests/login.spec.ts” also keeps the new test consistent with the old ones."
-        ru: "Чем конкретнее промпт, тем меньше агент импровизирует. Контекст вроде «Follow tests/login.spec.ts» ещё и делает новый тест похожим на старые."
+        en: "The more specific the prompt, the less the agent improvises. Context like “Follow tests/test_login.py” also keeps the new test consistent with the old ones."
+        ru: "Чем конкретнее промпт, тем меньше агент импровизирует. Контекст вроде «Follow tests/test_login.py» ещё и делает новый тест похожим на старые."
 
   - type: task
     task:
@@ -582,13 +590,13 @@ steps:
         en: "Will Petal's test pass or fail on this build?"
         ru: "Тест Petal пройдёт или упадёт на этой сборке?"
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('search finds roses', async ({ page }) => {
-          await page.goto('/shop');
-          await page.getByLabel('Search').fill('Rose');
-          await expect(page.getByTestId('results-count')).toHaveText('1 product');
-        });
+
+        def test_search_finds_roses(page: Page):
+            page.goto("/shop")
+            page.get_by_label("Search").fill("Rose")
+            expect(page.get_by_test_id("results-count")).to_have_text("1 product")
       outcome: pass
       reasons:
         - text:
@@ -641,8 +649,8 @@ steps:
         why:
           en: "Emotions aren't checks. Name the exact result."
           ru: "Эмоции — не проверки. Назови точный результат."
-      - wrong: "Use waitForTimeout(5000) to be safe."
-        right: "Wait with expect(...) assertions — no waitForTimeout."
+      - wrong: "Use wait_for_timeout(5000) to be safe."
+        right: "Wait with expect(...) assertions — no wait_for_timeout."
         why:
           en: "Hard waits make tests slow and still flaky. Playwright assertions wait by themselves."
           ru: "Жёсткие ожидания делают тесты медленными и всё равно нестабильными. Проверки Playwright ждут сами."
@@ -664,14 +672,14 @@ steps:
   - type: phrases
     items:
       - context: prompt
-        en: "Write a Playwright test for TC-130. Use getByRole and getByLabel locators, no waitForTimeout."
-        ru: "Напиши Playwright-тест для TC-130. Используй локаторы getByRole и getByLabel, без waitForTimeout."
+        en: "Write a pytest test for TC-130 with Playwright for Python. Use get_by_role and get_by_label locators, no wait_for_timeout."
+        ru: "Напиши pytest-тест по TC-130 с Playwright для Python. Используй локаторы get_by_role и get_by_label, без wait_for_timeout."
       - context: prompt
         en: "Use the existing test account anna@bloomly.app — don't create new users."
         ru: "Используй существующий тестовый аккаунт anna@bloomly.app — не создавай новых пользователей."
       - context: prompt
-        en: "Follow the conventions in tests/login.spec.ts."
-        ru: "Следуй соглашениям из tests/login.spec.ts."
+        en: "Follow the conventions in tests/test_login.py."
+        ru: "Следуй соглашениям из tests/test_login.py."
         note:
           en: "Pointing to an existing file is the fastest way to give context."
           ru: "Ссылка на существующий файл — самый быстрый способ дать контекст."
@@ -704,9 +712,9 @@ checkPool:
         why:
           en: "Polite is nice, but it adds no facts."
           ru: "Вежливость — это приятно, но фактов она не добавляет."
-      - text: { en: "A longer test title", ru: "Более длинного названия теста" }
+      - text: { en: "A longer test name", ru: "Более длинного названия теста" }
         why:
-          en: "The title describes the test; it doesn't check anything."
+          en: "The name describes the test; it doesn't check anything."
           ru: "Название описывает тест, но ничего не проверяет."
     hints:
       - en: "Which part of a test case says what should happen?"
@@ -735,10 +743,10 @@ checkPool:
         - { action: "Open /cart" }
         - { action: "Enter the promo code and click \"Apply\"", data: "SPRING20", expected: "Message \"This promo code has expired.\"; total stays €39.90" }
     blocks:
-      - { id: task, locked: true, text: "Write a Playwright test for TC-150: an expired promo code is rejected.", ru: "Напиши Playwright-тест для TC-150: просроченный промокод отклоняется." }
+      - { id: task, locked: true, text: "Write a pytest test with Playwright for Python (sync API) for TC-150: an expired promo code is rejected.", ru: "Напиши pytest-тест с Playwright для Python (sync API) по TC-150: просроченный промокод отклоняется." }
       - { id: steps, text: 'Steps: open /cart (the cart already has 1 Rose Bouquet), type SPRING20 into "Promo code", click "Apply".', ru: "Шаги: открой /cart (в корзине уже 1 Rose Bouquet), введи SPRING20 в «Promo code», нажми «Apply»." }
       - { id: expected, text: 'Expected: the message "This promo code has expired." is shown and the total stays "€39.90".', ru: "Ожидаемый результат: показано сообщение «This promo code has expired.», итог остаётся «€39.90»." }
-      - { id: rules, text: "Rules: getByRole, getByLabel or getByTestId. No CSS ids or classes, no waitForTimeout.", ru: "Правила: getByRole, getByLabel или getByTestId. Без CSS-id и классов, без waitForTimeout." }
+      - { id: rules, text: "Rules: get_by_role, get_by_label or get_by_test_id. No CSS ids or classes, no wait_for_timeout.", ru: "Правила: get_by_role, get_by_label или get_by_test_id. Без CSS-id и классов, без wait_for_timeout." }
       - { id: noise, text: "Add a 2-second pause after clicking Apply, just in case.", ru: "Добавь паузу 2 секунды после нажатия Apply, на всякий случай." }
     responses:
       - when: [steps, expected, rules]
@@ -748,54 +756,54 @@ checkPool:
           en: "Done! Label for the field, role for the button, test ids for the message and the total. No pauses. Green ✅"
           ru: "Готово! Метка для поля, роль для кнопки, test id для сообщения и итога. Без пауз. Зелёный ✅"
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('expired promo code is rejected', async ({ page }) => {
-            await page.goto('/cart');
-            await page.getByLabel('Promo code').fill('SPRING20');
-            await page.getByRole('button', { name: 'Apply' }).click();
-            await expect(page.getByTestId('promo-message')).toHaveText('This promo code has expired.');
-            await expect(page.getByTestId('cart-total')).toHaveText('€39.90');
-          });
+
+          def test_expired_promo_code_is_rejected(page: Page):
+              page.goto("/cart")
+              page.get_by_label("Promo code").fill("SPRING20")
+              page.get_by_role("button", name="Apply").click()
+              expect(page.get_by_test_id("promo-message")).to_have_text("This promo code has expired.")
+              expect(page.get_by_test_id("cart-total")).to_have_text("€39.90")
       - when: [steps, expected, rules]
         message:
           en: "Done! Resilient locators — and the 2-second pause you asked for. Green ✅"
           ru: "Готово! Устойчивые локаторы — и пауза 2 секунды, как ты просил{а|}. Зелёный ✅"
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('expired promo code is rejected', async ({ page }) => {
-            await page.goto('/cart');
-            await page.getByLabel('Promo code').fill('SPRING20');
-            await page.getByRole('button', { name: 'Apply' }).click();
-            await page.waitForTimeout(2000);
-            await expect(page.getByTestId('promo-message')).toHaveText('This promo code has expired.');
-          });
+
+          def test_expired_promo_code_is_rejected(page: Page):
+              page.goto("/cart")
+              page.get_by_label("Promo code").fill("SPRING20")
+              page.get_by_role("button", name="Apply").click()
+              page.wait_for_timeout(2000)
+              expect(page.get_by_test_id("promo-message")).to_have_text("This promo code has expired.")
       - when: [steps, expected]
         message:
           en: "Done! I used the element ids — quick and simple — and a short pause to be safe. Green ✅"
           ru: "Готово! Я взял id элементов — быстро и просто — и короткую паузу на всякий случай. Зелёный ✅"
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('expired promo code is rejected', async ({ page }) => {
-            await page.goto('/cart');
-            await page.locator('#promo').fill('SPRING20');
-            await page.locator('#apply-promo').click();
-            await page.waitForTimeout(2000);
-            await expect(page.locator('.promo p')).toHaveText('This promo code has expired.');
-          });
+
+          def test_expired_promo_code_is_rejected(page: Page):
+              page.goto("/cart")
+              page.locator("#promo").fill("SPRING20")
+              page.locator("#apply-promo").click()
+              page.wait_for_timeout(2000)
+              expect(page.locator(".promo p")).to_have_text("This promo code has expired.")
       - when: []
         message:
           en: "I checked that the cart page opens. Green ✅"
           ru: "Я проверил, что страница корзины открывается. Зелёный ✅"
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('cart page opens', async ({ page }) => {
-            await page.goto('/cart');
-            await expect(page.getByRole('heading', { name: 'Your cart' })).toBeVisible();
-          });
+
+          def test_cart_page_opens(page: Page):
+              page.goto("/cart")
+              expect(page.get_by_role("heading", name="Your cart")).to_be_visible()
     missing:
       rules:
         en: "Without rules Petal used `#promo`, `#apply-promo`, `.promo p` and a fixed pause. It passes today — and breaks when a developer renames an id."
@@ -842,8 +850,8 @@ checkPool:
           ru: "Ничто не указывает на баг — тест просто проверяет слишком мало."
       - text: { en: "The heading locator is fragile", ru: "Локатор заголовка хрупкий" }
         why:
-          en: "`getByRole('heading', ...)` is resilient. The problem is *what* is checked."
-          ru: "`getByRole('heading', ...)` — устойчивый локатор. Проблема в том, *что* проверяется."
+          en: '`get_by_role("heading", ...)` is resilient. The problem is *what* is checked.'
+          ru: '`get_by_role("heading", ...)` — устойчивый локатор. Проблема в том, *что* проверяется.'
     hints:
       - en: "Did Petal have any way to know what to check?"
         ru: "Был ли у Petal хоть какой-то способ узнать, что проверять?"
@@ -863,33 +871,33 @@ checkPool:
       en: "Which lines break Bloomly's rules? Flag them and pick the issue type."
       ru: "Какие строки нарушают правила Bloomly? Отметь их и выбери тип проблемы."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('adding a product shows a toast', async ({ page }) => {
-        await page.goto('/shop');
-        await page.waitForTimeout(3000);
-        await page.locator('.product-card .btn.small').first().click();
-        await expect(page.getByRole('status')).toHaveText('Rose Bouquet added to cart');
-      });
+
+      def test_adding_a_product_shows_a_toast(page: Page):
+          page.goto("/shop")
+          page.wait_for_timeout(3000)
+          page.locator(".product-card .btn.small").first.click()
+          expect(page.get_by_role("status")).to_have_text("Rose Bouquet added to cart")
     issues:
-      - line: 5
+      - line: 6
         type: hard-wait
         note:
           en: "A 3-second pause “for the products to load”. The click already waits for the button; the pause only slows every run."
           ru: "Пауза 3 секунды, «чтобы товары загрузились». Клик и так ждёт кнопку, пауза лишь замедляет каждый прогон."
-      - line: 6
+      - line: 7
         type: fragile-locator
         note:
-          en: "CSS classes plus `.first()`. Use the card by name: `page.getByTestId('product-card').filter({ hasText: 'Rose Bouquet' }).getByRole('button', { name: 'Add to cart' })`."
-          ru: "CSS-классы плюс `.first()`. Ищи карточку по названию: `page.getByTestId('product-card').filter({ hasText: 'Rose Bouquet' }).getByRole('button', { name: 'Add to cart' })`."
+          en: 'CSS classes plus `.first`. Use the card by name: `page.get_by_test_id("product-card").filter(has_text="Rose Bouquet").get_by_role("button", name="Add to cart")`.'
+          ru: 'CSS-классы плюс `.first`. Ищи карточку по названию: `page.get_by_test_id("product-card").filter(has_text="Rose Bouquet").get_by_role("button", name="Add to cart")`.'
     types: [hard-wait, fragile-locator, no-assertion, wrong-data, hallucination]
     hints:
       - en: "Check each line against the rules: locators, waits."
         ru: "Сверь каждую строку с правилами: локаторы, ожидания."
-      - en: "Line 7 is fine — `getByRole('status')` is the toast."
-        ru: "Строка 7 в порядке — `getByRole('status')` это всплывающее уведомление."
-      - en: "Lines 5 and 6."
-        ru: "Строки 5 и 6."
+      - en: 'Line 8 is fine — `get_by_role("status")` is the toast.'
+        ru: 'Строка 8 в порядке — `get_by_role("status")` это всплывающее уведомление.'
+      - en: "Lines 6 and 7."
+        ru: "Строки 6 и 7."
     explain:
       en: "These are the two habits a rules section prevents. Once you've seen them in review, add the rule to the prompt — or to the project's rules file — so you never have to comment on them again."
       ru: "Это ровно те две привычки, от которых защищает раздел правил. Увидел{а|} их на ревью — добавь правило в промпт или в файл правил проекта, чтобы больше никогда не писать про них комментарии."
@@ -901,7 +909,8 @@ checkPool:
       en: "Label the parts of this prompt."
       ru: "Подпиши части этого промпта."
     code: |
-      Write a Playwright test for TC-160 "Locked user can't log in".
+      # TC-160 "Locked user can't log in"
+      Write a pytest test with Playwright for Python (sync API) for this case.
       ___: the user locked@bloomly.app exists and is locked.
       Steps: open /login, log in as locked@bloomly.app / bloom123.
       ___: the alert says "Your account is locked. Please contact support."
@@ -927,15 +936,15 @@ checkPool:
       en: "Pass or fail?"
       ru: "Пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('customer sees the greeting', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('tom@bloomly.app');
-        await page.getByLabel('Password').fill('tulips42');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-      });
+
+      def test_customer_sees_the_greeting(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("tom@bloomly.app")
+          page.get_by_label("Password").fill("tulips42")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
     outcome: fail
     reasons:
       - text:
@@ -962,10 +971,10 @@ checkPool:
     keyPoint: kp-prompt-rules
     placement: true
     prompt:
-      en: "Which line in a prompt prevents tests like `page.locator('.btn.small').click()`?"
-      ru: "Какая строка в промпте защищает от тестов вроде `page.locator('.btn.small').click()`?"
+      en: 'Which line in a prompt prevents tests like `page.locator(".btn.small").click()`?'
+      ru: 'Какая строка в промпте защищает от тестов вроде `page.locator(".btn.small").click()`?'
     options:
-      - text: "Locators: getByRole, getByLabel or getByTestId only. No CSS classes."
+      - text: "Locators: get_by_role, get_by_label or get_by_test_id only. No CSS classes."
         correct: true
         why:
           en: "It names the allowed locators and bans the fragile ones."
@@ -974,19 +983,19 @@ checkPool:
         why:
           en: "Too vague: the agent may think `.btn.small` *is* stable."
           ru: "Слишком размыто: агент может решить, что `.btn.small` и есть стабильно."
-      - text: "Use waitForTimeout(3000) before every click."
+      - text: "Use wait_for_timeout(3000) before every click."
         why:
           en: "That's about waiting, and it's an anti-pattern too."
           ru: "Это про ожидания, и к тому же антипаттерн."
       - text: "Write the test in English."
         why:
-          en: "A useful rule, but about titles, not locators."
-          ru: "Полезное правило, но про названия, а не про локаторы."
+          en: "A useful rule, but about test names, not locators."
+          ru: "Полезное правило, но про названия тестов, а не про локаторы."
     hints:
       - en: "Look for a rule that names concrete locator methods."
         ru: "Ищи правило, где названы конкретные методы локаторов."
-      - en: "“Stable” isn't checkable; “getByRole only” is."
-        ru: "«Стабильно» не проверишь, а «только getByRole» — проверишь."
+      - en: "“Stable” isn't checkable; “get_by_role only” is."
+        ru: "«Стабильно» не проверишь, а «только get_by_role» — проверишь."
     explain:
       en: "Good rules are concrete and checkable. “No CSS classes” is something you (and the agent) can verify line by line."
       ru: "Хорошие правила конкретны и проверяемы. «No CSS classes» можно проверить построчно — и тебе, и агенту."
@@ -1009,7 +1018,7 @@ checkPool:
         why:
           en: "Data plus the facts the expected result depends on."
           ru: "Данные плюс факты, от которых зависит ожидаемый результат."
-      - text: "Follow the style of tests/orders.spec.ts"
+      - text: "Follow the style of tests/test_orders.py"
         correct: true
         why:
           en: "An existing file shows conventions better than any description."

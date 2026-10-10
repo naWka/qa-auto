@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Task } from '../content/schema';
 import { Bi, U, useLang } from '../components/Bi';
+import { SPEC_FILE } from '../emulator';
 import { CodeView } from '../components/CodeView';
 import { Icon } from '../components/Icon';
 import { Petal } from '../components/Characters';
@@ -101,7 +102,7 @@ export function AgentTask({ task, register, phase }: KindProps<Agent>) {
             </div>
           </div>
           <FilesView files={response.files} />
-          <CodeView code={response.code} label="example.spec.js" />
+          <CodeView code={response.code} label={SPEC_FILE} />
           {missing.length > 0 && (
             <div className="agent-missing">
               <div className="report-sub"><Icon name="bulb" size={14} /> <U k="task.missingBlocks" stack={false} /></div>

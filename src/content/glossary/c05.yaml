@@ -22,8 +22,8 @@
     en: "A locator based on what the user sees, such as a role and name or a label, so it survives redesigns."
     ru: "Локатор, основанный на том, что видит пользователь (роль и имя, подпись), поэтому он переживает редизайн."
   example:
-    en: "Nice resilient locator — getByLabel('Promo code') will still work after the restyle."
-    ru: "Отличный устойчивый локатор — getByLabel('Promo code') сработает и после смены стилей."
+    en: "Nice resilient locator — `get_by_label(\"Promo code\")` will still work after the restyle."
+    ru: "Отличный устойчивый локатор — `get_by_label(\"Promo code\")` сработает и после смены стилей."
   context: code-review
   chapter: 5
 
@@ -36,8 +36,8 @@
     en: "Playwright's rule that a locator used for an action or assertion must match exactly one element."
     ru: "Правило Playwright: локатор для действия или проверки должен находить ровно один элемент."
   example:
-    en: "The test failed with a strict mode violation: getByText('Log in') matched three elements."
-    ru: "Тест упал с нарушением строгого режима: getByText('Log in') нашёл три элемента."
+    en: "The test failed with a strict mode violation: `get_by_text(\"Log in\")` matched three elements."
+    ru: "Тест упал с нарушением строгого режима: `get_by_text(\"Log in\")` нашёл три элемента."
   context: chat
   chapter: 5
 
@@ -61,10 +61,10 @@
   ru: фильтр (filter)
   pos: noun, verb
   def:
-    en: "A locator method that keeps only the matches containing a given text or element."
-    ru: "Метод локатора, который оставляет только те совпадения, где есть нужный текст или элемент."
+    en: "A locator method that keeps only the matches containing a given text or element: `.filter(has_text=\"Sunny Tulips\")`."
+    ru: "Метод локатора, который оставляет только те совпадения, где есть нужный текст или элемент: `.filter(has_text=\"Sunny Tulips\")`."
   example:
-    en: "Use `.filter({ hasText: 'Peony Dream' })` instead of `.nth(3)` — the order of cards may change."
-    ru: "Используй `.filter({ hasText: 'Peony Dream' })` вместо `.nth(3)` — порядок карточек может поменяться."
+    en: "Use `.filter(has_text=\"Peony Dream\")` instead of `.nth(3)` — the order of cards may change."
+    ru: "Используй `.filter(has_text=\"Peony Dream\")` вместо `.nth(3)` — порядок карточек может поменяться."
   context: code-review
   chapter: 5

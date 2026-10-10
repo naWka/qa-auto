@@ -32,7 +32,7 @@ export function CodeTask({ task, register, phase }: KindProps<CodeT>) {
         setBusy(false);
         if (v.ok) {
           if (task.kind === 'find-bug') bump('bugsFound');
-          if (v.fragileFree && /getBy(Role|Label|Text|TestId|Placeholder)/.test(code)) bump('noFragile');
+          if (v.fragileFree && /get_by_(role|label|text|test_id|placeholder)/.test(code)) bump('noFragile');
         }
         return { correct: v.ok, hadRedRun: red.current };
       },

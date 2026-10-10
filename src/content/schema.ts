@@ -32,7 +32,7 @@ export const AppConfig = z.object({
 export type AppConfig = z.infer<typeof AppConfig>;
 
 export const StaticRule = z.union([
-  z.enum(['hasAssertion', 'noHardWait', 'noFragile', 'awaitsActions']),
+  z.enum(['hasAssertion', 'noHardWait', 'noFragile', 'callsMethods']),
   z.object({
     rule: z.enum(['uses', 'notUses', 'regex', 'notRegex', 'minExpects']),
     value: z.union([z.string(), z.number()]),
@@ -53,8 +53,8 @@ export type Checks = z.infer<typeof Checks>;
 
 export const Option = z.object({ text: TS, correct: z.boolean().optional(), why: T.optional() }).strict();
 
-/** Extra virtual files next to the spec, e.g. { 'pages/LoginPage.js': '…' } — imported as './pages/LoginPage'. */
-export const Files = z.record(z.string().regex(/^[\w./-]+\.(js|ts|json)$/), z.string());
+/** Extra project files next to the test file, e.g. { 'pages/login_page.py': '…' } — imported as `from pages.login_page import LoginPage`. */
+export const Files = z.record(z.string().regex(/^[\w./-]+\.(py|json|md|ini|toml|txt|yaml|yml)$/), z.string());
 export type Files = z.infer<typeof Files>;
 export type Option = z.infer<typeof Option>;
 
@@ -147,7 +147,7 @@ export const PickLocatorTask = z.object({
 
 export const IssueType = z.enum([
   'fragile-locator', 'no-assertion', 'weak-assertion', 'wrong-assertion', 'hard-wait',
-  'missing-await', 'hallucination', 'wrong-data', 'test-dependency', 'wrong-step',
+  'not-called', 'hallucination', 'wrong-data', 'test-dependency', 'wrong-step',
 ]);
 export type IssueType = z.infer<typeof IssueType>;
 

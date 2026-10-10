@@ -5,8 +5,8 @@ title: { en: "API tests", ru: "API-тесты" }
 department: { en: "Backend", ru: "Бэкенд" }
 color: mint
 summary:
-  en: "Test Bloomly without a browser: send requests to its REST API, read status codes and JSON, and use API calls to prepare data fast. You will review agent-written API tests and combine API setup with UI checks — the way real teams keep their suites fast."
-  ru: "Тестируем Bloomly без браузера: отправляем запросы к REST API, читаем коды ответа и JSON и быстро готовим данные через API. Ты научишься проверять API-тесты, написанные агентом, и сочетать подготовку через API с проверками в интерфейсе — так настоящие команды держат свои тесты быстрыми."
+  en: "Test Bloomly without a browser: send requests to its REST API with Playwright's request context, read status codes and JSON, and use API calls to prepare data fast. You will review agent-written API tests and combine API setup with UI checks — the way real teams keep their suites fast. Docs: https://playwright.dev/python/docs/api-testing"
+  ru: "Тестируем Bloomly без браузера: отправляем запросы к REST API через request context Playwright, читаем коды ответа и JSON и быстро готовим данные через API. Ты научишься проверять API-тесты, написанные агентом, и сочетать подготовку через API с проверками в интерфейсе — так настоящие команды держат свои тесты быстрыми. Документация: https://playwright.dev/python/docs/api-testing"
 intro:
   - who: leo
     text:
@@ -25,51 +25,53 @@ intro:
       en: "Petal, we don't have any of those endpoints. Let's start from the real list."
       ru: "Petal, у нас нет ни одного из этих эндпоинтов. Начнём с настоящего списка."
 plan:
-  - title: { en: "HTTP in one lesson: requests and responses", ru: "HTTP за один урок: запросы и ответы" }
+  - title: { en: "Requests and responses", ru: "Запросы и ответы" }
     goal:
-      en: "Read a request and a response — method, endpoint, headers, body, status code — just like in the Network tab of DevTools."
-      ru: "Читать запрос и ответ — метод, эндпоинт, заголовки, тело, код ответа — так же, как на вкладке Network в DevTools."
+      en: "Read a request and a response — method, endpoint, headers, body, status code — and send one from a test with Playwright's request context."
+      ru: "Читать запрос и ответ — метод, эндпоинт, заголовки, тело, код ответа — и отправлять запрос из теста через request context Playwright."
     keyPoints:
-      - en: "GET reads, POST creates, PUT and PATCH update, DELETE removes."
-        ru: "GET читает, POST создаёт, PUT и PATCH обновляют, DELETE удаляет."
-      - en: "Status codes by family: 2xx success, 4xx a client mistake (400, 401, 404), 5xx a server error."
-        ru: "Коды ответа по группам: 2xx — успех, 4xx — ошибка клиента (400, 401, 404), 5xx — ошибка сервера."
-      - en: "JSON is the data format: keys and values, like an object in JavaScript."
-        ru: "JSON — формат данных: ключи и значения, как объект в JavaScript."
-      - en: "You've seen all of this before — every time you attached a failed request to a bug report."
-        ru: "Ты всё это уже видел{а|} — каждый раз, когда прикладывал{а|} упавший запрос к баг-репорту."
-  - title: { en: "API tests with the request fixture", ru: "API-тесты с фикстурой request" }
+      - en: "GET reads, POST creates, PUT and PATCH update, DELETE removes. Status codes by family: 2xx success, 4xx a client mistake, 5xx a server error. You've seen all of this in the Network tab of DevTools."
+        ru: "GET читает, POST создаёт, PUT и PATCH обновляют, DELETE удаляет. Коды ответа по группам: 2xx — успех, 4xx — ошибка клиента, 5xx — ошибка сервера. Всё это ты уже {видела|видел} на вкладке Network в DevTools."
+      - en: "An `api` fixture creates the request context: `playwright.request.new_context(base_url=\"http://localhost:3000\")`, then `yield`, then `dispose()`. Inside a UI test, `page.request` sends requests the same way."
+        ru: "Фикстура `api` создаёт request context: `playwright.request.new_context(base_url=\"http://localhost:3000\")`, затем `yield`, затем `dispose()`. Внутри UI-теста запросы так же отправляет `page.request`."
+      - en: "Don't call the fixture `request`: that name already belongs to pytest's own fixture."
+        ru: "Не называй фикстуру `request`: это имя уже занято собственной фикстурой pytest."
+      - en: "`response.status` and `response.ok` are properties, without brackets; `response.json()` is a method that turns the JSON body into Python dicts and lists."
+        ru: "`response.status` и `response.ok` — свойства, без скобок; `response.json()` — метод, который превращает JSON-тело в словари и списки Python."
+  - title: { en: "Checking a response", ru: "Проверяем ответ" }
     goal:
       en: "Read and complete tests for GET /api/products and POST /api/login that check the status, the fields and the error cases."
       ru: "Читать и дописывать тесты для GET /api/products и POST /api/login, которые проверяют код ответа, поля и ошибочные случаи."
     keyPoints:
-      - en: "request.get and request.post send a call without a browser; the response has status(), ok() and json()."
-        ru: "request.get и request.post отправляют запрос без браузера; у ответа есть status(), ok() и json()."
-      - en: "Assert both the status and the body: a 200 with the wrong data is still a bug."
-        ru: "Проверяй и код ответа, и тело: 200 с неправильными данными — всё равно баг."
-      - en: "Negative cases matter in the API as much as in the UI: a wrong password, a missing token, an unknown product id."
-        ru: "Негативные случаи в API важны так же, как в интерфейсе: неверный пароль, отсутствующий токен, несуществующий id товара."
-  - title: { en: "The API for fast preconditions", ru: "API для быстрых предусловий" }
+      - en: "Assert both the status and the body: `assert response.status == 200`, then `assert data[\"user\"][\"email\"] == \"anna@bloomly.app\"`. A 200 with the wrong data is still a bug."
+        ru: "Проверяй и код ответа, и тело: `assert response.status == 200`, затем `assert data[\"user\"][\"email\"] == \"anna@bloomly.app\"`. 200 с неправильными данными — всё равно баг."
+      - en: "`expect(response).to_be_ok()` is a quick check for any 2xx status; for an exact code or a field, use `assert`."
+        ru: "`expect(response).to_be_ok()` — быстрая проверка любого кода 2xx; для точного кода или поля используй `assert`."
+      - en: "Negative cases matter in the API as much as in the UI: a wrong password → 401, an unknown product → 404, an out-of-stock order → 409."
+        ru: "Негативные случаи в API важны так же, как в интерфейсе: неверный пароль → 401, несуществующий товар → 404, заказ товара, которого нет в наличии, → 409."
+  - title: { en: "API for setup, UI for the check", ru: "API для подготовки, интерфейс для проверки" }
     goal:
-      en: "Replace slow UI setup with API calls — get a token from POST /api/login, prepare data with POST /api/orders — and keep the UI for what you actually test."
-      ru: "Заменять медленную подготовку через интерфейс вызовами API — получить токен через POST /api/login, подготовить данные через POST /api/orders — и оставлять интерфейс для того, что ты на самом деле тестируешь."
+      en: "Create an order through the API and check it in the UI — the same server, a fraction of the clicks."
+      ru: "Создать заказ через API и проверить его в интерфейсе — тот же сервер, в разы меньше кликов."
     keyPoints:
       - en: "Use the UI for the thing you are testing; use the API for everything you only need as a precondition."
         ru: "Через интерфейс — то, что ты тестируешь; через API — всё, что нужно только как предусловие."
-      - en: "Auth tokens: log in once via the API, then send `Authorization: Bearer <token>` in the header."
-        ru: "Токены авторизации: войди один раз через API, затем отправляй `Authorization: Bearer <token>` в заголовке."
+      - en: "Auth tokens: log in once with POST /api/login, then send `Authorization: Bearer <token>` in the headers (`extra_http_headers=` on the context or `headers=` on one request)."
+        ru: "Токены авторизации: войди один раз через POST /api/login, затем отправляй `Authorization: Bearer <token>` в заголовках (`extra_http_headers=` для всего контекста или `headers=` для одного запроса)."
+      - en: "The API and the page talk to the same server: an order created with POST /api/orders shows up on /orders."
+        ru: "API и страница работают с одним и тем же сервером: заказ, созданный через POST /api/orders, появляется на /orders."
       - en: "API setup makes tests faster and less flaky: fewer screens, fewer waits."
         ru: "Подготовка через API делает тесты быстрее и стабильнее: меньше экранов, меньше ожиданий."
   - title: { en: "Reviewing agent-written API tests", ru: "Ревью API-тестов от агента" }
     goal:
-      en: "Review an agent's API tests for invented endpoints, status-only assertions, hard-coded tokens and missing negative cases."
-      ru: "Проверять API-тесты от агента на выдуманные эндпоинты, проверки только кода ответа, зашитые токены и отсутствие негативных случаев."
+      en: "Review an agent's API tests for invented endpoints, missing status checks, weak assertions, hard-coded tokens and the wrong HTTP library."
+      ru: "Проверять API-тесты от агента на выдуманные эндпоинты, пропущенную проверку кода ответа, слабые проверки, зашитые токены и не ту HTTP-библиотеку."
     keyPoints:
       - en: "Check every endpoint and field against the API docs — agents invent plausible ones."
         ru: "Сверяй каждый эндпоинт и поле с документацией API — агенты придумывают правдоподобные."
-      - en: "`expect(response.ok()).toBeTruthy()` alone is a weak assertion; check the data that matters."
-        ru: "Одно лишь `expect(response.ok()).toBeTruthy()` — слабая проверка; проверяй данные, которые важны."
-      - en: "Secrets don't belong in test code: tokens and passwords come from environment variables."
-        ru: "Секретам не место в коде тестов: токены и пароли берутся из переменных окружения."
-      - en: "Mix wisely: the API for setup and data checks, the UI for what the user actually sees."
-        ru: "Сочетай с умом: API — для подготовки и проверки данных, интерфейс — для того, что пользователь действительно видит."
+      - en: "Weak spots: reading `response.json()` without checking the status, checking only `response.ok`, or `response.status()` with brackets — a JS habit that ends in `TypeError: 'int' object is not callable`."
+        ru: "Слабые места: чтение `response.json()` без проверки кода ответа, проверка одного лишь `response.ok` или `response.status()` со скобками — привычка из JS, которая заканчивается `TypeError: 'int' object is not callable`."
+      - en: "Secrets don't belong in test code: tokens come from a login fixture, passwords from environment variables (`os.environ[\"BLOOMLY_PASSWORD\"]`)."
+        ru: "Секретам не место в коде тестов: токены берутся из фикстуры входа, пароли — из переменных окружения (`os.environ[\"BLOOMLY_PASSWORD\"]`)."
+      - en: "Agents often reach for the `requests` package. Playwright's request context fits the rest of the suite — the same base URL, fixtures and settings — and `page.request` shares the page's cookies. One tool is enough."
+        ru: "Агенты часто тянутся к пакету `requests`. Request context Playwright вписывается в остальной набор — тот же base URL, фикстуры и настройки, — а `page.request` использует cookies страницы. Одного инструмента достаточно."

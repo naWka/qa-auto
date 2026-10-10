@@ -300,17 +300,18 @@ export function SettingsPage() {
   );
 }
 
-const PLAYGROUND_CODE = `import { test, expect } from '@playwright/test';
+const PLAYGROUND_CODE = `from playwright.sync_api import Page, expect
 
-test('customer can add tulips to the cart', async ({ page }) => {
-  await page.goto('/shop');
-  await page
-    .getByTestId('product-card')
-    .filter({ hasText: 'Sunny Tulips' })
-    .getByRole('button', { name: 'Add to cart' })
-    .click();
-  await expect(page.getByTestId('cart-count')).toHaveText('1');
-});
+
+def test_customer_can_add_tulips_to_the_cart(page: Page):
+    page.goto("/shop")
+    (
+        page.get_by_test_id("product-card")
+        .filter(has_text="Sunny Tulips")
+        .get_by_role("button", name="Add to cart")
+        .click()
+    )
+    expect(page.get_by_test_id("cart-count")).to_have_text("1")
 `;
 
 const BUGS = ['login-trim', 'login-no-error', 'greeting-wrong-name', 'signup-terms-ignored', 'search-case-sensitive', 'sort-by-name', 'add-to-cart-double', 'cart-count-stale', 'cart-total-ignores-qty', 'remove-wrong-item', 'promo-case-sensitive', 'promo-stacks', 'free-delivery-boundary', 'checkout-past-date', 'orders-filter-wrong', 'orders-summary-wrong', 'a11y-add-to-cart-div', 'a11y-qty-unnamed', 'a11y-search-no-label'];

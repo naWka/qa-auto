@@ -35,7 +35,7 @@ export class APIResponse {
   headers() { return { ...this._headers }; }
   _bodyText() { return this._body === undefined ? '' : JSON.stringify(this._body); }
   async json() {
-    if (this._body === undefined) throw new EmuError('api-json', 'apiResponse.json: Response body is empty', {});
+    if (this._body === undefined) throw new EmuError('api-json', 'APIResponse.json: Response body is empty', {});
     return JSON.parse(JSON.stringify(this._body));
   }
   async text() { return this._bodyText(); }
@@ -44,19 +44,30 @@ export class APIResponse {
 
 interface ReqOptions { data?: unknown; params?: Record<string, string | number>; headers?: Record<string, string> }
 
-export class APIRequestContext {
-  private rt: TestRuntime;
-  private data: AutData;
-  private bugs: string[];
+export interface ApiEnv {
+  /** runtime of the test that is running now (API contexts may outlive one test) */
+  rt: () => TestRuntime;
+  data: AutData;
+  bugs: () => string[];
   /** The browser context's storage: the app keeps created orders, new users and status changes there. */
-  private storage: Record<string, string>;
+  storage: () => Record<string, string>;
+}
 
-  constructor(rt: TestRuntime, data: AutData, bugs: string[], storage: Record<string, string> = {}) {
-    this.rt = rt;
-    this.data = structuredClone(data);
-    this.bugs = bugs;
-    this.storage = storage;
+export class APIRequestContext {
+  private env: ApiEnv;
+  private data: AutData;
+  /** extra_http_headers of playwright.request.new_context() */
+  defaultHeaders: Record<string, string>;
+  disposed = false;
+
+  constructor(env: ApiEnv, defaultHeaders: Record<string, string> = {}) {
+    this.env = env;
+    this.data = structuredClone(env.data);
+    this.defaultHeaders = defaultHeaders;
   }
+  private get rt() { return this.env.rt(); }
+  private get bugs() { return this.env.bugs(); }
+  private get storage() { return this.env.storage(); }
 
   private stored<T>(key: string, fallback: T): T {
     try { return key in this.storage ? JSON.parse(this.storage[key]) : fallback; } catch { return fallback; }
@@ -72,10 +83,12 @@ export class APIRequestContext {
 
   private call(method: string, url: string, opts: ReqOptions = {}) {
     const loc = callerLocation();
+    opts = { ...opts, headers: { ...this.defaultHeaders, ...(opts.headers || {}) } };
     return this.rt.api(`${method} "${url}"`, 'pw:api', loc, async () => {
+      if (this.disposed) throw new EmuError('api-disposed', `APIRequestContext.${method.toLowerCase()}: Target page, context or browser has been closed`, {});
       let target: URL;
-      try { target = new URL(url, BASE_URL); } catch { throw new EmuError('goto-invalid', `apiRequestContext.${method.toLowerCase()}: Invalid URL`, { url }); }
-      if (target.origin !== BASE_URL) throw new EmuError('goto-external', `apiRequestContext.${method.toLowerCase()}: getaddrinfo ENOTFOUND ${target.hostname}`, { url: target.href }, { emulatorNote: true });
+      try { target = new URL(url, BASE_URL); } catch { throw new EmuError('goto-invalid', `APIRequestContext.${method.toLowerCase()}: Invalid URL`, { url }); }
+      if (target.origin !== BASE_URL) throw new EmuError('goto-external', `APIRequestContext.${method.toLowerCase()}: getaddrinfo ENOTFOUND ${target.hostname}`, { url: target.href }, { emulatorNote: true });
       for (const [k, v] of Object.entries(opts.params || {})) target.searchParams.set(k, String(v));
       await this.rt.pace(`${method} ${url}`, loc?.line);
       await this.rt.sleep(40);

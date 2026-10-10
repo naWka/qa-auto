@@ -5,7 +5,7 @@ import { Icon } from '../components/Icon';
 import { U } from '../components/Bi';
 import { ErrorBlock } from '../lab/TestReport';
 
-/** Runs plain JS (no browser) and shows console output — for "what will it print" tasks. */
+/** Runs plain Python (no browser) and shows print() output — for "what will it print" tasks. */
 export function ScriptRun({ code }: { code: string }) {
   const [res, setRes] = useState<RunResult | null>(null);
   const [busy, setBusy] = useState(false);
@@ -20,7 +20,7 @@ export function ScriptRun({ code }: { code: string }) {
       <button className="btn btn-soft btn-sm" onClick={go} disabled={busy}><Icon name="play" size={15} /> <U k="task.run" stack={false} /></button>
       {res && (
         <div className="script-out">
-          <div className="report-sub"><Icon name="terminal" size={14} /> console.log</div>
+          <div className="report-sub"><Icon name="terminal" size={14} /> print()</div>
           <pre>{res.logs.join('\n') || '—'}</pre>
           {res.error && <ErrorBlock error={res.error} code={code} />}
         </div>

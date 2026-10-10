@@ -5,8 +5,8 @@ title: { en: "Test architecture", ru: "Архитектура тестов" }
 department: { en: "Architecture", ru: "Архитектура" }
 color: peach
 summary:
-  en: "Organize a growing suite so it stays readable: describe blocks, hooks, isolated tests, Page Objects, fixtures and test data. Agents happily build this structure for you — you will learn to read it, keep it tidy and ask for the right refactoring when it starts to rot."
-  ru: "Наводим порядок в растущем наборе тестов, чтобы его было легко читать: describe-блоки, хуки, изолированные тесты, Page Object, фикстуры и тестовые данные. Агенты охотно построят эту структуру за тебя — ты научишься её читать, поддерживать в порядке и просить правильный рефакторинг, когда она начнёт портиться."
+  en: "Organize a growing suite so it stays readable: test files and classes, isolated tests, fixtures in conftest.py, Page Objects and test data with parametrize. Agents happily build this structure for you — you will learn to read it, keep it tidy and ask for the right refactoring when it starts to rot."
+  ru: "Наводим порядок в растущем наборе тестов, чтобы его было легко читать: тестовые файлы и классы, изолированные тесты, фикстуры в conftest.py, Page Object и тестовые данные с parametrize. Агенты охотно построят эту структуру за тебя — ты научишься её читать, поддерживать в порядке и просить правильный рефакторинг, когда она начнёт портиться."
 intro:
   - who: leo
     text:
@@ -25,51 +25,55 @@ intro:
       en: "Faster to write, slower to fix. Let's give the suite an architecture: one place for each thing that can change."
       ru: "Быстрее написать, дольше чинить. Дадим набору тестов архитектуру: по одному месту для каждой вещи, которая может измениться."
 plan:
-  - title: { en: "describe, hooks and isolation", ru: "describe, хуки и изоляция" }
+  - title: { en: "Test files, classes and isolation", ru: "Тестовые файлы, классы и изоляция" }
     goal:
-      en: "Group tests with test.describe, move shared steps into beforeEach, and spot tests that depend on each other."
-      ru: "Группировать тесты через test.describe, выносить общие шаги в beforeEach и замечать тесты, которые зависят друг от друга."
+      en: "Group tests into files and classes like `class TestCart:`, and spot tests that depend on each other."
+      ru: "Группировать тесты по файлам и классам вроде `class TestCart:` и замечать тесты, которые зависят друг от друга."
     keyPoints:
-      - en: "test.describe groups tests like a section in TestRail or any other test management tool."
-        ru: "test.describe группирует тесты, как раздел в TestRail или любой другой системе управления тестами."
-      - en: "beforeEach and afterEach run around every test: setup and teardown, like preconditions and cleanup."
-        ru: "beforeEach и afterEach выполняются до и после каждого теста: подготовка и очистка, как предусловия и уборка после теста."
-      - en: "Each test gets a fresh browser context; a test that needs another test to run first is a bug in the suite."
-        ru: "Каждый тест получает чистый контекст браузера; тест, которому нужно, чтобы сначала прошёл другой тест, — это баг в наборе."
+      - en: "A test file groups tests like a section in TestRail; `class TestCart:` makes a smaller group inside it, and each test is a method that takes `self` and `page`."
+        ru: "Тестовый файл группирует тесты, как раздел в TestRail; `class TestCart:` создаёт внутри него группу поменьше, а каждый тест — это метод, который получает `self` и `page`."
+      - en: "pytest finds tests by name on its own: `test_*.py` files, `test_…` functions and the `test_…` methods of `Test…` classes."
+        ru: "pytest сам находит тесты по именам: файлы `test_*.py`, функции `test_…` и методы `test_…` в классах `Test…`."
+      - en: "Each test gets a fresh page and browser context: logged out, empty cart. Nothing carries over from the test before."
+        ru: "Каждый тест получает новую страницу и чистый контекст браузера: вход не выполнен, корзина пуста. От предыдущего теста ничего не остаётся."
+      - en: "A test that needs another test to run first is a bug in the suite. Run it alone — `pytest tests/test_cart.py::TestCart::test_remove_item` — it must pass."
+        ru: "Тест, которому нужно, чтобы сначала прошёл другой тест, — это баг в наборе. Запусти его отдельно — `pytest tests/test_cart.py::TestCart::test_remove_item`, — он должен пройти."
+  - title: { en: "Fixtures and conftest.py", ru: "Фикстуры и conftest.py" }
+    goal:
+      en: "Read a fixture such as `logged_in_page` and explain what it prepares before each test and cleans up after it."
+      ru: "Читать фикстуру, например `logged_in_page`, и объяснять, что она готовит перед каждым тестом и что убирает после него."
+    keyPoints:
+      - en: "`@pytest.fixture` is a reusable precondition: a test asks for it by name in its parameters, and pytest passes it in — just like `page`."
+        ru: "`@pytest.fixture` — переиспользуемое предусловие: тест просит его по имени в своих параметрах, и pytest передаёт его — так же, как `page`."
+      - en: "Code before `yield` is the setup, code after it is the teardown — preconditions and cleanup in one place."
+        ru: "Код до `yield` — подготовка, код после него — очистка: предусловия и уборка в одном месте."
+      - en: "Scope decides how often a fixture runs: `function` (the default) for every test, `session` once per run — say, for an API token. `autouse=True` applies a fixture to every test without asking."
+        ru: "Область действия (scope) решает, как часто запускается фикстура: `function` (по умолчанию) — для каждого теста, `session` — один раз за прогон, например для API-токена. `autouse=True` применяет фикстуру ко всем тестам без запроса."
+      - en: "Shared fixtures live in `conftest.py`: every test in the folder can use them without an import."
+        ru: "Общие фикстуры живут в `conftest.py`: их может использовать любой тест в папке без импорта."
   - title: { en: "Page Object Model", ru: "Page Object Model" }
     goal:
-      en: "Read a LoginPage class the agent built, follow a test through it, and update one locator in one place."
-      ru: "Читать класс LoginPage, который построил агент, прослеживать через него тест и обновлять локатор в одном месте."
+      en: "Read a `LoginPage` class the agent built, follow a test through it, and update one locator in one place."
+      ru: "Читать класс `LoginPage`, который построил агент, прослеживать через него тест и обновлять локатор в одном месте."
     keyPoints:
-      - en: "A page object keeps a page's locators and actions in one class: loginPage.login(email, password)."
-        ru: "Page object хранит локаторы и действия страницы в одном классе: loginPage.login(email, password)."
-      - en: "Tests read like test cases; when the UI changes, you fix the page object, not 40 tests."
-        ru: "Тесты читаются как тест-кейсы; когда меняется интерфейс, ты правишь page object, а не 40 тестов."
+      - en: "A page object keeps a page's locators and actions in one class: locators in `__init__`, actions as methods like `login_page.log_in(email, password)`."
+        ru: "Page object хранит локаторы и действия страницы в одном классе: локаторы — в `__init__`, действия — в методах вроде `login_page.log_in(email, password)`."
+      - en: "Tests read like test cases; when \"Log in\" becomes \"Sign in\", you fix one line in `pages/login_page.py`, not 40 tests."
+        ru: "Тесты читаются как тест-кейсы; когда «Log in» становится «Sign in», ты правишь одну строку в `pages/login_page.py`, а не 40 тестов."
       - en: "Assertions usually stay in the test, so the page object doesn't hide what is being checked."
         ru: "Проверки обычно остаются в тесте, чтобы page object не прятал, что именно проверяется."
       - en: "Agents tend to over-engineer: base classes, a wrapper for every click. Ask for the simplest version that works."
         ru: "Агенты любят переусложнять: базовые классы, обёртка для каждого клика. Проси самый простой рабочий вариант."
-  - title: { en: "Fixtures", ru: "Фикстуры" }
+  - title: { en: "Test data, parametrize and refactoring", ru: "Тестовые данные, parametrize и рефакторинг" }
     goal:
-      en: "Read a custom fixture, such as a logged-in page, and explain what it prepares and cleans up for each test."
-      ru: "Читать пользовательскую фикстуру, например страницу с выполненным входом, и объяснять, что она готовит и убирает для каждого теста."
+      en: "Turn five copy-pasted promo code tests into one parametrized test, and write a refactoring request the agent can follow safely."
+      ru: "Превращать пять скопированных тестов промокодов в один параметризованный тест и писать запрос на рефакторинг, который агент выполнит безопасно."
     keyPoints:
-      - en: "page and request are built-in fixtures: Playwright creates them for each test and passes them in."
-        ru: "page и request — встроенные фикстуры: Playwright создаёт их для каждого теста и передаёт в него."
-      - en: "test.extend adds your own fixtures — a logged-in user, a filled cart, a ready page object."
-        ru: "test.extend добавляет свои фикстуры — пользователя с выполненным входом, заполненную корзину, готовый page object."
-      - en: "A fixture is a reusable precondition with built-in cleanup — easier to share than copy-pasted beforeEach blocks."
-        ru: "Фикстура — переиспользуемое предусловие со встроенной уборкой; её проще использовать повторно, чем копировать блоки beforeEach."
-  - title: { en: "Test data, parameterization and refactoring", ru: "Тестовые данные, параметризация и рефакторинг" }
-    goal:
-      en: "Turn five copy-pasted promo code tests into one data-driven test, and write a refactoring request the agent can follow safely."
-      ru: "Превращать пять скопированных тестов промокодов в один тест на данных и писать запрос на рефакторинг, который агент выполнит безопасно."
-    keyPoints:
-      - en: "Parameterization: one test body and a table of inputs and expected results — your equivalence classes and boundary values as data."
-        ru: "Параметризация: одно тело теста и таблица входных данных и ожидаемых результатов — твои классы эквивалентности и граничные значения в виде данных."
-      - en: "Each data row gets its own test title, so the report shows exactly which case failed."
-        ru: "Каждая строка данных получает своё название теста, поэтому в отчёте видно, какой именно случай упал."
-      - en: "Refactoring changes structure, not behavior: the same tests must pass and fail as before."
-        ru: "Рефакторинг меняет структуру, а не поведение: те же тесты должны проходить и падать, как раньше."
-      - en: "Ask the agent for refactoring in small steps and run the suite after each one."
-        ru: "Проси агента делать рефакторинг небольшими шагами и запускай набор тестов после каждого."
+      - en: "`@pytest.mark.parametrize` runs one test body over a table of inputs and expected results — your equivalence classes and boundary values as data."
+        ru: "`@pytest.mark.parametrize` прогоняет одно тело теста по таблице входных данных и ожидаемых результатов — твои классы эквивалентности и граничные значения в виде данных."
+      - en: "`ids=` gives each row a readable name, so the report shows exactly which case failed: `test_promo_code[expired]`."
+        ru: "`ids=` даёт каждой строке понятное имя, поэтому в отчёте видно, какой именно случай упал: `test_promo_code[expired]`."
+      - en: "Bigger data lives outside the test: in a dataclass such as `User(email, password, name)` or in a JSON file under `data/`."
+        ru: "Данные побольше живут вне теста: в dataclass вроде `User(email, password, name)` или в JSON-файле в папке `data/`."
+      - en: "Refactoring changes structure, not behavior: the same tests must pass and fail as before. Ask the agent for small steps and run `pytest` after each one."
+        ru: "Рефакторинг меняет структуру, а не поведение: те же тесты должны проходить и падать, как раньше. Проси агента делать небольшие шаги и запускай `pytest` после каждого."

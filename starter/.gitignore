@@ -1,6 +1,10 @@
-node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.auth/
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+
+# Test artifacts: traces of failed tests and the optional HTML report
+test-results/
+report.html
+
 .DS_Store

@@ -42,8 +42,8 @@ steps:
           ru: "Petal открывает Bloomly в браузере через Playwright MCP. Что он на самом деле «видит»?"
         options:
           - text:
-              en: "A list of elements with roles and names, like `button \"Log in\"`"
-              ru: "Список элементов с ролями и именами, например `button \"Log in\"`"
+              en: 'A list of elements with roles and names, like `button "Log in"`'
+              ru: 'Список элементов с ролями и именами, например `button "Log in"`'
             correct: true
             why:
               en: "Right. It's an accessibility snapshot: the page the way a screen reader hears it — text, not pixels."
@@ -66,8 +66,8 @@ steps:
           - en: "Screen readers don't look at pixels either."
             ru: "Экранные дикторы тоже не смотрят на пиксели."
         explain:
-          en: "Playwright MCP sends the agent an accessibility snapshot: roles (button, heading, textbox) and accessible names (“Log in”). That's why agents are good at writing `getByRole(...)` locators."
-          ru: "Playwright MCP отправляет агенту снимок доступности: роли (button, heading, textbox) и доступные имена («Log in»). Поэтому агенты хорошо пишут локаторы `getByRole(...)`."
+          en: "Playwright MCP sends the agent an accessibility snapshot: roles (button, heading, textbox) and accessible names (“Log in”). That's why agents are good at writing `get_by_role(...)` locators."
+          ru: "Playwright MCP отправляет агенту снимок доступности: роли (button, heading, textbox) и доступные имена («Log in»). Поэтому агенты хорошо пишут локаторы `get_by_role(...)`."
       - id: c2-l1-p2
         kind: choice
         keyPoint: kp-agent-limits
@@ -125,8 +125,8 @@ steps:
         ru: "1) Ты пишешь [[промпт|prompt]]. 2) Агент читает [[контекст|context]]: твой промпт, файлы проекта, существующие тесты."
       - en: "3) It opens a real browser through [[Playwright MCP|mcp]] (or the more token-efficient Playwright CLI, `@playwright/cli`) and reads an [[accessibility snapshot|accessibility-snapshot]] — roles and names, like the fragment below."
         ru: "3) Он открывает настоящий браузер через [[Playwright MCP|mcp]] (или более экономный по токенам Playwright CLI, `@playwright/cli`) и читает [[снимок доступности|accessibility-snapshot]] — роли и имена, как во фрагменте ниже."
-      - en: "4) It writes the test, 5) runs `npx playwright test`, reads the output and fixes what broke, 6) reports back to you."
-        ru: "4) Пишет тест, 5) запускает `npx playwright test`, читает вывод и чинит то, что сломалось, 6) отчитывается тебе."
+      - en: "4) It writes the test, 5) runs `pytest`, reads the output and fixes what broke, 6) reports back to you."
+        ru: "4) Пишет тест, 5) запускает `pytest`, читает вывод и чинит то, что сломалось, 6) отчитывается тебе."
     code: |
       - article:
         - img "Bouquet of pink roses"
@@ -135,8 +135,8 @@ steps:
         - button "Add to cart"
     figure: agent-loop
     mentor:
-      en: "Notice: the snapshot has `button \"Add to cart\"` — no colours, no CSS classes. That's why a good agent writes `getByRole('button', { name: 'Add to cart' })`."
-      ru: "Обрати внимание: в снимке есть `button \"Add to cart\"` — ни цветов, ни CSS-классов. Поэтому хороший агент пишет `getByRole('button', { name: 'Add to cart' })`."
+      en: "Notice: the snapshot has `button \"Add to cart\"` — no colours, no CSS classes. That's why a good agent writes `get_by_role(\"button\", name=\"Add to cart\")`."
+      ru: 'Обрати внимание: в снимке есть `button "Add to cart"` — ни цветов, ни CSS-классов. Поэтому хороший агент пишет `get_by_role("button", name="Add to cart")`.'
 
   - type: theory
     keyPoint: kp-agent-limits
@@ -160,8 +160,8 @@ steps:
         ru: "Агент берёт на себя набор: код, запуски, чтение ошибок. За тобой — мышление: **что** проверять, **ревью** кода и **проверка** того, что зелёный тест что-то значит."
       - en: "Boundary values, [[negative tests|negative-test]], [[edge cases|edge-case]], product knowledge — that's your three years of experience. The agent has none of it."
         ru: "Граничные значения, [[негативные тесты|negative-test]], [[пограничные случаи|edge-case]], знание продукта — это твои три года опыта. У агента ничего этого нет."
-      - en: "Since v1.56 Playwright even ships its own Test Agents — planner, generator and healer (`npx playwright init-agents --loop=claude`). We'll meet them in chapter 8. The rule stays the same: a human decides."
-        ru: "С версии 1.56 в Playwright есть даже собственные Test Agents — planner, generator и healer (`npx playwright init-agents --loop=claude`). Познакомимся с ними в главе 8. Правило то же: решает человек."
+      - en: "Playwright even has its own Test Agents — planner, generator and healer — but they work only with its JavaScript test runner. In a Python project you set up the same roles yourself: Claude Code or Copilot subagents + Playwright MCP + pytest. That's chapter 8. The rule stays the same: a human decides."
+        ru: "У Playwright есть даже собственные Test Agents — planner, generator и healer, — но они работают только с его JavaScript-раннером. В Python-проекте те же роли настраиваешь ты: сабагенты Claude Code или Copilot + Playwright MCP + pytest. Это глава 8. Правило то же: решает человек."
     mentor:
       en: "You've reviewed requirements and junior colleagues' test cases. Reviewing Petal is the same job — in code."
       ru: "Ты уже проверял{а|} требования и тест-кейсы младших коллег. Ревью Petal — та же работа, только в коде."
@@ -173,15 +173,15 @@ steps:
       en: "Leo asked Petal: “Write a test: Anna logs in and sees her greeting.” Here is the result — and where each piece came from."
       ru: "Leo попросил Petal: «Напиши тест: Anna входит и видит приветствие». Вот результат — и откуда взялась каждая часть."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('registered user can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('bloom123');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-      });
+
+      def test_registered_user_can_log_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
     notes:
       - lines: 1
         text:
@@ -189,17 +189,21 @@ steps:
           ru: "Стандартный импорт. Petal взял его из существующих тестов — это контекст."
       - lines: 4
         text:
+          en: "The test name: Petal phrased it from the prompt. The `test_` prefix is what makes pytest find and run this function."
+          ru: "Имя теста: Petal сформулировал его по промпту. Благодаря приставке `test_` pytest находит эту функцию и запускает её."
+      - lines: 5
+        text:
           en: "The URL /login: Petal found it by clicking around the app in the browser."
           ru: "URL /login: Petal нашёл его, пощёлкав по приложению в браузере."
-      - lines: [5, 6]
+      - lines: [6, 7]
         text:
           en: "The email and password came from the prompt. The labels “Email” and “Password” came from the accessibility snapshot."
           ru: "Email и пароль пришли из промпта. Метки «Email» и «Password» — из снимка доступности."
-      - lines: 7
-        text:
-          en: "Role and name straight from the snapshot: `button \"Log in\"`."
-          ru: "Роль и имя прямо из снимка: `button \"Log in\"`."
       - lines: 8
+        text:
+          en: 'Role and name straight from the snapshot: `button "Log in"`.'
+          ru: 'Роль и имя прямо из снимка: `button "Log in"`.'
+      - lines: 9
         text:
           en: "The expected greeting: the prompt said “sees her greeting”, and Petal took the text from the page. Is “Welcome back, Anna!” the *required* text? Only the test case knows."
           ru: "Ожидаемое приветствие: в промпте было «видит приветствие», а текст Petal взял со страницы. Это *требуемый* текст — «Welcome back, Anna!»? Знает только тест-кейс."
@@ -236,39 +240,39 @@ steps:
             en: "Done! I opened /login, read the form in the accessibility snapshot and wrote the test. It checks the greeting from TC-101. Ran it once — green ✅"
             ru: "Готово! Я открыл /login, прочитал форму в снимке доступности и написал тест. Он проверяет приветствие из TC-101. Один раз запустил — зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('registered user can log in', async ({ page }) => {
-              await page.goto('/login');
-              await page.getByLabel('Email').fill('anna@bloomly.app');
-              await page.getByLabel('Password').fill('bloom123');
-              await page.getByRole('button', { name: 'Log in' }).click();
-              await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-            });
+
+            def test_registered_user_can_log_in(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("anna@bloomly.app")
+                page.get_by_label("Password").fill("bloom123")
+                page.get_by_role("button", name="Log in").click()
+                expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
         - when: [steps]
           message:
             en: "Done! The test logs in as Anna. Ran it — green ✅"
             ru: "Готово! Тест входит как Anna. Запустил — зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('registered user can log in', async ({ page }) => {
-              await page.goto('/login');
-              await page.getByLabel('Email').fill('anna@bloomly.app');
-              await page.getByLabel('Password').fill('bloom123');
-              await page.getByRole('button', { name: 'Log in' }).click();
-            });
+
+            def test_registered_user_can_log_in(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("anna@bloomly.app")
+                page.get_by_label("Password").fill("bloom123")
+                page.get_by_role("button", name="Log in").click()
         - when: []
           message:
             en: "Done! I wasn't sure which user to take, so I checked that the login page opens. Green ✅"
             ru: "Готово! Я не знал, какого пользователя взять, поэтому проверил, что страница входа открывается. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('login page opens', async ({ page }) => {
-              await page.goto('/login');
-              await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible();
-            });
+
+            def test_login_page_opens(page: Page):
+                page.goto("/login")
+                expect(page.get_by_role("heading", name="Log in")).to_be_visible()
       missing:
         steps:
           en: "Without steps and data Petal didn't know which account to use — so it only checked that the login page opens. That's not TC-101."
@@ -328,8 +332,8 @@ steps:
             en: "The accessible name of the login button"
             ru: "Доступное имя кнопки входа"
           why:
-            en: "This it *can* see: the snapshot shows `button \"Log in\"`."
-            ru: "Это он *может* увидеть: в снимке есть `button \"Log in\"`."
+            en: 'This it *can* see: the snapshot shows `button "Log in"`.'
+            ru: 'Это он *может* увидеть: в снимке есть `button "Log in"`.'
         - text:
             en: "The URL of the login page"
             ru: "URL страницы входа"
@@ -362,40 +366,40 @@ steps:
         en: "Find the lines with problems and choose the issue type."
         ru: "Найди строки с проблемами и выбери тип проблемы."
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('registered user can log in', async ({ page }) => {
-          await page.open('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByButton('Log in').click();
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+
+        def test_registered_user_can_log_in(page: Page):
+            page.open("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_button("Log in").click()
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       issues:
-        - line: 4
+        - line: 5
           type: hallucination
           note:
-            en: "There is no `page.open` in Playwright. Pages are opened with `page.goto('/login')`."
-            ru: "В Playwright нет `page.open`. Страницы открывают через `page.goto('/login')`."
-        - line: 7
+            en: 'There is no `page.open` in Playwright. Pages are opened with `page.goto("/login")`.'
+            ru: 'В Playwright нет `page.open`. Страницы открывают через `page.goto("/login")`.'
+        - line: 8
           type: hallucination
           note:
-            en: "`getByButton` doesn't exist. Buttons are found by role: `page.getByRole('button', { name: 'Log in' })`."
-            ru: "`getByButton` не существует. Кнопки ищут по роли: `page.getByRole('button', { name: 'Log in' })`."
+            en: "`get_by_button` doesn't exist. Buttons are found by role: `page.get_by_role(\"button\", name=\"Log in\")`."
+            ru: '`get_by_button` не существует. Кнопки ищут по роли: `page.get_by_role("button", name="Log in")`.'
       types: [hallucination, fragile-locator, no-assertion, wrong-data]
       hints:
         - en: "Compare the method names with Petal's first test from the example."
           ru: "Сравни названия методов с первым тестом Petal из примера."
         - en: "Look at how the page is opened and how the button is found."
           ru: "Посмотри, как открывается страница и как ищется кнопка."
-        - en: "Lines 4 and 7 use methods Playwright doesn't have."
-          ru: "В строках 4 и 7 — методы, которых в Playwright нет."
+        - en: "Lines 5 and 8 use methods Playwright doesn't have."
+          ru: "В строках 5 и 8 — методы, которых в Playwright нет."
       praise:
         en: "Sharp eye: plausible-looking but invented methods are the classic AI hallucination."
         ru: "Зоркий глаз: правдоподобные, но выдуманные методы — классическая галлюцинация ИИ."
       explain:
-        en: "Agents mix up APIs from different tools and invent plausible names. `page.open` and `getByButton` look reasonable — that's what makes them dangerous. A run would crash with “is not a function”; a good agent fixes that in its next loop, a hurried one leaves it to you."
-        ru: "Агенты путают API разных инструментов и придумывают правдоподобные имена. `page.open` и `getByButton` выглядят разумно — этим они и опасны. Прогон упадёт с ошибкой «is not a function»; хороший агент исправит это на следующем круге цикла, торопливый — оставит тебе."
+        en: "Agents mix up APIs from different tools and invent plausible names. `page.open` and `get_by_button` look reasonable — that's what makes them dangerous. A run would crash on line 5 with `AttributeError: 'Page' object has no attribute 'open'`; a good agent fixes that in its next loop, a hurried one leaves it to you."
+        ru: "Агенты путают API разных инструментов и придумывают правдоподобные имена. `page.open` и `get_by_button` выглядят разумно — этим они и опасны. Прогон упадёт на строке 5 с `AttributeError: 'Page' object has no attribute 'open'`; хороший агент исправит это на следующем круге цикла, торопливый — оставит тебе."
 
   - type: task
     task:
@@ -410,15 +414,15 @@ steps:
         en: "Will this test pass or fail on that build?"
         ru: "Этот тест пройдёт или упадёт на этой сборке?"
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('user sees a greeting after login', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByRole('heading', { name: 'Welcome back, Silva!' })).toBeVisible();
-        });
+
+        def test_user_sees_a_greeting_after_login(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", name="Welcome back, Silva!")).to_be_visible()
       outcome: pass
       reasons:
         - text:
@@ -429,8 +433,8 @@ steps:
             en: "Fail: the app has a bug, so the test must be red."
             ru: "Упадёт: в приложении баг, значит, тест обязан покраснеть."
         - text:
-            en: "Fail: `getByRole('heading')` can't find headings by text."
-            ru: "Упадёт: `getByRole('heading')` не умеет искать заголовки по тексту."
+            en: "Fail: `get_by_role(\"heading\")` can't find headings by text."
+            ru: 'Упадёт: `get_by_role("heading")` не умеет искать заголовки по тексту.'
       hints:
         - en: "Compare the expected text in the test with what this build shows."
           ru: "Сравни ожидаемый текст в тесте с тем, что показывает эта сборка."
@@ -517,18 +521,18 @@ steps:
     keyPoint: kp-agent-limits
     title: { en: "Agent mistakes from this lesson", ru: "Ошибки агента из этого урока" }
     items:
-      - wrong: "await page.open('/login');"
-        right: "await page.goto('/login');"
+      - wrong: 'page.open("/login")'
+        right: 'page.goto("/login")'
         why:
           en: "Invented method. Playwright opens pages with `goto`."
           ru: "Выдуманный метод. Playwright открывает страницы через `goto`."
-      - wrong: "await page.getByButton('Log in').click();"
-        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+      - wrong: 'page.get_by_button("Log in").click()'
+        right: 'page.get_by_role("button", name="Log in").click()'
         why:
           en: "Invented locator. Buttons are found by role and accessible name."
           ru: "Выдуманный локатор. Кнопки ищут по роли и доступному имени."
-      - wrong: "await expect(page.getByRole('heading', { name: 'Welcome back, Silva!' })).toBeVisible();"
-        right: "await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();"
+      - wrong: 'expect(page.get_by_role("heading", name="Welcome back, Silva!")).to_be_visible()'
+        right: 'expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()'
         why:
           en: "Copied from a buggy page. The expected value must come from the requirement, not from the screen."
           ru: "Списано с багованной страницы. Ожидаемое значение берётся из требования, а не с экрана."
@@ -592,8 +596,8 @@ checkPool:
       - en: "Look for a role plus a name."
         ru: "Ищи роль плюс имя."
     explain:
-      en: "Accessibility snapshots list roles and accessible names (`button \"Add to cart\"`). That's also why `getByRole` locators come so naturally to agents."
-      ru: "Снимок доступности перечисляет роли и доступные имена (`button \"Add to cart\"`). Поэтому агентам так легко даются локаторы `getByRole`."
+      en: "Accessibility snapshots list roles and accessible names (`button \"Add to cart\"`). That's also why `get_by_role` locators come so naturally to agents."
+      ru: 'Снимок доступности перечисляет роли и доступные имена (`button "Add to cart"`). Поэтому агентам так легко даются локаторы `get_by_role`.'
 
   - id: c2-l1-k2
     kind: parsons
@@ -607,7 +611,7 @@ checkPool:
       - "The agent reads the context: prompt, project files, existing tests"
       - "It opens the app via Playwright MCP and reads the accessibility snapshot"
       - "It writes the test code"
-      - "It runs npx playwright test and reads the output"
+      - "It runs pytest and reads the output"
       - "It reports back, and you review the result"
     distractors:
       - "It asks the product manager for the requirements"
@@ -629,18 +633,18 @@ checkPool:
       en: "Petal wrote this test from memory without running it. Pass or fail?"
       ru: "Petal написал этот тест по памяти и не запускал его. Пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('user can open the shop from home', async ({ page }) => {
-        await page.goto('/');
-        await page.getByLink('Shop now').click();
-        await expect(page.getByRole('heading', { name: 'Shop' })).toBeVisible();
-      });
+
+      def test_user_can_open_the_shop_from_home(page: Page):
+          page.goto("/")
+          page.get_by_link("Shop now").click()
+          expect(page.get_by_role("heading", name="Shop")).to_be_visible()
     outcome: fail
     reasons:
       - text:
-          en: "Fail: `getByLink` doesn't exist in Playwright — the test crashes on line 5."
-          ru: "Упадёт: `getByLink` в Playwright не существует — тест сломается на строке 5."
+          en: "Fail: `get_by_link` doesn't exist in Playwright — the test crashes on line 6."
+          ru: "Упадёт: `get_by_link` в Playwright не существует — тест сломается на строке 6."
         correct: true
       - text:
           en: "Pass: the “Shop now” link is on the home page."
@@ -653,11 +657,11 @@ checkPool:
         ru: "Внимательно прочитай названия всех методов."
       - en: "How are links found in Playwright? By role."
         ru: "Как в Playwright ищут ссылки? По роли."
-      - en: "Line 5 should be `page.getByRole('link', { name: 'Shop now' })`."
-        ru: "В строке 5 должно быть `page.getByRole('link', { name: 'Shop now' })`."
+      - en: 'Line 6 should be `page.get_by_role("link", name="Shop now")`.'
+        ru: 'В строке 6 должно быть `page.get_by_role("link", name="Shop now")`.'
     explain:
-      en: "`getByLink` is a hallucination: it sounds like `getByLabel` or `getByText`, but it doesn't exist. The run fails with “page.getByLink is not a function”."
-      ru: "`getByLink` — галлюцинация: звучит как `getByLabel` или `getByText`, но не существует. Прогон падает с «page.getByLink is not a function»."
+      en: "`get_by_link` is a hallucination: it sounds like `get_by_label` or `get_by_text`, but it doesn't exist. The run fails with `AttributeError: 'Page' object has no attribute 'get_by_link'`."
+      ru: "`get_by_link` — галлюцинация: звучит как `get_by_label` или `get_by_text`, но не существует. Прогон падает с `AttributeError: 'Page' object has no attribute 'get_by_link'`."
 
   - id: c2-l1-k4
     kind: review
@@ -669,22 +673,22 @@ checkPool:
       en: "Find the invented parts."
       ru: "Найди выдуманные места."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('wrong password shows an error', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Username').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('wrong-pass');
-        await page.getByRole('button', { name: 'Sign in' }).click();
-        await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
-      });
+
+      def test_wrong_password_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_label("Username").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("wrong-pass")
+          page.get_by_role("button", name="Sign in").click()
+          expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
     issues:
-      - line: 5
+      - line: 6
         type: hallucination
         note:
           en: "Bloomly has no “Username” field. The label is “Email”."
           ru: "В Bloomly нет поля «Username». Метка — «Email»."
-      - line: 7
+      - line: 8
         type: hallucination
         note:
           en: "The button is “Log in”, not “Sign in”."
@@ -695,8 +699,8 @@ checkPool:
         ru: "Сравни каждую метку и название кнопки с настоящей страницей входа."
       - en: "Many sites say “Username” and “Sign in”. Bloomly doesn't."
         ru: "На многих сайтах пишут «Username» и «Sign in». В Bloomly — нет."
-      - en: "Lines 5 and 7."
-        ru: "Строки 5 и 7."
+      - en: "Lines 6 and 8."
+        ru: "Строки 6 и 8."
     explain:
       en: "Without looking at the page, the agent filled the gaps with the most common words on the internet. Elements can be hallucinated just like methods."
       ru: "Не глядя на страницу, агент заполнил пробелы самыми частыми словами из интернета. Элементы галлюцинируются так же, как методы."
@@ -769,7 +773,7 @@ checkPool:
       - { id: task, locked: true, text: "Write a Playwright test for TC-102: a wrong password shows an error.", ru: "Напиши Playwright-тест для TC-102: неверный пароль показывает ошибку." }
       - { id: steps, text: 'Steps: open /login, enter anna@bloomly.app and the wrong password nope123, click "Log in".', ru: "Шаги: открой /login, введи anna@bloomly.app и неверный пароль nope123, нажми «Log in»." }
       - { id: expected, text: 'Expected: the alert says "Invalid email or password." and the URL stays /login.', ru: "Ожидаемый результат: в сообщении об ошибке «Invalid email or password.», URL остаётся /login." }
-      - { id: noise, text: "Use waitForTimeout(5000) to be safe.", ru: "Используй waitForTimeout(5000) на всякий случай." }
+      - { id: noise, text: "Use wait_for_timeout(5000) to be safe.", ru: "Используй wait_for_timeout(5000) на всякий случай." }
     responses:
       - when: [steps, expected]
         unless: [noise]
@@ -778,56 +782,56 @@ checkPool:
           en: "Done! The test enters the wrong password and checks the exact alert text from TC-102 and the URL. Green ✅"
           ru: "Готово! Тест вводит неверный пароль и проверяет точный текст ошибки из TC-102 и URL. Зелёный ✅"
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('wrong password shows an error', async ({ page }) => {
-            await page.goto('/login');
-            await page.getByLabel('Email').fill('anna@bloomly.app');
-            await page.getByLabel('Password').fill('nope123');
-            await page.getByRole('button', { name: 'Log in' }).click();
-            await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
-            await expect(page).toHaveURL('/login');
-          });
+
+          def test_wrong_password_shows_an_error(page: Page):
+              page.goto("/login")
+              page.get_by_label("Email").fill("anna@bloomly.app")
+              page.get_by_label("Password").fill("nope123")
+              page.get_by_role("button", name="Log in").click()
+              expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
+              expect(page).to_have_url("http://localhost:3000/login")
       - when: [steps, expected]
         message:
           en: "Done! I added a 5-second wait to be safe, as you asked. Green ✅ (it takes a bit longer now)."
           ru: "Готово! Как ты и просил{а|}, добавил ожидание 5 секунд на всякий случай. Зелёный ✅ (правда, теперь он идёт дольше)."
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('wrong password shows an error', async ({ page }) => {
-            await page.goto('/login');
-            await page.getByLabel('Email').fill('anna@bloomly.app');
-            await page.getByLabel('Password').fill('nope123');
-            await page.getByRole('button', { name: 'Log in' }).click();
-            await page.waitForTimeout(5000);
-            await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
-          });
+
+          def test_wrong_password_shows_an_error(page: Page):
+              page.goto("/login")
+              page.get_by_label("Email").fill("anna@bloomly.app")
+              page.get_by_label("Password").fill("nope123")
+              page.get_by_role("button", name="Log in").click()
+              page.wait_for_timeout(5000)
+              expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
       - when: [steps]
         message:
           en: "Done! After the click the test checks that we're still on the login page. Green ✅"
           ru: "Готово! После клика тест проверяет, что мы всё ещё на странице входа. Зелёный ✅"
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('wrong password shows an error', async ({ page }) => {
-            await page.goto('/login');
-            await page.getByLabel('Email').fill('anna@bloomly.app');
-            await page.getByLabel('Password').fill('nope123');
-            await page.getByRole('button', { name: 'Log in' }).click();
-            await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible();
-          });
+
+          def test_wrong_password_shows_an_error(page: Page):
+              page.goto("/login")
+              page.get_by_label("Email").fill("anna@bloomly.app")
+              page.get_by_label("Password").fill("nope123")
+              page.get_by_role("button", name="Log in").click()
+              expect(page.get_by_role("heading", name="Log in")).to_be_visible()
       - when: []
         message:
           en: "I wasn't sure about the details, so I checked the login page title. Green ✅"
           ru: "Я не был уверен в деталях, поэтому проверил заголовок вкладки страницы входа. Зелёный ✅"
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('login page works', async ({ page }) => {
-            await page.goto('/login');
-            await expect(page).toHaveTitle('Log in · Bloomly');
-          });
+
+          def test_login_page_works(page: Page):
+              page.goto("/login")
+              expect(page).to_have_title("Log in · Bloomly")
     missing:
       expected:
         en: "Without the expected result Petal only checked that the “Log in” heading is there. That passes even if no error appears at all."
@@ -843,8 +847,8 @@ checkPool:
         ru: "Ожидаемый результат — то, что можешь дать только ты: точный текст ошибки."
       - en: "One block makes every run 5 seconds slower."
         ru: "Один блок делает каждый прогон на 5 секунд медленнее."
-      - en: "Steps + expected. Leave out the waitForTimeout block."
-        ru: "Шаги + ожидаемый результат. Блок с waitForTimeout не бери."
+      - en: "Steps + expected. Leave out the wait_for_timeout block."
+        ru: "Шаги + ожидаемый результат. Блок с wait_for_timeout не бери."
     praise:
       en: "You gave Petal the exact error text and kept the hard wait out. Clean prompt."
       ru: "Ты дал{а|} Petal точный текст ошибки и не пустил{а|} в промпт жёсткое ожидание. Чистый промпт."
@@ -898,8 +902,8 @@ checkPool:
     keyPoint: kp-agent-loop
     placement: true
     prompt:
-      en: "Petal runs its new test and gets: `TypeError: page.open is not a function`. What does a good agent do next in its loop?"
-      ru: "Petal запускает новый тест и получает: `TypeError: page.open is not a function`. Что хороший агент делает дальше в своём цикле?"
+      en: "Petal runs its new test, and pytest reports: `AttributeError: 'Page' object has no attribute 'open'`. What does a good agent do next in its loop?"
+      ru: "Petal запускает новый тест, и pytest сообщает: `AttributeError: 'Page' object has no attribute 'open'`. Что хороший агент делает дальше в своём цикле?"
     options:
       - text:
           en: "Reads the error, replaces it with `page.goto` and runs the test again"

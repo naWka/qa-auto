@@ -7,10 +7,10 @@ import { U, useUiString } from '../components/Bi';
 import { BrowserFrame } from './BrowserFrame';
 import { TestReport } from './TestReport';
 import { useRunner, type RunArgs } from './useRunner';
-import type { AppSetup, RunResult } from '../emulator';
+import { SPEC_FILE, type AppSetup, type RunResult } from '../emulator';
 import { useSettings } from '../store/settings';
 
-const SPEC_NAME = 'example.spec.js';
+const SPEC_NAME = SPEC_FILE;
 
 export interface CodeLabProps {
   code: string;

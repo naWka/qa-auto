@@ -30,7 +30,7 @@ export function SelfTestPage() {
       run: async (code, app, files) => {
         const r = await run(code, app, files);
         const flat = (steps: StepRecord[], d = 0): string[] => steps.flatMap((x) => [`${'  '.repeat(d)}${x.status === 'failed' ? '✗' : '✓'} ${x.title}${x.line ? ` :${x.file ? x.file + ':' : ''}${x.line}` : ''}`, ...flat(x.children, d + 1)]);
-        return { status: r.status, error: r.error?.message, logs: r.logs, tests: r.tests.map((t) => ({ title: t.titlePath.join(' › '), status: t.status, error: t.error?.message, soft: t.softErrors.map((e) => e.message.split('\n')[0]), steps: flat(t.steps) })) };
+        return { status: r.status, error: r.error && `${r.error.code} | ${r.error.message} | line ${r.error.line ?? '?'}`, logs: r.logs, findings: r.findings.map((f) => `${f.rule}@${f.line}`), tests: r.tests.map((t) => ({ id: t.nodeid, status: t.status, label: t.label, error: t.error && `${t.error.code} | ${t.error.message} | line ${t.error.line ?? '?'}${t.error.file ? ' in ' + t.error.file : ''}`, steps: flat(t.steps) })) };
       },
     };
   }, []);
@@ -81,9 +81,9 @@ export function SelfTestPage() {
         } else if (t.kind === 'pick-locator') {
           const correct = t.options.find((o) => o.correct);
           const text = typeof correct?.text === 'string' ? correct.text.trim().replace(/;$/, '') : '';
-          if (text && /^(page\.)?(getBy|locator)/.test(text)) {
+          if (text && /^(page\.)?(get_by|locator)/.test(text)) {
             const expr = text.startsWith('page.') ? text : `page.${text}`;
-            const code = `test('locator', async ({ page }) => {\n  await page.goto(${JSON.stringify((app as { route?: string } | undefined)?.route || '/')});\n  await expect(${expr}).toHaveCount(1);\n});`;
+            const code = `from playwright.sync_api import Page, expect\n\n\ndef test_locator(page: Page):\n    page.goto(${JSON.stringify((app as { route?: string } | undefined)?.route || '/')})\n    expect(${expr}).to_have_count(1)\n`;
             const r = await run(code, app);
             push({ id: t.id, kind: t.kind, status: r.status === 'passed' ? 'ok' : 'fail', note: `${expr} → ${summarize(r)}` });
           }
@@ -103,7 +103,7 @@ export function SelfTestPage() {
         } else if (t.kind === 'input' && t.run === 'script' && t.code) {
           const r = await runSpec({ code: t.code, mode: 'script', frame: null, controller: new RunController({ speed: 0, stepMode: false }), autDir: AUT_DIR });
           const printed = r.logs.join('\n');
-          const ok = t.answers.some((a) => printed.includes(a));
+          const ok = t.answers.some((a) => printed.includes(a) || !!r.error?.message.includes(a));
           push({ id: t.id, kind: t.kind, status: ok ? 'ok' : 'warn', note: `printed: ${printed.slice(0, 120)} · answers: ${t.answers.join(' / ')}` });
         }
       } catch (e) {

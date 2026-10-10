@@ -45,8 +45,8 @@ steps:
           <button type="submit" class="btn" data-testid="login-button">Log in</button>
         answers: ["3", "three", "три"]
         hints:
-          - en: "An attribute looks like `name=\"value\"`."
-            ru: "Атрибут выглядит как `name=\"value\"`."
+          - en: 'An attribute looks like `name="value"`.'
+            ru: 'Атрибут выглядит как `name="value"`.'
           - en: "Count the `=` signs inside the opening tag `<button …>`."
             ru: "Посчитай знаки `=` внутри открывающего тега `<button …>`."
         explain:
@@ -59,16 +59,16 @@ steps:
           en: "Kai renames all CSS classes in the redesign. Which locator for the cart counter in the header survives?"
           ru: "Кай переименовывает при редизайне все CSS-классы. Какой локатор счётчика корзины в шапке это переживёт?"
         options:
-          - text: "page.getByTestId('cart-count')"
+          - text: 'page.get_by_test_id("cart-count")'
             correct: true
             why:
               en: "`data-testid` exists only for tests; a redesign doesn't touch it."
               ru: "`data-testid` существует только для тестов, редизайн его не трогает."
-          - text: "page.locator('.badge')"
+          - text: 'page.locator(".badge")'
             why:
               en: "`.badge` is a CSS class — exactly what Kai's redesign renames."
               ru: "`.badge` — это CSS-класс, ровно то, что Кай переименует в редизайне."
-          - text: "page.locator('header nav a:nth-child(3) span')"
+          - text: 'page.locator("header nav a:nth-child(3) span")'
             why:
               en: "It depends on the order and nesting of elements: one new nav link, and it points somewhere else."
               ru: "Он зависит от порядка и вложенности элементов: появится ещё одна ссылка в меню — и он укажет не туда."
@@ -86,10 +86,10 @@ steps:
     keyPoint: kp-attributes
     title: { en: "Attributes: the fields of an element", ru: "Атрибуты: поля элемента" }
     body:
-      - en: "In the previous lesson you met [[tags|tag]] like `<button>` and `<input>`. An opening tag can carry extra information — [[attributes|attribute]]. Each one is a `name=\"value\"` pair: `type=\"password\"`, `placeholder=\"you@example.com\"`."
-        ru: "В прошлом уроке ты познакоми{лась|лся} с [[тегами|tag]] вроде `<button>` и `<input>`. Открывающий тег может нести дополнительную информацию — [[атрибуты|attribute]]. Каждый атрибут — пара `name=\"value\"`: `type=\"password\"`, `placeholder=\"you@example.com\"`."
+      - en: 'In the previous lesson you met [[tags|tag]] like `<button>` and `<input>`. An opening tag can carry extra information — [[attributes|attribute]]. Each one is a `name="value"` pair: `type="password"`, `placeholder="you@example.com"`.'
+        ru: 'В прошлом уроке ты познакоми{лась|лся} с [[тегами|tag]] вроде `<button>` и `<input>`. Открывающий тег может нести дополнительную информацию — [[атрибуты|attribute]]. Каждый атрибут — пара `name="value"`: `type="password"`, `placeholder="you@example.com"`.'
       - en: "Think of a ticket in Jira. Everyone reads the title; the fields — key, priority, labels — describe the ticket. Attributes are the element's fields. `id` is like the ticket key: unique on the page (`id=\"email\"`). `type` changes behaviour: `type=\"password\"` hides what you type. `placeholder` is the grey hint in an empty field."
-        ru: "Вспомни тикет в Jira. Заголовок читают все, а поля — ключ, приоритет, метки — описывают сам тикет. Атрибуты — это поля элемента. `id` похож на ключ тикета: он уникален на странице (`id=\"email\"`). `type` меняет поведение: `type=\"password\"` скрывает вводимые символы. `placeholder` — серая подсказка в пустом поле."
+        ru: 'Вспомни тикет в Jira. Заголовок читают все, а поля — ключ, приоритет, метки — описывают сам тикет. Атрибуты — это поля элемента. `id` похож на ключ тикета: он уникален на странице (`id="email"`). `type` меняет поведение: `type="password"` скрывает вводимые символы. `placeholder` — серая подсказка в пустом поле.'
       - en: "Some attributes have no value at all: `disabled`, `hidden`, `checked`. Being there *is* the value. White Orchid's button below has `disabled`, so nobody can click it."
         ru: "У некоторых атрибутов значения нет вовсе: `disabled`, `hidden`, `checked`. Значение — *само их присутствие*. У кнопки White Orchid ниже есть `disabled`, поэтому нажать её нельзя."
     code: |
@@ -102,12 +102,12 @@ steps:
     keyPoint: kp-class-vs-testid
     title: { en: "class is for looks, data-testid is for tests", ru: "class — для внешнего вида, data-testid — для тестов" }
     body:
-      - en: "`class` holds style names for the stylesheet (CSS): `class=\"btn small secondary\"` is three classes separated by spaces. Many [[elements|element]] share a class — every Bloomly button has `btn` — and the names change whenever the design does."
-        ru: "`class` хранит имена стилей для таблицы стилей (CSS): `class=\"btn small secondary\"` — это три класса через пробел. Один класс носят многие [[элементы|element]] — у каждой кнопки Bloomly есть `btn`, — а имена меняются при каждой смене дизайна."
+      - en: '`class` holds style names for the stylesheet (CSS): `class="btn small secondary"` is three classes separated by spaces. Many [[elements|element]] share a class — every Bloomly button has `btn` — and the names change whenever the design does.'
+        ru: '`class` хранит имена стилей для таблицы стилей (CSS): `class="btn small secondary"` — это три класса через пробел. Один класс носят многие [[элементы|element]] — у каждой кнопки Bloomly есть `btn`, — а имена меняются при каждой смене дизайна.'
       - en: "You'd never write a test step like “click the green rounded button”: after a redesign it's blue. A [[CSS selector|css-selector]] like `.btn.small` is that same step written in code. An [[XPath|xpath]] that walks the tree, like `//li[4]//button`, is no better: one extra wrapper, and it points somewhere else."
         ru: "Ты бы никогда не написал{а|} шаг теста «нажми зелёную скруглённую кнопку»: после редизайна она станет синей. [[CSS-селектор|css-selector]] вроде `.btn.small` — тот же шаг, только в коде. [[XPath|xpath]], который идёт по дереву, например `//li[4]//button`, не лучше: добавят одну обёртку — и он укажет на другое."
-      - en: "Attributes that start with `data-` hold custom data for the page's own scripts (`data-id=\"rose-bouquet\"`). One of them is a convention just for tests: `data-testid`. Users never see it, a redesign doesn't touch it, and Playwright reads it with `getByTestId('cart-count')`. That's a [[test ID|test-id]] — a contract between developers and QA."
-        ru: "Атрибуты, которые начинаются с `data-`, хранят собственные данные для скриптов страницы (`data-id=\"rose-bouquet\"`). Один из них — договорённость только для тестов: `data-testid`. Пользователь его не видит, редизайн его не трогает, а Playwright читает его через `getByTestId('cart-count')`. Это [[test ID|test-id]] — контракт между разработчиками и QA."
+      - en: "Attributes that start with `data-` hold custom data for the page's own scripts (`data-id=\"rose-bouquet\"`). One of them is a convention just for tests: `data-testid`. Users never see it, a redesign doesn't touch it, and Playwright reads it with `get_by_test_id(\"cart-count\")`. That's a [[test ID|test-id]] — a contract between developers and QA."
+        ru: 'Атрибуты, которые начинаются с `data-`, хранят собственные данные для скриптов страницы (`data-id="rose-bouquet"`). Один из них — договорённость только для тестов: `data-testid`. Пользователь его не видит, редизайн его не трогает, а Playwright читает его через `get_by_test_id("cart-count")`. Это [[test ID|test-id]] — контракт между разработчиками и QA.'
     figure: locator-priority
     mentor:
       en: "Roles and labels still come first — they check what users see. A test id is for things without a good name: the cart counter, a total, a product card. And agents love classes: when Petal writes `.btn.small`, ask which attribute would survive the redesign."
@@ -131,8 +131,8 @@ steps:
           - `aria-hidden="true"` — «пропусти меня»: ✿ в логотипе — просто украшение.
           - `aria-invalid="true"`, `aria-disabled="true"` — состояния: «поле заполнено неверно», «элемент выключен». После неудачной регистрации поле Email получает `aria-invalid`, а `aria-describedby` указывает на текст ошибки.
           - `role="alert"` — из той же семьи: «прочитай это сразу». Он стоит на блоке ошибки входа.
-      - en: "You've always checked that a wrong field shows an error. These attributes are the same check for a user who can't see the red border — real requirements you can test. Playwright reads them too: `getByRole('button', { name: 'Increase Rose Bouquet' })` finds the + button through its `aria-label`. The next lesson goes deeper into roles and names."
-        ru: "Ты всегда проверял{а|}, что неверно заполненное поле показывает ошибку. Эти атрибуты — та же проверка для пользователя, который не видит красной рамки: настоящие требования, которые можно тестировать. Playwright тоже их читает: `getByRole('button', { name: 'Increase Rose Bouquet' })` находит кнопку + через её `aria-label`. В следующем уроке разберём роли и имена подробнее."
+      - en: "You've always checked that a wrong field shows an error. These attributes are the same check for a user who can't see the red border — real requirements you can test. Playwright reads them too: `get_by_role(\"button\", name=\"Increase Rose Bouquet\")` finds the + button through its `aria-label`. The next lesson goes deeper into roles and names."
+        ru: 'Ты всегда проверял{а|}, что неверно заполненное поле показывает ошибку. Эти атрибуты — та же проверка для пользователя, который не видит красной рамки: настоящие требования, которые можно тестировать. Playwright тоже их читает: `get_by_role("button", name="Increase Rose Bouquet")` находит кнопку + через её `aria-label`. В следующем уроке разберём роли и имена подробнее.'
     code: |
       <a href="/" class="logo" aria-label="Bloomly home"><span class="logo-mark" aria-hidden="true">✿</span> Bloomly</a>
       <button type="button" data-qty="1" data-idx="0" aria-label="Increase Rose Bouquet">+</button>
@@ -150,8 +150,8 @@ steps:
     focus: "[aria-label='Decrease Rose Bouquet']"
     view: dom
     mentor:
-      en: "For every attribute, ask: who is it for? **Behaviour and state:** `type`, `disabled`. **The app's own scripts:** `data-qty`, `data-idx`. **Looks:** `class`. **Tests:** `data-testid`. **People:** `aria-label` and the visible text. Find elements by the last two piles; check states like `disabled` with assertions such as `toBeDisabled()`."
-      ru: "Про каждый атрибут спрашивай: для кого он? **Поведение и состояние:** `type`, `disabled`. **Собственные скрипты приложения:** `data-qty`, `data-idx`. **Внешний вид:** `class`. **Тесты:** `data-testid`. **Люди:** `aria-label` и видимый текст. Находи элементы по двум последним группам, а состояния вроде `disabled` проверяй проверками, например `toBeDisabled()`."
+      en: "For every attribute, ask: who is it for? **Behaviour and state:** `type`, `disabled`. **The app's own scripts:** `data-qty`, `data-idx`. **Looks:** `class`. **Tests:** `data-testid`. **People:** `aria-label` and the visible text. Find elements by the last two piles; check states like `disabled` with assertions such as `to_be_disabled()`."
+      ru: "Про каждый атрибут спрашивай: для кого он? **Поведение и состояние:** `type`, `disabled`. **Собственные скрипты приложения:** `data-qty`, `data-idx`. **Внешний вид:** `class`. **Тесты:** `data-testid`. **Люди:** `aria-label` и видимый текст. Находи элементы по двум последним группам, а состояния вроде `disabled` проверяй проверками, например `to_be_disabled()`."
 
   - type: task
     task:
@@ -201,17 +201,17 @@ steps:
       show: [attributes]
       hints:
         - en: "You can't click an invisible element on the page. Use the tree: open `<form id=\"login-form\">`."
-          ru: "По невидимому элементу на странице не кликнешь. Используй дерево: раскрой `<form id=\"login-form\">`."
+          ru: 'По невидимому элементу на странице не кликнешь. Используй дерево: раскрой `<form id="login-form">`.'
         - en: "Look for an attribute with no value that hides an element."
           ru: "Ищи атрибут без значения, который прячет элемент."
         - en: "It's the first child of the form: `<div role=\"alert\" … hidden>`."
-          ru: "Это первый потомок формы: `<div role=\"alert\" … hidden>`."
+          ru: 'Это первый потомок формы: `<div role="alert" … hidden>`.'
       praise:
         en: "Found without seeing it. That's what reading the DOM gives you — tests see this tree, not the screen."
         ru: "Наш{ла|ёл}, не видя его. Вот что даёт чтение DOM: тесты видят это дерево, а не экран."
       explain:
-        en: "`hidden` is a boolean attribute: while it's there, the box is invisible. After a wrong password the app removes `hidden` and fills in the text. So “the element exists” proves nothing here — a test checks `toHaveText('Invalid email or password.')`. And `role=\"alert\"` makes screen readers announce the message as soon as it appears. (The panel says the name is empty — right: there's no text in the box yet.)"
-        ru: "`hidden` — атрибут без значения: пока он есть, блок невидим. После неверного пароля приложение убирает `hidden` и вписывает текст. Поэтому «элемент существует» здесь ничего не доказывает — тест проверяет `toHaveText('Invalid email or password.')`. А `role=\"alert\"` заставляет скринридер объявить сообщение, как только оно появится. (Панель пишет, что имя пустое, — так и есть: текста в блоке пока нет.)"
+        en: "`hidden` is a boolean attribute: while it's there, the box is invisible. After a wrong password the app removes `hidden` and fills in the text. So “the element exists” proves nothing here — a test checks `to_have_text(\"Invalid email or password.\")`. And `role=\"alert\"` makes screen readers announce the message as soon as it appears. (The panel says the name is empty — right: there's no text in the box yet.)"
+        ru: '`hidden` — атрибут без значения: пока он есть, блок невидим. После неверного пароля приложение убирает `hidden` и вписывает текст. Поэтому «элемент существует» здесь ничего не доказывает — тест проверяет `to_have_text("Invalid email or password.")`. А `role="alert"` заставляет скринридер объявить сообщение, как только оно появится. (Панель пишет, что имя пустое, — так и есть: текста в блоке пока нет.)'
 
   - type: task
     task:
@@ -226,13 +226,13 @@ steps:
         ru: "Он пройдёт или упадёт — сегодня, пока Кай ничего не поменял?"
       app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('cart leads to checkout', async ({ page }) => {
-          await page.goto('/cart');
-          await page.locator('.btn').click();
-          await expect(page).toHaveURL('/checkout');
-        });
+
+        def test_cart_leads_to_checkout(page: Page):
+            page.goto("/cart")
+            page.locator(".btn").click()
+            expect(page).to_have_url("http://localhost:3000/checkout")
       outcome: fail
       reasons:
         - text:
@@ -263,8 +263,8 @@ steps:
         en: "Right — the test is broken even before the redesign. A class was never an address."
         ru: "Верно — тест сломан ещё до редизайна. Класс никогда не был адресом."
       explain:
-        en: "The locator matches 3 elements, so `click()` stops with a strict mode violation instead of clicking a random one. A class describes a look that many elements share. Better: `getByRole('button', { name: 'Proceed to checkout' })` or `getByTestId('checkout-button')`."
-        ru: "Локатор находит 3 элемента, поэтому `click()` останавливается с нарушением строгого режима, а не кликает наугад. Класс описывает внешний вид, общий для многих элементов. Лучше: `getByRole('button', { name: 'Proceed to checkout' })` или `getByTestId('checkout-button')`."
+        en: 'The locator matches 3 elements, so `click()` stops with a strict mode violation instead of clicking a random one. A class describes a look that many elements share. Better: `get_by_role("button", name="Proceed to checkout")` or `get_by_test_id("checkout-button")`.'
+        ru: 'Локатор находит 3 элемента, поэтому `click()` останавливается с нарушением строгого режима, а не кликает наугад. Класс описывает внешний вид, общий для многих элементов. Лучше: `get_by_role("button", name="Proceed to checkout")` или `get_by_test_id("checkout-button")`.'
 
   - type: task
     task:
@@ -284,44 +284,44 @@ steps:
           - { action: "Open /shop" }
           - { action: "Click \"Add to cart\" on the Peony Dream card", expected: "The cart counter in the header shows 1" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('adding a product updates the cart counter', async ({ page }) => {
-          await page.goto('/shop');
-          const card = page.locator('#results li:nth-child(4)');
-          await card.locator('.btn.small').click();
-          await expect(page.getByTestId('cart-counter')).toHaveText('1');
-        });
+
+        def test_adding_a_product_updates_the_cart_counter(page: Page):
+            page.goto("/shop")
+            card = page.locator("#results li:nth-child(4)")
+            card.locator(".btn.small").click()
+            expect(page.get_by_test_id("cart-counter")).to_have_text("1")
       issues:
-        - line: 5
-          type: fragile-locator
-          note:
-            en: "Position, not product: the 4th card is Peony Dream only while the shop is sorted by “Most popular”. Use `page.getByTestId('product-card').filter({ hasText: 'Peony Dream' })`."
-            ru: "Позиция, а не товар: 4-я карточка — Peony Dream, только пока магазин отсортирован по «Most popular». Используй `page.getByTestId('product-card').filter({ hasText: 'Peony Dream' })`."
         - line: 6
           type: fragile-locator
           note:
-            en: "`.btn.small` is two style classes — Kai's redesign renames them. Use `card.getByRole('button', { name: 'Add to cart' })`."
-            ru: "`.btn.small` — два класса стилей, Кай переименует их в редизайне. Используй `card.getByRole('button', { name: 'Add to cart' })`."
+            en: 'Position, not product: the 4th card is Peony Dream only while the shop is sorted by “Most popular”. Use `page.get_by_test_id("product-card").filter(has_text="Peony Dream")`.'
+            ru: 'Позиция, а не товар: 4-я карточка — Peony Dream, только пока магазин отсортирован по «Most popular». Используй `page.get_by_test_id("product-card").filter(has_text="Peony Dream")`.'
         - line: 7
+          type: fragile-locator
+          note:
+            en: "`.btn.small` is two style classes — Kai's redesign renames them. Use `card.get_by_role(\"button\", name=\"Add to cart\")`."
+            ru: '`.btn.small` — два класса стилей, Кай переименует их в редизайне. Используй `card.get_by_role("button", name="Add to cart")`.'
+        - line: 8
           type: hallucination
           note:
             en: "There's no `data-testid=\"cart-counter\"` in Bloomly — the counter's test id is `cart-count`. Petal invented a plausible one."
-            ru: "В Bloomly нет `data-testid=\"cart-counter\"` — test id счётчика называется `cart-count`. Petal придумал правдоподобный."
+            ru: 'В Bloomly нет `data-testid="cart-counter"` — test id счётчика называется `cart-count`. Petal придумал правдоподобный.'
       types: [fragile-locator, hallucination, wrong-data, no-assertion, hard-wait]
       hints:
         - en: "For each locator ask: will it survive Kai's redesign and a different sort order? Does it exist at all?"
           ru: "Про каждый локатор спроси: переживёт ли он редизайн Кая и другую сортировку? Существует ли он вообще?"
         - en: "One locator counts positions, one uses style classes, and one test id doesn't exist on the page."
           ru: "Один локатор считает позиции, другой опирается на классы стилей, а одного test id на странице нет."
-        - en: "Lines 5, 6 and 7."
-          ru: "Строки 5, 6 и 7."
+        - en: "Lines 6, 7 and 8."
+          ru: "Строки 6, 7 и 8."
       praise:
         en: "Three catches — including the invented test id that only looks right. That's a review that saves tomorrow's red build."
         ru: "Три находки — включая выдуманный test id, который лишь выглядит правильным. Такое ревью спасает завтрашнюю красную сборку."
       explain:
-        en: "Test ids are great — but only real ones. An invented `cart-counter` fails just like an invented button text. A redesign-proof version: `getByTestId('product-card').filter({ hasText: 'Peony Dream' })`, then `getByRole('button', { name: 'Add to cart' })`, then `getByTestId('cart-count')`."
-        ru: "Test id — это отлично, но только настоящие. Выдуманный `cart-counter` падает так же, как выдуманный текст кнопки. Версия, которая переживёт редизайн: `getByTestId('product-card').filter({ hasText: 'Peony Dream' })`, затем `getByRole('button', { name: 'Add to cart' })`, затем `getByTestId('cart-count')`."
+        en: 'Test ids are great — but only real ones. An invented `cart-counter` fails just like an invented button text. A redesign-proof version: `get_by_test_id("product-card").filter(has_text="Peony Dream")`, then `get_by_role("button", name="Add to cart")`, then `get_by_test_id("cart-count")`.'
+        ru: 'Test id — это отлично, но только настоящие. Выдуманный `cart-counter` падает так же, как выдуманный текст кнопки. Версия, которая переживёт редизайн: `get_by_test_id("product-card").filter(has_text="Peony Dream")`, затем `get_by_role("button", name="Add to cart")`, затем `get_by_test_id("cart-count")`.'
 
   - type: task
     task:
@@ -343,10 +343,10 @@ steps:
           - { action: "Click \"Create account\"", expected: "Error \"Please enter a valid email address.\"; the Email field has aria-invalid=\"true\"" }
       blocks:
         - { id: task, locked: true, text: "Write a Playwright test for TC-421 (Bloomly signup).", ru: "Напиши Playwright-тест для TC-421 (регистрация в Bloomly)." }
-        - { id: steps, text: "Steps: open /signup, type anna-at-bloomly into Email, click \"Create account\".", ru: "Шаги: открой /signup, введи anna-at-bloomly в поле Email, нажми «Create account»." }
-        - { id: text, text: "Expected: the email error says \"Please enter a valid email address.\"", ru: "Ожидается: ошибка у поля Email гласит «Please enter a valid email address.»" }
-        - { id: aria, text: "Also assert that the Email field has aria-invalid=\"true\" — that's how a screen reader knows the field is wrong.", ru: "Также проверь, что у поля Email есть aria-invalid=\"true\", — так скринридер узнаёт, что поле заполнено неверно." }
-        - { id: locators, text: "Locators: getByLabel, getByRole, getByTestId. No CSS classes or ids.", ru: "Локаторы: getByLabel, getByRole, getByTestId. Никаких CSS-классов и id." }
+        - { id: steps, text: 'Steps: open /signup, type anna-at-bloomly into Email, click "Create account".', ru: "Шаги: открой /signup, введи anna-at-bloomly в поле Email, нажми «Create account»." }
+        - { id: text, text: 'Expected: the email error says "Please enter a valid email address."', ru: "Ожидается: ошибка у поля Email гласит «Please enter a valid email address.»" }
+        - { id: aria, text: "Also assert that the Email field has aria-invalid=\"true\" — that's how a screen reader knows the field is wrong.", ru: 'Также проверь, что у поля Email есть aria-invalid="true", — так скринридер узнаёт, что поле заполнено неверно.' }
+        - { id: locators, text: "Locators: get_by_label, get_by_role, get_by_test_id. No CSS classes or ids.", ru: "Локаторы: get_by_label, get_by_role, get_by_test_id. Никаких CSS-классов и id." }
         - { id: css, text: "Copy the ids and classes from the HTML — they're short and precise.", ru: "Бери id и классы из HTML — они короткие и точные." }
       responses:
         - when: [steps, text, aria, locators]
@@ -356,68 +356,68 @@ steps:
             en: "Done! The test checks what sighted users see (the error text) and what a screen reader gets (`aria-invalid`). Green ✅"
             ru: "Готово! Тест проверяет и то, что видят зрячие пользователи (текст ошибки), и то, что получает скринридер (`aria-invalid`). Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('invalid email is flagged on signup', async ({ page }) => {
-              await page.goto('/signup');
-              await page.getByLabel('Email').fill('anna-at-bloomly');
-              await page.getByRole('button', { name: 'Create account' }).click();
-              await expect(page.getByTestId('email-error')).toHaveText('Please enter a valid email address.');
-              await expect(page.getByLabel('Email')).toHaveAttribute('aria-invalid', 'true');
-            });
+
+            def test_invalid_email_is_flagged_on_signup(page: Page):
+                page.goto("/signup")
+                page.get_by_label("Email").fill("anna-at-bloomly")
+                page.get_by_role("button", name="Create account").click()
+                expect(page.get_by_test_id("email-error")).to_have_text("Please enter a valid email address.")
+                expect(page.get_by_label("Email")).to_have_attribute("aria-invalid", "true")
         - when: [steps, text, aria]
           message:
             en: "Done! I took the ids and classes straight from the HTML — short and precise. Green ✅"
             ru: "Готово! Я взял id и классы прямо из HTML — коротко и точно. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('invalid email is flagged on signup', async ({ page }) => {
-              await page.goto('/signup');
-              await page.locator('#signupEmail').fill('anna-at-bloomly');
-              await page.locator('#signup-form .btn').click();
-              await expect(page.locator('.field-error').nth(1)).toHaveText('Please enter a valid email address.');
-              await expect(page.locator('#signupEmail')).toHaveAttribute('aria-invalid', 'true');
-            });
+
+            def test_invalid_email_is_flagged_on_signup(page: Page):
+                page.goto("/signup")
+                page.locator("#signupEmail").fill("anna-at-bloomly")
+                page.locator("#signup-form .btn").click()
+                expect(page.locator(".field-error").nth(1)).to_have_text("Please enter a valid email address.")
+                expect(page.locator("#signupEmail")).to_have_attribute("aria-invalid", "true")
         - when: [steps, text, locators]
           unless: [css]
           message:
             en: "Done! Clean locators, and the error text is checked. Green ✅"
             ru: "Готово! Чистые локаторы, текст ошибки проверен. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('invalid email is flagged on signup', async ({ page }) => {
-              await page.goto('/signup');
-              await page.getByLabel('Email').fill('anna-at-bloomly');
-              await page.getByRole('button', { name: 'Create account' }).click();
-              await expect(page.getByTestId('email-error')).toHaveText('Please enter a valid email address.');
-            });
+
+            def test_invalid_email_is_flagged_on_signup(page: Page):
+                page.goto("/signup")
+                page.get_by_label("Email").fill("anna-at-bloomly")
+                page.get_by_role("button", name="Create account").click()
+                expect(page.get_by_test_id("email-error")).to_have_text("Please enter a valid email address.")
         - when: [steps, text]
           message:
             en: "Done! Short selectors straight from the HTML, and the error text is checked. Green ✅"
             ru: "Готово! Короткие селекторы прямо из HTML, текст ошибки проверен. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('invalid email is flagged on signup', async ({ page }) => {
-              await page.goto('/signup');
-              await page.locator('#signupEmail').fill('anna-at-bloomly');
-              await page.locator('#signup-form .btn').click();
-              await expect(page.locator('.field-error').nth(1)).toHaveText('Please enter a valid email address.');
-            });
+
+            def test_invalid_email_is_flagged_on_signup(page: Page):
+                page.goto("/signup")
+                page.locator("#signupEmail").fill("anna-at-bloomly")
+                page.locator("#signup-form .btn").click()
+                expect(page.locator(".field-error").nth(1)).to_have_text("Please enter a valid email address.")
         - when: []
           message:
             en: "I wasn't sure what exactly you need, so I kept it simple: submit the empty form and check that some error shows up. Green ✅"
             ru: "Я не был уверен, что именно нужно, поэтому сделал попроще: отправить пустую форму и проверить, что появилась какая-нибудь ошибка. Зелёный ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('signup shows an error', async ({ page }) => {
-              await page.goto('/signup');
-              await page.locator('.btn').click();
-              await expect(page.locator('.field-error').first()).toBeVisible();
-            });
+
+            def test_signup_shows_an_error(page: Page):
+                page.goto("/signup")
+                page.locator(".btn").click()
+                expect(page.locator(".field-error").first).to_be_visible()
       missing:
         steps:
           en: "Without the steps Petal didn't know the scenario or the data — it tested the empty form instead."
@@ -426,8 +426,8 @@ steps:
           en: "Without the expected text Petal checked only that *some* error is visible."
           ru: "Без ожидаемого текста Petal проверил только, что видна *какая-то* ошибка."
         aria:
-          en: "Without this block Petal checked only the visible text. TC-421 also expects `aria-invalid=\"true\"` — agents rarely check accessibility unless you ask."
-          ru: "Без этого блока Petal проверил только видимый текст. А TC-421 ожидает ещё и `aria-invalid=\"true\"` — агенты редко проверяют доступность, если их не попросить."
+          en: 'Without this block Petal checked only the visible text. TC-421 also expects `aria-invalid="true"` — agents rarely check accessibility unless you ask.'
+          ru: 'Без этого блока Petal проверил только видимый текст. А TC-421 ожидает ещё и `aria-invalid="true"` — агенты редко проверяют доступность, если их не попросить.'
         locators:
           en: "Without the locator rule Petal took `#signupEmail`, `.btn` and `.field-error` from the HTML — green today, red after Kai's redesign."
           ru: "Без правила про локаторы Petal взял из HTML `#signupEmail`, `.btn` и `.field-error` — сегодня зелёный, после редизайна Кая красный."
@@ -498,8 +498,8 @@ steps:
         en: "You reviewed a frontend change like a tester: not “does it look the same”, but “does every reader still get what they need”."
         ru: "Ты проверил{а|} фронтенд-изменение как тестировщик: не «выглядит ли так же», а «получает ли каждый читатель то, что ему нужно»."
       explain:
-        en: "`data-testid` is for tests; `aria-label` is for people — and for `getByRole`. Kai can add one without removing the other: `aria-label=\"Increase Rose Bouquet\" data-testid=\"qty-plus\"`. In the next lesson you'll learn to catch accessibility bugs like this one with a test."
-        ru: "`data-testid` — для тестов, `aria-label` — для людей, а заодно для `getByRole`. Кай может добавить один, не удаляя другой: `aria-label=\"Increase Rose Bouquet\" data-testid=\"qty-plus\"`. В следующем уроке ты научишься ловить такие баги доступности тестом."
+        en: "`data-testid` is for tests; `aria-label` is for people — and for `get_by_role`. Kai can add one without removing the other: `aria-label=\"Increase Rose Bouquet\" data-testid=\"qty-plus\"`. In the next lesson you'll learn to catch accessibility bugs like this one with a test."
+        ru: '`data-testid` — для тестов, `aria-label` — для людей, а заодно для `get_by_role`. Кай может добавить один, не удаляя другой: `aria-label="Increase Rose Bouquet" data-testid="qty-plus"`. В следующем уроке ты научишься ловить такие баги доступности тестом.'
 
   - type: task
     task:
@@ -514,59 +514,59 @@ steps:
         ru: "Измени одну строку, чтобы тест больше не зависел от CSS-класса. Он должен остаться зелёным."
       app: { state: { cart: [{ id: rose-bouquet, qty: 1 }] } }
       starter: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('the + button updates the cart counter', async ({ page }) => {
-          await page.goto('/cart');
-          await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
-          await expect(page.locator('.badge')).toHaveText('2');
-        });
+
+        def test_plus_button_updates_the_cart_counter(page: Page):
+            page.goto("/cart")
+            page.get_by_role("button", name="Increase Rose Bouquet").click()
+            expect(page.locator(".badge")).to_have_text("2")
       solution: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('the + button updates the cart counter', async ({ page }) => {
-          await page.goto('/cart');
-          await page.getByRole('button', { name: 'Increase Rose Bouquet' }).click();
-          await expect(page.getByTestId('cart-count')).toHaveText('2');
-        });
+
+        def test_plus_button_updates_the_cart_counter(page: Page):
+            page.goto("/cart")
+            page.get_by_role("button", name="Increase Rose Bouquet").click()
+            expect(page.get_by_test_id("cart-count")).to_have_text("2")
       checks:
         expect: pass
         static:
           - noFragile
           - rule: uses
-            value: getByTestId
+            value: get_by_test_id
             message:
-              en: "Use the counter's test id: getByTestId(...)."
-              ru: "Используй test id счётчика: getByTestId(...)."
+              en: "Use the counter's test id: get_by_test_id(...)."
+              ru: "Используй test id счётчика: get_by_test_id(...)."
       hints:
         - en: "Which attribute of the counter exists only for tests? In the header it's `<span class=\"badge\" data-testid=\"cart-count\">`."
-          ru: "Какой атрибут счётчика существует только для тестов? В шапке это `<span class=\"badge\" data-testid=\"cart-count\">`."
-        - en: "Replace `page.locator('.badge')` with `page.getByTestId(...)`."
-          ru: "Замени `page.locator('.badge')` на `page.getByTestId(...)`."
-        - en: "Line 6: `await expect(page.getByTestId('cart-count')).toHaveText('2');`"
-          ru: "Строка 6: `await expect(page.getByTestId('cart-count')).toHaveText('2');`"
+          ru: 'Какой атрибут счётчика существует только для тестов? В шапке это `<span class="badge" data-testid="cart-count">`.'
+        - en: 'Replace `page.locator(".badge")` with `page.get_by_test_id(...)`.'
+          ru: 'Замени `page.locator(".badge")` на `page.get_by_test_id(...)`.'
+        - en: 'Line 7: `expect(page.get_by_test_id("cart-count")).to_have_text("2")`'
+          ru: 'Строка 7: `expect(page.get_by_test_id("cart-count")).to_have_text("2")`'
       praise:
-        en: "Redesign-proof. And line 5 already finds the + button by its `aria-label` — both locators now rely on promises, not on looks."
-        ru: "Теперь редизайн не страшен. А строка 5 и так находит кнопку + по её `aria-label` — оба локатора опираются на обещания, а не на внешний вид."
+        en: "Redesign-proof. And line 6 already finds the + button by its `aria-label` — both locators now rely on promises, not on looks."
+        ru: "Теперь редизайн не страшен. А строка 6 и так находит кнопку + по её `aria-label` — оба локатора опираются на обещания, а не на внешний вид."
       explain:
-        en: "The counter has no role or name of its own — it's a number inside the “Cart” link. That's the classic case for a test id: `getByTestId('cart-count')`. Kai can rename `.badge` to anything; the test won't notice."
-        ru: "У счётчика нет своей роли и имени — это просто число внутри ссылки «Cart». Классический случай для test id: `getByTestId('cart-count')`. Кай может переименовать `.badge` как угодно — тест этого не заметит."
+        en: "The counter has no role or name of its own — it's a number inside the “Cart” link. That's the classic case for a test id: `get_by_test_id(\"cart-count\")`. Kai can rename `.badge` to anything; the test won't notice."
+        ru: 'У счётчика нет своей роли и имени — это просто число внутри ссылки «Cart». Классический случай для test id: `get_by_test_id("cart-count")`. Кай может переименовать `.badge` как угодно — тест этого не заметит.'
 
   - type: mistakes
     title: { en: "Attribute mistakes agents make", ru: "Ошибки с атрибутами, которые делают агенты" }
     items:
-      - wrong: "await page.locator('.btn').click();"
-        right: "await page.getByRole('button', { name: 'Proceed to checkout' }).click();"
+      - wrong: 'page.locator(".btn").click()'
+        right: 'page.get_by_role("button", name="Proceed to checkout").click()'
         why:
           en: "A class is a style many elements share — three on the cart page alone. And Kai's redesign renames it."
           ru: "Класс — это стиль, общий для многих элементов: только в корзине их три. А Кай переименует его в редизайне."
-      - wrong: "await expect(page.getByTestId('cart-counter')).toHaveText('1');"
-        right: "await expect(page.getByTestId('cart-count')).toHaveText('1');"
+      - wrong: 'expect(page.get_by_test_id("cart-counter")).to_have_text("1")'
+        right: 'expect(page.get_by_test_id("cart-count")).to_have_text("1")'
         why:
           en: "Agents invent test ids that sound right. A test id exists only if a developer put it into the HTML — check it in DevTools."
           ru: "Агенты придумывают test id, которые звучат правдоподобно. Test id существует, только если разработчик добавил его в HTML, — проверь в DevTools."
-      - wrong: "await expect(page.getByTestId('login-error')).toBeAttached();"
-        right: "await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');"
+      - wrong: 'expect(page.get_by_test_id("login-error")).to_be_attached()'
+        right: 'expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")'
         why:
           en: "The error box is always in the DOM, just `hidden`. “It exists” proves nothing — check that it shows the right text."
           ru: "Блок ошибки всегда есть в DOM, просто с `hidden`. «Он существует» ничего не доказывает — проверь, что он показывает нужный текст."
@@ -580,16 +580,16 @@ steps:
     keyPoint: kp-class-vs-testid
     prompt:
       en: "In your own words: why does `data-testid=\"cart-count\"` survive Kai's redesign while `class=\"badge\"` doesn't? And why isn't a test id enough for the + button?"
-      ru: "Своими словами: почему `data-testid=\"cart-count\"` переживёт редизайн Кая, а `class=\"badge\"` — нет? И почему для кнопки + одного test id мало?"
+      ru: 'Своими словами: почему `data-testid="cart-count"` переживёт редизайн Кая, а `class="badge"` — нет? И почему для кнопки + одного test id мало?'
     model:
-      en: "A class is a style name: the team changes it whenever the look changes, and many elements share it. A data-testid exists only for tests, users never see it, and the team agrees not to rename it — so it survives a redesign. But a test id is invisible to people. The + button also needs its aria-label, “Increase Rose Bouquet”, because that's the only name a screen reader can announce — and the name getByRole and the agent rely on."
-      ru: "Класс — это имя стиля: команда меняет его при каждой смене внешнего вида, и его носят многие элементы. data-testid существует только для тестов, пользователь его не видит, а команда договорилась его не переименовывать — поэтому он переживает редизайн. Но test id невидим для людей. Кнопке + нужен ещё и aria-label «Increase Rose Bouquet»: это единственное имя, которое может произнести скринридер, — и то имя, на которое опираются getByRole и агент."
+      en: "A class is a style name: the team changes it whenever the look changes, and many elements share it. A data-testid exists only for tests, users never see it, and the team agrees not to rename it — so it survives a redesign. But a test id is invisible to people. The + button also needs its aria-label, “Increase Rose Bouquet”, because that's the only name a screen reader can announce — and the name get_by_role and the agent rely on."
+      ru: "Класс — это имя стиля: команда меняет его при каждой смене внешнего вида, и его носят многие элементы. data-testid существует только для тестов, пользователь его не видит, а команда договорилась его не переименовывать — поэтому он переживает редизайн. Но test id невидим для людей. Кнопке + нужен ещё и aria-label «Increase Rose Bouquet»: это единственное имя, которое может произнести скринридер, — и то имя, на которое опираются get_by_role и агент."
 
   - type: phrases
     items:
       - context: code-review
-        en: "Line 6: .btn.small is a style class, and the redesign renames it. Could you use getByRole('button', { name: 'Add to cart' }) instead?"
-        ru: "Строка 6: .btn.small — это класс стилей, и редизайн его переименует. Можешь использовать вместо него getByRole('button', { name: 'Add to cart' })?"
+        en: 'Line 7: .btn.small is a style class, and the redesign renames it. Could you use get_by_role("button", name="Add to cart") instead?'
+        ru: 'Строка 7: .btn.small — это класс стилей, и редизайн его переименует. Можешь использовать вместо него get_by_role("button", name="Add to cart")?'
       - context: code-review
         en: "There's no data-testid=\"cart-counter\" in the DOM — it's cart-count. Please check test ids in DevTools before using them."
         ru: "В DOM нет data-testid=\"cart-counter\" — он называется cart-count. Пожалуйста, проверяй test id в DevTools, прежде чем их использовать."
@@ -606,8 +606,8 @@ steps:
         en: "Before the redesign lands, I'm moving our locators from CSS classes to roles and test ids."
         ru: "До выхода редизайна я перевожу наши локаторы с CSS-классов на роли и test id."
       - context: prompt
-        en: "Don't use CSS classes or ids in locators. Prefer getByRole and getByLabel; use getByTestId only for elements without a name."
-        ru: "Не используй в локаторах CSS-классы и id. Предпочитай getByRole и getByLabel; getByTestId — только для элементов без имени."
+        en: "Don't use CSS classes or ids in locators. Prefer get_by_role and get_by_label; use get_by_test_id only for elements without a name."
+        ru: "Не используй в локаторах CSS-классы и id. Предпочитай get_by_role и get_by_label; get_by_test_id — только для элементов без имени."
         note:
           en: "Worth saving in the project's rules for the agent, so you don't repeat it in every prompt."
           ru: "Это стоит один раз записать в правила проекта для агента, чтобы не повторять в каждом промпте."
@@ -627,8 +627,8 @@ checkPool:
       - text: 'href="/cart"'
         correct: true
         why:
-          en: "A `name=\"value\"` pair inside the opening `<a …>` tag: where the link leads."
-          ru: "Пара `name=\"value\"` внутри открывающего тега `<a …>`: куда ведёт ссылка."
+          en: 'A `name="value"` pair inside the opening `<a …>` tag: where the link leads.'
+          ru: 'Пара `name="value"` внутри открывающего тега `<a …>`: куда ведёт ссылка.'
       - text: 'class="badge"'
         correct: true
         why:
@@ -644,8 +644,8 @@ checkPool:
           ru: "Это тег: он говорит, что это за элемент. Атрибуты живут внутри него."
     optionsCode: true
     hints:
-      - en: "Attributes always have the form `name=\"value\"` and sit inside an opening tag."
-        ru: "Атрибуты всегда выглядят как `name=\"value\"` и стоят внутри открывающего тега."
+      - en: 'Attributes always have the form `name="value"` and sit inside an opening tag.'
+        ru: 'Атрибуты всегда выглядят как `name="value"` и стоят внутри открывающего тега.'
       - en: "Two of the options have an `=` sign."
         ru: "У двух вариантов есть знак `=`."
     explain:
@@ -667,11 +667,11 @@ checkPool:
         ru: "Радиокнопки — в группе «Account type» (`<fieldset>`)."
       - en: "Look for an attribute with no value — just its name. Pick the `<input>` itself, not its `<label>`."
         ru: "Ищи атрибут без значения — только имя. Выбери сам `<input>`, а не его `<label>`."
-      - en: "The `<input type=\"radio\" … checked>` of “Personal”."
-        ru: "`<input type=\"radio\" … checked>` у варианта «Personal»."
+      - en: 'The `<input type="radio" … checked>` of “Personal”.'
+        ru: '`<input type="radio" … checked>` у варианта «Personal».'
     explain:
-      en: "`checked` works like `disabled` and `hidden`: no value, its presence is the state. That's why “Personal” is selected on load. A test would check it with `await expect(page.getByRole('radio', { name: 'Personal' })).toBeChecked()`."
-      ru: "`checked` работает как `disabled` и `hidden`: значения нет, состояние — само присутствие атрибута. Поэтому «Personal» выбран сразу при загрузке. В тесте это проверяют так: `await expect(page.getByRole('radio', { name: 'Personal' })).toBeChecked()`."
+      en: "`checked` works like `disabled` and `hidden`: no value, its presence is the state. That's why “Personal” is selected on load. A test would check it with `expect(page.get_by_role(\"radio\", name=\"Personal\")).to_be_checked()`."
+      ru: '`checked` работает как `disabled` и `hidden`: значения нет, состояние — само присутствие атрибута. Поэтому «Personal» выбран сразу при загрузке. В тесте это проверяют так: `expect(page.get_by_role("radio", name="Personal")).to_be_checked()`.'
 
   - id: c4-l2-k3
     kind: predict
@@ -680,12 +680,12 @@ checkPool:
       en: "Will this test pass or fail?"
       ru: "Этот тест пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('every product card has an Add to cart button', async ({ page }) => {
-        await page.goto('/shop');
-        await expect(page.getByTestId('add-to-cart')).toHaveCount(6);
-      });
+
+      def test_every_product_card_has_an_add_to_cart_button(page: Page):
+          page.goto("/shop")
+          expect(page.get_by_test_id("add-to-cart")).to_have_count(6)
     outcome: pass
     reasons:
       - text:
@@ -699,8 +699,8 @@ checkPool:
           en: "Fail: a test id must be unique, so Playwright throws a strict mode error"
           ru: "Упадёт: test id должен быть уникальным, поэтому Playwright выдаст ошибку строгого режима"
         why:
-          en: "Strict mode applies to actions and single-element checks. `toHaveCount` is made for many elements — and test ids may repeat."
-          ru: "Строгий режим касается действий и проверок одного элемента. `toHaveCount` создан для многих элементов — а test id могут повторяться."
+          en: "Strict mode applies to actions and single-element checks. `to_have_count` is made for many elements — and test ids may repeat."
+          ru: "Строгий режим касается действий и проверок одного элемента. `to_have_count` создан для многих элементов — а test id могут повторяться."
       - text:
           en: "Fail: White Orchid's button is disabled, so it isn't counted"
           ru: "Упадёт: кнопка White Orchid неактивна, поэтому её не посчитают"
@@ -710,11 +710,11 @@ checkPool:
     hints:
       - en: "Is a test id like an `id` (one per page) or like a label for a kind of element?"
         ru: "Test id — это как `id` (один на страницу) или как метка для вида элементов?"
-      - en: "`toHaveCount` counts every match, disabled ones too."
-        ru: "`toHaveCount` считает все совпадения, неактивные тоже."
+      - en: "`to_have_count` counts every match, disabled ones too."
+        ru: "`to_have_count` считает все совпадения, неактивные тоже."
     explain:
-      en: "Six cards, six buttons, one shared test id. To click one of them, narrow it down: `getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByTestId('add-to-cart')`. Only the `id` attribute must be unique on a page."
-      ru: "Шесть карточек, шесть кнопок, один общий test id. Чтобы нажать одну из них, сузь поиск: `getByTestId('product-card').filter({ hasText: 'Sunny Tulips' }).getByTestId('add-to-cart')`. Уникальным на странице обязан быть только атрибут `id`."
+      en: 'Six cards, six buttons, one shared test id. To click one of them, narrow it down: `get_by_test_id("product-card").filter(has_text="Sunny Tulips").get_by_test_id("add-to-cart")`. Only the `id` attribute must be unique on a page.'
+      ru: 'Шесть карточек, шесть кнопок, один общий test id. Чтобы нажать одну из них, сузь поиск: `get_by_test_id("product-card").filter(has_text="Sunny Tulips").get_by_test_id("add-to-cart")`. Уникальным на странице обязан быть только атрибут `id`.'
 
   - id: c4-l2-k4
     kind: review
@@ -735,36 +735,36 @@ checkPool:
         - { action: "Check \"This is a gift\"" }
         - { action: "Type into Gift message", data: "Happy birthday!", expected: "The counter shows \"15/200\"" }
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('gift message counter counts characters', async ({ page }) => {
-        await page.goto('/checkout');
-        await page.getByLabel('This is a gift').check();
-        await page.locator('textarea.gift-input').fill('Happy birthday!');
-        await expect(page.locator('.hint')).toHaveText('15/200');
-      });
+
+      def test_gift_message_counter_counts_characters(page: Page):
+          page.goto("/checkout")
+          page.get_by_label("This is a gift").check()
+          page.locator("textarea.gift-input").fill("Happy birthday!")
+          expect(page.locator(".hint")).to_have_text("15/200")
     issues:
-      - line: 6
+      - line: 7
         type: hallucination
         note:
-          en: "There's no class `gift-input` — the textarea has only `id=\"co-message\"`, `rows` and `maxlength`. Use `getByLabel('Gift message')`."
-          ru: "Класса `gift-input` нет — у textarea только `id=\"co-message\"`, `rows` и `maxlength`. Используй `getByLabel('Gift message')`."
-      - line: 7
+          en: "There's no class `gift-input` — the textarea has only `id=\"co-message\"`, `rows` and `maxlength`. Use `get_by_label(\"Gift message\")`."
+          ru: 'Класса `gift-input` нет — у textarea только `id="co-message"`, `rows` и `maxlength`. Используй `get_by_label("Gift message")`.'
+      - line: 8
         type: fragile-locator
         note:
-          en: "`.hint` is a style class (small grey text). Another hint on the page or a redesign breaks it. Use `getByTestId('gift-counter')`."
-          ru: "`.hint` — класс стиля (мелкий серый текст). Ещё одна подсказка на странице или редизайн — и он сломается. Используй `getByTestId('gift-counter')`."
+          en: '`.hint` is a style class (small grey text). Another hint on the page or a redesign breaks it. Use `get_by_test_id("gift-counter")`.'
+          ru: '`.hint` — класс стиля (мелкий серый текст). Ещё одна подсказка на странице или редизайн — и он сломается. Используй `get_by_test_id("gift-counter")`.'
     types: [fragile-locator, hallucination, wrong-data, wrong-assertion, hard-wait]
     hints:
       - en: "One class doesn't exist on the page at all; another exists but only describes a style."
         ru: "Одного класса на странице нет вовсе; другой есть, но описывает только стиль."
-      - en: "Line 5 is fine: it uses the checkbox's label. And “Happy birthday!” really is 15 characters."
-        ru: "Строка 5 в порядке: она использует подпись чекбокса. А в «Happy birthday!» действительно 15 символов."
-      - en: "Lines 6 and 7."
-        ru: "Строки 6 и 7."
+      - en: "Line 6 is fine: it uses the checkbox's label. And “Happy birthday!” really is 15 characters."
+        ru: "Строка 6 в порядке: она использует подпись чекбокса. А в «Happy birthday!» действительно 15 символов."
+      - en: "Lines 7 and 8."
+        ru: "Строки 7 и 8."
     explain:
-      en: "An invented class fails today; a real style class fails after the redesign. Both have the same cure: a label for the field (`getByLabel('Gift message')`) and a test id for the counter, which has no name of its own (`getByTestId('gift-counter')`)."
-      ru: "Выдуманный класс падает сегодня, настоящий класс стиля — после редизайна. Лечатся оба одинаково: подпись для поля (`getByLabel('Gift message')`) и test id для счётчика, у которого нет своего имени (`getByTestId('gift-counter')`)."
+      en: 'An invented class fails today; a real style class fails after the redesign. Both have the same cure: a label for the field (`get_by_label("Gift message")`) and a test id for the counter, which has no name of its own (`get_by_test_id("gift-counter")`).'
+      ru: 'Выдуманный класс падает сегодня, настоящий класс стиля — после редизайна. Лечатся оба одинаково: подпись для поля (`get_by_label("Gift message")`) и test id для счётчика, у которого нет своего имени (`get_by_test_id("gift-counter")`).'
 
   - id: c4-l2-k5
     kind: pick-locator
@@ -775,31 +775,31 @@ checkPool:
       en: "The cart total (“€39.90”) has no role or label of its own. Pick the locator that survives Kai's redesign."
       ru: "У итоговой суммы корзины («€39.90») нет своей роли и подписи. Выбери локатор, который переживёт редизайн Кая."
     options:
-      - text: "page.getByTestId('cart-total')"
+      - text: 'page.get_by_test_id("cart-total")'
         correct: true
         why:
           en: "Made for tests, untouched by the redesign, and it matches exactly one element."
           ru: "Создан для тестов, редизайн его не трогает, и он находит ровно один элемент."
-      - text: "page.locator('dd.total')"
+      - text: 'page.locator("dd.total")'
         why:
           en: "`total` is only a style (bold text): the “Total” label next to it has the same class, and the redesign may rename it."
           ru: "`total` — всего лишь стиль (жирный текст): тот же класс есть у соседней подписи «Total», а в редизайне его могут переименовать."
-      - text: "page.locator('.summary dd:last-child')"
+      - text: 'page.locator(".summary dd:last-child")'
         why:
           en: "Depends on the order of the summary rows: add a “Gift wrap” row, and it points elsewhere."
           ru: "Зависит от порядка строк в итогах: добавят строку «Gift wrap» — и он укажет на другое."
-      - text: "page.getByText('€39.90')"
+      - text: 'page.get_by_text("€39.90")'
         why:
           en: "That's the value you want to *check*, not an address. If the total is wrong, this locator finds nothing."
           ru: "Это значение, которое нужно *проверить*, а не адрес. Если сумма неверная, локатор ничего не найдёт."
     hints:
       - en: "Which attribute of the total exists only for tests?"
         ru: "Какой атрибут итоговой суммы существует только для тестов?"
-      - en: "Inspect it: `<dd class=\"total\" data-testid=\"cart-total\">`."
-        ru: "Посмотри код элемента: `<dd class=\"total\" data-testid=\"cart-total\">`."
+      - en: 'Inspect it: `<dd class="total" data-testid="cart-total">`.'
+        ru: 'Посмотри код элемента: `<dd class="total" data-testid="cart-total">`.'
     explain:
-      en: "For elements without a role or name — totals, counters, cards — a test id is the stable choice. Then you assert the value: `await expect(page.getByTestId('cart-total')).toHaveText('€39.90')`."
-      ru: "Для элементов без роли и имени — сумм, счётчиков, карточек — test id и есть стабильный выбор. А значение потом проверяешь: `await expect(page.getByTestId('cart-total')).toHaveText('€39.90')`."
+      en: 'For elements without a role or name — totals, counters, cards — a test id is the stable choice. Then you assert the value: `expect(page.get_by_test_id("cart-total")).to_have_text("€39.90")`.'
+      ru: 'Для элементов без роли и имени — сумм, счётчиков, карточек — test id и есть стабильный выбор. А значение потом проверяешь: `expect(page.get_by_test_id("cart-total")).to_have_text("€39.90")`.'
 
   - id: c4-l2-k6
     kind: predict
@@ -807,18 +807,18 @@ checkPool:
     placement: true
     context:
       en: "The logo in Bloomly's header: `<a href=\"/\" class=\"logo\" aria-label=\"Bloomly home\"><span class=\"logo-mark\" aria-hidden=\"true\">✿</span> Bloomly</a>`"
-      ru: "Логотип в шапке Bloomly: `<a href=\"/\" class=\"logo\" aria-label=\"Bloomly home\"><span class=\"logo-mark\" aria-hidden=\"true\">✿</span> Bloomly</a>`"
+      ru: 'Логотип в шапке Bloomly: `<a href="/" class="logo" aria-label="Bloomly home"><span class="logo-mark" aria-hidden="true">✿</span> Bloomly</a>`'
     prompt:
       en: "Will this test pass or fail?"
       ru: "Этот тест пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('the logo leads home', async ({ page }) => {
-        await page.goto('/shop');
-        await page.getByRole('link', { name: '✿ Bloomly' }).click();
-        await expect(page).toHaveURL('/');
-      });
+
+      def test_the_logo_leads_home(page: Page):
+          page.goto("/shop")
+          page.get_by_role("link", name="✿ Bloomly").click()
+          expect(page).to_have_url("http://localhost:3000/")
     outcome: fail
     reasons:
       - text:
@@ -843,11 +843,11 @@ checkPool:
     hints:
       - en: "Which attribute names the link?"
         ru: "Какой атрибут даёт ссылке имя?"
-      - en: "`getByRole(..., { name })` looks at the element's name, not at what's painted on the screen."
-        ru: "`getByRole(..., { name })` смотрит на имя элемента, а не на то, что нарисовано на экране."
+      - en: "`name=` in `get_by_role` compares the element's name, not what's painted on the screen."
+        ru: "`name=` в `get_by_role` сравнивает имя элемента, а не то, что нарисовано на экране."
     explain:
-      en: "`aria-label` replaces the text inside as the link's name, and `aria-hidden=\"true\"` keeps the ✿ out of it anyway. The working locator is `getByRole('link', { name: 'Bloomly home' })` — the same name a screen reader announces."
-      ru: "`aria-label` заменяет текст внутри ссылки в качестве её имени, а `aria-hidden=\"true\"` и так исключает ✿. Рабочий локатор — `getByRole('link', { name: 'Bloomly home' })`: то же имя, что произносит скринридер."
+      en: "`aria-label` replaces the text inside as the link's name, and `aria-hidden=\"true\"` keeps the ✿ out of it anyway. The working locator is `get_by_role(\"link\", name=\"Bloomly home\")` — the same name a screen reader announces."
+      ru: '`aria-label` заменяет текст внутри ссылки в качестве её имени, а `aria-hidden="true"` и так исключает ✿. Рабочий локатор — `get_by_role("link", name="Bloomly home")`: то же имя, что произносит скринридер.'
 
   - id: c4-l2-k7
     kind: fill
@@ -856,15 +856,15 @@ checkPool:
       en: "An empty signup form is submitted. Fill in the attribute names so the test checks what a screen reader gets."
       ru: "Пустая форма регистрации отправлена. Впиши названия атрибутов, чтобы тест проверял то, что получает скринридер."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('empty email is marked invalid', async ({ page }) => {
-        await page.goto('/signup');
-        await page.getByRole('button', { name: 'Create account' }).click();
-        await expect(page.getByTestId('email-error')).toHaveText('Please enter a valid email address.');
-        await expect(page.getByLabel('Email')).toHaveAttribute('___', 'true');
-        await expect(page.getByLabel('Email')).toHaveAttribute('___', 'signupEmail-error');
-      });
+
+      def test_empty_email_is_marked_invalid(page: Page):
+          page.goto("/signup")
+          page.get_by_role("button", name="Create account").click()
+          expect(page.get_by_test_id("email-error")).to_have_text("Please enter a valid email address.")
+          expect(page.get_by_label("Email")).to_have_attribute("___", "true")
+          expect(page.get_by_label("Email")).to_have_attribute("___", "signupEmail-error")
     blanks:
       - { answers: [aria-invalid], options: [aria-invalid, aria-hidden, aria-disabled] }
       - { answers: [aria-describedby], options: [aria-describedby, aria-label, id] }
@@ -875,8 +875,8 @@ checkPool:
       - en: "Second blank: the attribute that points to the id of the error text."
         ru: "Второй пропуск: атрибут, который указывает на id текста ошибки."
     explain:
-      en: "`aria-invalid=\"true\"` tells a screen reader the field is wrong; `aria-describedby=\"signupEmail-error\"` makes it read the error text when the user lands on the field. Bloomly adds both when validation fails and removes them once the field is fixed."
-      ru: "`aria-invalid=\"true\"` сообщает скринридеру, что поле заполнено неверно, а `aria-describedby=\"signupEmail-error\"` заставляет его прочитать текст ошибки, когда пользователь попадает в поле. Bloomly добавляет оба атрибута при ошибке валидации и убирает их, когда поле исправлено."
+      en: '`aria-invalid="true"` tells a screen reader the field is wrong; `aria-describedby="signupEmail-error"` makes it read the error text when the user lands on the field. Bloomly adds both when validation fails and removes them once the field is fixed.'
+      ru: '`aria-invalid="true"` сообщает скринридеру, что поле заполнено неверно, а `aria-describedby="signupEmail-error"` заставляет его прочитать текст ошибки, когда пользователь попадает в поле. Bloomly добавляет оба атрибута при ошибке валидации и убирает их, когда поле исправлено.'
 
   - id: c4-l2-k8
     kind: fix
@@ -886,34 +886,34 @@ checkPool:
       en: "The cart has two rows: Rose Bouquet and Sunny Tulips. Petal's test is red with a strict mode violation."
       ru: "В корзине две строки: Rose Bouquet и Sunny Tulips. Тест Petal красный из-за нарушения строгого режима."
     prompt:
-      en: "Fix line 5: find the + button of the Sunny Tulips row by the name its `aria-label` gives it."
-      ru: "Исправь строку 5: найди кнопку + в строке Sunny Tulips по имени, которое ей даёт `aria-label`."
+      en: "Fix line 6: find the + button of the Sunny Tulips row by the name its `aria-label` gives it."
+      ru: "Исправь строку 6: найди кнопку + в строке Sunny Tulips по имени, которое ей даёт `aria-label`."
     starter: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('+ raises the Sunny Tulips quantity', async ({ page }) => {
-        await page.goto('/cart');
-        await page.locator('.qty button:last-child').click();
-        await expect(page.getByLabel('Quantity of Sunny Tulips')).toHaveValue('2');
-      });
+
+      def test_plus_raises_the_sunny_tulips_quantity(page: Page):
+          page.goto("/cart")
+          page.locator(".qty button:last-child").click()
+          expect(page.get_by_label("Quantity of Sunny Tulips")).to_have_value("2")
     solution: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('+ raises the Sunny Tulips quantity', async ({ page }) => {
-        await page.goto('/cart');
-        await page.getByRole('button', { name: 'Increase Sunny Tulips' }).click();
-        await expect(page.getByLabel('Quantity of Sunny Tulips')).toHaveValue('2');
-      });
+
+      def test_plus_raises_the_sunny_tulips_quantity(page: Page):
+          page.goto("/cart")
+          page.get_by_role("button", name="Increase Sunny Tulips").click()
+          expect(page.get_by_label("Quantity of Sunny Tulips")).to_have_value("2")
     checks:
       expect: pass
       static: [noFragile]
     hints:
       - en: "`.qty button:last-child` matches the + button in *every* row. The aria-label tells the rows apart."
         ru: "`.qty button:last-child` находит кнопку + в *каждой* строке. Строки различает aria-label."
-      - en: "The + buttons are named “Increase <product>”. Use `page.getByRole('button', { name: ... })`."
-        ru: "Кнопки + называются «Increase <товар>». Используй `page.getByRole('button', { name: ... })`."
-      - en: "Line 5: `await page.getByRole('button', { name: 'Increase Sunny Tulips' }).click();`"
-        ru: "Строка 5: `await page.getByRole('button', { name: 'Increase Sunny Tulips' }).click();`"
+      - en: 'The + buttons are named “Increase <product>”. Use `page.get_by_role("button", name=...)`.'
+        ru: 'Кнопки + называются «Increase <товар>». Используй `page.get_by_role("button", name=...)`.'
+      - en: 'Line 6: `page.get_by_role("button", name="Increase Sunny Tulips").click()`'
+        ru: 'Строка 6: `page.get_by_role("button", name="Increase Sunny Tulips").click()`'
     explain:
-      en: "On screen both + buttons look identical; their `aria-label`s are different. That's why the same attribute that helps a screen-reader user also gives the test a precise, redesign-proof locator. Line 6 already uses one: `getByLabel` reads `aria-label` too."
-      ru: "На экране обе кнопки + одинаковые, а их `aria-label` разные. Поэтому тот же атрибут, что помогает пользователю скринридера, даёт тесту точный локатор, которому не страшен редизайн. Строка 6 уже им пользуется: `getByLabel` тоже читает `aria-label`."
+      en: "On screen both + buttons look identical; their `aria-label`s are different. That's why the same attribute that helps a screen-reader user also gives the test a precise, redesign-proof locator. Line 7 already uses one: `get_by_label` reads `aria-label` too."
+      ru: "На экране обе кнопки + одинаковые, а их `aria-label` разные. Поэтому тот же атрибут, что помогает пользователю скринридера, даёт тесту точный локатор, которому не страшен редизайн. Строка 7 уже им пользуется: `get_by_label` тоже читает `aria-label`."

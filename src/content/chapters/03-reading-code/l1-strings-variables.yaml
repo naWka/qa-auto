@@ -1,18 +1,18 @@
 id: c3-l1
 chapter: c3
-title: { en: "Data in code: strings and variables", ru: "Данные в коде: строки и переменные" }
+title: { en: "Strings, variables and f-strings", ru: "Строки, переменные и f-строки" }
 goal:
-  en: "Find the test data in a test and read exactly what will be typed or checked."
-  ru: "Находить тестовые данные в тесте и точно читать, что будет введено или проверено."
+  en: "Find the test data in a test and read exactly what will be typed or checked — including text built with f-strings."
+  ru: "Находить тестовые данные в тесте и точно читать, что будет введено или проверено, — включая текст, собранный f-строкой."
 minutes: 8
 keyPoints:
   - id: kp-strings
     title: { en: "Text in quotes is exact data", ru: "Текст в кавычках — точные данные" }
-  - id: kp-const
-    title: { en: "const gives test data a name", ru: "const даёт тестовым данным имя" }
-  - id: kp-template
-    title: { en: "Template literals put data into text", ru: "Шаблонные строки подставляют данные в текст" }
-terms: [code, string, number, boolean, constant, variable, comment, console, test-data]
+  - id: kp-variable
+    title: { en: "A variable gives test data a name", ru: "Переменная даёт тестовым данным имя" }
+  - id: kp-fstring
+    title: { en: "f-strings put data into text", ru: "f-строки подставляют данные в текст" }
+terms: [code, string, number, boolean, none, variable, constant, f-string, comment, test-data]
 
 steps:
   - type: story
@@ -39,8 +39,8 @@ steps:
         kind: choice
         keyPoint: kp-strings
         prompt:
-          en: "For the code, are `'Log in'` and `'Login'` the same text?"
-          ru: "Для кода `'Log in'` и `'Login'` — это один и тот же текст?"
+          en: "For the code, are `\"Log in\"` and `\"Login\"` the same text?"
+          ru: "Для кода `\"Log in\"` и `\"Login\"` — это один и тот же текст?"
         options:
           - text: { en: "No — one has a space, so they are different strings", ru: "Нет — в одном есть пробел, значит, это разные строки" }
             correct: true
@@ -53,109 +53,111 @@ steps:
           - { en: "Compare the two texts letter by letter.", ru: "Сравни два текста буква за буквой." }
           - { en: "Look between \"Log\" and \"in\".", ru: "Посмотри, что стоит между «Log» и «in»." }
         explain:
-          en: "`'Log in'` has 6 characters, `'Login'` has 5. For code they are different strings — like two different expected results in a test case."
-          ru: "В `'Log in'` 6 символов, в `'Login'` — 5. Для кода это разные строки — как два разных ожидаемых результата в тест-кейсе."
+          en: "`\"Log in\"` has 6 characters, `\"Login\"` has 5. For code they are different strings — like two different expected results in a test case."
+          ru: "В `\"Log in\"` 6 символов, в `\"Login\"` — 5. Для кода это разные строки — как два разных ожидаемых результата в тест-кейсе."
       - id: c3-l1-p2
         kind: choice
-        keyPoint: kp-const
+        keyPoint: kp-variable
         prompt:
           en: "What will this code type into the Email field?"
           ru: "Что этот код введёт в поле Email?"
         code: |
-          const email = 'anna@bloomly.app';
-          await page.getByLabel('Email').fill(email);
+          email = "anna@bloomly.app"
+          page.get_by_label("Email").fill(email)
         options:
           - text: "anna@bloomly.app"
             correct: true
             why: { en: "`email` is a name; its value is the text in quotes on the first line.", ru: "`email` — это имя, а его значение — текст в кавычках в первой строке." }
           - text: "email"
             why: { en: "No quotes around `email` in `fill(email)` — so it's a name, not the word itself.", ru: "В `fill(email)` вокруг `email` нет кавычек — значит, это имя, а не само слово." }
-          - text: "const email"
-            why: { en: "`const` only creates the name. It is never typed anywhere.", ru: "`const` только создаёт имя. Его никуда не вводят." }
+          - text: 'email = "anna@bloomly.app"'
+            why: { en: "That line only gives the text a name. It types nothing — typing is the job of `fill`.", ru: "Эта строка только даёт тексту имя. Сама она ничего не вводит — вводит `fill`." }
         optionsCode: true
         hints:
           - { en: "The first line gives a name to some text.", ru: "Первая строка даёт имя какому-то тексту." }
           - { en: "Which text is attached to the name `email`?", ru: "Какой текст привязан к имени `email`?" }
         explain:
-          en: "Line 1 stores the text 'anna@bloomly.app' under the name `email`. Line 2 uses the name, so the stored text is typed."
-          ru: "Строка 1 сохраняет текст 'anna@bloomly.app' под именем `email`. Строка 2 использует это имя — значит, вводится сохранённый текст."
+          en: "Line 1 stores the text \"anna@bloomly.app\" under the name `email`. Line 2 uses the name, so the stored text is typed."
+          ru: "Строка 1 сохраняет текст «anna@bloomly.app» под именем `email`. Строка 2 использует это имя — значит, вводится сохранённый текст."
 
   - type: theory
     keyPoint: kp-strings
     title: { en: "Text in quotes is exact data", ru: "Текст в кавычках — точные данные" }
     body:
-      - en: "In a test case you write: Click \"Log in\". In [[code]] it looks almost the same: `'Log in'`. Anything inside quotes is a [[string]] — text that the code uses exactly as written."
-        ru: "В тест-кейсе ты пишешь: Нажать «Log in». В [[коде|code]] это выглядит почти так же: `'Log in'`. Всё, что в кавычках, — это [[строка|string]]: текст, который код использует ровно так, как он записан."
-      - en: "Exactly means exactly: `'Log in'`, `'Login'` and `'log in'` are three different strings. A space, a capital letter or a full stop changes the data — like a typo in the expected result of a test case."
-        ru: "Ровно — значит ровно: `'Log in'`, `'Login'` и `'log in'` — три разные строки. Пробел, заглавная буква или точка меняют данные — как опечатка в ожидаемом результате тест-кейса."
-      - en: "Single quotes `'...'`, double quotes `\"...\"` and backticks `` `...` `` all make strings. Values without quotes are something else: `2` is a [[number]], `true` / `false` is a [[boolean]] (yes/no)."
-        ru: "Одинарные кавычки `'...'`, двойные `\"...\"` и обратные `` `...` `` — всё это строки. Значения без кавычек — другое: `2` — это [[число|number]], `true` / `false` — [[логическое значение|boolean]] (да/нет)."
+      - en: "In a test case you write: Click \"Log in\". In [[code]] it looks almost the same: `\"Log in\"`. Anything inside quotes is a [[string]] — text that the code uses exactly as written."
+        ru: "В тест-кейсе ты пишешь: Нажать «Log in». В [[коде|code]] это выглядит почти так же: `\"Log in\"`. Всё, что в кавычках, — это [[строка|string]]: текст, который код использует ровно так, как он записан."
+      - en: "Exactly means exactly: `\"Log in\"`, `\"Login\"` and `\"log in\"` are three different strings. A space, a capital letter or a full stop changes the data — like a typo in the expected result of a test case."
+        ru: "Ровно — значит ровно: `\"Log in\"`, `\"Login\"` и `\"log in\"` — три разные строки. Пробел, заглавная буква или точка меняют данные — как опечатка в ожидаемом результате тест-кейса."
+      - en: "Python accepts double quotes `\"...\"` and single quotes `'...'` — they mean the same; most projects use double. Values without quotes are something else: `2` is a [[number]], `True` / `False` is a [[boolean]] (yes/no), and [[None|none]] means \"no value at all\"."
+        ru: "Python понимает и двойные кавычки `\"...\"`, и одинарные `'...'` — разницы нет, в большинстве проектов пишут двойные. Значения без кавычек — другое: `2` — это [[число|number]], `True` / `False` — [[логическое значение|boolean]] (да/нет), а [[None|none]] значит «значения нет вообще»."
     code: |
-      await page.getByLabel('Email').fill('anna@bloomly.app');
-      await page.getByRole('button', { name: 'Log in' }).click();
-      await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!');
+      page.get_by_label("Email").fill("anna@bloomly.app")
+      page.get_by_role("button", name="Log in").click()
+      expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Anna!")
     mentor:
       en: "Agents copy texts from the page — or guess them. Your check: every string the agent wrote must match the app character by character."
       ru: "Агенты копируют тексты со страницы — или угадывают их. Твоя проверка: каждая строка, которую написал агент, должна совпадать с приложением символ в символ."
 
   - type: theory
-    keyPoint: kp-const
-    title: { en: "const = named test data", ru: "const — тестовые данные с именем" }
+    keyPoint: kp-variable
+    title: { en: "Variables: test data with a name", ru: "Переменные: тестовые данные с именем" }
     body:
-      - en: "A test case has a Test data column: Email = anna@bloomly.app. In code the same idea is a [[constant]]: `const email = 'anna@bloomly.app';` — the name on the left, the value on the right."
-        ru: "В тест-кейсе есть колонка «Тестовые данные»: Email = anna@bloomly.app. В коде та же идея — [[константа|constant]]: `const email = 'anna@bloomly.app';` — слева имя, справа значение."
+      - en: "A test case has a Test data column: Email = anna@bloomly.app. In code the same idea is a [[variable]]: `email = \"anna@bloomly.app\"` — the name on the left, the value on the right. This `=` doesn't compare anything: it attaches the name to the value."
+        ru: "В тест-кейсе есть колонка «Тестовые данные»: Email = anna@bloomly.app. В коде та же идея — [[переменная|variable]]: `email = \"anna@bloomly.app\"` — слева имя, справа значение. Этот `=` ничего не сравнивает: он привязывает имя к значению."
       - en: "Further down, the code uses the name instead of repeating the text. When you see `fill(email)` — no quotes! — look up: what value was given to `email`? That is what will be typed."
         ru: "Дальше код использует имя, а не повторяет текст. Видишь `fill(email)` — без кавычек! — посмотри выше: какое значение дали `email`? Именно оно и будет введено."
-      - en: "`let` creates a [[variable]] whose value can change later. In tests you'll mostly see `const`: the data is set once and stays."
-        ru: "`let` создаёт [[переменную|variable]], значение которой потом можно поменять. В тестах чаще встречается `const`: данные задали один раз, и они не меняются."
+      - en: "A name can get a new value later — the last `=` above the line wins. Names in CAPITALS, like `PASSWORD = \"bloom123\"`, are a [[constant]] by team agreement: data shared by several tests, set once at the top of the file and never changed."
+        ru: "Имени можно потом дать новое значение — действует последний `=` выше строки. Имена ЗАГЛАВНЫМИ, вроде `PASSWORD = \"bloom123\"`, — это [[константа|constant]] по договорённости команды: общие данные для нескольких тестов, их задают один раз в начале файла и больше не меняют."
     code: |
-      const email = 'anna@bloomly.app';
-      const password = 'bloom123';
+      def test_registered_user_can_log_in(page: Page):
+          email = "anna@bloomly.app"
+          password = "bloom123"
 
-      await page.getByLabel('Email').fill(email);
-      await page.getByLabel('Password').fill(password);
+          page.goto("/login")
+          page.get_by_label("Email").fill(email)
+          page.get_by_label("Password").fill(password)
 
   - type: example
-    keyPoint: kp-const
+    keyPoint: kp-variable
     title: { en: "Where is the data in this test?", ru: "Где в этом тесте данные?" }
     intro:
       en: "A login test the way Petal writes it: test data first, then the steps. Read the notes line by line."
       ru: "Тест логина в стиле Petal: сначала тестовые данные, потом шаги. Читай заметки строка за строкой."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      // Test data
-      const email = 'anna@bloomly.app';
-      const password = 'bloom123';
 
-      test('Anna can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill(email);
-        await page.getByLabel('Password').fill(password);
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!');
-      });
+      def test_anna_can_log_in(page: Page):
+          # Test data
+          email = "anna@bloomly.app"
+          password = "bloom123"
+
+          page.goto("/login")
+          page.get_by_label("Email").fill(email)
+          page.get_by_label("Password").fill(password)
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Anna!")
     notes:
-      - lines: 3
+      - lines: 5
         text:
-          en: "`//` starts a [[comment]] — a note for humans. The computer skips it."
-          ru: "`//` начинает [[комментарий|comment]] — заметку для людей. Компьютер её пропускает."
-      - lines: [4, 5]
+          en: "`#` starts a [[comment]] — a note for humans. Python skips it."
+          ru: "`#` начинает [[комментарий|comment]] — заметку для людей. Python её пропускает."
+      - lines: [6, 7]
         text:
-          en: "The test data: two constants. This is the \"Test data\" column of the test case."
-          ru: "Тестовые данные: две константы. Это колонка «Тестовые данные» из тест-кейса."
-      - lines: 9
+          en: "The test data: two variables at the top of the test. This is the \"Test data\" column of the test case."
+          ru: "Тестовые данные: две переменные в начале теста. Это колонка «Тестовые данные» из тест-кейса."
+      - lines: 10
         text:
-          en: "`email` without quotes is a name. Look up to line 4: 'anna@bloomly.app' will be typed."
-          ru: "`email` без кавычек — это имя. Смотрим на строку 4: будет введено 'anna@bloomly.app'."
-      - lines: 11
-        text:
-          en: "'Log in' in quotes is the exact button text from the app."
-          ru: "'Log in' в кавычках — точный текст кнопки из приложения."
+          en: "`email` without quotes is a name. Look up to line 6: \"anna@bloomly.app\" will be typed."
+          ru: "`email` без кавычек — это имя. Смотрим на строку 6: будет введено «anna@bloomly.app»."
       - lines: 12
         text:
-          en: "The expected result. `toHaveText` compares the whole text exactly — every letter, comma and `!`."
-          ru: "Ожидаемый результат. `toHaveText` сравнивает весь текст точно — каждую букву, запятую и `!`."
+          en: "\"Log in\" in quotes is the exact button text from the app."
+          ru: "«Log in» в кавычках — точный текст кнопки из приложения."
+      - lines: 13
+        text:
+          en: "The expected result. `to_have_text` compares the whole text exactly — every letter, comma and `!`."
+          ru: "Ожидаемый результат. `to_have_text` сравнивает весь текст точно — каждую букву, запятую и `!`."
     runnable: true
 
   - type: task
@@ -170,14 +172,14 @@ steps:
         en: "On the login page the heading, the nav link and the submit button all say: Log in"
         ru: "На странице логина заголовок, ссылка в меню и кнопка отправки подписаны одинаково: Log in"
       options:
-        - text: "'Log in'"
+        - text: '"Log in"'
           correct: true
           why: { en: "Same letters, same case, one space — a perfect copy.", ru: "Те же буквы, тот же регистр, один пробел — идеальная копия." }
-        - text: "'Login'"
+        - text: '"Login"'
           why: { en: "The space is missing. This is a classic agent guess — many apps use \"Login\", Bloomly doesn't.", ru: "Пропал пробел. Классическая догадка агента: во многих приложениях «Login», но не в Bloomly." }
-        - text: "'Log In'"
+        - text: '"Log In"'
           why: { en: "Capital I. Some Playwright locators forgive letter case, but assertions and typed data don't — so always copy texts exactly.", ru: "Заглавная I. Некоторые локаторы Playwright прощают регистр, но проверки и вводимые данные — нет. Поэтому тексты всегда копируем точно." }
-        - text: "'Log in '"
+        - text: '"Log in "'
           why: { en: "There is an extra space at the end, inside the quotes. It's part of the string.", ru: "В конце, внутри кавычек, лишний пробел. Он — часть строки." }
       optionsCode: true
       hints:
@@ -188,30 +190,31 @@ steps:
         en: "Sharp eye! Character-by-character comparison is exactly how you review strings."
         ru: "Зоркий глаз! Посимвольное сравнение — именно так и проверяют строки на ревью."
       explain:
-        en: "`'Log in'` matches the app exactly. The other three differ by one character each — the kind of difference you'd circle in red in someone's test case."
-        ru: "`'Log in'` точно совпадает с приложением. Остальные три отличаются ровно на один символ — такое ты бы обв{ела|ёл} в чужом тест-кейсе красным."
+        en: "`\"Log in\"` matches the app exactly. The other three differ by one character each — the kind of difference you'd circle in red in someone's test case."
+        ru: "`\"Log in\"` точно совпадает с приложением. Остальные три отличаются ровно на один символ — такое ты бы обв{ела|ёл} в чужом тест-кейсе красным."
 
   - type: task
     task:
       id: c3-l1-t2
       kind: match
-      keyPoint: kp-const
+      keyPoint: kp-variable
       prompt:
-        en: "Petal declared the test data at the top of the file. Match each line with the text it will actually type."
-        ru: "Petal объявил тестовые данные в начале файла. Сопоставь каждую строку с текстом, который она на самом деле введёт."
+        en: "Petal put the test data at the top of the test. Match each call with the text it will actually type."
+        ru: "Petal задал тестовые данные в начале теста. Сопоставь каждый вызов с текстом, который он на самом деле введёт."
       context:
         en: |
-          ```js
-          const email = 'maya@bloomly.app';
-          const password = 'qa-rocks';
-          const promo = 'BLOOM10';
+          Test data from the test:
+          ```python
+          email = "maya@bloomly.app"
+          password = "qa-rocks"
+          promo = "BLOOM10"
           ```
         ru: |
-          Тестовые данные из файла:
-          ```js
-          const email = 'maya@bloomly.app';
-          const password = 'qa-rocks';
-          const promo = 'BLOOM10';
+          Тестовые данные из теста:
+          ```python
+          email = "maya@bloomly.app"
+          password = "qa-rocks"
+          promo = "BLOOM10"
           ```
       pairs:
         - left: "fill(email)"
@@ -220,74 +223,77 @@ steps:
           right: "qa-rocks"
         - left: "fill(promo)"
           right: "BLOOM10"
-        - left: "fill('email')"
+        - left: 'fill("email")'
           right: "email"
       leftCode: true
       rightCode: true
       hints:
-        - { en: "A name without quotes → look up its value in the constants.", ru: "Имя без кавычек → ищи его значение среди констант." }
-        - { en: "One line has quotes around the word. What is inside quotes is typed as is.", ru: "В одной строке слово в кавычках. Текст в кавычках вводится как есть." }
-        - { en: "`fill('email')` types the five letters e-m-a-i-l.", ru: "`fill('email')` вводит пять букв: e-m-a-i-l." }
+        - { en: "A name without quotes → look up its value in the variables.", ru: "Имя без кавычек → ищи его значение среди переменных." }
+        - { en: "One call has quotes around the word. What is inside quotes is typed as is.", ru: "В одном вызове слово в кавычках. Текст в кавычках вводится как есть." }
+        - { en: '`fill("email")` types the five letters e-m-a-i-l.', ru: '`fill("email")` вводит пять букв: e-m-a-i-l.' }
       praise:
-        en: "You caught the quotes trap — `fill('email')` is a real mistake agents make after a refactoring."
-        ru: "Ты замети{ла|л} ловушку с кавычками — `fill('email')` агенты правда пишут после рефакторинга."
+        en: 'You caught the quotes trap — `fill("email")` is a real mistake agents make after a refactoring.'
+        ru: 'Ты замети{ла|л} ловушку с кавычками — `fill("email")` агенты правда пишут после рефакторинга.'
       explain:
-        en: "No quotes = a name, so the code types its value. Quotes = the text itself. `fill('email')` would type the word \"email\" and the login would fail."
-        ru: "Без кавычек — это имя, и код вводит его значение. В кавычках — сам текст. `fill('email')` ввёл бы слово «email», и логин бы не прошёл."
+        en: 'No quotes = a name, so the code types its value. Quotes = the text itself. `fill("email")` would type the word "email" and the login would fail.'
+        ru: 'Без кавычек — это имя, и код вводит его значение. В кавычках — сам текст. `fill("email")` ввёл бы слово «email», и логин бы не прошёл.'
 
   - type: theory
-    keyPoint: kp-template
-    title: { en: "Template literals: text with gaps", ru: "Шаблонные строки: текст с пропусками" }
+    keyPoint: kp-fstring
+    title: { en: "f-strings: text with gaps", ru: "f-строки: текст с пропусками" }
     body:
-      - en: "Some texts depend on the data: Anna sees \"Welcome back, Anna!\", Tom sees \"Welcome back, Tom!\". Code builds such text with a template literal — a string in backticks `` `...` ``."
-        ru: "Некоторые тексты зависят от данных: Анна видит «Welcome back, Anna!», Том — «Welcome back, Tom!». Такой текст код собирает шаблонной строкой — строкой в обратных кавычках `` `...` ``."
-      - en: "Inside it, `${name}` is a gap: the value of `name` goes there. To read it, replace the gap with the value in your head."
-        ru: "Внутри неё `${name}` — это пропуск: туда подставляется значение `name`. Чтобы прочитать такую строку, мысленно замени пропуск значением."
-      - en: "So `` `Welcome back, ${name}!` `` with `name = 'Tom'` becomes `Welcome back, Tom!`. Then check the result against the app's real text — commas, spaces and `!` included."
-        ru: "Так `` `Welcome back, ${name}!` `` при `name = 'Tom'` превращается в `Welcome back, Tom!`. А потом сверь результат с реальным текстом приложения — с запятыми, пробелами и `!`."
+      - en: "Some texts depend on the data: Anna sees \"Welcome back, Anna!\", Tom sees \"Welcome back, Tom!\". Python builds such text with an [[f-string]] — a string with the letter `f` right before the opening quote: `f\"...\"`."
+        ru: "Некоторые тексты зависят от данных: Анна видит «Welcome back, Anna!», Том — «Welcome back, Tom!». Такой текст Python собирает [[f-строкой|f-string]] — строкой с буквой `f` прямо перед открывающей кавычкой: `f\"...\"`."
+      - en: "Inside it, `{name}` is a gap: the value of `name` goes there. To read it, replace the gap with the value in your head: `f\"Welcome back, {name}!\"` with `name = \"Tom\"` becomes `Welcome back, Tom!`."
+        ru: "Внутри неё `{name}` — это пропуск: туда подставляется значение `name`. Чтобы прочитать такую строку, мысленно замени пропуск значением: `f\"Welcome back, {name}!\"` при `name = \"Tom\"` превращается в `Welcome back, Tom!`."
+      - en: "Watch the `f`. Without it, the braces are just characters: `\"Welcome back, {name}!\"` stays exactly that, braces included. Agents drop the `f` now and then — and the test expects a text no page will ever show."
+        ru: "Следи за `f`. Без неё фигурные скобки — просто символы: `\"Welcome back, {name}!\"` так и останется, вместе со скобками. Агенты иногда теряют `f` — и тест ждёт текст, которого не покажет ни одна страница."
     code: |
-      const name = 'Tom';
-      const greeting = `Welcome back, ${name}!`;
-      // greeting is now: Welcome back, Tom!
+      name = "Tom"
+      greeting = f"Welcome back, {name}!"
+      # greeting is now: Welcome back, Tom!
+
+      broken = "Welcome back, {name}!"
+      # broken is now: Welcome back, {name}!
     mentor:
-      en: "You know this from test cases: Expected: \"Welcome back, <first name>!\". A template literal is the same template — the code fills in the field from the data."
-      ru: "Ты знаешь это по тест-кейсам: Ожидаемый результат: «Welcome back, <имя>!». Шаблонная строка — тот же шаблон, только поле заполняет код из данных."
+      en: "You know this from test cases: Expected: \"Welcome back, <first name>!\". An f-string is the same template — the code fills in the field from the data."
+      ru: "Ты знаешь это по тест-кейсам: Ожидаемый результат: «Welcome back, <имя>!». f-строка — тот же шаблон, только поле заполняет код из данных."
 
   - type: task
     task:
       id: c3-l1-t3
       kind: input
-      keyPoint: kp-template
+      keyPoint: kp-fstring
       prompt:
         en: "What will this script print? Type the exact text."
         ru: "Что выведет этот скрипт? Напиши точный текст."
       code: |
-        const name = 'Tom';
-        const count = 2;
-        console.log(`${name} has ${count} orders`);
+        name = "Tom"
+        count = 2
+        print(f"{name} has {count} orders")
       answers: ["Tom has 2 orders"]
       caseSensitive: true
       run: script
       placeholder: "Printed text"
       hints:
-        - { en: "Replace each `${...}` with the value of that name.", ru: "Замени каждый `${...}` значением этого имени." }
-        - { en: "`${name}` becomes Tom, `${count}` becomes 2. Everything else stays as written.", ru: "`${name}` превращается в Tom, `${count}` — в 2. Всё остальное остаётся как написано." }
+        - { en: "Replace each `{...}` with the value of that name.", ru: "Замени каждый `{...}` значением этого имени." }
+        - { en: "`{name}` becomes Tom, `{count}` becomes 2. Everything else stays as written.", ru: "`{name}` превращается в Tom, `{count}` — в 2. Всё остальное остаётся как написано." }
         - { en: "Tom has … orders", ru: "Tom has … orders" }
       praise:
-        en: "Exactly. You read the template the way the computer does."
-        ru: "Точно. Ты прочита{ла|л} шаблон так же, как его читает компьютер."
+        en: "Exactly. You read the f-string the way Python does."
+        ru: "Точно. Ты прочита{ла|л} f-строку так же, как её читает Python."
       explain:
-        en: "`console.log` prints a message to the [[console]]. The template takes the values of `name` and `count` and puts them into the gaps: \"Tom has 2 orders\". Note that `2` is a number — no quotes needed."
-        ru: "`console.log` выводит сообщение в [[консоль|console]]. Шаблон берёт значения `name` и `count` и вставляет их в пропуски: «Tom has 2 orders». Заметь: `2` — число, кавычки не нужны."
+        en: '`print` shows a line of text in the output. The f-string takes the values of `name` and `count` and puts them into the gaps: "Tom has 2 orders". Note that `2` is a number — no quotes needed.'
+        ru: "`print` выводит строку текста. f-строка берёт значения `name` и `count` и вставляет их в пропуски: «Tom has 2 orders». Заметь: `2` — число, кавычки не нужны."
 
   - type: task
     task:
       id: c3-l1-t4
       kind: fill
-      keyPoint: kp-template
+      keyPoint: kp-fstring
       prompt:
-        en: "Complete the test data for Tom from the test case. The heading check uses a template literal."
-        ru: "Заполни тестовые данные Тома по тест-кейсу. Проверка заголовка собрана шаблонной строкой."
+        en: "Complete the test data for Tom from the test case. The heading check uses an f-string."
+        ru: "Заполни тестовые данные Тома по тест-кейсу. Проверка заголовка собрана f-строкой."
       testCase:
         id: TC-003
         title: Tom can log in
@@ -297,33 +303,33 @@ steps:
           - { action: "Log in", data: "tom@bloomly.app / tulips42" }
           - { action: "Look at the account page heading", expected: "\"Welcome back, Tom!\"" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        const email = 'tom@bloomly.app';
-        const password = '___';
-        const firstName = '___';
 
-        test('Tom can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill(email);
-          await page.getByLabel('Password').fill(password);
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByRole('heading', { level: 1 })).toHaveText(`Welcome back, ${firstName}!`);
-        });
+        def test_tom_can_log_in(page: Page):
+            email = "tom@bloomly.app"
+            password = "___"
+            first_name = "___"
+
+            page.goto("/login")
+            page.get_by_label("Email").fill(email)
+            page.get_by_label("Password").fill(password)
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", level=1)).to_have_text(f"Welcome back, {first_name}!")
       blanks:
         - { answers: [tulips42], options: [tulips42, Tulips42, bloom123] }
         - { answers: [Tom], options: [Tom, Becker, Tom Becker] }
       checks: { expect: pass }
       hints:
         - { en: "Both values are in the test case card — copy them exactly.", ru: "Оба значения есть в карточке тест-кейса — скопируй их точно." }
-        - { en: "For the name: put it into the template and read the full heading. Does it match the expected result?", ru: "Для имени: подставь его в шаблон и прочитай заголовок целиком. Совпадает с ожидаемым результатом?" }
+        - { en: "For the name: put it into the f-string and read the full heading. Does it match the expected result?", ru: "Для имени: подставь его в f-строку и прочитай заголовок целиком. Совпадает с ожидаемым результатом?" }
         - { en: "Password all lowercase; the greeting uses only the first name.", ru: "Пароль — только строчными; в приветствии только имя." }
       praise:
         en: "Green! You took the data straight from the test case — that's the habit that saves hours."
         ru: "Зелёный! Ты взя{ла|л} данные прямо из тест-кейса — эта привычка экономит часы."
       explain:
-        en: "Tom's password is 'tulips42' (lowercase t). With `firstName = 'Tom'` the template gives \"Welcome back, Tom!\" — exactly the expected result. 'Tom Becker' would produce \"Welcome back, Tom Becker!\" and fail."
-        ru: "Пароль Тома — 'tulips42' (со строчной t). С `firstName = 'Tom'` шаблон даёт «Welcome back, Tom!» — ровно ожидаемый результат. С 'Tom Becker' получилось бы «Welcome back, Tom Becker!», и тест бы упал."
+        en: "Tom's password is \"tulips42\" (lowercase t). With `first_name = \"Tom\"` the f-string gives \"Welcome back, Tom!\" — exactly the expected result. \"Tom Becker\" would produce \"Welcome back, Tom Becker!\" and fail."
+        ru: "Пароль Тома — «tulips42» (со строчной t). С `first_name = \"Tom\"` f-строка даёт «Welcome back, Tom!» — ровно ожидаемый результат. С «Tom Becker» получилось бы «Welcome back, Tom Becker!», и тест бы упал."
 
   - type: task
     task:
@@ -345,86 +351,86 @@ steps:
           - { action: "Enter email and password", data: "anna@bloomly.app / bloom123" }
           - { action: "Click \"Log in\"", expected: "Account page shows \"Welcome back, Anna!\"" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        const email = 'anna@bloomly.app';
-        const password = 'Bloom123';
 
-        test('Anna can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill(email);
-          await page.getByLabel('Password').fill(password);
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome Back, Anna!');
-        });
+        def test_registered_user_can_log_in(page: Page):
+            email = "anna@bloomly.app"
+            password = "Bloom123"
+
+            page.goto("/login")
+            page.get_by_label("Email").fill(email)
+            page.get_by_label("Password").fill(password)
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", level=1)).to_have_text("Welcome Back, Anna!")
       issues:
-        - line: 4
+        - line: 6
           type: wrong-data
           note:
-            en: "The password is 'bloom123' with a lowercase b. Passwords are case-sensitive: this test can't log in."
-            ru: "Пароль — 'bloom123' со строчной b. Пароли чувствительны к регистру: с таким тест не войдёт."
-        - line: 11
+            en: "The password is \"bloom123\" with a lowercase b. Passwords are case-sensitive: this test can't log in."
+            ru: "Пароль — «bloom123» со строчной b. Пароли чувствительны к регистру: с таким тест не войдёт."
+        - line: 12
           type: wrong-assertion
           note:
-            en: "The app says \"Welcome back, Anna!\" — lowercase b in \"back\". `toHaveText` compares exactly, so this check fails even when login works."
-            ru: "В приложении «Welcome back, Anna!» — «back» со строчной b. `toHaveText` сравнивает точно, так что проверка упадёт, даже когда логин работает."
-      types: [wrong-data, wrong-assertion, fragile-locator, missing-await, no-assertion]
+            en: 'The app says "Welcome back, Anna!" — lowercase b in "back". `to_have_text` compares exactly, so this check fails even when login works.'
+            ru: "В приложении «Welcome back, Anna!» — «back» со строчной b. `to_have_text` сравнивает точно, так что проверка упадёт, даже когда логин работает."
+      types: [wrong-data, wrong-assertion, fragile-locator, not-called, no-assertion]
       hints:
         - { en: "Compare every string in quotes with the test case card. Two of them are off by one letter.", ru: "Сравни каждую строку в кавычках с карточкой тест-кейса. Две отличаются на одну букву." }
-        - { en: "Look at the constants at the top and at the expected text in the last step.", ru: "Посмотри на константы в начале и на ожидаемый текст в последнем шаге." }
-        - { en: "Line 4: compare the first letter of the password. Line 11: compare the word \"back\".", ru: "Строка 4: сравни первую букву пароля. Строка 11: сравни слово «back»." }
+        - { en: "Look at the variables at the top of the test and at the expected text in the last step.", ru: "Посмотри на переменные в начале теста и на ожидаемый текст в последнем шаге." }
+        - { en: "Line 6: compare the first letter of the password. Line 12: compare the word \"back\".", ru: "Строка 6: сравни первую букву пароля. Строка 12: сравни слово «back»." }
       praise:
         en: "Two one-letter bugs, both found. That's a review Petal can learn from."
         ru: "Два бага в одну букву — оба найдены. На таком ревью Petal может учиться."
       explain:
-        en: "Note where you flagged the data bug: on line 4, where the constant is defined — not on line 9, where it's used. Fix it once at the source, and every line that uses `password` is fixed."
-        ru: "Обрати внимание, где ты отмечаешь ошибку в данных: в строке 4, где объявлена константа, а не в строке 9, где она используется. Исправишь в источнике — исправится каждая строка, где есть `password`."
+        en: "Note where you flagged the data bug: on line 6, where the variable gets its value — not on line 10, where it's used. Fix it once at the source, and every line that uses `password` is fixed."
+        ru: "Обрати внимание, где ты отмечаешь ошибку в данных: в строке 6, где переменная получает значение, а не в строке 10, где она используется. Исправишь в источнике — исправится каждая строка, где есть `password`."
 
   - type: task
     task:
       id: c3-l1-t6
       kind: predict
-      keyPoint: kp-template
+      keyPoint: kp-fstring
       prompt:
-        en: "Will this test pass or fail? Build the expected heading in your head first."
-        ru: "Этот тест пройдёт или упадёт? Сначала мысленно собери ожидаемый заголовок."
+        en: "Will this test pass or fail? Build the expected heading in your head first — read the last line slowly."
+        ru: "Этот тест пройдёт или упадёт? Сначала мысленно собери ожидаемый заголовок — прочитай последнюю строку медленно."
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        const email = 'tom@bloomly.app';
-        const password = 'tulips42';
-        const name = 'Tom';
 
-        test('Tom sees his greeting', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill(email);
-          await page.getByLabel('Password').fill(password);
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByRole('heading', { level: 1 })).toHaveText(`Welcome back, ${name}.`);
-        });
+        def test_tom_sees_his_greeting(page: Page):
+            email = "tom@bloomly.app"
+            password = "tulips42"
+            name = "Tom"
+
+            page.goto("/login")
+            page.get_by_label("Email").fill(email)
+            page.get_by_label("Password").fill(password)
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, {name}!")
       outcome: fail
       reasons:
         - text:
-            en: "The expected text ends with a full stop, but the page says \"Welcome back, Tom!\""
-            ru: "Ожидаемый текст заканчивается точкой, а на странице «Welcome back, Tom!»"
+            en: "There's no `f` before the quotes, so the test expects the literal text \"Welcome back, {name}!\""
+            ru: "Перед кавычками нет `f`, поэтому тест ждёт буквально текст «Welcome back, {name}!»"
           correct: true
         - text:
             en: "Tom's password is wrong"
             ru: "У Тома неверный пароль"
-          why: { en: "'tulips42' is exactly Tom's password.", ru: "'tulips42' — ровно пароль Тома." }
+          why: { en: "\"tulips42\" is exactly Tom's password.", ru: "«tulips42» — ровно пароль Тома." }
         - text:
-            en: "`${name}` doesn't work inside `expect`"
-            ru: "`${name}` не работает внутри `expect`"
-          why: { en: "Template literals work anywhere. Here it builds \"Welcome back, Tom.\" — and that's the problem.", ru: "Шаблонные строки работают где угодно. Здесь получается «Welcome back, Tom.» — в этом и проблема." }
+            en: "It passes: `{name}` becomes Tom"
+            ru: "Пройдёт: `{name}` превратится в Tom"
+          why: { en: "Only inside an f-string. Without the `f`, the braces and the word \"name\" are ordinary characters.", ru: "Только внутри f-строки. Без `f` скобки и слово «name» — обычные символы." }
       hints:
-        - { en: "Replace `${name}` with its value and read the whole expected text.", ru: "Замени `${name}` значением и прочитай ожидаемый текст целиком." }
-        - { en: "Now compare it with Bloomly's account heading, down to the last character.", ru: "Теперь сравни его с заголовком страницы аккаунта Bloomly до последнего символа." }
+        - { en: "Look at what stands right before the opening quote in the last line.", ru: "Посмотри, что стоит прямо перед открывающей кавычкой в последней строке." }
+        - { en: "No `f` — no gaps. Which text does the test expect, character by character?", ru: "Нет `f` — нет пропусков. Какой текст ждёт тест, символ за символом?" }
       praise:
-        en: "Right — one punctuation mark is enough to turn a test red."
-        ru: "Верно — одного знака препинания хватает, чтобы тест стал красным."
+        en: "Right — one missing letter turns a correct check into one that can never pass."
+        ru: "Верно — одна потерянная буква превращает правильную проверку в ту, что не пройдёт никогда."
       explain:
-        en: "Login works, but the template builds \"Welcome back, Tom.\" while the app shows \"Welcome back, Tom!\". The report will say the expected and received texts differ. The fix is one character — but only if someone reads the string."
-        ru: "Логин проходит, но шаблон собирает «Welcome back, Tom.», а приложение показывает «Welcome back, Tom!». В отчёте будет видно, что ожидаемый и полученный тексты различаются. Исправление — один символ, но только если кто-то прочитает строку."
+        en: "Login works, but without the `f` the braces stay in the text: the test expects \"Welcome back, {name}!\" while the app shows \"Welcome back, Tom!\". The report says it plainly: `Locator expected to have text 'Welcome back, {name}!'`, `Actual value: Welcome back, Tom!`. The fix is one letter — but only if someone reads the string."
+        ru: "Логин проходит, но без `f` скобки остаются в тексте: тест ждёт «Welcome back, {name}!», а приложение показывает «Welcome back, Tom!». В отчёте это видно сразу: `Locator expected to have text 'Welcome back, {name}!'`, `Actual value: Welcome back, Tom!`. Исправление — одна буква, но только если кто-то прочитает строку."
 
   - type: task
     task:
@@ -432,43 +438,43 @@ steps:
       kind: vocab
       mode: cloze
       sentence:
-        en: "Petal stored the email in a ___ at the top of the file, so all five tests reuse it."
-        ru: "Petal сохранил email в константе в начале файла, чтобы все пять тестов её переиспользовали."
-      answer: constant
-      options: [constant, comment, console]
+        en: "Petal stored the email in a ___ at the top of the test, so every step reuses it."
+        ru: "Petal сохранил email в переменной в начале теста, чтобы каждый шаг её переиспользовал."
+      answer: variable
+      options: [variable, comment, boolean]
 
   - type: mistakes
     title: { en: "Typical string mistakes (agents make them too)", ru: "Типичные ошибки со строками (агенты тоже их делают)" }
     items:
-      - wrong: "await page.getByLabel('Email').fill('email');"
-        right: "await page.getByLabel('Email').fill(email);"
+      - wrong: 'page.get_by_label("Email").fill("email")'
+        right: 'page.get_by_label("Email").fill(email)'
         why:
           en: "Quotes turn the name into the literal word: the test types \"email\" instead of the address."
           ru: "Кавычки превращают имя в само слово: тест вводит «email» вместо адреса."
-      - wrong: "await expect(heading).toHaveText('Welcome back, ${name}!');"
-        right: "await expect(heading).toHaveText(`Welcome back, ${name}!`);"
+      - wrong: 'expect(heading).to_have_text("Welcome back, {name}!")'
+        right: 'expect(heading).to_have_text(f"Welcome back, {name}!")'
         why:
-          en: "`${...}` works only inside backticks. In single quotes the text stays literally \"${name}\"."
-          ru: "`${...}` работает только внутри обратных кавычек. В одинарных кавычках так и останется текст «${name}»."
-      - wrong: "const password = 'bloom123 ';"
-        right: "const password = 'bloom123';"
+          en: "No `f` — no gaps. The test expects the text \"{name}\" literally and fails even when the page is right."
+          ru: "Нет `f` — нет пропусков. Тест ждёт буквально текст «{name}» и падает, даже когда страница в порядке."
+      - wrong: 'expect(heading).to_have_text(f"Welcome back, ${name}!")'
+        right: 'expect(heading).to_have_text(f"Welcome back, {name}!")'
+        why:
+          en: "`${name}` is JavaScript syntax. In a Python f-string the `$` stays in the text: \"Welcome back, $Tom!\". Agents that also write JavaScript slip into this."
+          ru: "`${name}` — синтаксис JavaScript. В f-строке Python знак `$` остаётся в тексте: «Welcome back, $Tom!». Агенты, которые пишут и на JavaScript, легко на этом спотыкаются."
+      - wrong: 'password = "bloom123 "'
+        right: 'password = "bloom123"'
         why:
           en: "A trailing space inside the quotes is part of the password. The login fails, and the space is invisible in the report."
           ru: "Пробел в конце внутри кавычек — часть пароля. Логин не проходит, а в отчёте пробел не видно."
-      - wrong: "await page.getByRole('button', { name: 'Login' }).click();"
-        right: "await page.getByRole('button', { name: 'Log in' }).click();"
-        why:
-          en: "The agent guessed a common label. Bloomly says \"Log in\". Always take texts from the app, not from memory."
-          ru: "Агент угадал популярную подпись. В Bloomly — «Log in». Тексты всегда берём из приложения, а не из памяти."
 
   - type: explain
-    keyPoint: kp-const
+    keyPoint: kp-variable
     prompt:
       en: "In your own words: how do you find out what a test will type into the Email field?"
       ru: "Своими словами: как узнать, что тест введёт в поле Email?"
     model:
-      en: "I find the line with `getByLabel('Email').fill(...)` and look inside the brackets. If there's text in quotes, that exact text is typed. If there's a name without quotes, like `email`, I look up to the `const` with that name — its value is what will be typed. Then I compare it with the test case data, character by character."
-      ru: "Я нахожу строку с `getByLabel('Email').fill(...)` и смотрю, что в скобках. Если там текст в кавычках — вводится ровно он. Если имя без кавычек, например `email`, я ищу выше `const` с этим именем — его значение и будет введено. Потом сравниваю его с данными тест-кейса посимвольно."
+      en: "I find the line with `get_by_label(\"Email\").fill(...)` and look inside the brackets. If there's text in quotes, that exact text is typed. If there's a name without quotes, like `email`, I look up to the line where `email = ...` gets its value — the last one above. Then I compare that value with the test case data, character by character."
+      ru: "Я нахожу строку с `get_by_label(\"Email\").fill(...)` и смотрю, что в скобках. Если там текст в кавычках — вводится ровно он. Если имя без кавычек, например `email`, я ищу выше строку, где `email = ...` получает значение, — последнюю такую. Потом сравниваю это значение с данными тест-кейса посимвольно."
 
   - type: phrases
     items:
@@ -476,8 +482,11 @@ steps:
         en: "The expected text doesn't match the app: it's \"Welcome back, Anna!\" with a lowercase b."
         ru: "Ожидаемый текст не совпадает с приложением: там «Welcome back, Anna!» со строчной b."
       - context: code-review
-        en: "Could we move the test data into constants at the top of the file?"
-        ru: "Можем вынести тестовые данные в константы в начало файла?"
+        en: "This string is missing the f prefix, so the name never gets filled in."
+        ru: "У этой строки нет префикса f, поэтому имя так и не подставляется."
+      - context: code-review
+        en: "Could we move the test data into variables at the top of the test?"
+        ru: "Можем вынести тестовые данные в переменные в начало теста?"
         note:
           en: "\"Could we…?\" sounds softer than \"Move it\" — standard tone in code review."
           ru: "«Could we…?» звучит мягче, чем «Move it», — обычный тон для код-ревью."
@@ -497,53 +506,53 @@ checkPool:
     keyPoint: kp-strings
     placement: true
     prompt:
-      en: "Bloomly's account heading is \"Welcome back, Anna!\". Which expected text will make `toHaveText` pass?"
-      ru: "Заголовок аккаунта в Bloomly — «Welcome back, Anna!». С каким ожидаемым текстом `toHaveText` пройдёт?"
+      en: "Bloomly's account heading is \"Welcome back, Anna!\". Which expected text will make `to_have_text` pass?"
+      ru: "Заголовок аккаунта в Bloomly — «Welcome back, Anna!». С каким ожидаемым текстом `to_have_text` пройдёт?"
     options:
-      - text: "'Welcome back, Anna!'"
+      - text: '"Welcome back, Anna!"'
         correct: true
         why: { en: "Identical, character by character.", ru: "Совпадает посимвольно." }
-      - text: "'Welcome Back, Anna!'"
-        why: { en: "Capital B. `toHaveText` is case-sensitive.", ru: "Заглавная B. `toHaveText` учитывает регистр." }
-      - text: "'Welcome back Anna!'"
+      - text: '"Welcome Back, Anna!"'
+        why: { en: "Capital B. `to_have_text` is case-sensitive.", ru: "Заглавная B. `to_have_text` учитывает регистр." }
+      - text: '"Welcome back Anna!"'
         why: { en: "The comma is missing.", ru: "Пропала запятая." }
-      - text: "'Welcome back, Anna'"
-        why: { en: "The `!` is missing. `toHaveText` compares the whole text.", ru: "Пропал `!`. `toHaveText` сравнивает текст целиком." }
+      - text: '"Welcome back, Anna"'
+        why: { en: "The `!` is missing. `to_have_text` compares the whole text.", ru: "Пропал `!`. `to_have_text` сравнивает текст целиком." }
     optionsCode: true
     hints:
       - { en: "Compare letters, case and punctuation.", ru: "Сравни буквы, регистр и знаки препинания." }
       - { en: "Three options each lose or change exactly one character.", ru: "В трёх вариантах ровно один символ потерян или изменён." }
     explain:
-      en: "`toHaveText` with a string checks the whole text exactly. Only an identical copy passes."
-      ru: "`toHaveText` со строкой проверяет весь текст точно. Проходит только идентичная копия."
+      en: "`to_have_text` with a string checks the whole text exactly. Only an identical copy passes."
+      ru: "`to_have_text` со строкой проверяет весь текст точно. Проходит только идентичная копия."
 
   - id: c3-l1-k2
     kind: input
-    keyPoint: kp-const
+    keyPoint: kp-variable
     prompt:
       en: "Petal wrote this. What will be typed into the Email field?"
       ru: "Это написал Petal. Что будет введено в поле Email?"
     code: |
-      const user = 'maya@bloomly.app';
-      const pass = 'qa-rocks';
+      user = "maya@bloomly.app"
+      secret = "qa-rocks"
 
-      await page.getByLabel('Email').fill(pass);
-      await page.getByLabel('Password').fill(user);
+      page.get_by_label("Email").fill(secret)
+      page.get_by_label("Password").fill(user)
     answers: ["qa-rocks"]
     hints:
       - { en: "Look only at the Email line. Which name is inside `fill(...)`?", ru: "Смотри только на строку с Email. Какое имя внутри `fill(...)`?" }
       - { en: "Now find the value of that name at the top.", ru: "Теперь найди значение этого имени наверху." }
-      - { en: "`fill(pass)` → the value of `pass`.", ru: "`fill(pass)` → значение `pass`." }
+      - { en: "`fill(secret)` → the value of `secret`.", ru: "`fill(secret)` → значение `secret`." }
     praise:
       en: "Well spotted — the names are swapped, and only careful reading shows it."
       ru: "Отлично замечено — имена перепутаны, и видно это только при внимательном чтении."
     explain:
-      en: "The Email field gets `pass`, which is 'qa-rocks'. The data is right, but it's sent to the wrong fields — the test will fail with \"Please enter a valid email address.\""
-      ru: "В поле Email уходит `pass`, то есть 'qa-rocks'. Данные верные, но попали не в те поля — тест упадёт с «Please enter a valid email address.»"
+      en: "The Email field gets `secret`, which is \"qa-rocks\". The data is right, but it's sent to the wrong fields — the test will fail with \"Please enter a valid email address.\""
+      ru: "В поле Email уходит `secret`, то есть «qa-rocks». Данные верные, но попали не в те поля — тест упадёт с «Please enter a valid email address.»"
 
   - id: c3-l1-k3
     kind: review
-    keyPoint: kp-const
+    keyPoint: kp-variable
     prompt:
       en: "Review Petal's sign-up test against the test case. Flag the data and the expected text that are wrong."
       ru: "Сделай ревью теста регистрации от Petal по тест-кейсу. Отметь неверные данные и неверный ожидаемый текст."
@@ -556,45 +565,44 @@ checkPool:
         - { action: "Fill in name, email, password, country", data: "Lena Novak / lena@bloomly.app / tulips2026 / Poland" }
         - { action: "Accept the terms and click \"Create account\"", expected: "\"Account created!\" and \"Welcome to Bloomly, Lena.\"" }
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      const fullName = 'Lena Novak';
-      const email = 'lena@bloomly.app';
-      const password = 'tulip';
 
-      test('new customer can sign up', async ({ page }) => {
-        await page.goto('/signup');
-        await page.getByLabel('Full name').fill(fullName);
-        await page.getByLabel('Email').fill(email);
-        await page.getByLabel('Password').fill(password);
-        await page.getByLabel('Country').selectOption('Poland');
-        await page.getByLabel('I agree to the Terms of Service').check();
-        await page.getByRole('button', { name: 'Create account' }).click();
-        await expect(page.getByTestId('signup-success')).toContainText(`Welcome to Bloomly, ${fullName}.`);
-      });
+      def test_new_customer_can_create_an_account(page: Page):
+          full_name = "Lena Novak"
+          email = "lena@bloomly.app"
+          password = "tulip"
+          page.goto("/signup")
+          page.get_by_label("Full name").fill(full_name)
+          page.get_by_label("Email").fill(email)
+          page.get_by_label("Password").fill(password)
+          page.get_by_label("Country").select_option("Poland")
+          page.get_by_label("I agree to the Terms of Service").check()
+          page.get_by_role("button", name="Create account").click()
+          expect(page.get_by_test_id("signup-success")).to_contain_text(f"Welcome to Bloomly, {full_name}.")
     issues:
-      - line: 5
+      - line: 7
         type: wrong-data
         note:
-          en: "'tulip' has 5 characters; Bloomly needs at least 8. A positive test needs valid data: 'tulips2026' from the case."
-          ru: "В 'tulip' 5 символов, а Bloomly нужно минимум 8. Позитивному тесту нужны валидные данные: 'tulips2026' из кейса."
+          en: "\"tulip\" has 5 characters; Bloomly needs at least 8. A positive test needs valid data: \"tulips2026\" from the case."
+          ru: "В «tulip» 5 символов, а Bloomly нужно минимум 8. Позитивному тесту нужны валидные данные: «tulips2026» из кейса."
       - line: 15
         type: wrong-assertion
         note:
-          en: "The template builds \"Welcome to Bloomly, Lena Novak.\" but the app greets by first name only: \"Welcome to Bloomly, Lena.\""
-          ru: "Шаблон собирает «Welcome to Bloomly, Lena Novak.», а приложение приветствует только по имени: «Welcome to Bloomly, Lena.»"
-    types: [wrong-data, wrong-assertion, fragile-locator, missing-await, hard-wait]
+          en: "The f-string builds \"Welcome to Bloomly, Lena Novak.\" but the app greets by first name only: \"Welcome to Bloomly, Lena.\""
+          ru: "f-строка собирает «Welcome to Bloomly, Lena Novak.», а приложение приветствует только по имени: «Welcome to Bloomly, Lena.»"
+    types: [wrong-data, wrong-assertion, fragile-locator, not-called, hard-wait]
     hints:
-      - { en: "Check each constant against the test case data and the precondition.", ru: "Сверь каждую константу с данными и предусловием тест-кейса." }
+      - { en: "Check each variable against the test case data and the precondition.", ru: "Сверь каждую переменную с данными и предусловием тест-кейса." }
       - { en: "Build the text in the last `expect` in your head. Is it the same as the expected result?", ru: "Мысленно собери текст в последнем `expect`. Он совпадает с ожидаемым результатом?" }
-      - { en: "Line 5: count the characters. Line 15: which name goes into the template?", ru: "Строка 5: посчитай символы. Строка 15: какое имя попадает в шаблон?" }
+      - { en: "Line 7: count the characters. Line 15: which name goes into the f-string?", ru: "Строка 7: посчитай символы. Строка 15: какое имя попадает в f-строку?" }
     explain:
-      en: "Data bugs hide in constants, expected-text bugs hide in templates. Read both: the constant's value, then the text the template builds from it."
-      ru: "Ошибки в данных прячутся в константах, ошибки в ожидаемом тексте — в шаблонах. Читай и то, и другое: значение константы и текст, который из неё собирает шаблон."
+      en: "Data bugs hide in variables, expected-text bugs hide in f-strings. Read both: the variable's value, then the text the f-string builds from it."
+      ru: "Ошибки в данных прячутся в переменных, ошибки в ожидаемом тексте — в f-строках. Читай и то, и другое: значение переменной и текст, который из неё собирает f-строка."
 
   - id: c3-l1-k4
     kind: predict
-    keyPoint: kp-template
+    keyPoint: kp-fstring
     prompt:
       en: "Will this test pass or fail?"
       ru: "Этот тест пройдёт или упадёт?"
@@ -602,36 +610,36 @@ checkPool:
       en: "After \"Add to cart\", Bloomly shows a toast like \"Rose Bouquet added to cart\"."
       ru: "После «Add to cart» Bloomly показывает всплывающее сообщение вида «Rose Bouquet added to cart»."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      const product = 'Sunny Tulips';
 
-      test('toast names the added product', async ({ page }) => {
-        await page.goto('/shop');
-        await page.getByTestId('product-card').filter({ hasText: product })
-          .getByRole('button', { name: 'Add to cart' }).click();
-        await expect(page.getByRole('status')).toHaveText(`${product} added to cart`);
-      });
+      def test_toast_names_the_added_product(page: Page):
+          product = "Sunny Tulips"
+
+          page.goto("/shop")
+          card = page.get_by_test_id("product-card").filter(has_text=product)
+          card.get_by_role("button", name="Add to cart").click()
+          expect(page.get_by_role("status")).to_have_text(f"{product} added to cart")
     outcome: pass
     reasons:
       - text:
-          en: "The template builds \"Sunny Tulips added to cart\" — exactly the toast text"
-          ru: "Шаблон собирает «Sunny Tulips added to cart» — ровно текст сообщения"
+          en: "The f-string builds \"Sunny Tulips added to cart\" — exactly the toast text"
+          ru: "f-строка собирает «Sunny Tulips added to cart» — ровно текст сообщения"
         correct: true
       - text:
           en: "It fails: `product` can't be used twice"
           ru: "Упадёт: `product` нельзя использовать дважды"
-        why: { en: "Reusing a constant is the whole point of having one.", ru: "Переиспользовать константу — ровно то, зачем она нужна." }
+        why: { en: "Reusing a variable is the whole point of having one.", ru: "Переиспользовать переменную — ровно то, зачем она нужна." }
       - text:
           en: "It fails: the toast says \"Sunny Tulips added to Cart\""
           ru: "Упадёт: в сообщении «Sunny Tulips added to Cart»"
         why: { en: "Bloomly's toast uses a lowercase \"cart\".", ru: "В сообщении Bloomly «cart» со строчной." }
     hints:
-      - { en: "Put the value of `product` into the template.", ru: "Подставь значение `product` в шаблон." }
+      - { en: "Put the value of `product` into the f-string.", ru: "Подставь значение `product` в f-строку." }
       - { en: "Compare the result with the toast format from the context.", ru: "Сравни результат с форматом сообщения из контекста." }
     explain:
-      en: "`product` is used twice: to find the right card and to build the expected toast. The text comes out as \"Sunny Tulips added to cart\" — a match, so the test passes."
-      ru: "`product` используется дважды: чтобы найти нужную карточку и чтобы собрать ожидаемое сообщение. Получается «Sunny Tulips added to cart» — совпадение, тест проходит."
+      en: '`product` is used twice: to find the right card and to build the expected toast. The text comes out as "Sunny Tulips added to cart" — a match, so the test passes. (`card` is a variable too: a name for the card locator.)'
+      ru: "`product` используется дважды: чтобы найти нужную карточку и чтобы собрать ожидаемое сообщение. Получается «Sunny Tulips added to cart» — совпадение, тест проходит. (`card` — тоже переменная: имя для локатора карточки.)"
 
   - id: c3-l1-k5
     kind: predict
@@ -640,105 +648,115 @@ checkPool:
       en: "Look very closely at the test data. Will this test pass or fail?"
       ru: "Посмотри очень внимательно на тестовые данные. Тест пройдёт или упадёт?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      const email = 'anna@bloomly.app';
-      const password = 'bloom123 ';
 
-      test('Anna can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill(email);
-        await page.getByLabel('Password').fill(password);
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page).toHaveURL('/account');
-      });
+      def test_anna_can_log_in(page: Page):
+          email = "anna@bloomly.app"
+          password = "bloom123 "
+
+          page.goto("/login")
+          page.get_by_label("Email").fill(email)
+          page.get_by_label("Password").fill(password)
+          page.get_by_role("button", name="Log in").click()
+          expect(page).to_have_url("http://localhost:3000/account")
     outcome: fail
     reasons:
       - text:
-          en: "The password has a space at the end, so it's not 'bloom123' — \"Invalid email or password.\""
-          ru: "В пароле пробел в конце, значит, это не 'bloom123' — «Invalid email or password.»"
+          en: "The password has a space at the end, so it's not \"bloom123\" — \"Invalid email or password.\""
+          ru: "В пароле пробел в конце, значит, это не «bloom123» — «Invalid email or password.»"
         correct: true
       - text:
           en: "It passes — spaces don't count"
           ru: "Пройдёт — пробелы не считаются"
         why: { en: "Inside quotes a space is a character like any other.", ru: "Внутри кавычек пробел — такой же символ, как любой другой." }
       - text:
-          en: "`toHaveURL` can't check '/account'"
-          ru: "`toHaveURL` не умеет проверять '/account'"
+          en: "`to_have_url` can't check \"/account\""
+          ru: "`to_have_url` не умеет проверять «/account»"
         why: { en: "It can — that's a normal URL check.", ru: "Умеет — это обычная проверка адреса." }
     hints:
-      - { en: "Read line 4 slowly, up to the closing quote.", ru: "Прочитай строку 4 медленно, до закрывающей кавычки." }
-      - { en: "What is between `3` and `'`?", ru: "Что стоит между `3` и `'`?" }
+      - { en: "Read line 6 slowly, up to the closing quote.", ru: "Прочитай строку 6 медленно, до закрывающей кавычки." }
+      - { en: "What is between `3` and the closing `\"`?", ru: "Что стоит между `3` и закрывающей `\"`?" }
     explain:
-      en: "`'bloom123 '` is 9 characters, the real password is 8. Bloomly says \"Invalid email or password.\" and stays on /login. In a report this looks like a broken login — only reading the string shows the truth."
-      ru: "В `'bloom123 '` 9 символов, а в настоящем пароле 8. Bloomly отвечает «Invalid email or password.» и остаётся на /login. В отчёте это выглядит как сломанный логин — правду показывает только чтение строки."
+      en: "`\"bloom123 \"` is 9 characters, the real password is 8. Bloomly says \"Invalid email or password.\" and stays on /login. In a report this looks like a broken login — only reading the string shows the truth."
+      ru: "В `\"bloom123 \"` 9 символов, а в настоящем пароле 8. Bloomly отвечает «Invalid email or password.» и остаётся на /login. В отчёте это выглядит как сломанный логин — правду показывает только чтение строки."
 
   - id: c3-l1-k6
     kind: fill
-    keyPoint: kp-template
+    keyPoint: kp-fstring
     prompt:
-      en: "Fill the gap so that the template builds the expected heading from the comment."
-      ru: "Заполни пропуск, чтобы шаблон собрал ожидаемый заголовок из комментария."
+      en: "Pick the line that builds exactly the expected heading from the comment."
+      ru: "Выбери вариант, который собирает ровно ожидаемый заголовок из комментария."
     code: |
-      const firstName = 'Anna';
-      const city = 'Lisbon';
-      // Expected heading: "Welcome back, Anna!"
-      const expectedHeading = `Welcome back, ${___}!`;
+      first_name = "Anna"
+      city = "Lisbon"
+      # Expected heading: "Welcome back, Anna!"
+      expected_heading = ___
     blanks:
-      - { answers: [firstName], options: [firstName, city, expectedHeading] }
+      - answers: ['f"Welcome back, {first_name}!"']
+        options: ['f"Welcome back, {first_name}!"', '"Welcome back, {first_name}!"', 'f"Welcome back, {city}!"', 'f"Welcome back, ${first_name}!"']
     hints:
-      - { en: "Which constant holds the text 'Anna'?", ru: "В какой константе лежит текст 'Anna'?" }
-      - { en: "Inside `${...}` goes a name, without quotes.", ru: "Внутрь `${...}` пишется имя, без кавычек." }
+      - { en: "Three things must be right: the `f` before the quote, the name inside the braces, nothing extra around them.", ru: "Должны совпасть три вещи: `f` перед кавычкой, имя в фигурных скобках и ничего лишнего вокруг них." }
+      - { en: "Build each option in your head. Which one gives \"Welcome back, Anna!\" and nothing else?", ru: "Мысленно собери каждый вариант. Какой даёт «Welcome back, Anna!» и ничего больше?" }
     explain:
-      en: "`${firstName}` puts 'Anna' into the gap: \"Welcome back, Anna!\". With `city` you'd get \"Welcome back, Lisbon!\"."
-      ru: "`${firstName}` подставляет 'Anna': «Welcome back, Anna!». С `city` получилось бы «Welcome back, Lisbon!»."
+      en: "Only `f\"Welcome back, {first_name}!\"` builds \"Welcome back, Anna!\". Without the `f` you get the braces literally; with `city` — \"Welcome back, Lisbon!\"; with the JavaScript-style `${...}` — \"Welcome back, $Anna!\"."
+      ru: "Только `f\"Welcome back, {first_name}!\"` собирает «Welcome back, Anna!». Без `f` получатся буквально фигурные скобки; с `city` — «Welcome back, Lisbon!»; с `${...}` в стиле JavaScript — «Welcome back, $Anna!»."
 
   - id: c3-l1-k7
     kind: input
-    keyPoint: kp-template
+    keyPoint: kp-variable
     placement: true
     prompt:
       en: "What will this script print? Type the exact text."
       ru: "Что выведет этот скрипт? Напиши точный текст."
     code: |
-      let name = 'Anna';
-      name = 'Tom';
-      console.log(`Welcome back, ${name}!`);
+      name = "Anna"
+      name = "Tom"
+      print(f"Welcome back, {name}!")
     answers: ["Welcome back, Tom!"]
     caseSensitive: true
     run: script
     hints:
-      - { en: "`let` creates a variable whose value can change. Which value does it have on line 3?", ru: "`let` создаёт переменную, значение которой может меняться. Какое у неё значение в строке 3?" }
-      - { en: "Line 2 replaces 'Anna' with 'Tom'.", ru: "Строка 2 заменяет 'Anna' на 'Tom'." }
+      - { en: "A variable can get a new value. Which value does `name` have when line 3 runs?", ru: "Переменная может получить новое значение. Какое значение у `name`, когда выполняется строка 3?" }
+      - { en: "Line 2 replaces \"Anna\" with \"Tom\".", ru: "Строка 2 заменяет «Anna» на «Tom»." }
     explain:
-      en: "`let` allowed the value to change: by line 3 `name` is 'Tom', so the template prints \"Welcome back, Tom!\"."
-      ru: "`let` позволил поменять значение: к строке 3 `name` равно 'Tom', поэтому шаблон печатает «Welcome back, Tom!»."
+      en: "Python runs top to bottom, and each `=` replaces the value. By line 3 `name` is \"Tom\", so the f-string prints \"Welcome back, Tom!\". When you look up a value, take the last `=` above the line."
+      ru: "Python выполняет код сверху вниз, и каждый `=` заменяет значение. К строке 3 `name` равно «Tom», поэтому f-строка печатает «Welcome back, Tom!». Когда ищешь значение, бери последний `=` выше строки."
 
   - id: c3-l1-k8
     kind: choice
-    keyPoint: kp-const
+    keyPoint: kp-variable
     prompt:
-      en: "Anna's test password changes to 'spring26'. Petal's file uses `password` in 5 tests. What is the smallest correct change?"
-      ru: "Тестовый пароль Анны меняется на 'spring26'. В файле Petal `password` используется в 5 тестах. Какое минимальное правильное изменение?"
+      en: "Anna's test password changes to \"spring26\". Petal's file uses `PASSWORD` in 5 tests. What is the smallest correct change?"
+      ru: "Тестовый пароль Анны меняется на «spring26». В файле Petal `PASSWORD` используется в 5 тестах. Какое минимальное правильное изменение?"
     code: |
-      const email = 'anna@bloomly.app';
-      const password = 'bloom123';
+      EMAIL = "anna@bloomly.app"
+      PASSWORD = "bloom123"
 
-      test('Anna can log in', async ({ page }) => { /* uses email, password */ });
-      test('Anna sees her orders', async ({ page }) => { /* uses email, password */ });
-      test('Anna can reorder', async ({ page }) => { /* uses email, password */ });
-      // ...and 2 more tests
+
+      def test_anna_can_log_in(page: Page):
+          ...  # uses EMAIL and PASSWORD
+
+
+      def test_anna_sees_her_orders(page: Page):
+          ...  # uses EMAIL and PASSWORD
+
+
+      def test_anna_can_reorder(page: Page):
+          ...  # uses EMAIL and PASSWORD
+
+      # ...and 2 more tests
     options:
-      - text: { en: "Change only line 2: `const password = 'spring26';`", ru: "Поменять только строку 2: `const password = 'spring26';`" }
+      - text: { en: 'Change only line 2: `PASSWORD = "spring26"`', ru: 'Поменять только строку 2: `PASSWORD = "spring26"`' }
         correct: true
         why: { en: "Every test reads the value from this one constant.", ru: "Все тесты берут значение из этой одной константы." }
       - text: { en: "Change the password in each of the 5 tests", ru: "Поменять пароль в каждом из 5 тестов" }
-        why: { en: "The tests don't contain the password — they only use the name `password`.", ru: "В тестах нет самого пароля — они используют только имя `password`." }
-      - text: { en: "Rename the constant to `newPassword`", ru: "Переименовать константу в `newPassword`" }
-        why: { en: "The value would stay 'bloom123', and every test would break on the unknown name.", ru: "Значение так и останется 'bloom123', а все тесты сломаются на незнакомом имени." }
+        why: { en: "The tests don't contain the password — they only use the name `PASSWORD`.", ru: "В тестах нет самого пароля — они используют только имя `PASSWORD`." }
+      - text: { en: "Rename the constant to `NEW_PASSWORD`", ru: "Переименовать константу в `NEW_PASSWORD`" }
+        why: { en: "The value would stay \"bloom123\", and every test would break on the unknown name `PASSWORD` (`NameError`).", ru: "Значение так и останется «bloom123», а все тесты сломаются на неизвестном имени `PASSWORD` (`NameError`)." }
     hints:
-      - { en: "Where is the text 'bloom123' written?", ru: "Где написан текст 'bloom123'?" }
+      - { en: "Where is the text \"bloom123\" written?", ru: "Где написан текст «bloom123»?" }
       - { en: "The tests use the name; the value lives in one place.", ru: "Тесты используют имя, а значение живёт в одном месте." }
     explain:
-      en: "That's why test data lives in constants: one place to read, one place to change — like a shared test data sheet for many test cases."
-      ru: "Именно поэтому тестовые данные хранят в константах: одно место, чтобы прочитать, одно — чтобы поменять. Как общая таблица тестовых данных для многих тест-кейсов."
+      en: "That's why shared test data lives in constants at the top of the file: one place to read, one place to change — like a shared test data sheet for many test cases. The CAPITAL letters tell the team: set once, don't change it inside a test."
+      ru: "Именно поэтому общие тестовые данные хранят в константах в начале файла: одно место, чтобы прочитать, одно — чтобы поменять. Как общая таблица тестовых данных для многих тест-кейсов. ЗАГЛАВНЫЕ буквы говорят команде: задано один раз, внутри теста не меняем."

@@ -52,20 +52,20 @@ steps:
           en: "Will Petal's test pass on the redesign build?"
           ru: "Пройдёт ли тест Petal на сборке с редизайном?"
         code: |
-          import { test, expect } from '@playwright/test';
+          from playwright.sync_api import Page, expect
 
-          test('registered user can log in', async ({ page }) => {
-            await page.goto('/login');
-            await page.getByLabel('Email').fill('anna@bloomly.app');
-            await page.getByLabel('Password').fill('bloom123');
-            await page.locator('.btn').click();
-            await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-          });
+
+          def test_registered_user_can_log_in(page: Page):
+              page.goto("/login")
+              page.get_by_label("Email").fill("anna@bloomly.app")
+              page.get_by_label("Password").fill("bloom123")
+              page.locator(".btn").click()
+              expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
         outcome: fail
         reasons:
           - text:
-              en: "Fail: line 7 looks for the class `btn`, and that class no longer exists — although login itself works."
-              ru: "Упадёт: строка 7 ищет класс `btn`, а такого класса больше нет, — хотя сам вход работает."
+              en: "Fail: line 8 looks for the class `btn`, and that class no longer exists — although login itself works."
+              ru: "Упадёт: строка 8 ищет класс `btn`, а такого класса больше нет, — хотя сам вход работает."
             correct: true
           - text:
               en: "Pass: the button is still there and still says “Log in”."
@@ -85,8 +85,8 @@ steps:
           - en: "After the redesign the button's class is `bl_btn__375kd`. Does `.btn` match it?"
             ru: "После редизайна у кнопки класс `bl_btn__375kd`. Подходит ли под него `.btn`?"
         explain:
-          en: "The test fails on the click: `locator('.btn')` waits 5 seconds for an element with the class `btn` and finds none. Nothing is wrong for users, so this red is a false alarm. That's what happened to the 38 tests last night."
-          ru: "Тест падает на клике: `locator('.btn')` 5 секунд ждёт элемент с классом `btn` и не находит. Для пользователей всё в порядке, так что этот красный — ложная тревога. Именно это этой ночью и случилось с 38 тестами."
+          en: "The test fails on the click: `locator(\".btn\")` waits 5 seconds for an element with the class `btn` and finds none. Nothing is wrong for users, so this red is a false alarm. That's what happened to the 38 tests last night."
+          ru: 'Тест падает на клике: `locator(".btn")` 5 секунд ждёт элемент с классом `btn` и не находит. Для пользователей всё в порядке, так что этот красный — ложная тревога. Именно это этой ночью и случилось с 38 тестами.'
 
       - id: c5-l2-p2
         kind: choice
@@ -128,11 +128,11 @@ steps:
       - en: "The usual suspects in [[CSS|css-selector]] and [[XPath|xpath]]: **position** (`nth-child`, `li[2]`), **long paths** (`nav > a > span`) and **class names** — worst of all generated ones like `bl_btn__375kd`, where the part after `__` is a hash that changes whenever the styles change."
         ru: "Обычные подозреваемые в [[CSS|css-selector]] и [[XPath|xpath]]: **позиция** (`nth-child`, `li[2]`), **длинные пути** (`nav > a > span`) и **имена классов** — хуже всего сгенерированные, вроде `bl_btn__375kd`: часть после `__` — это хеш, который меняется при любом изменении стилей."
     code: |
-      // Tied to layout: each one breaks when the page is rebuilt
-      page.locator('li:nth-child(2) .btn');              // position + class
-      page.locator('#login-form > input:nth-child(3)');  // path + position
-      page.locator('.bl_btn__375kd');                    // generated class
-      page.locator('//main/form/input[1]');              // XPath by position
+      # Tied to layout: each one breaks when the page is rebuilt
+      page.locator("li:nth-child(2) .btn")  # position + class
+      page.locator("#login-form > input:nth-child(3)")  # path + position
+      page.locator(".bl_btn__375kd")  # generated class
+      page.locator("//main/form/input[1]")  # XPath by position
     mentor:
       en: "For every selector, ask: “What change would break it?” If the answer is “a designer's change”, it's fragile."
       ru: "Про каждый селектор спрашивай: «Какое изменение его сломает?» Если ответ — «изменение от дизайнера», он хрупкий."
@@ -146,34 +146,34 @@ steps:
     app: { variant: redesign }
     runnable: true
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('fragile: adds Sunny Tulips to the cart', async ({ page }) => {
-        await page.goto('/shop');
-        await page.locator('li:nth-child(2) .btn').click();
-        await expect(page.locator('nav > a:nth-child(3) > .badge')).toHaveText('1');
-      });
 
-      test('resilient: adds Sunny Tulips to the cart', async ({ page }) => {
-        await page.goto('/shop');
-        const card = page.getByTestId('product-card').filter({ hasText: 'Sunny Tulips' });
-        await card.getByRole('button', { name: 'Add to cart' }).click();
-        await expect(page.getByTestId('cart-count')).toHaveText('1');
-      });
+      def test_fragile_adds_sunny_tulips_to_the_cart(page: Page):
+          page.goto("/shop")
+          page.locator("li:nth-child(2) .btn").click()
+          expect(page.locator("nav > a:nth-child(3) > .badge")).to_have_text("1")
+
+
+      def test_resilient_adds_sunny_tulips_to_the_cart(page: Page):
+          page.goto("/shop")
+          card = page.get_by_test_id("product-card").filter(has_text="Sunny Tulips")
+          card.get_by_role("button", name="Add to cart").click()
+          expect(page.get_by_test_id("cart-count")).to_have_text("1")
     notes:
-      - lines: 5
+      - lines: 6
         text:
           en: "`li:nth-child(2)` = “the second product in the list”: it breaks when the sort order or the catalog changes. `.btn` = the button's look: it breaks when classes are renamed. On the redesign the run times out right here — two ways to break, and neither is a bug."
           ru: "`li:nth-child(2)` = «второй товар в списке»: ломается, когда меняется сортировка или каталог. `.btn` = внешний вид кнопки: ломается, когда переименовывают классы. На редизайне прогон падает по таймауту прямо здесь — два способа сломаться, и ни один из них не баг."
-      - lines: 6
+      - lines: 7
         text:
           en: "A path through the menu: `nav` → its third link → the element with the class `badge`. The redesign wrapped the links in a new `div` and renamed the class — two breaks in one line."
           ru: "Путь через меню: `nav` → его третья ссылка → элемент с классом `badge`. Редизайн завернул ссылки в новый `div` и переименовал класс — две поломки в одной строке."
-      - lines: [11, 12]
+      - lines: [12, 13]
         text:
           en: "The product card that contains the text “Sunny Tulips”, then the button by role and name inside it. Nothing here depends on order, nesting or styling. (`filter` gets its own lesson next.)"
           ru: "Карточка товара, в которой есть текст «Sunny Tulips», а внутри неё — кнопка по роли и имени. Здесь ничего не зависит от порядка, вложенности или стилей. (Про `filter` — отдельный следующий урок.)"
-      - lines: 13
+      - lines: 14
         text:
           en: "The counter by its test id. Result: test 1 red, test 2 green — on the same app, where nothing changed for users."
           ru: "Счётчик по его test id. Итог: тест 1 красный, тест 2 зелёный — на одном и том же приложении, где для пользователей ничего не изменилось."
@@ -187,15 +187,15 @@ steps:
         en: "Match each locator with the change that breaks it."
         ru: "Сопоставь каждый локатор с изменением, которое его сломает."
       pairs:
-        - left: "page.locator('.btn')"
+        - left: 'page.locator(".btn")'
           right: { en: "New design tokens: every CSS class gets a new name", ru: "Новые дизайн-токены: у каждого CSS-класса новое имя" }
-        - left: "page.locator('#login-form > input:nth-child(3)')"
+        - left: 'page.locator("#login-form > input:nth-child(3)")'
           right: { en: "Each label and its field get wrapped in a new `div`", ru: "Каждую подпись с её полем заворачивают в новый `div`" }
-        - left: "page.locator('//ul/li[2]//button')"
+        - left: 'page.locator("//ul/li[2]//button")'
           right: { en: "The “Most popular” order in the shop changes", ru: "Меняется порядок «Most popular» в магазине" }
-        - left: "page.locator('article > h2 + p')"
+        - left: 'page.locator("article > h2 + p")'
           right: { en: "The price moves above the product name", ru: "Цена переезжает над названием товара" }
-        - left: "page.getByRole('button', { name: 'Log in' })"
+        - left: 'page.get_by_role("button", name="Log in")'
           right: { en: "The button text changes to “Sign in”", ru: "Текст кнопки меняется на «Sign in»" }
       leftCode: true
       hints:
@@ -219,18 +219,18 @@ steps:
       keyPoint: kp-layout-breaks
       app: { route: /shop, variant: redesign }
       prompt:
-        en: "This is the shop after Kai's redesign. Petal's test reads prices with `page.locator('article > h2 + p')` — “the paragraph right after the product name”. Find the price of Sunny Tulips and see where it sits now."
-        ru: "Это магазин после редизайна Кая. Тест Petal читает цены через `page.locator('article > h2 + p')` — «абзац сразу после названия товара». Найди цену Sunny Tulips и посмотри, где она теперь."
+        en: "This is the shop after Kai's redesign. Petal's test reads prices with `page.locator(\"article > h2 + p\")` — “the paragraph right after the product name”. Find the price of Sunny Tulips and see where it sits now."
+        ru: 'Это магазин после редизайна Кая. Тест Petal читает цены через `page.locator("article > h2 + p")` — «абзац сразу после названия товара». Найди цену Sunny Tulips и посмотри, где она теперь.'
       target: "[data-product-id='sunny-tulips'] [data-testid='product-price']"
       view: dom
       show: [attributes]
       hints:
-        - en: "Scroll the page to the Sunny Tulips card (second in the list) and click its price — or open it in the tree: `<div id=\"results\">` → `<ul>` → the second `<li>` → `<article>`."
-          ru: "Прокрути страницу до карточки Sunny Tulips (вторая в списке) и нажми на её цену — или раскрой её в дереве: `<div id=\"results\">` → `<ul>` → второй `<li>` → `<article>`."
-        - en: "The price is a `<p>` with `data-testid=\"product-price\"`. Check what comes right before and after it."
-          ru: "Цена — это `<p>` с `data-testid=\"product-price\"`. Посмотри, что идёт прямо перед ним и после него."
+        - en: 'Scroll the page to the Sunny Tulips card (second in the list) and click its price — or open it in the tree: `<div id="results">` → `<ul>` → the second `<li>` → `<article>`.'
+          ru: 'Прокрути страницу до карточки Sunny Tulips (вторая в списке) и нажми на её цену — или раскрой её в дереве: `<div id="results">` → `<ul>` → второй `<li>` → `<article>`.'
+        - en: 'The price is a `<p>` with `data-testid="product-price"`. Check what comes right before and after it.'
+          ru: 'Цена — это `<p>` с `data-testid="product-price"`. Посмотри, что идёт прямо перед ним и после него.'
         - en: "It's `<p … data-testid=\"product-price\">€24.00</p>` — now above `<h2>Sunny Tulips</h2>`."
-          ru: "Это `<p … data-testid=\"product-price\">€24.00</p>` — теперь он выше `<h2>Sunny Tulips</h2>`."
+          ru: 'Это `<p … data-testid="product-price">€24.00</p>` — теперь он выше `<h2>Sunny Tulips</h2>`.'
       praise:
         en: "Found it — and you can see exactly why the old selector misses: same price, new place in the tree."
         ru: "Наш{ла|ёл} — и теперь видно, почему старый селектор промахивается: цена та же, место в дереве новое."
@@ -242,16 +242,16 @@ steps:
     keyPoint: kp-user-facing-resilient
     title: { en: "Resilient means red for the right reason", ru: "Устойчивый — значит красный по правильной причине" }
     body:
-      - en: "A [[resilient locator|resilient-locator]] describes what the user sees: a role and a name, a label, a visible text. `getByRole('button', { name: 'Log in' })` is “the Log in button” — exactly how your test case says it. Kai's redesign changed classes and wrappers, not that."
-        ru: "[[Устойчивый локатор|resilient-locator]] описывает то, что видит пользователь: роль и имя, подпись, видимый текст. `getByRole('button', { name: 'Log in' })` — это «кнопка Log in», ровно как в твоём тест-кейсе. Редизайн Кая поменял классы и обёртки, но не это."
+      - en: "A [[resilient locator|resilient-locator]] describes what the user sees: a role and a name, a label, a visible text. `get_by_role(\"button\", name=\"Log in\")` is “the Log in button” — exactly how your test case says it. Kai's redesign changed classes and wrappers, not that."
+        ru: '[[Устойчивый локатор|resilient-locator]] описывает то, что видит пользователь: роль и имя, подпись, видимый текст. `get_by_role("button", name="Log in")` — это «кнопка Log in», ровно как в твоём тест-кейсе. Редизайн Кая поменял классы и обёртки, но не это.'
       - en: "Resilient doesn't mean “never fails”. If the button is renamed to “Sign in”, the test fails — and it should: users see a new button, so the test case changes too. If the button stops being a button for screen readers, it fails — and that's an accessibility bug worth reporting."
         ru: "Устойчивый не значит «никогда не падает». Если кнопку переименуют в «Sign in», тест упадёт — и правильно: пользователи видят новую кнопку, значит, меняется и тест-кейс. Если кнопка перестанет быть кнопкой для скринридера, тест упадёт — и это баг доступности, о котором стоит сообщить."
       - en: "So the rule: a good [[locator]] fails **only when the user's experience changes**. New classes and wrappers, which only the code sees → green. A new button text or a lost role, which users notice → red."
         ru: "Отсюда правило: хороший [[локатор|locator]] падает, **только когда меняется опыт пользователя**. Новые классы и обёртки, которые видит только код, → зелёный. Новый текст кнопки или потерянная роль, которые замечают пользователи, → красный."
     figure: red-green
     mentor:
-      en: "`getByTestId` survives a rename too — handy when an element has no good name. But it won't tell you that the button text changed. Choose knowing what you want to catch."
-      ru: "`getByTestId` переживает и переименование — удобно, когда у элемента нет хорошего имени. Но он не скажет тебе, что текст кнопки изменился. Выбирай, понимая, что именно хочешь поймать."
+      en: "`get_by_test_id` survives a rename too — handy when an element has no good name. But it won't tell you that the button text changed. Choose knowing what you want to catch."
+      ru: "`get_by_test_id` переживает и переименование — удобно, когда у элемента нет хорошего имени. Но он не скажет тебе, что текст кнопки изменился. Выбирай, понимая, что именно хочешь поймать."
 
   - type: task
     task:
@@ -266,18 +266,18 @@ steps:
         en: "Will this test pass on the redesign build?"
         ru: "Пройдёт ли этот тест на сборке с редизайном?"
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('new customer can sign up', async ({ page }) => {
-          await page.goto('/signup');
-          await page.getByLabel('Full name').fill('Lena Ferreira');
-          await page.getByLabel('Email').fill('lena@bloomly.app');
-          await page.getByLabel('Password').fill('sunflower8');
-          await page.getByLabel('Country').selectOption('Portugal');
-          await page.getByLabel('I agree to the Terms of Service').check();
-          await page.getByRole('button', { name: 'Create account' }).click();
-          await expect(page.getByRole('heading', { name: 'Account created!' })).toBeVisible();
-        });
+
+        def test_new_customer_can_sign_up(page: Page):
+            page.goto("/signup")
+            page.get_by_label("Full name").fill("Lena Ferreira")
+            page.get_by_label("Email").fill("lena@bloomly.app")
+            page.get_by_label("Password").fill("sunflower8")
+            page.get_by_label("Country").select_option("Portugal")
+            page.get_by_label("I agree to the Terms of Service").check()
+            page.get_by_role("button", name="Create account").click()
+            expect(page.get_by_role("heading", name="Account created!")).to_be_visible()
       outcome: pass
       reasons:
         - text:
@@ -288,8 +288,8 @@ steps:
             en: "Fail: the fields moved into new wrappers, so the locators lose them."
             ru: "Упадёт: поля переехали в новые обёртки, и локаторы их теряют."
           why:
-            en: "`getByLabel` follows the link between a label and its field (`for` → `id`), not their position in the tree."
-            ru: "`getByLabel` идёт по связи между подписью и её полем (`for` → `id`), а не по их месту в дереве."
+            en: "`get_by_label` follows the link between a label and its field (`for` → `id`), not their position in the tree."
+            ru: "`get_by_label` идёт по связи между подписью и её полем (`for` → `id`), а не по их месту в дереве."
         - text:
             en: "Fail: the “Create account” button has a new class."
             ru: "Упадёт: у кнопки «Create account» новый класс."
@@ -299,8 +299,8 @@ steps:
       hints:
         - en: "Does any locator mention a class, a position or a path?"
           ru: "Упоминает ли хоть один локатор класс, позицию или путь?"
-        - en: "`getByLabel` finds a field through its label. Did the redesign change any label text?"
-          ru: "`getByLabel` находит поле через его подпись. Поменял ли редизайн текст хоть одной подписи?"
+        - en: "`get_by_label` finds a field through its label. Did the redesign change any label text?"
+          ru: "`get_by_label` находит поле через его подпись. Поменял ли редизайн текст хоть одной подписи?"
         - en: "None of these locators depends on the layout."
           ru: "Ни один из этих локаторов не зависит от вёрстки."
       praise:
@@ -329,44 +329,44 @@ steps:
           - { action: "Open /cart" }
           - { action: "Enter the promo code and click \"Apply\"", data: "BLOOM10", expected: "Total is €36.40" }
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('BLOOM10 gives 10% off', async ({ page }) => {
-          await page.goto('/cart');
-          await page.locator('.bl_promo__33cjx > input').fill('BLOOM10');
-          await page.locator('.bl_promo__33cjx > .bl_btn__375kd').click();
-          await page.waitForTimeout(1000);
-          await expect(page.locator('.bl_summary__vi46o > dd:nth-child(8)')).toHaveText('€36.40');
-        });
+
+        def test_bloom10_gives_10_percent_off(page: Page):
+            page.goto("/cart")
+            page.locator(".bl_promo__33cjx > input").fill("BLOOM10")
+            page.locator(".bl_promo__33cjx > .bl_btn__375kd").click()
+            page.wait_for_timeout(1000)
+            expect(page.locator(".bl_summary__vi46o > dd:nth-child(8)")).to_have_text("€36.40")
       issues:
-        - line: 5
-          type: fragile-locator
-          note:
-            en: "A generated class plus a path. `bl_promo__33cjx` is today's hash — the next design-system build can rename it again. Use `getByLabel('Promo code')`."
-            ru: "Сгенерированный класс плюс путь. `bl_promo__33cjx` — сегодняшний хеш, следующая сборка дизайн-системы может снова его переименовать. Используй `getByLabel('Promo code')`."
         - line: 6
           type: fragile-locator
           note:
-            en: "The same problem twice: generated classes for the block and for the button. Use `getByRole('button', { name: 'Apply' })`."
-            ru: "Та же проблема дважды: сгенерированные классы у блока и у кнопки. Используй `getByRole('button', { name: 'Apply' })`."
+            en: "A generated class plus a path. `bl_promo__33cjx` is today's hash — the next design-system build can rename it again. Use `get_by_label(\"Promo code\")`."
+            ru: 'Сгенерированный класс плюс путь. `bl_promo__33cjx` — сегодняшний хеш, следующая сборка дизайн-системы может снова его переименовать. Используй `get_by_label("Promo code")`.'
         - line: 7
-          type: hard-wait
-          note:
-            en: "One extra second on every run, and it guarantees nothing. `toHaveText` waits by itself."
-            ru: "Лишняя секунда на каждом прогоне, и никаких гарантий. `toHaveText` ждёт сам."
-        - line: 8
           type: fragile-locator
           note:
-            en: "A generated class plus a position: “the 8th child of the summary”. Add a row like “Gift wrap”, and it reads the wrong value. Use `getByTestId('cart-total')`."
-            ru: "Сгенерированный класс плюс позиция: «восьмой потомок итогового блока». Добавят строку вроде «Gift wrap» — и он прочитает не то значение. Используй `getByTestId('cart-total')`."
+            en: 'The same problem twice: generated classes for the block and for the button. Use `get_by_role("button", name="Apply")`.'
+            ru: 'Та же проблема дважды: сгенерированные классы у блока и у кнопки. Используй `get_by_role("button", name="Apply")`.'
+        - line: 8
+          type: hard-wait
+          note:
+            en: "One extra second on every run, and it guarantees nothing. `to_have_text` waits by itself."
+            ru: "Лишняя секунда на каждом прогоне, и никаких гарантий. `to_have_text` ждёт сам."
+        - line: 9
+          type: fragile-locator
+          note:
+            en: 'A generated class plus a position: “the 8th child of the summary”. Add a row like “Gift wrap”, and it reads the wrong value. Use `get_by_test_id("cart-total")`.'
+            ru: 'Сгенерированный класс плюс позиция: «восьмой потомок итогового блока». Добавят строку вроде «Gift wrap» — и он прочитает не то значение. Используй `get_by_test_id("cart-total")`.'
       types: [fragile-locator, hard-wait, wrong-assertion, wrong-data, hallucination]
       hints:
         - en: "It's green on staging today. For each line, ask: what will break it next month?"
           ru: "Сегодня на стейджинге он зелёный. Про каждую строку спроси: что сломает её в следующем месяце?"
         - en: "Look for `bl_…__xxxxx` names and positions like `nth-child`. One more line costs time, not stability."
           ru: "Ищи имена вида `bl_…__xxxxx` и позиции вроде `nth-child`. А ещё одна строка бьёт не по стабильности, а по времени."
-        - en: "Lines 5, 6 and 8 are fragile; line 7 is a hard wait."
-          ru: "Строки 5, 6 и 8 хрупкие; строка 7 — жёсткое ожидание."
+        - en: "Lines 6, 7 and 9 are fragile; line 8 is a hard wait."
+          ru: "Строки 6, 7 и 9 хрупкие; строка 8 — жёсткое ожидание."
       praise:
         en: "“Green on staging” didn't fool you — you checked what each line depends on."
         ru: "«Зелёный на стейджинге» тебя не обманул — ты {проверила|проверил}, от чего зависит каждая строка."
@@ -402,21 +402,21 @@ steps:
       multi: true
       optionsCode: true
       options:
-        - text: "locator.click: Timeout 5000ms exceeded — waiting for locator('.btn')"
+        - text: 'TimeoutError: Locator.click: Timeout 5000ms exceeded — waiting for locator(".btn")'
           correct: true
           why:
             en: "The class `btn` is gone after the redesign. The button is there; the selector is stale."
             ru: "Класса `btn` после редизайна нет. Кнопка на месте, устарел селектор."
-        - text: "locator.fill: Timeout 5000ms exceeded — waiting for locator('#login-form > input:nth-child(3)')"
+        - text: 'TimeoutError: Locator.fill: Timeout 5000ms exceeded — waiting for locator("#login-form > input:nth-child(3)")'
           correct: true
           why:
             en: "The Email field moved into a wrapper `div`. The field works; the path doesn't."
             ru: "Поле Email переехало в обёртку `div`. Поле работает, а путь — нет."
-        - text: "expect(getByTestId('cart-total')).toHaveText failed — Expected: \"€36.40\", Received: \"€31.50\""
+        - text: 'AssertionError: Locator expected to have text ''€36.40'' — Actual value: €31.50 — waiting for get_by_test_id("cart-total")'
           why:
             en: "The locator found the total — the value is wrong: €35.00 − €3.50 and no €4.90 delivery. A real bug: report it."
             ru: "Локатор нашёл итог, а неверно значение: €35.00 − €3.50 и нет доставки за €4.90. Настоящий баг: заводи баг-репорт."
-        - text: "locator.click: Timeout 5000ms exceeded — waiting for getByRole('button', { name: 'Add to cart' })"
+        - text: 'TimeoutError: Locator.click: Timeout 5000ms exceeded — waiting for get_by_role("button", name="Add to cart")'
           why:
             en: "A role + name locator failing after a redesign means “Add to cart” stopped being a button — screen readers can't use it either. An accessibility bug, not a test problem."
             ru: "Если после редизайна падает локатор по роли и имени, значит, «Add to cart» перестала быть кнопкой — скринридер её тоже не найдёт. Это баг доступности, а не проблема теста."
@@ -442,27 +442,39 @@ steps:
       app: { variant: redesign, state: { user: anna@bloomly.app } }
       context:
         en: |
-          The night run is red because of 38 tests like this one (tests/orders.spec.ts). The error: `locator.selectOption: Timeout 5000ms exceeded — waiting for locator('.toolbar > select')`.
-          ```js
-          import { test, expect } from '@playwright/test';
+          The night run is red because of 38 tests like this one from `tests/test_orders.py`:
+          ```python
+          from playwright.sync_api import Page, expect
 
-          test('Delivered filter shows delivered orders only', async ({ page }) => {
-            await page.goto('/orders');
-            await page.locator('.toolbar > select').selectOption('Delivered');
-            await expect(page.locator('table tbody tr')).toHaveCount(3);
-          });
+
+          def test_delivered_filter_shows_delivered_orders_only(page: Page):
+              page.goto("/orders")
+              page.locator(".toolbar > select").select_option("Delivered")
+              expect(page.locator("table tbody tr")).to_have_count(3)
+          ```
+          The error in the report:
+          ```
+          E   playwright._impl._errors.TimeoutError: Locator.select_option: Timeout 5000ms exceeded.
+          E   Call log:
+          E     - waiting for locator(".toolbar > select")
           ```
           Petal is simulated, as everywhere in the trainer.
         ru: |
-          Ночной прогон красный из-за 38 таких тестов, как этот (tests/orders.spec.ts). Ошибка: `locator.selectOption: Timeout 5000ms exceeded — waiting for locator('.toolbar > select')`.
-          ```js
-          import { test, expect } from '@playwright/test';
+          Ночной прогон красный из-за 38 таких тестов, как этот из `tests/test_orders.py`:
+          ```python
+          from playwright.sync_api import Page, expect
 
-          test('Delivered filter shows delivered orders only', async ({ page }) => {
-            await page.goto('/orders');
-            await page.locator('.toolbar > select').selectOption('Delivered');
-            await expect(page.locator('table tbody tr')).toHaveCount(3);
-          });
+
+          def test_delivered_filter_shows_delivered_orders_only(page: Page):
+              page.goto("/orders")
+              page.locator(".toolbar > select").select_option("Delivered")
+              expect(page.locator("table tbody tr")).to_have_count(3)
+          ```
+          Ошибка в отчёте:
+          ```
+          E   playwright._impl._errors.TimeoutError: Locator.select_option: Timeout 5000ms exceeded.
+          E   Call log:
+          E     - waiting for locator(".toolbar > select")
           ```
           Petal, как и везде в тренажёре, симулирован.
       prompt:
@@ -476,8 +488,8 @@ steps:
           - { action: "Open /orders" }
           - { action: "Choose \"Delivered\" in the Status filter", expected: "Only the 3 delivered orders are listed" }
       blocks:
-        - { id: task, locked: true, text: "38 tests fail after the design-system redesign. The app works: texts, roles, labels and test ids did not change. Start with tests/orders.spec.ts.", ru: "После редизайна дизайн-системы падают 38 тестов. Приложение работает: тексты, роли, подписи и test id не менялись. Начни с tests/orders.spec.ts." }
-        - { id: locators, text: "Replace CSS classes and DOM paths with getByRole, getByLabel or getByTestId. Don't copy the new generated class names (bl_…).", ru: "Замени CSS-классы и пути по DOM на getByRole, getByLabel или getByTestId. Не копируй новые сгенерированные имена классов (bl_…)." }
+        - { id: task, locked: true, text: "38 tests fail after the design-system redesign. The app works: texts, roles, labels and test ids did not change. Start with tests/test_orders.py.", ru: "После редизайна дизайн-системы падают 38 тестов. Приложение работает: тексты, роли, подписи и test id не менялись. Начни с tests/test_orders.py." }
+        - { id: locators, text: "Replace CSS classes and DOM paths with get_by_role, get_by_label or get_by_test_id. Don't copy the new generated class names (bl_…).", ru: "Замени CSS-классы и пути по DOM на get_by_role, get_by_label или get_by_test_id. Не копируй новые сгенерированные имена классов (bl_…)." }
         - { id: keep, text: "Keep every assertion and expected value as it is — don't change what the tests check.", ru: "Оставь все проверки и ожидаемые значения как есть — не меняй то, что проверяют тесты." }
         - { id: fast, text: "Just make the suite green as fast as you can.", ru: "Просто сделай набор зелёным как можно быстрее." }
       responses:
@@ -488,50 +500,50 @@ steps:
             en: "Updated! The Status filter is found by its label, the rows by their test id. The check is the same: exactly 3 delivered orders. Green on the redesign ✅"
             ru: "Обновил! Фильтр Status ищется по подписи, строки — по test id. Проверка та же: ровно 3 доставленных заказа. Зелёный на редизайне ✅"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('Delivered filter shows delivered orders only', async ({ page }) => {
-              await page.goto('/orders');
-              await page.getByLabel('Status').selectOption('Delivered');
-              await expect(page.getByTestId('order-row')).toHaveCount(3);
-            });
+
+            def test_delivered_filter_shows_delivered_orders_only(page: Page):
+                page.goto("/orders")
+                page.get_by_label("Status").select_option("Delivered")
+                expect(page.get_by_test_id("order-row")).to_have_count(3)
         - when: [fast]
           message:
             en: "Done in two minutes ✅ I copied the new class names from staging and added a short wait, just in case."
             ru: "Готово за две минуты ✅ Скопировал новые имена классов со стейджинга и на всякий случай добавил небольшое ожидание."
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('Delivered filter shows delivered orders only', async ({ page }) => {
-              await page.goto('/orders');
-              await page.waitForTimeout(2000);
-              await page.locator('.bl_toolbar__xtule > select').selectOption('Delivered');
-              await expect(page.locator('table tbody tr')).toHaveCount(3);
-            });
+
+            def test_delivered_filter_shows_delivered_orders_only(page: Page):
+                page.goto("/orders")
+                page.wait_for_timeout(2000)
+                page.locator(".bl_toolbar__xtule > select").select_option("Delivered")
+                expect(page.locator("table tbody tr")).to_have_count(3)
         - when: [locators]
           message:
             en: "Replaced the locators ✅ I also relaxed the row count to a visibility check — counts are brittle."
             ru: "Заменил локаторы ✅ А ещё ослабил проверку количества строк до проверки видимости — количество слишком хрупкое."
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('Delivered filter shows delivered orders only', async ({ page }) => {
-              await page.goto('/orders');
-              await page.getByLabel('Status').selectOption('Delivered');
-              await expect(page.getByTestId('order-row').first()).toBeVisible();
-            });
+
+            def test_delivered_filter_shows_delivered_orders_only(page: Page):
+                page.goto("/orders")
+                page.get_by_label("Status").select_option("Delivered")
+                expect(page.get_by_test_id("order-row").first).to_be_visible()
         - when: []
           message:
             en: "Fixed ✅ The toolbar class is now `bl_toolbar__xtule`, so I updated the selector."
             ru: "Исправил ✅ Класс панели теперь `bl_toolbar__xtule`, поэтому я обновил селектор."
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('Delivered filter shows delivered orders only', async ({ page }) => {
-              await page.goto('/orders');
-              await page.locator('.bl_toolbar__xtule > select').selectOption('Delivered');
-              await expect(page.locator('table tbody tr')).toHaveCount(3);
-            });
+
+            def test_delivered_filter_shows_delivered_orders_only(page: Page):
+                page.goto("/orders")
+                page.locator(".bl_toolbar__xtule > select").select_option("Delivered")
+                expect(page.locator("table tbody tr")).to_have_count(3)
       missing:
         locators:
           en: "Without the locator rule Petal did the quickest thing: copied today's generated class name. Green on staging — and red again after the next design-system build."
@@ -577,27 +589,27 @@ steps:
           - { action: "Tick \"Remember me\"" }
           - { action: "Click \"Log in\"", expected: "Heading \"Welcome back, Anna!\"" }
       starter: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('user logs in with Remember me', async ({ page }) => {
-          await page.goto('/login');
-          await page.locator('#login-form > input:nth-child(3)').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.locator('#login-form > label:nth-child(6) > input').check();
-          await page.locator('.btn').click();
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+
+        def test_user_logs_in_with_remember_me(page: Page):
+            page.goto("/login")
+            page.locator("#login-form > input:nth-child(3)").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.locator("#login-form > label:nth-child(6) > input").check()
+            page.locator(".btn").click()
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       solution: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('user logs in with Remember me', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('checkbox', { name: 'Remember me' }).check();
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+
+        def test_user_logs_in_with_remember_me(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("checkbox", name="Remember me").check()
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       checks:
         expect: pass
         static: [noFragile]
@@ -605,12 +617,12 @@ steps:
           - app: {}
             expect: pass
       hints:
-        - en: "Three lines find elements by position or class. Line 6 already shows the resilient way."
-          ru: "Три строки ищут элементы по позиции или классу. Строка 6 уже показывает устойчивый способ."
-        - en: "Fields → `getByLabel`. The checkbox and the button have a role and a name."
-          ru: "Поля → `getByLabel`. У чекбокса и кнопки есть роль и имя."
-        - en: "Lines 5, 7 and 8: `page.getByLabel('Email')`, `page.getByRole('checkbox', { name: 'Remember me' })`, `page.getByRole('button', { name: 'Log in' })`."
-          ru: "Строки 5, 7 и 8: `page.getByLabel('Email')`, `page.getByRole('checkbox', { name: 'Remember me' })`, `page.getByRole('button', { name: 'Log in' })`."
+        - en: "Three lines find elements by position or class. Line 7 already shows the resilient way."
+          ru: "Три строки ищут элементы по позиции или классу. Строка 7 уже показывает устойчивый способ."
+        - en: "Fields → `get_by_label`. The checkbox and the button have a role and a name."
+          ru: "Поля → `get_by_label`. У чекбокса и кнопки есть роль и имя."
+        - en: 'Lines 6, 8 and 9: `page.get_by_label("Email")`, `page.get_by_role("checkbox", name="Remember me")`, `page.get_by_role("button", name="Log in")`.'
+          ru: 'Строки 6, 8 и 9: `page.get_by_label("Email")`, `page.get_by_role("checkbox", name="Remember me")`, `page.get_by_role("button", name="Log in")`.'
       praise:
         en: "Green on both builds — and every locator reads like a step of TC-523."
         ru: "Зелёный на обеих сборках — и каждый локатор читается как шаг TC-523."
@@ -622,23 +634,30 @@ steps:
     keyPoint: kp-false-alarms
     title: { en: "Quick “fixes” that keep the false alarms coming", ru: "Быстрые «исправления», после которых ложные тревоги возвращаются" }
     items:
-      - wrong: "await page.locator('.bl_btn__375kd').click(); // healed"
-        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+      - wrong: 'page.locator(".bl_btn__375kd").click()  # healed'
+        right: 'page.get_by_role("button", name="Log in").click()'
         why:
           en: "A generated class name changes with the styles. Copying it fixes today's red and books the next false alarm."
           ru: "Сгенерированное имя класса меняется вместе со стилями. Скопировать его — значит убрать сегодняшний красный и заказать следующую ложную тревогу."
-      - wrong: "await page.waitForTimeout(3000);\nawait page.locator('.btn').click();"
-        right: "await page.getByRole('button', { name: 'Log in' }).click();"
+      - wrong: "page.wait_for_timeout(3000)\npage.locator(\".btn\").click()"
+        right: 'page.get_by_role("button", name="Log in").click()'
         why:
           en: "A selector that matches nothing fails every time. A wait — or a retry — only makes the red arrive later. Fragile isn't flaky."
           ru: "Селектор, который ничего не находит, падает каждый раз. Ожидание или повторный запуск только откладывают красный. Хрупкий — не значит нестабильный."
-      - wrong: "await expect(page.getByTestId('order-row').first()).toBeVisible();"
-        right: "await expect(page.getByTestId('order-row')).toHaveCount(3);"
+      - wrong: 'expect(page.get_by_test_id("order-row").first).to_be_visible()'
+        right: 'expect(page.get_by_test_id("order-row")).to_have_count(3)'
         why:
           en: "Fragile is about *how you find* elements, not *what you check*. Fix the locator; keep the assertion as strict as the test case."
           ru: "Хрупкость — про то, *как ищешь* элементы, а не про то, *что проверяешь*. Исправь локатор, а проверку оставь такой же строгой, как в тест-кейсе."
-      - wrong: "test.skip('Delivered filter shows delivered orders only', async ({ page }) => {"
-        right: "test('Delivered filter shows delivered orders only', async ({ page }) => {"
+      - wrong: |-
+          @pytest.mark.skip(reason="red after the redesign")
+          def test_delivered_filter_shows_delivered_orders_only(page: Page):
+              ...
+        right: |-
+          def test_delivered_filter_shows_delivered_orders_only(page: Page):
+              page.goto("/orders")
+              page.get_by_label("Status").select_option("Delivered")
+              expect(page.get_by_test_id("order-row")).to_have_count(3)
         why:
           en: "A skipped test raises no alarms at all — false or real. Muting noisy tests is how real bugs slip through after a red week. Fix the locators instead."
           ru: "Пропущенный тест не поднимает никаких тревог — ни ложных, ни настоящих. Именно так, через отключённые шумные тесты, настоящие баги и проскакивают после красной недели. Лучше исправь локаторы."
@@ -658,8 +677,8 @@ steps:
         en: "After the redesign 38 tests went red, but all of them are false alarms — the locators were tied to CSS classes. Real bugs: zero."
         ru: "После редизайна покраснели 38 тестов, но все они — ложные тревоги — локаторы были привязаны к CSS-классам. Настоящих багов — ноль."
       - context: code-review
-        en: "Line 5 copies a generated class name — it'll break with the next design-system build. Could you use getByLabel('Promo code') instead?"
-        ru: "В строке 5 скопировано сгенерированное имя класса — оно сломается при следующей сборке дизайн-системы. Можешь использовать getByLabel('Promo code')?"
+        en: 'Line 6 copies a generated class name — it''ll break with the next design-system build. Could you use get_by_label("Promo code") instead?'
+        ru: 'В строке 6 скопировано сгенерированное имя класса — оно сломается при следующей сборке дизайн-системы. Можешь использовать get_by_label("Promo code")?'
       - context: chat
         en: "Heads-up: tonight's red run is a locator issue, not a product issue. No need to stop the release."
         ru: "К сведению: сегодняшний красный прогон — проблема локаторов, а не продукта. Останавливать релиз не нужно."
@@ -670,8 +689,8 @@ steps:
           en: "When a role + name locator fails, check the app before you touch the test."
           ru: "Когда падает локатор по роли и имени, сначала проверь приложение, а потом уже трогай тест."
       - context: prompt
-        en: "Replace CSS classes and nth-child paths with getByRole, getByLabel or getByTestId. Keep every assertion as it is."
-        ru: "Замени CSS-классы и пути с nth-child на getByRole, getByLabel или getByTestId. Все проверки оставь как есть."
+        en: "Replace CSS classes and nth-child paths with get_by_role, get_by_label or get_by_test_id. Keep every assertion as it is."
+        ru: "Замени CSS-классы и пути с nth-child на get_by_role, get_by_label или get_by_test_id. Все проверки оставь как есть."
       - context: meeting
         en: "If we keep CSS selectors, every redesign costs us a day of triage — and the team stops trusting red."
         ru: "Если оставим CSS-селекторы, каждый редизайн будет стоить нам дня разбора — и команда перестанет доверять красному."
@@ -689,13 +708,13 @@ checkPool:
       en: "Will Petal's test pass on the redesign build?"
       ru: "Пройдёт ли тест Petal на сборке с редизайном?"
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('cheapest product comes first', async ({ page }) => {
-        await page.goto('/shop');
-        await page.getByLabel('Sort by').selectOption('Price: low to high');
-        await expect(page.locator('li:first-child article > h2 + p')).toHaveText('€12.00');
-      });
+
+      def test_cheapest_product_comes_first(page: Page):
+          page.goto("/shop")
+          page.get_by_label("Sort by").select_option("Price: low to high")
+          expect(page.locator("li:first-child article > h2 + p")).to_have_text("€12.00")
     outcome: fail
     reasons:
       - text:
@@ -720,16 +739,16 @@ checkPool:
       - en: "In the redesign, what comes right after the product name on Mint Succulent's card?"
         ru: "Что в редизайне идёт сразу после названия на карточке Mint Succulent?"
     explain:
-      en: "A false alarm in one line: the shop is right, the selector is stale. A test id inside the first card — `getByTestId('product-price')` — doesn't care which tag comes first."
-      ru: "Ложная тревога в одну строку: магазин прав, селектор устарел. Локатору по test id внутри первой карточки — `getByTestId('product-price')` — всё равно, какой тег идёт первым."
+      en: "A false alarm in one line: the shop is right, the selector is stale. A test id inside the first card — `get_by_test_id(\"product-price\")` — doesn't care which tag comes first."
+      ru: 'Ложная тревога в одну строку: магазин прав, селектор устарел. Локатору по test id внутри первой карточки — `get_by_test_id("product-price")` — всё равно, какой тег идёт первым.'
 
   - id: c5-l2-k2
     kind: choice
     keyPoint: kp-user-facing-resilient
     placement: true
     prompt:
-      en: "Petal's test clicks `page.getByRole('button', { name: 'Proceed to checkout' })`. After which change *should* this test fail?"
-      ru: "Тест Petal кликает `page.getByRole('button', { name: 'Proceed to checkout' })`. После какого изменения этот тест *должен* упасть?"
+      en: "Petal's test clicks `page.get_by_role(\"button\", name=\"Proceed to checkout\")`. After which change *should* this test fail?"
+      ru: 'Тест Petal кликает `page.get_by_role("button", name="Proceed to checkout")`. После какого изменения этот тест *должен* упасть?'
     options:
       - text: { en: "Sofia renames the button to “Go to checkout”", ru: "София переименовывает кнопку в «Go to checkout»" }
         correct: true
@@ -775,36 +794,36 @@ checkPool:
         - { action: "Tick \"This is a gift\"" }
         - { action: "Type a gift message", data: "Happy birthday!", expected: "The counter shows 15/200" }
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('gift message counter counts characters', async ({ page }) => {
-        await page.goto('/checkout');
-        await page.locator('//form/label[5]/input').check();
-        await page.getByLabel('Gift message').fill('Happy birthday!');
-        await expect(page.locator('#checkout-form > div > p.hint')).toHaveText('15/200');
-      });
+
+      def test_gift_message_counter_counts_characters(page: Page):
+          page.goto("/checkout")
+          page.locator("//form/label[5]/input").check()
+          page.get_by_label("Gift message").fill("Happy birthday!")
+          expect(page.locator("#checkout-form > div > p.hint")).to_have_text("15/200")
     issues:
-      - line: 5
+      - line: 6
         type: fragile-locator
         note:
-          en: "XPath by position: “the 5th label directly inside the form”. After the wrappers the form has only one direct label left. Use `getByRole('checkbox', { name: 'This is a gift' })`."
-          ru: "XPath по позиции: «пятая подпись прямо внутри формы». После обёрток у формы останется только одна прямая подпись. Используй `getByRole('checkbox', { name: 'This is a gift' })`."
-      - line: 7
+          en: 'XPath by position: “the 5th label directly inside the form”. After the wrappers the form has only one direct label left. Use `get_by_role("checkbox", name="This is a gift")`.'
+          ru: 'XPath по позиции: «пятая подпись прямо внутри формы». После обёрток у формы останется только одна прямая подпись. Используй `get_by_role("checkbox", name="This is a gift")`.'
+      - line: 8
         type: fragile-locator
         note:
-          en: "A path plus a class: `form > div > p.hint`. The class becomes `bl_hint__…`, and the form gets more `div`s. Use `getByTestId('gift-counter')`."
-          ru: "Путь плюс класс: `form > div > p.hint`. Класс станет `bl_hint__…`, а `div` в форме прибавится. Используй `getByTestId('gift-counter')`."
+          en: 'A path plus a class: `form > div > p.hint`. The class becomes `bl_hint__…`, and the form gets more `div`s. Use `get_by_test_id("gift-counter")`.'
+          ru: 'Путь плюс класс: `form > div > p.hint`. Класс станет `bl_hint__…`, а `div` в форме прибавится. Используй `get_by_test_id("gift-counter")`.'
     types: [fragile-locator, hard-wait, wrong-assertion, wrong-data]
     hints:
       - en: "For each locator: does it rely on a position, a path, a class — or on what the user sees?"
         ru: "Про каждый локатор: опирается он на позицию, путь, класс — или на то, что видит пользователь?"
       - en: "Two lines rely on the layout: one XPath and one CSS path."
         ru: "На вёрстку опираются две строки: один XPath и один CSS-путь."
-      - en: "Lines 5 and 7."
-        ru: "Строки 5 и 7."
+      - en: "Lines 6 and 8."
+        ru: "Строки 6 и 8."
     explain:
-      en: "Line 6 survives: `getByLabel('Gift message')` follows the label wherever it sits. Lines 5 and 7 describe the form's structure — exactly what the redesign changes. On Friday both go red with no bug in checkout."
-      ru: "Строка 6 выживет: `getByLabel('Gift message')` идёт за подписью, где бы та ни находилась. Строки 5 и 7 описывают устройство формы — ровно то, что меняет редизайн. В пятницу обе покраснеют, хотя в чекауте не будет ни одного бага."
+      en: "Line 7 survives: `get_by_label(\"Gift message\")` follows the label wherever it sits. Lines 6 and 8 describe the form's structure — exactly what the redesign changes. On Friday both go red with no bug in checkout."
+      ru: 'Строка 7 выживет: `get_by_label("Gift message")` идёт за подписью, где бы та ни находилась. Строки 6 и 8 описывают устройство формы — ровно то, что меняет редизайн. В пятницу обе покраснеют, хотя в чекауте не будет ни одного бага.'
 
   - id: c5-l2-k4
     kind: fix
@@ -821,23 +840,23 @@ checkPool:
         - { action: "Open /account", expected: "City shows \"Lisbon\"" }
         - { action: "Click \"My orders\"", expected: "The orders page opens (/orders)" }
     starter: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('account page shows the city and links to orders', async ({ page }) => {
-        await page.goto('/account');
-        await expect(page.locator('dl.details > dd:nth-child(6)')).toHaveText('Lisbon');
-        await page.locator('.row-actions > .btn.secondary').click();
-        await expect(page).toHaveURL('/orders');
-      });
+
+      def test_account_page_shows_the_city_and_links_to_orders(page: Page):
+          page.goto("/account")
+          expect(page.locator("dl.details > dd:nth-child(6)")).to_have_text("Lisbon")
+          page.locator(".row-actions > .btn.secondary").click()
+          expect(page).to_have_url("http://localhost:3000/orders")
     solution: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('account page shows the city and links to orders', async ({ page }) => {
-        await page.goto('/account');
-        await expect(page.getByTestId('account-city')).toHaveText('Lisbon');
-        await page.getByRole('link', { name: 'My orders' }).click();
-        await expect(page).toHaveURL('/orders');
-      });
+
+      def test_account_page_shows_the_city_and_links_to_orders(page: Page):
+          page.goto("/account")
+          expect(page.get_by_test_id("account-city")).to_have_text("Lisbon")
+          page.get_by_role("link", name="My orders").click()
+          expect(page).to_have_url("http://localhost:3000/orders")
     checks:
       expect: pass
       static: [noFragile]
@@ -849,8 +868,8 @@ checkPool:
         ru: "Два локатора зависят от классов и позиций."
       - en: "The city has a test id, `account-city`. “My orders” is a link with a name."
         ru: "У города есть test id — `account-city`. «My orders» — ссылка с именем."
-      - en: "`page.getByTestId('account-city')` and `page.getByRole('link', { name: 'My orders' })`."
-        ru: "`page.getByTestId('account-city')` и `page.getByRole('link', { name: 'My orders' })`."
+      - en: '`page.get_by_test_id("account-city")` and `page.get_by_role("link", name="My orders")`.'
+        ru: '`page.get_by_test_id("account-city")` и `page.get_by_role("link", name="My orders")`.'
     explain:
       en: "“The 6th child of the details list” and “the secondary button in the actions row” describe the layout. The test id and the link's name describe what's there, so they pass on both builds."
       ru: "«Шестой потомок списка данных» и «второстепенная кнопка в ряду действий» описывают вёрстку. Test id и имя ссылки описывают то, что там есть, поэтому проходят на обеих сборках."
@@ -866,16 +885,16 @@ checkPool:
       ru: "Какое падение заслуживает баг-репорта?"
     optionsCode: true
     options:
-      - text: "locator.click: Timeout 5000ms exceeded — waiting for locator('nav > a:nth-child(2)')"
+      - text: 'TimeoutError: Locator.click: Timeout 5000ms exceeded — waiting for locator("nav > a:nth-child(2)")'
         why:
           en: "A path through the menu, and the redesign wrapped the links. A false alarm."
           ru: "Путь через меню, а редизайн завернул ссылки в обёртку. Ложная тревога."
-      - text: "expect(getByTestId('orders-summary')).toHaveText failed — Expected: \"Showing 3 of 6 orders\", Received: \"Showing 6 of 6 orders\""
+      - text: 'AssertionError: Locator expected to have text ''Showing 3 of 6 orders'' — Actual value: Showing 6 of 6 orders — waiting for get_by_test_id("orders-summary")'
         correct: true
         why:
           en: "The locator found the summary, and the summary is wrong: the filter shows 3 orders, the text says 6. A real bug."
           ru: "Локатор нашёл сводку, и сводка неверная: фильтр показывает 3 заказа, а текст говорит про 6. Настоящий баг."
-      - text: "locator.fill: Timeout 5000ms exceeded — waiting for locator('.promo input')"
+      - text: 'TimeoutError: Locator.fill: Timeout 5000ms exceeded — waiting for locator(".promo input")'
         why:
           en: "An old class name; the promo field itself is fine. A false alarm."
           ru: "Старое имя класса, а само поле промокода в порядке. Ложная тревога."
@@ -892,8 +911,8 @@ checkPool:
     kind: choice
     keyPoint: kp-false-alarms
     context:
-      en: "Petal: “To stop the red nights, I'll set retries to 3 and add `waitForTimeout(3000)` before every click.”"
-      ru: "Petal: «Чтобы красные ночи прекратились, я поставлю 3 повторных запуска и добавлю `waitForTimeout(3000)` перед каждым кликом»."
+      en: "Petal: “To stop the red nights, I'll rerun every failed test 3 times (`pytest --reruns 3`) and add `wait_for_timeout(3000)` before every click.”"
+      ru: "Petal: «Чтобы красные ночи прекратились, я буду перезапускать каждый упавший тест 3 раза (`pytest --reruns 3`) и добавлю `wait_for_timeout(3000)` перед каждым кликом»."
     prompt:
       en: "The red tests fail on `.btn` and `nth-child` selectors after the redesign. What do you reply?"
       ru: "Красные тесты падают на селекторах с `.btn` и `nth-child` после редизайна. Что ты ответишь?"
@@ -933,20 +952,20 @@ checkPool:
       en: "This is the cart after Kai's redesign. Pick the locator for the highlighted button that survives this redesign — and the next one."
       ru: "Это корзина после редизайна Кая. Выбери локатор для подсвеченной кнопки, который переживёт этот редизайн — и следующий."
     options:
-      - text: "page.getByRole('button', { name: 'Proceed to checkout' })"
+      - text: 'page.get_by_role("button", name="Proceed to checkout")'
         correct: true
         why:
           en: "The role and the name are what customers rely on. They didn't change in this redesign and won't change in the next one unless customers see a change too."
           ru: "На роль и имя опираются покупатели. В этом редизайне они не поменялись — и в следующем не поменяются, если только изменение не увидят сами покупатели."
-      - text: "page.locator('.bl_btn__375kd')"
+      - text: 'page.locator(".bl_btn__375kd")'
         why:
           en: "Today's generated class — and it matches three elements: “Apply”, “Continue shopping” and this button."
           ru: "Сегодняшний сгенерированный класс — и под него подходят три элемента: «Apply», «Continue shopping» и эта кнопка."
-      - text: "page.locator('.row-actions > button')"
+      - text: 'page.locator(".row-actions > button")'
         why:
           en: "The old class name — after the redesign it matches nothing."
           ru: "Старое имя класса — после редизайна под него ничего не подходит."
-      - text: "page.locator('//main/div[last()]/button')"
+      - text: 'page.locator("//main/div[last()]/button")'
         why:
           en: "Works today: “the button in the last block of the page”. Add a block below the summary, and it points elsewhere or nowhere."
           ru: "Сегодня работает: «кнопка в последнем блоке страницы». Добавят блок под итогом — и он укажет на другое или в пустоту."
@@ -964,18 +983,18 @@ checkPool:
     keyPoint: kp-layout-breaks
     app: { route: /signup, variant: redesign }
     prompt:
-      en: "Petal's signup test fills `page.locator('#signup-form > input:nth-child(2)')` and times out on Kai's redesign. Find the field it was meant for and look at its parent."
-      ru: "Тест регистрации от Petal заполняет `page.locator('#signup-form > input:nth-child(2)')` и падает по таймауту на редизайне Кая. Найди поле, которое имелось в виду, и посмотри на его родителя."
+      en: "Petal's signup test fills `page.locator(\"#signup-form > input:nth-child(2)\")` and times out on Kai's redesign. Find the field it was meant for and look at its parent."
+      ru: 'Тест регистрации от Petal заполняет `page.locator("#signup-form > input:nth-child(2)")` и падает по таймауту на редизайне Кая. Найди поле, которое имелось в виду, и посмотри на его родителя.'
     target: "#fullName"
     view: dom
     show: [attributes]
     hints:
-      - en: "Open `<form id=\"signup-form\">` in the tree."
-        ru: "Раскрой в дереве `<form id=\"signup-form\">`."
+      - en: 'Open `<form id="signup-form">` in the tree.'
+        ru: 'Раскрой в дереве `<form id="signup-form">`.'
       - en: "The first field of the form is “Full name”. In the redesign its label and input share a new parent."
         ru: "Первое поле формы — «Full name». В редизайне у его подписи и поля общий новый родитель."
       - en: "It's `<input id=\"fullName\">` inside the first `<div class=\"bl_field__…\">`."
-        ru: "Это `<input id=\"fullName\">` внутри первого `<div class=\"bl_field__…\">`."
+        ru: 'Это `<input id="fullName">` внутри первого `<div class="bl_field__…">`.'
     explain:
-      en: "In the old build the input was the form's 2nd child, right after its label. Now both sit inside `<div class=\"bl_field__2ty9n\">`, so the form has no direct `input` children at all. The label is still linked to the field (`for=\"fullName\"`), so `getByLabel('Full name')` finds it on both builds."
-      ru: "В старой сборке поле было вторым потомком формы, сразу после подписи. Теперь оба лежат внутри `<div class=\"bl_field__2ty9n\">`, и прямых потомков `input` у формы нет вообще. Подпись по-прежнему связана с полем (`for=\"fullName\"`), поэтому `getByLabel('Full name')` находит его на обеих сборках."
+      en: "In the old build the input was the form's 2nd child, right after its label. Now both sit inside `<div class=\"bl_field__2ty9n\">`, so the form has no direct `input` children at all. The label is still linked to the field (`for=\"fullName\"`), so `get_by_label(\"Full name\")` finds it on both builds."
+      ru: 'В старой сборке поле было вторым потомком формы, сразу после подписи. Теперь оба лежат внутри `<div class="bl_field__2ty9n">`, и прямых потомков `input` у формы нет вообще. Подпись по-прежнему связана с полем (`for="fullName"`), поэтому `get_by_label("Full name")` находит его на обеих сборках.'

@@ -13,17 +13,17 @@ const warn = (file: string, msg: string) => warnings.push(`! ${file}: ${msg}`);
 
 // Ids that some chapter owns (see docs/CONTENT.md §9). Referencing one that isn't written yet is a warning.
 const PLANNED_TERMS = `manual-testing test-automation automated-test test-case test-step expected-result actual-result
-regression-testing test-suite spec-file test-runner action assertion locator test-report pass fail precondition test-data
+regression-testing test-suite test-file test-runner action assertion locator test-report pass fail precondition test-data
 smoke-test timeout bug llm ai-agent prompt context hallucination mcp accessibility-snapshot code-review diff false-positive
-false-negative request-changes test-coverage edge-case negative-test code syntax variable constant string number boolean
-function arrow-function parameter argument object property method array loop async await promise comment error-message
-console dom html element tag attribute devtools inspect css-selector xpath test-id role accessible-name accessibility
-fragile-selector resilient-locator strict-mode chaining filter web-first-assertion retry soft-assertion actionability
-auto-waiting flaky-test race-condition hard-wait trace-viewer debugging self-healing test-plan planner generator healer
-seed-test project-rules test-isolation hook describe-block setup teardown page-object-model class fixture
-parameterization data-driven-testing refactoring api-testing endpoint request response status-code http-method payload
-json header auth-token ci-cd pipeline codegen html-report headless cross-browser-testing pull-request repository commit
-portfolio config-file`.split(/\s+/).filter(Boolean);
+false-negative request-changes test-coverage edge-case negative-test code syntax variable constant string f-string number
+boolean none function parameter argument keyword-argument object property method list dictionary loop indentation import
+decorator comment error-message traceback dom html element tag attribute devtools inspect css-selector xpath test-id role
+accessible-name accessibility fragile-selector resilient-locator strict-mode chaining filter web-first-assertion retry
+soft-assertion actionability auto-waiting flaky-test race-condition hard-wait trace-viewer debugging self-healing test-plan
+planner generator healer seed-test project-rules test-isolation conftest test-class setup teardown page-object-model class
+fixture parameterization data-driven-testing refactoring api-testing endpoint request response status-code http-method
+payload json header auth-token ci-cd pipeline codegen html-report headless cross-browser-testing pull-request repository
+commit portfolio config-file virtual-environment`.split(/\s+/).filter(Boolean);
 
 function load(file: string): unknown {
   try {

@@ -11,11 +11,12 @@ Read also: `docs/AUT.md` (the Bloomly app — exact labels, roles, texts, bugs) 
 
 - Russian-speaking women, **experienced manual QA engineers (~3 years)**: test cases, checklists, bug reports,
   test design (boundary values, negative cases), regression — all known. They are **not juniors**. No coding background.
-- Goal: move into automation **with AI agents**. The AI (Claude Code, Copilot, Playwright Test Agents) writes most
+- Goal: move into automation **with AI agents**. The AI (Claude Code, Copilot, agents built on Playwright MCP / CLI) writes most
   of the code. The student must **understand, direct, review and verify** it.
 - Core message, repeated in many forms: *"The agent writes code fast. You know what is worth checking.
   In test design you are stronger than the agent."*
-- JS only to reading level. No syntax drills, no "write a loop from scratch".
+- Python only to reading level. No syntax drills, no "write a loop from scratch". Tests are pytest + pytest-playwright
+  (sync API) — see docs/EMULATOR.md.
   Task mix per lesson: ~60% read / review / predict, ~25% prompt / agent / verdict, ~15% small one-line fixes.
 - Always build from their experience: "you did this by hand — here is how code does the same".
 - One idea per screen. A lesson = one new idea, 5–10 minutes. Short paragraphs (1–3 sentences each).
@@ -27,7 +28,7 @@ Read also: `docs/AUT.md` (the Bloomly app — exact labels, roles, texts, bugs) 
 
 Every student-facing text is `{ en: "...", ru: "..." }`.
 - `en` is the main text; `ru` is a natural Russian translation (not a calque). Keep paragraphs aligned 1:1.
-- Code, test titles, code comments, prompts to the agent — **English only** (as in real projects).
+- Code, test names, code comments, prompts to the agent — **English only** (as in real projects).
 - Tone: a warm, smart senior colleague. Supportive, never childish. Praise is specific
   ("you picked a resilient locator — that's how senior engineers do it").
   Mistakes are normal and useful. Never call a wrong answer right.
@@ -39,7 +40,7 @@ Every student-facing text is `{ en: "...", ru: "..." }`.
 - Term links: `[[locator]]` (display = id) or `[[display text|term-id]]`.
   EN: `[[locators|locator]]`; RU: `[[локатор|locator]]`, `[[локаторы|locator]]`.
   Link a term on its first mention in a step, not every time. Only ids that exist in the glossary (§9).
-- Markdown subset in text: `**bold**`, `*italic*`, `` `inline code` ``, lists, fenced code blocks (```js).
+- Markdown subset in text: `**bold**`, `*italic*`, `` `inline code` ``, lists, fenced code blocks (```python).
   No headings, no tables, no HTML.
 
 ## 3. Story
@@ -120,7 +121,7 @@ Mark 1–2 quick ones (`choice`/`fill`/`predict`/`input`) with `placement: true`
   body:                                # paragraphs, EN and RU aligned
     - { en: "...", ru: "..." }
   code: |                              # optional snippet
-    await page.goto('/login');
+    page.goto("/login")
   figure: agent-loop                   # optional: agent-loop | test-anatomy | manual-vs-auto | dom-tree | review-checklist | red-green
                                        #   | locator-priority | actionability | flaky-causes | test-agents | review-gates
                                        #   | page-object | fixture-lifecycle | http-exchange | ui-vs-api | ci-pipeline
@@ -130,9 +131,8 @@ Mark 1–2 quick ones (`choice`/`fill`/`predict`/`input`) with `placement: true`
   title: {...}
   intro: {...}
   code: |
-    test('user can log in', async ({ page }) => {
-      await page.goto('/login');
-    });
+    def test_user_can_log_in(page: Page):
+        page.goto("/login")
   notes:
     - lines: 1
       text: {...}
@@ -168,9 +168,9 @@ Mark 1–2 quick ones (`choice`/`fill`/`predict`/`input`) with `placement: true`
   title: {...}
   intro: {...}
   code: |
-    test('...', async ({ page }) => { ... });
+    def test_...(page: Page): ...
   app: {...}
-  files: {...}                         # optional virtual files
+  files: {...}                         # optional project files (pages/login_page.py, conftest.py)
   mentor: {...}
 
 - type: task
@@ -179,8 +179,8 @@ Mark 1–2 quick ones (`choice`/`fill`/`predict`/`input`) with `placement: true`
 - type: mistakes
   title: {...}
   items:
-    - wrong: "await page.waitForTimeout(3000);"
-      right: "await expect(page.getByText('Saved')).toBeVisible();"
+    - wrong: "page.wait_for_timeout(3000)"
+      right: "expect(page.get_by_text(\"Saved\")).to_be_visible()"
       why: {...}
 
 - type: explain
@@ -203,7 +203,7 @@ docs/AUT.md), `placement`.
 
 ```yaml
 # Multiple choice. Options may be code (optionsCode: true) or bilingual text. multi: true = checkboxes.
-# Optional `code` snippet or `diff` (before/after) above the question. run: script = run plain JS after answering.
+# Optional `code` snippet or `diff` (before/after) above the question. run: script = run plain Python after answering.
 - id: c1-l2-t1
   kind: choice
   keyPoint: kp-goto
@@ -211,10 +211,10 @@ docs/AUT.md), `placement`.
   code: |
     ...
   options:
-    - text: "await page.goto('/login');"
+    - text: 'page.goto("/login")'
       correct: true
       why: { en: "...", ru: "..." }
-    - text: "await page.open('/login');"
+    - text: 'page.open("/login")'
       why: { en: "There is no `page.open` in Playwright — a typical AI hallucination.", ru: "..." }
   optionsCode: true
 
@@ -223,7 +223,7 @@ docs/AUT.md), `placement`.
   kind: input
   prompt: {...}
   code: |
-    const email = 'anna@bloomly.app';
+    email = "anna@bloomly.app"
   answers: ["anna@bloomly.app"]
 
 # Fill the gaps: ___ (3 underscores) in code; one blank entry per gap, in order.
@@ -231,8 +231,8 @@ docs/AUT.md), `placement`.
 - id: c1-l2-t3
   kind: fill
   code: |
-    await page.getByLabel('Email').___('anna@bloomly.app');
-    await page.getByRole('button', { name: 'Log in' }).___();
+    page.get_by_label("Email").___("anna@bloomly.app")
+    page.get_by_role("button", name="Log in").___()
   blanks:
     - { answers: [fill], options: [fill, click, check] }
     - { answers: [click] }
@@ -243,15 +243,14 @@ docs/AUT.md), `placement`.
 - id: c1-l2-t4
   kind: parsons
   lines:
-    - "test('user can log in', async ({ page }) => {"
-    - "  await page.goto('/login');"
-    - "  await page.getByLabel('Email').fill('anna@bloomly.app');"
-    - "  await page.getByLabel('Password').fill('bloom123');"
-    - "  await page.getByRole('button', { name: 'Log in' }).click();"
-    - "  await expect(page).toHaveURL('/account');"
-    - "});"
-  alt: [[0, 1, 3, 2, 4, 5, 6]]
-  distractors: ["  await page.waitForTimeout(5000);"]
+    - "def test_user_can_log_in(page: Page):"
+    - "    page.goto(\"/login\")"
+    - "    page.get_by_label(\"Email\").fill(\"anna@bloomly.app\")"
+    - "    page.get_by_label(\"Password\").fill(\"bloom123\")"
+    - "    page.get_by_role(\"button\", name=\"Log in\").click()"
+    - "    expect(page).to_have_url(\"http://localhost:3000/account\")"
+  alt: [[0, 1, 3, 2, 4, 5]]
+  distractors: ["    page.wait_for_timeout(5000)"]          # indentation is part of each line
   checks: { expect: pass }             # optional: run the assembled test
 
 # Match pairs (left ↔ right). leftCode/rightCode render a side as code.
@@ -259,7 +258,7 @@ docs/AUT.md), `placement`.
   kind: match
   pairs:
     - left: { en: "Step: open the login page", ru: "..." }
-      right: "await page.goto('/login');"
+      right: 'page.goto("/login")'
   rightCode: true
 
 # Predict, then run: student says pass/fail (+ optional reason), then sees the real run.
@@ -267,7 +266,7 @@ docs/AUT.md), `placement`.
   kind: predict
   app: { bugs: [greeting-wrong-name] }
   code: |
-    test('...', async ({ page }) => { ... });
+    def test_...(page: Page): ...
   outcome: fail                         # must match the real emulator result (self-test checks it)
   reasons:                              # optional "why?" choice
     - text: {...}
@@ -280,12 +279,12 @@ docs/AUT.md), `placement`.
   app: { route: /login }
   target: "#email"
   options:
-    - { text: "page.getByLabel('Email')", correct: true, why: {...} }
-    - { text: "page.locator('#login-form > input:nth-child(3)')", why: {...} }
+    - { text: 'page.get_by_label("Email")', correct: true, why: {...} }
+    - { text: 'page.locator("#login-form > input:nth-child(3)")', why: {...} }
 
 # Code review of AI-generated code: student flags problem lines and picks the issue type.
 # line: 1-based line number in `code`; line: 0 = test-level issue (e.g. the whole test has no assertion).
-# Issue types: fragile-locator, no-assertion, weak-assertion, wrong-assertion, hard-wait, missing-await,
+# Issue types: fragile-locator, no-assertion, weak-assertion, wrong-assertion, hard-wait, not-called,
 #              hallucination, wrong-data, test-dependency, wrong-step
 - id: c2-l3-t2
   kind: review
@@ -313,7 +312,7 @@ docs/AUT.md), `placement`.
     - { id: task, locked: true, text: "Write a Playwright test for the Bloomly login.", ru: "Напиши Playwright-тест на вход в Bloomly." }
     - { id: steps, text: "Steps: open /login, log in as anna@bloomly.app with password bloom123.", ru: "..." }
     - { id: expected, text: "Expected: the account page shows the heading \"Welcome back, Anna!\".", ru: "..." }
-    - { id: locators, text: "Use getByRole and getByLabel locators. No CSS classes.", ru: "..." }
+    - { id: locators, text: "Use get_by_role and get_by_label locators. No CSS classes.", ru: "..." }
     - { id: noise, text: "Make it perfect, please!", ru: "Сделай идеально, пожалуйста!" }
   responses:
     - when: [steps, expected, locators]
@@ -343,7 +342,7 @@ docs/AUT.md), `placement`.
     ...
   checks:
     expect: pass
-    static: [hasAssertion, noHardWait]  # also: noFragile, awaitsActions, {rule: uses|notUses|regex|notRegex|minExpects, value, message}
+    static: [hasAssertion, noHardWait]  # also: noFragile, callsMethods, {rule: uses|notUses|regex|notRegex|minExpects, value, message}
 
 - id: c1-boss-t2
   kind: find-bug
@@ -383,20 +382,24 @@ docs/AUT.md), `placement`.
     - { text: { en: "A bug in the app", ru: "..." }, why: {...} }
 
 # Virtual files (chapter 9+): any runnable task (fix/find-bug/code, predict, agent, fill, parsons, trace)
-# and example steps accept `files` — extra modules next to the spec. In fix/find-bug tasks the student can edit
-# them (tabs above the editor); `solutionFiles` holds the reference version (defaults to `files`).
-# Agent responses may carry their own `files`. Spec imports: `import { LoginPage } from './pages/LoginPage';`.
+# and example steps accept `files` — extra project files next to the test file. In fix/find-bug tasks the student
+# can edit them (tabs above the editor); `solutionFiles` holds the reference version (defaults to `files`).
+# Agent responses may carry their own `files`. Imports: `from pages.login_page import LoginPage`;
+# fixtures from `conftest.py` are available to every test without an import.
 - id: c9-l2-t5
   kind: fix
   files:
-    pages/LoginPage.js: |
-      export class LoginPage { ... }
+    pages/login_page.py: |
+      class LoginPage: ...
+    conftest.py: |
+      import pytest
+      ...
   solutionFiles:
-    pages/LoginPage.js: |
-      export class LoginPage { ... }
+    pages/login_page.py: |
+      class LoginPage: ...
   starter: |
-    import { test, expect } from '@playwright/test';
-    import { LoginPage } from './pages/LoginPage';
+    from playwright.sync_api import Page, expect
+    from pages.login_page import LoginPage
     ...
   solution: |
     ...
@@ -423,15 +426,22 @@ docs/AUT.md), `placement`.
 ## 8. Rules for code in tasks
 
 - Code must run in the emulator against Bloomly **exactly as documented in docs/AUT.md** (labels, names, texts).
-  Prefer full tests: `test('...', async ({ page }) => { ... });`. Include
-  `import { test, expect } from '@playwright/test';` in full-file examples.
-- Use only API from docs/EMULATOR.md. Test titles and comments in English.
+  Prefer full tests: `def test_user_can_log_in(page: Page): ...`. Include
+  `from playwright.sync_api import Page, expect` in full-file examples (plus `import re` / `import pytest` when used).
+- Python style (PEP 8): 4-space indents, double quotes, `snake_case` names, two blank lines between top-level
+  functions/classes, test names that read like test-case titles (`test_wrong_password_shows_an_error`).
+- Use only API from docs/EMULATOR.md. Test names and comments in English.
+- URLs: `page.goto("/login")` (base URL is set in pytest.ini); URL checks with
+  `expect(page).to_have_url("http://localhost:3000/account")` or `expect(page).to_have_url(re.compile(r"/account$"))`.
 - Every `fix` / `find-bug` / `code` task has a `solution` that satisfies `checks`. Every `predict` has the true `outcome`.
   Every `agent` best response passes its `checks`. Self-test verifies all of this.
 - Keep snippets short (≤ 15 lines for tasks; boss up to ~25).
 - AI-generated code in `review`/`agent` should contain realistic AI mistakes: invented methods (`page.open`,
-  `getByButton`), CSS-class selectors, `waitForTimeout`, missing assertion, `expect(await x.isVisible()).toBeTruthy()`,
-  wrong expected text vs the test case, wrong test data, steps that don't match the case.
+  `get_by_button`), JavaScript habits in Python (`getByRole`, `await`, `{ name: "…" }`), CSS-class selectors,
+  `wait_for_timeout` / `time.sleep`, missing assertion, `assert page.get_by_text("…")` (always true),
+  `assert x.is_visible()` (no retry), `expect(x).to_be_visible` without `()`, wrong expected text vs the test case,
+  wrong test data, steps that don't match the case.
+- Check code without a browser with `npm run check:code -- <lesson-id>`; browser outcomes with `#/dev/selftest`.
 - Use `app.state` to preset login/cart when the lesson isn't about those steps.
 - `app.variant: redesign` (docs/AUT.md) = same app after a design-system migration; use it to prove a locator is
   resilient (`also: [{ app: { variant: redesign }, expect: pass }]`).
@@ -458,20 +468,21 @@ One file per owning chapter: `src/content/glossary/cNN.yaml` = list of entries:
 
 Term ownership (who writes the entry; anyone may *reference* any id):
 - **c1**: manual-testing, test-automation, automated-test, test-case, test-step, expected-result, actual-result,
-  regression-testing, test-suite, spec-file, test-runner, action, assertion, locator, test-report, pass, fail,
+  regression-testing, test-suite, test-file, test-runner, action, assertion, locator, test-report, pass, fail,
   precondition, test-data, smoke-test, timeout, bug
 - **c2**: llm, ai-agent, prompt, context, hallucination, mcp, accessibility-snapshot, code-review, diff,
   false-positive, false-negative, request-changes, test-coverage, edge-case, negative-test
-- **c3**: code, syntax, variable, constant, string, number, boolean, function, arrow-function, parameter,
-  argument, object, property, method, array, loop, async, await, promise, comment, error-message, console
+- **c3**: code, syntax, variable, constant, string, f-string, number, boolean, none, function, parameter,
+  argument, keyword-argument, object, property, method, list, dictionary, loop, indentation, import, decorator,
+  comment, error-message, traceback
 - **c4–c11** (written together with the chapter stubs): dom, html, element, tag, attribute, devtools, inspect,
   css-selector, xpath, test-id, role, accessible-name, accessibility · fragile-selector, resilient-locator,
   strict-mode, chaining, filter · web-first-assertion, retry, soft-assertion, actionability · auto-waiting,
   flaky-test, race-condition, hard-wait, trace-viewer, debugging, self-healing · test-plan, planner, generator,
-  healer, seed-test, project-rules · test-isolation, hook, describe-block, setup, teardown, page-object-model,
+  healer, seed-test, project-rules · test-isolation, conftest, test-class, setup, teardown, page-object-model,
   class, fixture, parameterization, data-driven-testing, refactoring · api-testing, endpoint, request, response,
   status-code, http-method, payload, json, header, auth-token · ci-cd, pipeline, codegen, html-report, headless,
-  cross-browser-testing, pull-request, repository, commit, portfolio, config-file
+  cross-browser-testing, pull-request, repository, commit, portfolio, config-file, virtual-environment
 
 ## 10. Quality checklist
 

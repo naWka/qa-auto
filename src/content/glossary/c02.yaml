@@ -50,8 +50,8 @@
     en: "Everything the agent can see while it works: your prompt, project files, existing tests, the page in the browser."
     ru: "Всё, что агент видит во время работы: твой промпт, файлы проекта, существующие тесты, страницу в браузере."
   example:
-    en: "Give the agent more context: point it to tests/login.spec.ts as an example."
-    ru: "Дай агенту больше контекста: укажи tests/login.spec.ts как образец."
+    en: "Give the agent more context: point it to tests/test_login.py as an example."
+    ru: "Дай агенту больше контекста: укажи tests/test_login.py как образец."
   context: prompt
   chapter: 2
 

@@ -1,7 +1,8 @@
 # Bloom QA — Playwright with AI
 
 A bilingual (EN + RU) gamified trainer for experienced manual QA engineers who move into test
-automation. The AI agent writes the code; the student learns to understand, direct, review and verify it.
+automation with **Python: pytest + Playwright**. The AI agent writes the code; the student learns to understand,
+direct, review and verify it.
 
 **Live:** https://nawka.github.io/qa-auto/
 
@@ -11,10 +12,12 @@ automation. The AI agent writes the code; the student learns to understand, dire
   tasks (choice, fill-in, Parsons, matching, predict-then-run, pick-the-locator, code review of AI output,
   simulated AI agent prompting, fix the test, catch the bug) → typical mistakes → explain in your own words →
   vocabulary and "how to say it at work".
-- **Playwright emulator** running in the browser against **Bloomly**, a small shop app with switchable bugs
-  (`public/aut`). The API mirrors Playwright Test (`test`, `expect`, `page.getByRole`, web-first assertions,
-  auto-waiting, strict mode, fixtures, `request`). Step-by-step mode highlights each element; the report looks
-  like Playwright's, with bilingual explanations. Simplifications are marked "Emulator note".
+- **Python + Playwright emulator** running in the browser against **Bloomly**, a small shop app with switchable bugs
+  (`public/aut`). A small Python interpreter (`src/emulator/py`) runs pytest-style test files: test functions,
+  fixtures with `yield` and scopes, `conftest.py`, `parametrize`, marks, real Python errors. The Playwright API mirrors
+  pytest-playwright's sync API (`page.get_by_role`, `expect(...).to_have_text`, web-first assertions, auto-waiting,
+  strict mode, API request context). Step-by-step mode highlights each element; the report looks like pytest's output,
+  with bilingual explanations. Simplifications are marked "Emulator note".
 - **Under the hood tools**: a DevTools-like inspector (DOM tree, accessibility snapshot as an agent sees it through
   Playwright MCP, role / accessible name / suggested locator), a simplified trace viewer (Before/After snapshots of
   every action), virtual files for page objects and fixtures, a fake REST API shared with the UI, a "redesign"
@@ -30,6 +33,7 @@ automation. The AI agent writes the code; the student learns to understand, dire
 npm install
 npm run dev            # http://localhost:5173/qa-auto/
 npm run check:content  # validate YAML content
+npm run check:code     # parse every Python snippet, run "what will it print" tasks, find JS leftovers
 npm run build          # content check + typecheck + production build
 ```
 
@@ -47,7 +51,7 @@ The final-project starter lives in `starter/`; the build packs it together with 
 
 All texts live in `src/content/*.yaml` (lessons per chapter, glossary, mentor phrases, UI strings, errors).
 See `docs/CONTENT.md` for the format, `docs/AUT.md` for the app under test, `docs/EMULATOR.md` for the
-supported Playwright API.
+supported Python / pytest / Playwright API.
 
 Russian texts use gender variants `{feminine|masculine}`; the default address is feminine and can be
 switched in Settings.

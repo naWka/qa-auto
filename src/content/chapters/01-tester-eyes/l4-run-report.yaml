@@ -4,18 +4,18 @@ title:
   en: "Run it and read the report"
   ru: "Запусти и прочитай отчёт"
 goal:
-  en: "Read a test report and a Playwright error, and decide whether a red test means a bug in the app or a broken test."
-  ru: "Читать отчёт о прогоне и ошибку Playwright и решать, что значит красный тест: баг в приложении или сломанный тест."
+  en: "Read pytest's report and the error of a failed test, and decide whether a red test means a bug in the app or a broken test."
+  ru: "Читать отчёт pytest и ошибку упавшего теста и решать, что значит красный тест: баг в приложении или сломанный тест."
 minutes: 10
 keyPoints:
   - id: kp-pass-fail
     title:
-      en: "The report: passed or failed, per test, with time"
-      ru: "Отчёт: прошёл или упал, по каждому тесту, со временем"
+      en: "The report: PASSED or FAILED for each test, then a summary"
+      ru: "Отчёт: PASSED или FAILED по каждому тесту и итоговая строка"
   - id: kp-read-error
     title:
-      en: "Read the error: Locator, Expected, Received, the failing line"
-      ru: "Читай ошибку: Locator, Expected, Received, упавшая строка"
+      en: "Read the error: the failing line, the expected text, the Actual value"
+      ru: "Читай ошибку: упавшая строка, ожидаемый текст, Actual value"
   - id: kp-bug-or-test
     title:
       en: "Red means a bug in the app or a broken test — triage it"
@@ -27,8 +27,8 @@ steps:
     lines:
       - who: leo
         text:
-          en: "The nightly run is in: 38 passed, 2 failed. Do we block the release?"
-          ru: "Ночной прогон готов: 38 прошли, 2 упали. Блокируем релиз?"
+          en: "The nightly run is in: \"2 failed, 38 passed\". Do we block the release?"
+          ru: "Ночной прогон готов: «2 failed, 38 passed». Блокируем релиз?"
       - who: maya
         text:
           en: "Red isn't bad news — it's information. Let's read the report like a bug report: what was expected, what actually happened."
@@ -51,25 +51,27 @@ steps:
         kind: choice
         keyPoint: kp-read-error
         prompt:
-          en: "Part of an error from a failed test. What happened?"
-          ru: "Фрагмент ошибки из упавшего теста. Что произошло?"
+          en: "Part of pytest's output for a failed test. What happened?"
+          ru: "Фрагмент вывода pytest для упавшего теста. Что произошло?"
         code: |
-          Expected: "Welcome back, Anna!"
-          Received: "Welcome back, Silva!"
+          $ pytest
+          ...
+          E       AssertionError: Locator expected to have text 'Welcome back, Anna!'
+          E       Actual value: Welcome back, Silva!
         options:
           - text:
               en: "The page showed \"Welcome back, Silva!\" where \"Welcome back, Anna!\" was expected."
               ru: "Страница показала «Welcome back, Silva!» там, где ожидалось «Welcome back, Anna!»."
             correct: true
             why:
-              en: "Expected is the expected result, Received is the actual one."
-              ru: "Expected — ожидаемый результат, Received — фактический."
+              en: "The first `E` line says what the test expected. `Actual value` is what the page really showed."
+              ru: "Первая строка `E` — что тест ожидал. `Actual value` — что страница показала на самом деле."
           - text:
               en: "The test couldn't find the page."
               ru: "Тест не нашёл страницу."
             why:
-              en: "It found the page and read a heading from it — that's what Received shows."
-              ru: "Он нашёл страницу и прочитал на ней заголовок — это и показывает Received."
+              en: "It found the page and read a heading from it — that's what `Actual value` shows."
+              ru: "Он нашёл страницу и прочитал на ней заголовок — это и показывает `Actual value`."
           - text:
               en: "The test code has a typo."
               ru: "В коде теста опечатка."
@@ -77,13 +79,13 @@ steps:
               en: "Nothing here points to a typo: the test expected exactly what TC-001 says."
               ru: "Ничто не указывает на опечатку: тест ожидал ровно то, что сказано в TC-001."
         hints:
-          - en: "\"Received\" = what the test actually got."
-            ru: "«Received» = что тест получил на самом деле."
-          - en: "Compare the two lines word by word."
-            ru: "Сравни две строки слово за словом."
+          - en: "\"Actual value\" = what the test actually got."
+            ru: "«Actual value» = что тест получил на самом деле."
+          - en: "Compare the two texts word by word."
+            ru: "Сравни два текста слово за словом."
         explain:
-          en: "Expected vs Received is the same pair as Expected result vs Actual result in your bug reports."
-          ru: "Expected и Received — та же пара, что «ожидаемый» и «фактический результат» в твоих баг-репортах."
+          en: "The expected text and the `Actual value` are the same pair as Expected result and Actual result in your bug reports."
+          ru: "Ожидаемый текст и `Actual value` — та же пара, что «ожидаемый» и «фактический результат» в твоих баг-репортах."
       - id: c1-l4-p2
         kind: choice
         keyPoint: kp-bug-or-test
@@ -126,25 +128,30 @@ steps:
       ru: "Зелёный, красный и что показывает отчёт"
     figure: red-green
     body:
-      - en: "After a run the [[test runner|test-runner]] gives a [[test report|test-report]]: one line per test — ✓ [[passed|pass]] or ✘ [[failed|fail]] — with its title and how long it took."
-        ru: "После прогона [[тест-раннер|test-runner]] выдаёт [[отчёт|test-report]]: по строке на тест — ✓ [[прошёл|pass]] или ✘ [[упал|fail]] — с названием и временем выполнения."
+      - en: "Tests run with one command: `pytest`. It's the [[test runner|test-runner]]: it finds every `test_…` function in files named `test_*.py`, runs them and prints a [[test report|test-report]]. Plain `pytest` prints one character per test: `.` — [[passed|pass]], `F` — [[failed|fail]]. So `tests/test_login.py .F.` means three tests, and the second one is red."
+        ru: "Тесты запускают одной командой: `pytest`. Это [[тест-раннер|test-runner]]: он находит все функции `test_…` в файлах `test_*.py`, запускает их и выводит [[отчёт|test-report]]. Просто `pytest` печатает по символу на тест: `.` — [[прошёл|pass]], `F` — [[упал|fail]]. Значит, `tests/test_login.py .F.` — это три теста, и второй красный."
+      - en: "With `pytest -v` (verbose) every test gets its own line: its name and PASSED or FAILED. This is where names pay off: `test_wrong_password_shows_an_error FAILED` already tells you where to look. The last line sums up the run: `1 failed, 2 passed in 7.81s`."
+        ru: "С `pytest -v` (verbose, «подробно») у каждого теста своя строка: имя и PASSED или FAILED. Вот где окупаются хорошие имена: `test_wrong_password_shows_an_error FAILED` уже говорит, куда смотреть. Последняя строка подводит итог: `1 failed, 2 passed in 7.81s`."
       - en: "A test stops at the first failed step or assertion. The lines after it don't run — like a test case blocked at step 3."
         ru: "Тест останавливается на первом упавшем шаге или проверке. Строки после неё не выполняются — как тест-кейс, заблокированный на шаге 3."
-      - en: "This is where titles pay off: \"✘ wrong password shows an error\" already tells you where to look."
-        ru: "Вот где окупаются хорошие названия: «✘ wrong password shows an error» уже говорит, куда смотреть."
     code: |
-      Running 3 tests using 1 worker
+      $ pytest -v
+      ============================= test session starts ==============================
+      collected 3 items
 
-        ✓  1 login.spec.js:3:5 › registered user can log in (1.2s)
-        ✘  2 login.spec.js:11:5 › wrong password shows an error (5.4s)
-        ✓  3 login.spec.js:19:5 › locked user sees an error (0.9s)
+      tests/test_login.py::test_registered_user_can_log_in PASSED              [ 33%]
+      tests/test_login.py::test_wrong_password_shows_an_error FAILED           [ 66%]
+      tests/test_login.py::test_locked_user_sees_an_error PASSED               [100%]
 
-        1 failed
-          login.spec.js:11:5 › wrong password shows an error
-        2 passed (7.8s)
+      =================================== FAILURES ===================================
+      ______________________ test_wrong_password_shows_an_error ______________________
+      ...
+      =========================== short test summary info ============================
+      FAILED tests/test_login.py::test_wrong_password_shows_an_error - AssertionError: Locator expected to have text 'Invalid email or password.'
+      ========================= 1 failed, 2 passed in 7.81s ==========================
     mentor:
-      en: "5.4 seconds for a login test? Suspicious. A failing assertion keeps waiting for the expected result — here up to 5 seconds — before it gives up. That's where the time went."
-      ru: "5,4 секунды на тест логина? Подозрительно. Падающая проверка продолжает ждать ожидаемый результат — здесь до 5 секунд — и только потом сдаётся. Вот куда ушло время."
+      en: "7.81 seconds for three login tests? Suspicious. A failing assertion keeps waiting for the expected result — here up to 5 seconds — before it gives up. That's where the time went. Want proof? `pytest --durations=3` lists the slowest tests."
+      ru: "7,81 секунды на три теста логина? Подозрительно. Падающая проверка продолжает ждать ожидаемый результат — здесь до 5 секунд — и только потом сдаётся. Вот куда ушло время. Нужны доказательства? `pytest --durations=3` покажет самые медленные тесты."
 
   - type: theory
     keyPoint: kp-read-error
@@ -152,36 +159,39 @@ steps:
       en: "Anatomy of an error"
       ru: "Анатомия ошибки"
     body:
-      - en: "Every failed test comes with an error. Read it like a mini bug report, top to bottom."
-        ru: "У каждого упавшего теста есть ошибка. Читай её как мини-баг-репорт, сверху вниз."
-      - en: "**Locator** — which element was checked. **Expected** — what the test expected. **Received** — the [[actual result|actual-result]]. **Timeout** — how long it waited ([[timeout|timeout]])."
-        ru: "**Locator** — какой элемент проверяли. **Expected** — что тест ожидал. **Received** — [[фактический результат|actual-result]]. **Timeout** — сколько он ждал ([[тайм-аут|timeout]])."
-      - en: "Then the **Call log** (what Playwright tried) and the code frame: `>` marks the failing line, `^` the exact spot. `login.spec.js:9:57` means file, line 9, column 57."
-        ru: "Дальше **Call log** (что пробовал Playwright) и фрагмент кода: `>` отмечает упавшую строку, `^` — точное место. `login.spec.js:9:57` — файл, строка 9, столбец 57."
+      - en: "Every failed test gets its own block under **FAILURES**. Read it like a mini bug report, top to bottom. First comes the test's code, up to the line marked `>` — where the test stopped."
+        ru: "У каждого упавшего теста свой блок в разделе **FAILURES**. Читай его как мини-баг-репорт, сверху вниз. Сначала идёт код теста — до строки с `>`: на ней тест и остановился."
+      - en: "Then the error, on the lines starting with `E`. The first one says what was expected: `Locator expected to have text 'Welcome back, Anna!'`. **Actual value** is the [[actual result|actual-result]]. The **Call log** shows what Playwright tried and how long it waited — the [[timeout|timeout]]."
+        ru: "Дальше ошибка — строки, которые начинаются с `E`. Первая говорит, что ожидалось: `Locator expected to have text 'Welcome back, Anna!'`. **Actual value** — [[фактический результат|actual-result]]. **Call log** показывает, что пробовал Playwright и сколько ждал, — [[тайм-аут|timeout]]."
+      - en: "The last line is the address: `tests/test_login.py:10: AssertionError` means file `tests/test_login.py`, line 10, an assertion failed."
+        ru: "Последняя строка — адрес: `tests/test_login.py:10: AssertionError` значит файл `tests/test_login.py`, строка 10, упала проверка."
     code: |
-      Error: expect(locator).toHaveText(expected) failed
+      $ pytest
+      ...
+      =================================== FAILURES ===================================
+      _______________________ test_registered_user_can_log_in ________________________
 
-      Locator:  getByRole('heading', { level: 1 })
-      Expected: "Welcome back, Anna!"
-      Received: "Welcome back, Silva!"
-      Timeout:  5000ms
+      page = <Page url='http://localhost:3000/account'>
 
-      Call log:
-        - Expect "toHaveText" with timeout 5000ms
-        - waiting for getByRole('heading', { level: 1 })
-          9 × locator resolved to <h1>Welcome back, Silva!</h1>
-            - unexpected value "Welcome back, Silva!"
+          def test_registered_user_can_log_in(page: Page):
+              page.goto("/login")
+              page.get_by_label("Email").fill("anna@bloomly.app")
+              page.get_by_label("Password").fill("bloom123")
+              page.get_by_role("button", name="Log in").click()
+              expect(page).to_have_url("http://localhost:3000/account")
+      >       expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Anna!")
+      E       AssertionError: Locator expected to have text 'Welcome back, Anna!'
+      E       Actual value: Welcome back, Silva!
+      E       Call log:
+      E         - Expect "to_have_text" with timeout 5000ms
+      E         - waiting for get_by_role("heading", level=1)
+      E           9 × locator resolved to <h1>Welcome back, Silva!</h1>
+      E             - unexpected value "Welcome back, Silva!"
 
-         7 |   await page.getByRole('button', { name: 'Log in' }).click();
-         8 |   await expect(page).toHaveURL('/account');
-      >  9 |   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!');
-           |                                                         ^
-        10 | });
-
-          at login.spec.js:9:57
+      tests/test_login.py:10: AssertionError
     mentor:
-      en: "If there's no Received at all and the call log just says \"waiting for getByLabel('E-mail')\", the element was never found. Usually that's a typo or a changed label — a problem in the test."
-      ru: "Если Received нет вовсе, а в call log только «waiting for getByLabel('E-mail')», элемент так и не нашёлся. Обычно это опечатка или изменившаяся подпись — проблема в тесте."
+      en: "If the Actual value says `<element(s) not found>` and the call log only says `waiting for get_by_label(\"E-mail\")`, the element was never found. Usually that's a typo or a changed label — a problem in the test."
+      ru: "Если в Actual value написано `<element(s) not found>`, а в call log только `waiting for get_by_label(\"E-mail\")`, элемент так и не нашёлся. Обычно это опечатка или изменившаяся подпись — проблема в тесте."
 
   - type: theory
     keyPoint: kp-bug-or-test
@@ -191,8 +201,8 @@ steps:
     body:
       - en: "A red test means one of two things: a [[bug|bug]] in the app, or a mistake in the test — a wrong locator, wrong data, an outdated expected result."
         ru: "Красный тест значит одно из двух: [[баг|bug]] в приложении или ошибку в тесте — неверный локатор, неверные данные, устаревший ожидаемый результат."
-      - en: "Triage it like you always do: compare Expected and Received with the test case. The test expects what the test case says, but the app shows something else → bug. The test expects something else, or can't find an element → check the test first."
-        ru: "Разбирай как обычно: сравни Expected и Received с тест-кейсом. Тест ждёт то, что сказано в тест-кейсе, а приложение показывает другое → баг. Тест ждёт что-то другое или не находит элемент → сначала проверь тест."
+      - en: "Triage it like you always do: compare the expected text and the Actual value with the test case. The test expects what the test case says, but the app shows something else → bug. The test expects something else, or can't find an element → check the test first."
+        ru: "Разбирай как обычно: сравни ожидаемый текст и Actual value с тест-кейсом. Тест ждёт то, что сказано в тест-кейсе, а приложение показывает другое → баг. Тест ждёт что-то другое или не находит элемент → сначала проверь тест."
       - en: "If it's a bug, write a bug report in English: steps, expected, actual. The error already gives you most of it."
         ru: "Если это баг, пиши баг-репорт на английском: шаги, ожидаемый, фактический результат. Большую часть уже даёт ошибка."
     mentor:
@@ -205,33 +215,33 @@ steps:
       en: "See a red report for yourself"
       ru: "Посмотри на красный отчёт {сама|сам}"
     intro:
-      en: "This build has a bug switched on, so the test will fail — on purpose. Run it and find Expected, Received and the failing line in the report."
-      ru: "В этой сборке включён баг, поэтому тест упадёт — так и задумано. Запусти его и найди в отчёте Expected, Received и упавшую строку."
+      en: "This build has a bug switched on, so the test will fail — on purpose. Run it and find in the report the line marked `>`, the expected text and the Actual value. The trainer's report shows the same pieces as pytest in a terminal."
+      ru: "В этой сборке включён баг, поэтому тест упадёт — так и задумано. Запусти его и найди в отчёте строку с `>`, ожидаемый текст и Actual value. Отчёт тренажёра показывает те же части, что и pytest в терминале."
     app: { bugs: [greeting-wrong-name] }
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('registered user can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('bloom123');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page).toHaveURL('/account');
-        await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!');
-      });
+
+      def test_registered_user_can_log_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page).to_have_url("http://localhost:3000/account")
+          expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Anna!")
     notes:
-      - lines: [4, 5, 6, 7]
+      - lines: [5, 6, 7, 8]
         text:
           en: "The steps all work: login itself is fine in this build."
           ru: "Все шаги проходят: сам вход в этой сборке работает."
-      - lines: 8
+      - lines: 9
         text:
           en: "Passes: the account page does open."
           ru: "Проходит: страница аккаунта действительно открывается."
-      - lines: 9
+      - lines: 10
         text:
-          en: "Fails: Expected \"Welcome back, Anna!\", Received \"Welcome back, Silva!\". The test follows TC-001, so this is a bug in the app."
-          ru: "Падает: Expected «Welcome back, Anna!», Received «Welcome back, Silva!». Тест следует TC-001, значит, это баг в приложении."
+          en: "Fails: the test expects \"Welcome back, Anna!\", the Actual value is \"Welcome back, Silva!\". The test follows TC-001, so this is a bug in the app."
+          ru: "Падает: тест ждёт «Welcome back, Anna!», а Actual value — «Welcome back, Silva!». Тест следует TC-001, значит, это баг в приложении."
     runnable: true
 
   - type: task
@@ -243,53 +253,59 @@ steps:
         en: "Read the nightly report. Which statement is true?"
         ru: "Прочитай ночной отчёт. Какое утверждение верно?"
       code: |
-        Running 4 tests using 1 worker
+        $ pytest -v
+        ============================= test session starts ==============================
+        collected 4 items
 
-          ✓  1 login.spec.js:3:5 › registered user can log in (1.1s)
-          ✓  2 login.spec.js:12:5 › wrong password shows an error (0.8s)
-          ✘  3 login.spec.js:21:5 › locked user sees an error (5.3s)
-          ✓  4 login.spec.js:30:5 › empty email shows an error (0.5s)
+        tests/test_login.py::test_registered_user_can_log_in PASSED              [ 25%]
+        tests/test_login.py::test_wrong_password_shows_an_error PASSED           [ 50%]
+        tests/test_login.py::test_locked_user_sees_an_error FAILED               [ 75%]
+        tests/test_login.py::test_empty_email_shows_an_error PASSED              [100%]
 
-          1 failed
-            login.spec.js:21:5 › locked user sees an error
-          3 passed (8.2s)
+        =================================== FAILURES ===================================
+        ________________________ test_locked_user_sees_an_error ________________________
+        ...
+        tests/test_login.py:26: AssertionError
+        =========================== short test summary info ============================
+        FAILED tests/test_login.py::test_locked_user_sees_an_error - AssertionError: Locator expected to be visible
+        ========================= 1 failed, 3 passed in 8.24s ==========================
       options:
         - text:
-            en: "One test failed — \"locked user sees an error\". It starts on line 21 of login.spec.js."
-            ru: "Упал один тест — «locked user sees an error». Он начинается в строке 21 файла login.spec.js."
+            en: "One test failed — test_locked_user_sees_an_error. It stopped on line 26 of tests/test_login.py."
+            ru: "Упал один тест — test_locked_user_sees_an_error. Он остановился на строке 26 файла tests/test_login.py."
           correct: true
           why:
-            en: "✘ marks the failure, and `login.spec.js:21:5` is where that test is written."
-            ru: "✘ отмечает падение, а `login.spec.js:21:5` — место, где этот тест написан."
+            en: "FAILED marks the red test, and `tests/test_login.py:26` is the line in the test file where it stopped."
+            ru: "FAILED отмечает красный тест, а `tests/test_login.py:26` — строка в файле с тестами, на которой он остановился."
         - text:
             en: "Login is broken for everyone."
             ru: "Вход сломан у всех."
           why:
-            en: "\"registered user can log in\" passed. Only the locked-user case is red."
-            ru: "«registered user can log in» прошёл. Красный только кейс с заблокированным пользователем."
+            en: "`test_registered_user_can_log_in` PASSED. Only the locked-user case is red."
+            ru: "`test_registered_user_can_log_in` — PASSED. Красный только кейс с заблокированным пользователем."
         - text:
-            en: "There is a bug on line 21 of the Bloomly app."
-            ru: "Баг в строке 21 приложения Bloomly."
+            en: "There is a bug on line 26 of the Bloomly app."
+            ru: "Баг в строке 26 приложения Bloomly."
           why:
-            en: "Line 21 is in the test file. Whether the app has a bug — you don't know yet."
-            ru: "Строка 21 — в файле с тестами. Есть ли баг в приложении, ты пока не знаешь."
+            en: "Line 26 is in the test file. Whether the app has a bug — you don't know yet."
+            ru: "Строка 26 — в файле с тестами. Есть ли баг в приложении, ты пока не знаешь."
         - text:
             en: "Three tests failed."
             ru: "Упали три теста."
           why:
-            en: "✓ means passed. Three passed, one failed."
-            ru: "✓ значит «прошёл». Три прошли, один упал."
+            en: "PASSED means passed. The last line says it: 1 failed, 3 passed."
+            ru: "PASSED значит «прошёл». Последняя строка так и говорит: 1 failed, 3 passed."
       hints:
-        - en: "Find the ✘."
-          ru: "Найди ✘."
-        - en: "`login.spec.js:21:5` points into the test file, not the app."
-          ru: "`login.spec.js:21:5` указывает в файл с тестами, а не в приложение."
+        - en: "Find the word FAILED."
+          ru: "Найди слово FAILED."
+        - en: "`tests/test_login.py:26` points into the test file, not the app."
+          ru: "`tests/test_login.py:26` указывает в файл с тестами, а не в приложение."
       praise:
         en: "You read the report precisely — including what it does not tell you yet."
         ru: "Ты {прочитала|прочитал} отчёт точно — включая то, чего он пока не говорит."
       explain:
-        en: "The report says which test failed and where it lives in the test file. It doesn't say why — that's in the error, which we read next."
-        ru: "Отчёт говорит, какой тест упал и где он лежит в файле с тестами. Почему — он не говорит: это в ошибке, её читаем дальше."
+        en: "The report says which test failed and on which line of the test file it stopped. It doesn't say why yet — that's in the `E` lines, hidden behind `...` here."
+        ru: "Отчёт говорит, какой тест упал и на какой строке файла с тестами он остановился. Почему — пока не говорит: это в строках `E`, здесь они спрятаны за `...`."
 
   - type: task
     task:
@@ -297,35 +313,34 @@ steps:
       kind: choice
       keyPoint: kp-read-error
       prompt:
-        en: "TC-002 \"Wrong password shows an error\" failed with this error. What does Received tell you?"
-        ru: "TC-002 «Wrong password shows an error» упал с такой ошибкой. Что тебе говорит Received?"
+        en: "TC-002 \"Wrong password shows an error\" failed. What does the Actual value tell you?"
+        ru: "TC-002 «Wrong password shows an error» упал. Что тебе говорит Actual value?"
       code: |
-        Error: expect(locator).toHaveText(expected) failed
-
-        Locator:  getByRole('alert')
-        Expected: "Invalid email or password."
-        Received: "Please enter a valid email address."
-        Timeout:  5000ms
+        $ pytest tests/test_login.py
+        ...
+        >       expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
+        E       AssertionError: Locator expected to have text 'Invalid email or password.'
+        E       Actual value: Please enter a valid email address.
       options:
         - text:
             en: "The app showed a different error: it didn't accept the email as valid, so the password was never checked."
             ru: "Приложение показало другую ошибку: оно не приняло email как корректный, поэтому до пароля дело не дошло."
           correct: true
           why:
-            en: "Received is the actual message. The next step: look at the email in the test — or suspect email validation."
-            ru: "Received — фактическое сообщение. Следующий шаг: посмотреть на email в тесте — или заподозрить проверку email."
+            en: "The Actual value is the actual message. The next step: look at the email in the test — or suspect email validation."
+            ru: "Actual value — фактическое сообщение. Следующий шаг: посмотреть на email в тесте — или заподозрить проверку email."
         - text:
             en: "The test found the correct error."
             ru: "Тест нашёл правильную ошибку."
           why:
-            en: "Expected and Received differ — that's why it failed."
-            ru: "Expected и Received различаются — поэтому тест и упал."
+            en: "The expected text and the Actual value differ — that's why it failed."
+            ru: "Ожидаемый текст и Actual value различаются — поэтому тест и упал."
         - text:
             en: "The error box wasn't found."
             ru: "Блок с ошибкой не нашёлся."
           why:
-            en: "It was found — Received shows its text. A missing element has no Received."
-            ru: "Нашёлся — Received показывает его текст. У ненайденного элемента Received нет."
+            en: "It was found — the Actual value shows its text. For a missing element you'd see `<element(s) not found>`."
+            ru: "Нашёлся — Actual value показывает его текст. Для ненайденного элемента там было бы `<element(s) not found>`."
         - text:
             en: "The password is wrong."
             ru: "Пароль неверный."
@@ -333,16 +348,16 @@ steps:
             en: "That's what the test wanted to check, but the app stopped earlier — at the email."
             ru: "Это тест и хотел проверить, но приложение остановилось раньше — на email."
       hints:
-        - en: "Received is the actual result. Read it literally."
-          ru: "Received — фактический результат. Прочитай его буквально."
+        - en: "The Actual value is the actual result. Read it literally."
+          ru: "Actual value — фактический результат. Прочитай его буквально."
         - en: "Which field does \"Please enter a valid email address.\" talk about?"
           ru: "О каком поле говорит «Please enter a valid email address.»?"
       praise:
         en: "You read the actual result, not just \"it's red\". That's how triage starts."
         ru: "Ты {прочитала|прочитал} фактический результат, а не просто «красное». С этого начинается разбор."
       explain:
-        en: "Received says the app rejected the email. Either the test typed it wrong (a test problem) or the app rejects a valid email — for example, one with a space at the end that should be trimmed (a bug)."
-        ru: "Received говорит, что приложение отвергло email. Либо тест ввёл его неправильно (проблема теста), либо приложение отвергает корректный email — например, с пробелом в конце, который должен обрезаться (баг)."
+        en: "The Actual value says the app rejected the email. Either the test typed it wrong (a test problem) or the app rejects a valid email — for example, one with a space at the end that should be trimmed (a bug)."
+        ru: "Actual value говорит, что приложение отвергло email. Либо тест ввёл его неправильно (проблема теста), либо приложение отвергает корректный email — например, с пробелом в конце, который должен обрезаться (баг)."
 
   - type: task
     task:
@@ -357,19 +372,18 @@ steps:
         en: "Will this test pass or fail? If it fails — where?"
         ru: "Этот тест пройдёт или упадёт? Если упадёт — где?"
       code: |
-        test('registered user can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page).toHaveURL('/account');
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+        def test_registered_user_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page).to_have_url("http://localhost:3000/account")
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       outcome: fail
       reasons:
         - text:
-            en: "It fails on line 6: Expected \".../account\", Received \".../\" (the home page). Line 7 never runs."
-            ru: "Упадёт на строке 6: Expected «.../account», Received «.../» (главная). Строка 7 не выполнится."
+            en: "It fails on line 6: the test expects \".../account\", the actual URL is \".../\" (the home page). Line 7 never runs."
+            ru: "Упадёт на строке 6: тест ждёт «.../account», а фактический URL — «.../» (главная). Строка 7 не выполнится."
           correct: true
         - text:
             en: "It fails on line 7, because the heading is missing."
@@ -392,8 +406,8 @@ steps:
         en: "You predicted the exact failing line. Reading reports will feel easy now."
         ru: "Ты {предсказала|предсказал} точную упавшую строку. Теперь отчёты будут читаться легко."
       explain:
-        en: "The first assertion that fails stops the test. The report will show line 6 with Expected `http://localhost:3000/account` and Received `http://localhost:3000/`."
-        ru: "Первая упавшая проверка останавливает тест. В отчёте будет строка 6 с Expected `http://localhost:3000/account` и Received `http://localhost:3000/`."
+        en: "The first assertion that fails stops the test. The report marks line 6 with `>` and says `Page URL expected to be 'http://localhost:3000/account'`, `Actual value: http://localhost:3000/`."
+        ru: "Первая упавшая проверка останавливает тест. В отчёте строка 6 отмечена `>`, а в ошибке — `Page URL expected to be 'http://localhost:3000/account'` и `Actual value: http://localhost:3000/`."
 
   - type: task
     task:
@@ -432,18 +446,18 @@ steps:
           - action: "Click \"Log in\""
             expected: "The account page opens and shows \"Welcome back, Anna!\""
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('registered user can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page).toHaveURL('/account');
-          await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Silva!');
-        });
+
+        def test_registered_user_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page).to_have_url("http://localhost:3000/account")
+            expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Silva!")
       issues:
-        - line: 9
+        - line: 10
           type: wrong-assertion
           note:
             en: "TC-001 expects \"Welcome back, Anna!\". The app was wrong, not the test — Petal turned a bug into the expected behaviour."
@@ -454,8 +468,8 @@ steps:
           ru: "Сравни ожидаемый текст в коде с TC-001."
         - en: "Who should change here: the test or the app?"
           ru: "Кто здесь должен измениться: тест или приложение?"
-        - en: "Line 9 now expects the bug."
-          ru: "Строка 9 теперь ожидает баг."
+        - en: "Line 10 now expects the bug."
+          ru: "Строка 10 теперь ожидает баг."
       praise:
         en: "You protected the test case from the agent. That's exactly why Bloomly hired a QA."
         ru: "Ты {защитила|защитил} тест-кейс от агента. Именно для этого Bloomly и нанял QA."
@@ -473,67 +487,77 @@ steps:
           Petal's test failed with this error:
 
           ```
-          Error: locator.click: Timeout 5000ms exceeded.
-          Call log:
-            - waiting for getByRole('button', { name: 'Login' })
+          $ pytest tests/test_login.py
+          ...
+              def test_registered_user_can_log_in(page: Page):
+                  page.goto("/login")
+                  page.get_by_label("Email").fill("anna@bloomly.app")
+                  page.get_by_label("Password").fill("bloom123")
+          >       page.get_by_role("button", name="Login").click()
 
-            5 |   await page.getByLabel('Email').fill('anna@bloomly.app');
-            6 |   await page.getByLabel('Password').fill('bloom123');
-          > 7 |   await page.getByRole('button', { name: 'Login' }).click();
-              |                                                     ^
+          tests/test_login.py:8:
+          ...
+          E       playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+          E       Call log:
+          E         - waiting for get_by_role("button", name="Login")
           ```
         ru: |
           Тест Petal упал с такой ошибкой:
 
           ```
-          Error: locator.click: Timeout 5000ms exceeded.
-          Call log:
-            - waiting for getByRole('button', { name: 'Login' })
+          $ pytest tests/test_login.py
+          ...
+              def test_registered_user_can_log_in(page: Page):
+                  page.goto("/login")
+                  page.get_by_label("Email").fill("anna@bloomly.app")
+                  page.get_by_label("Password").fill("bloom123")
+          >       page.get_by_role("button", name="Login").click()
 
-            5 |   await page.getByLabel('Email').fill('anna@bloomly.app');
-            6 |   await page.getByLabel('Password').fill('bloom123');
-          > 7 |   await page.getByRole('button', { name: 'Login' }).click();
-              |                                                     ^
+          tests/test_login.py:8:
+          ...
+          E       playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+          E       Call log:
+          E         - waiting for get_by_role("button", name="Login")
           ```
       prompt:
         en: "Read the error, find the cause and fix the test so it passes. The button on the page says \"Log in\"."
         ru: "Прочитай ошибку, найди причину и исправь тест, чтобы он проходил. На кнопке на странице написано «Log in»."
       starter: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('registered user can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Login' }).click();
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+
+        def test_registered_user_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Login").click()
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       solution: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('registered user can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+
+        def test_registered_user_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       checks:
         expect: pass
         static: [hasAssertion]
       hints:
-        - en: "There's no Received: the element was never found. Look at the \"waiting for\" line."
-          ru: "Received нет: элемент так и не нашёлся. Посмотри на строку «waiting for»."
+        - en: "There's no Actual value: the element was never found. Look at the \"waiting for\" line."
+          ru: "Actual value нет: элемент так и не нашёлся. Посмотри на строку «waiting for»."
         - en: "Compare the button name in the code with the text on the page, letter by letter."
           ru: "Сравни название кнопки в коде с текстом на странице буква в букву."
-        - en: "On line 7, change 'Login' to 'Log in'."
-          ru: "В строке 7 замени 'Login' на 'Log in'."
+        - en: "On line 8, change \"Login\" to \"Log in\"."
+          ru: "В строке 8 замени \"Login\" на \"Log in\"."
       praise:
         en: "From error to fix in one read. That's a test problem solved without bothering a developer."
         ru: "От ошибки до исправления с одного прочтения. Проблема теста решена без отвлечения разработчиков."
       explain:
-        en: "\"Timeout … waiting for getByRole('button', { name: 'Login' })\" means no button with that name exists. The page says \"Log in\" with a space — a classic agent slip. This was a broken test, not a bug."
-        ru: "«Timeout … waiting for getByRole('button', { name: 'Login' })» значит, что кнопки с таким названием нет. На странице «Log in» с пробелом — классическая оплошность агента. Это был сломанный тест, а не баг."
+        en: "\"Timeout … exceeded\" plus \"waiting for get_by_role(\"button\", name=\"Login\")\" means no button with that name exists. The page says \"Log in\" with a space — a classic agent slip. This was a broken test, not a bug. Tip: when an action like a click fails, a real terminal also prints a few blocks from Playwright's own files (the second `...` here). Skip them and find the `>` line in your test file."
+        ru: "«Timeout … exceeded» вместе с «waiting for get_by_role(\"button\", name=\"Login\")» значит, что кнопки с таким названием нет. На странице «Log in» с пробелом — классическая оплошность агента. Это был сломанный тест, а не баг. Совет: когда падает действие вроде клика, настоящий терминал печатает ещё несколько блоков из файлов самого Playwright (здесь это второе `...`). Пропускай их и ищи строку с `>` в своём файле с тестами."
 
   - type: task
     task:
@@ -560,25 +584,25 @@ steps:
           - action: "Click \"Log in\""
             expected: "The account page opens"
       starter: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('email is not case-sensitive', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page).toHaveURL('/account');
-        });
+
+        def test_email_is_not_case_sensitive(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page).to_have_url("http://localhost:3000/account")
       solution: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('email is not case-sensitive', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('Anna@Bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page).toHaveURL('/account');
-        });
+
+        def test_email_is_not_case_sensitive(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("Anna@Bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page).to_have_url("http://localhost:3000/account")
       checks:
         expect: fail
         also:
@@ -589,14 +613,14 @@ steps:
           ru: "Тест проходит, но проверяет ли он то, что сказано в TC-007?"
         - en: "Look at the test data for the email in TC-007 — and in the code."
           ru: "Посмотри на тестовые данные email в TC-007 — и в коде."
-        - en: "On line 5, use 'Anna@Bloomly.app' exactly as in the test case."
-          ru: "В строке 5 используй 'Anna@Bloomly.app' точно как в тест-кейсе."
+        - en: "On line 6, use \"Anna@Bloomly.app\" exactly as in the test case."
+          ru: "В строке 6 используй \"Anna@Bloomly.app\" точно как в тест-кейсе."
       praise:
         en: "The test now fails for the right reason — and that red is a bug report waiting to be written."
         ru: "Теперь тест падает по правильной причине — и этот красный уже готовый повод для баг-репорта."
       explain:
-        en: "With the data from TC-007 the test fails: Expected `/account`, Received `/login` — Bloomly says \"Invalid email or password.\". The test follows the test case exactly, so this red is a bug in the app. On the fixed build the same test is green."
-        ru: "С данными из TC-007 тест падает: Expected `/account`, Received `/login` — Bloomly пишет «Invalid email or password.». Тест в точности следует тест-кейсу, значит, этот красный — баг в приложении. На исправленной сборке тот же тест зелёный."
+        en: "With the data from TC-007 the test fails on line 9: `Page URL expected to be 'http://localhost:3000/account'`, `Actual value: http://localhost:3000/login` — Bloomly says \"Invalid email or password.\". The test follows the test case exactly, so this red is a bug in the app. On the fixed build the same test is green."
+        ru: "С данными из TC-007 тест падает на строке 9: `Page URL expected to be 'http://localhost:3000/account'`, `Actual value: http://localhost:3000/login` — Bloomly пишет «Invalid email or password.». Тест в точности следует тест-кейсу, значит, этот красный — баг в приложении. На исправленной сборке тот же тест зелёный."
 
   - type: mistakes
     keyPoint: kp-bug-or-test
@@ -604,13 +628,13 @@ steps:
       en: "Typical mistakes with red tests"
       ru: "Типичные ошибки с красными тестами"
     items:
-      - wrong: "await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Silva!'); // updated to match the app"
-        right: "await expect(page.getByRole('heading', { level: 1 })).toHaveText('Welcome back, Anna!'); // TC-001, bug filed"
+      - wrong: 'expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Silva!")  # updated to match the app'
+        right: 'expect(page.get_by_role("heading", level=1)).to_have_text("Welcome back, Anna!")  # TC-001, bug filed'
         why:
           en: "Changing the expected result to match the app turns a bug into a \"feature\". The test case decides what's right."
           ru: "Подогнать ожидаемый результат под приложение — значит превратить баг в «фичу». Что правильно, решает тест-кейс."
       - wrong: "Test is red → rerun it until it's green"
-        right: "Test is red → read Expected vs Received → decide: bug or broken test"
+        right: "Test is red → read the E lines: expected vs Actual value → bug or broken test?"
         why:
           en: "Rerunning hides information. Read the error first — it usually tells you everything."
           ru: "Перезапуск прячет информацию. Сначала прочитай ошибку — обычно она говорит всё."
@@ -626,8 +650,8 @@ steps:
       en: "In your own words: a test is red. How do you decide whether it's a bug or a broken test?"
       ru: "Своими словами: тест красный. Как ты решаешь, баг это или сломанный тест?"
     model:
-      en: "I read the error: the failing line, Expected and Received. Then I compare with the test case. If the test expects what the test case says and the app shows something else, it's a bug — I write a bug report with steps, expected and actual. If the test expects something different, uses the wrong data, or can't find an element because of a typo or an old label, the test needs fixing."
-      ru: "Я читаю ошибку: упавшую строку, Expected и Received. Потом сравниваю с тест-кейсом. Если тест ждёт то, что сказано в тест-кейсе, а приложение показывает другое, — это баг, и я пишу баг-репорт с шагами, ожидаемым и фактическим результатом. Если тест ждёт что-то другое, использует неверные данные или не находит элемент из-за опечатки или старой подписи — чинить нужно тест."
+      en: "I read the failure in the report: the line marked with `>`, then the `E` lines with the expected value and the Actual value. Then I compare them with the test case. If the test expects what the test case says and the app shows something else, it's a bug — I write a bug report with steps, expected and actual. If the test expects something different, uses the wrong data, or can't find an element because of a typo or an old label, the test needs fixing."
+      ru: "Я читаю падение в отчёте: строку с `>`, потом строки `E` с ожидаемым значением и Actual value. Потом сравниваю их с тест-кейсом. Если тест ждёт то, что сказано в тест-кейсе, а приложение показывает другое, — это баг, и я пишу баг-репорт с шагами, ожидаемым и фактическим результатом. Если тест ждёт что-то другое, использует неверные данные или не находит элемент из-за опечатки или старой подписи — чинить нужно тест."
 
   - type: phrases
     items:
@@ -644,8 +668,8 @@ steps:
         en: "Is anyone working on the login page? The login tests started failing after this morning's deploy."
         ru: "Кто-нибудь сейчас трогает страницу логина? Тесты логина начали падать после утреннего деплоя."
       - context: prompt
-        en: "The test fails with Expected \"Welcome back, Anna!\" and Received \"Welcome back, Silva!\". Don't change the assertion. Tell me whether the problem is in the test or in the app."
-        ru: "Тест падает: Expected «Welcome back, Anna!», Received «Welcome back, Silva!». Не меняй проверку. Скажи, проблема в тесте или в приложении."
+        en: "The test fails: it expects \"Welcome back, Anna!\", but the actual value is \"Welcome back, Silva!\". Don't change the assertion. Tell me whether the problem is in the test or in the app."
+        ru: "Тест падает: он ждёт «Welcome back, Anna!», а фактическое значение — «Welcome back, Silva!». Не меняй проверку. Скажи, проблема в тесте или в приложении."
         note:
           en: "\"Don't change the assertion\" stops the agent from hiding the bug."
           ru: "«Don't change the assertion» не даёт агенту спрятать баг."
@@ -659,27 +683,33 @@ checkPool:
       en: "On which line of the test file did this test fail? Type the number."
       ru: "На какой строке файла с тестом упал этот тест? Введи номер."
     code: |
-      Error: expect(page).toHaveURL(expected) failed
+      $ pytest tests/test_login.py
+      ...
+      page = <Page url='http://localhost:3000/'>
 
-      Expected: "http://localhost:3000/account"
-      Received: "http://localhost:3000/"
-      Timeout:  5000ms
+          def test_registered_user_can_log_in(page: Page):
+              page.goto("/login")
+              page.get_by_label("Email").fill("anna@bloomly.app")
+              page.get_by_label("Password").fill("bloom123")
+              page.get_by_role("button", name="Log in").click()
+      >       expect(page).to_have_url("http://localhost:3000/account")
+      E       AssertionError: Page URL expected to be 'http://localhost:3000/account'
+      E       Actual value: http://localhost:3000/
+      E       Call log:
+      E         - Expect "to_have_url" with timeout 5000ms
+      E           9 × unexpected value "http://localhost:3000/"
 
-        10 |   await page.getByLabel('Password').fill('bloom123');
-        11 |   await page.getByRole('button', { name: 'Log in' }).click();
-      > 12 |   await expect(page).toHaveURL('/account');
-           |                      ^
-        13 |   await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-    answers: ["12"]
+      tests/test_login.py:9: AssertionError
+    answers: ["9"]
     placeholder: "line"
     hints:
-      - en: "Look for the `>` sign in the code frame."
-        ru: "Найди знак `>` во фрагменте кода."
-      - en: "The number right after `>` is the line."
-        ru: "Число сразу после `>` — это номер строки."
+      - en: "Look at the very last line: file name, colon, number."
+        ru: "Посмотри на самую последнюю строку: имя файла, двоеточие, число."
+      - en: "The numbers on the left edge only count lines of this snippet. The number after `tests/test_login.py:` is the line in the test file."
+        ru: "Числа у левого края считают только строки этого фрагмента. Число после `tests/test_login.py:` — номер строки в файле с тестом."
     explain:
-      en: "`>` marks the failing line: 12, the URL check. Line 13 never ran."
-      ru: "`>` отмечает упавшую строку: 12, проверку URL. Строка 13 не выполнялась."
+      en: "`tests/test_login.py:9` is file and line 9: the line marked `>`, the URL check. Nothing after it ran."
+      ru: "`tests/test_login.py:9` — это файл и строка 9: строка с `>`, проверка URL. Ничего после неё не выполнялось."
 
   - id: c1-l4-k2
     kind: choice
@@ -689,29 +719,32 @@ checkPool:
       en: "Which statement about this report is true?"
       ru: "Какое утверждение об этом отчёте верно?"
     code: |
-      Running 4 tests using 1 worker
+      $ pytest
+      ============================= test session starts ==============================
+      collected 4 items
 
-        ✓  1 cart.spec.js:3:5 › cart shows the added bouquet (1.1s)
-        ✘  2 cart.spec.js:12:5 › promo code BLOOM10 gives 10% off (5.3s)
-        ✓  3 cart.spec.js:22:5 › empty cart shows a message (0.4s)
-        ✘  4 cart.spec.js:30:5 › remove button removes the right item (5.2s)
+      tests/test_cart.py .F.F                                                  [100%]
 
-        2 failed
-        2 passed (12.0s)
+      =================================== FAILURES ===================================
+      ...
+      =========================== short test summary info ============================
+      FAILED tests/test_cart.py::test_promo_code_bloom10_gives_10_percent_off - AssertionError: Locator expected to have text '−€3.50'
+      FAILED tests/test_cart.py::test_remove_button_removes_the_right_item - AssertionError: Locator expected to have text 'Sunny Tulips'
+      ========================= 2 failed, 2 passed in 12.03s =========================
     options:
       - text:
           en: "Two tests failed: the promo code test and the remove test."
           ru: "Упали два теста: про промокод и про удаление."
         correct: true
         why:
-          en: "The two ✘ lines."
-          ru: "Две строки с ✘."
+          en: "Two `F`s in `.F.F` — and both names are listed in the short test summary."
+          ru: "Две `F` в `.F.F` — и оба имени перечислены в short test summary."
       - text:
           en: "The whole cart is broken."
           ru: "Вся корзина сломана."
         why:
-          en: "Two cart tests passed. Something specific broke."
-          ru: "Два теста корзины прошли. Сломалось что-то конкретное."
+          en: "Two cart tests passed — those are the dots. Something specific broke."
+          ru: "Два теста корзины прошли — это точки. Сломалось что-то конкретное."
       - text:
           en: "The app has exactly two bugs."
           ru: "В приложении ровно два бага."
@@ -719,8 +752,8 @@ checkPool:
           en: "Two red tests — but each could be a bug or a broken test. Triage first."
           ru: "Два красных теста — но каждый может быть и багом, и сломанным тестом. Сначала разбор."
     hints:
-      - en: "Count the ✘ marks."
-        ru: "Посчитай значки ✘."
+      - en: "Count the F's in `.F.F`."
+        ru: "Посчитай буквы F в `.F.F`."
       - en: "A red test isn't automatically a bug."
         ru: "Красный тест — не автоматически баг."
     explain:
@@ -756,8 +789,8 @@ checkPool:
     hints:
       - en: "What would you do with a manual case blocked at step 3?"
         ru: "Что бы ты {сделала|сделал} с ручным кейсом, заблокированным на шаге 3?"
-      - en: "Look at the report: only one line per test."
-        ru: "Посмотри на отчёт: по одной строке на тест."
+      - en: "Look at the report: one result per test — PASSED or FAILED."
+        ru: "Посмотри на отчёт: у каждого теста один результат — PASSED или FAILED."
     explain:
       en: "The first failure stops the test. That's why the error always points to one line — the first thing that went wrong."
       ru: "Первое падение останавливает тест. Поэтому ошибка всегда указывает на одну строку — первое, что пошло не так."
@@ -773,13 +806,12 @@ checkPool:
       en: "Will this test pass or fail on today's build?"
       ru: "Этот тест пройдёт или упадёт на сегодняшней сборке?"
     code: |
-      test('wrong password shows an error', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('wrong-pass');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page.getByRole('alert')).toBeVisible();
-      });
+      def test_wrong_password_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("wrong-pass")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("alert")).to_be_visible()
     outcome: fail
     reasons:
       - text:
@@ -798,21 +830,21 @@ checkPool:
       - en: "How long does an assertion wait before failing?"
         ru: "Сколько ждёт проверка, прежде чем упасть?"
     explain:
-      en: "The assertion catches the bug: no error is visible, so after the timeout the test fails. In the report it'll be the slow ✘ line."
-      ru: "Проверка ловит баг: ошибки не видно, и после тайм-аута тест падает. В отчёте это будет медленная строка с ✘."
+      en: "The assertion catches the bug: no error is visible, so after the timeout the test fails. The report shows FAILED with `AssertionError: Locator expected to be visible` — and the whole run takes about 5 seconds longer."
+      ru: "Проверка ловит баг: ошибки не видно, и после тайм-аута тест падает. В отчёте будет FAILED с `AssertionError: Locator expected to be visible` — а весь прогон станет секунд на 5 дольше."
 
   - id: c1-l4-k5
     kind: choice
     keyPoint: kp-read-error
     prompt:
-      en: "A test opened `/account` directly and failed with this error. What does Received tell you?"
-      ru: "Тест сразу открыл `/account` и упал с такой ошибкой. Что тебе говорит Received?"
+      en: "A test opened `/account` directly and failed. What does the Actual value tell you?"
+      ru: "Тест сразу открыл `/account` и упал. Что тебе говорит Actual value?"
     code: |
-      Error: expect(page).toHaveURL(expected) failed
-
-      Expected: "http://localhost:3000/account"
-      Received: "http://localhost:3000/login?next=%2Faccount"
-      Timeout:  5000ms
+      $ pytest tests/test_account.py
+      ...
+      >       expect(page).to_have_url("http://localhost:3000/account")
+      E       AssertionError: Page URL expected to be 'http://localhost:3000/account'
+      E       Actual value: http://localhost:3000/login?next=%2Faccount
     options:
       - text:
           en: "The test wasn't logged in, so Bloomly redirected it to the login page. The test is missing its precondition."
@@ -828,19 +860,19 @@ checkPool:
           en: "Redirecting a logged-out user to login is correct behaviour, not a bug."
           ru: "Отправить незалогиненного пользователя на вход — правильное поведение, а не баг."
       - text:
-          en: "The URL is right; the matcher is wrong."
-          ru: "URL правильный, неправильный метод проверки."
+          en: "The URL is right; the check itself is wrong."
+          ru: "URL правильный, неправильна сама проверка."
         why:
-          en: "Received shows a different page — /login, not /account."
-          ru: "Received показывает другую страницу — /login, а не /account."
+          en: "The Actual value shows a different page — /login, not /account."
+          ru: "Actual value показывает другую страницу — /login, а не /account."
     hints:
-      - en: "Read the path in Received: which page is it?"
-        ru: "Прочитай путь в Received: какая это страница?"
+      - en: "Read the path in the Actual value: which page is it?"
+        ru: "Прочитай путь в Actual value: какая это страница?"
       - en: "What does Bloomly do when a logged-out user opens /account?"
         ru: "Что делает Bloomly, когда незалогиненный пользователь открывает /account?"
     explain:
-      en: "Received shows the login page with `next=/account`. The app behaved correctly; the test forgot the precondition \"user is logged in\". A test problem, not a bug."
-      ru: "Received показывает страницу входа с `next=/account`. Приложение повело себя правильно, а тест забыл предусловие «пользователь вошёл». Проблема теста, а не баг."
+      en: 'The Actual value shows the login page with `next=/account`. The app behaved correctly; the test forgot the precondition "user is logged in". A test problem, not a bug.'
+      ru: "Actual value показывает страницу входа с `next=/account`. Приложение повело себя правильно, а тест забыл предусловие «пользователь вошёл». Проблема теста, а не баг."
 
   - id: c1-l4-k6
     kind: fix
@@ -850,88 +882,93 @@ checkPool:
         The test failed with this error:
 
         ```
-        Error: expect(locator).toHaveText(expected) failed
+        $ pytest tests/test_login.py
+        ...
+            def test_wrong_password_shows_an_error(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("anna@bloomly.app")
+                page.get_by_label("Password").fill("wrong-pass")
+                page.get_by_role("button", name="Log in").click()
+        >       expect(page.get_by_role("alert")).to_have_text("Invalid email or password")
+        E       AssertionError: Locator expected to have text 'Invalid email or password'
+        E       Actual value: Invalid email or password.
 
-        Locator:  getByRole('alert')
-        Expected: "Invalid email or password"
-        Received: "Invalid email or password."
-        Timeout:  5000ms
-
-          5 |   await page.getByRole('button', { name: 'Log in' }).click();
-        > 6 |   await expect(page.getByRole('alert')).toHaveText('Invalid email or password');
-            |                                         ^
-          7 | });
+        tests/test_login.py:9: AssertionError
         ```
       ru: |
         Тест упал с такой ошибкой:
 
         ```
-        Error: expect(locator).toHaveText(expected) failed
+        $ pytest tests/test_login.py
+        ...
+            def test_wrong_password_shows_an_error(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("anna@bloomly.app")
+                page.get_by_label("Password").fill("wrong-pass")
+                page.get_by_role("button", name="Log in").click()
+        >       expect(page.get_by_role("alert")).to_have_text("Invalid email or password")
+        E       AssertionError: Locator expected to have text 'Invalid email or password'
+        E       Actual value: Invalid email or password.
 
-        Locator:  getByRole('alert')
-        Expected: "Invalid email or password"
-        Received: "Invalid email or password."
-        Timeout:  5000ms
-
-          5 |   await page.getByRole('button', { name: 'Log in' }).click();
-        > 6 |   await expect(page.getByRole('alert')).toHaveText('Invalid email or password');
-            |                                         ^
-          7 | });
+        tests/test_login.py:9: AssertionError
         ```
     prompt:
-      en: "TC-002 expects \"Invalid email or password.\". Compare Expected and Received, then fix the test."
-      ru: "TC-002 ожидает «Invalid email or password.». Сравни Expected и Received и исправь тест."
+      en: "TC-002 expects \"Invalid email or password.\". Compare the expected text with the Actual value, then fix the test."
+      ru: "TC-002 ожидает «Invalid email or password.». Сравни ожидаемый текст с Actual value и исправь тест."
     starter: |
-      test('wrong password shows an error', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('wrong-pass');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page.getByRole('alert')).toHaveText('Invalid email or password');
-      });
+      from playwright.sync_api import Page, expect
+
+
+      def test_wrong_password_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("wrong-pass")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("alert")).to_have_text("Invalid email or password")
     solution: |
-      test('wrong password shows an error', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('wrong-pass');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
-      });
+      from playwright.sync_api import Page, expect
+
+
+      def test_wrong_password_shows_an_error(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("wrong-pass")
+          page.get_by_role("button", name="Log in").click()
+          expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
     checks:
       expect: pass
       static: [hasAssertion]
     hints:
-      - en: "Expected and Received differ by one character."
-        ru: "Expected и Received отличаются одним символом."
+      - en: "The expected text and the Actual value differ by one character."
+        ru: "Ожидаемый текст и Actual value отличаются одним символом."
       - en: "Look at the very end of the two texts."
         ru: "Посмотри на самый конец двух текстов."
-      - en: "Add the period: 'Invalid email or password.'"
-        ru: "Добавь точку: 'Invalid email or password.'"
+      - en: "Add the period: \"Invalid email or password.\""
+        ru: "Добавь точку: \"Invalid email or password.\""
     explain:
-      en: "`toHaveText` compares the whole text, so a missing period is enough to fail. The app matches TC-002 — the test had a typo."
-      ru: "`toHaveText` сравнивает текст целиком, поэтому пропущенной точки достаточно для падения. Приложение соответствует TC-002 — опечатка была в тесте."
+      en: "`to_have_text` compares the whole text, so a missing period is enough to fail. The app matches TC-002 — the test had a typo."
+      ru: "`to_have_text` сравнивает текст целиком, поэтому пропущенной точки достаточно для падения. Приложение соответствует TC-002 — опечатка была в тесте."
 
   - id: c1-l4-k7
     kind: choice
     keyPoint: kp-bug-or-test
     prompt:
-      en: "TC-012 says: \"The shop shows 6 products.\" The test failed with this error. Bug or test?"
-      ru: "TC-012: «В магазине показано 6 товаров». Тест упал с такой ошибкой. Баг или тест?"
+      en: "TC-012 says: \"The shop shows 6 products.\" The test failed. Bug or test?"
+      ru: "TC-012: «В магазине показано 6 товаров». Тест упал. Баг или тест?"
     code: |
-      Error: expect(locator).toHaveText(expected) failed
-
-      Locator:  getByTestId('results-count')
-      Expected: "5 products"
-      Received: "6 products"
-      Timeout:  5000ms
+      $ pytest tests/test_shop.py
+      ...
+      >       expect(page.get_by_test_id("results-count")).to_have_text("5 products")
+      E       AssertionError: Locator expected to have text '5 products'
+      E       Actual value: 6 products
     options:
       - text:
           en: "A mistake in the test: the app matches TC-012, the test expects the wrong number."
           ru: "Ошибка в тесте: приложение соответствует TC-012, а тест ждёт не то число."
         correct: true
         why:
-          en: "Received equals the test case. Expected doesn't."
-          ru: "Received совпадает с тест-кейсом, а Expected — нет."
+          en: "The Actual value equals the test case. The expected text doesn't."
+          ru: "Actual value совпадает с тест-кейсом, а ожидаемый текст — нет."
       - text:
           en: "A bug in the app: one product too many."
           ru: "Баг в приложении: на один товар больше."
@@ -942,16 +979,16 @@ checkPool:
           en: "Can't tell — rerun it."
           ru: "Непонятно — перезапустить."
         why:
-          en: "You can tell: compare Expected and Received with the test case."
-          ru: "Понятно: сравни Expected и Received с тест-кейсом."
+          en: "You can tell: compare the expected text and the Actual value with the test case."
+          ru: "Понятно: сравни ожидаемый текст и Actual value с тест-кейсом."
     hints:
       - en: "Which of the two values matches the test case?"
         ru: "Какое из двух значений совпадает с тест-кейсом?"
-      - en: "If Received matches the test case, who is wrong?"
-        ru: "Если Received совпадает с тест-кейсом, кто ошибается?"
+      - en: "If the Actual value matches the test case, who is wrong?"
+        ru: "Если Actual value совпадает с тест-кейсом, кто ошибается?"
     explain:
-      en: "Received (the actual result) matches TC-012, so the app is fine. The test's expected value is wrong — fix the test, no bug report needed."
-      ru: "Received (фактический результат) совпадает с TC-012, значит, с приложением всё в порядке. Неверно ожидаемое значение в тесте — чиним тест, баг-репорт не нужен."
+      en: "The Actual value (the actual result) matches TC-012, so the app is fine. The test's expected value is wrong — fix the test, no bug report needed."
+      ru: "Actual value (фактический результат) совпадает с TC-012, значит, с приложением всё в порядке. Неверно ожидаемое значение в тесте — чиним тест, баг-репорт не нужен."
 
   - id: c1-l4-k8
     kind: review
@@ -973,12 +1010,11 @@ checkPool:
         - action: "Click \"Apply\""
           expected: "\"Promo code BLOOM10 applied: −10%.\" is shown"
     code: |
-      test('promo code is not case-sensitive', async ({ page }) => {
-        await page.goto('/cart');
-        await page.getByLabel('Promo code').fill('BLOOM10');
-        await page.getByRole('button', { name: 'Apply' }).click();
-        await expect(page.getByTestId('promo-message')).toHaveText('Promo code BLOOM10 applied: −10%.');
-      });
+      def test_promo_code_is_not_case_sensitive(page: Page):
+          page.goto("/cart")
+          page.get_by_label("Promo code").fill("BLOOM10")
+          page.get_by_role("button", name="Apply").click()
+          expect(page.get_by_test_id("promo-message")).to_have_text("Promo code BLOOM10 applied: −10%.")
     issues:
       - line: 3
         type: wrong-data

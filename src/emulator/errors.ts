@@ -68,7 +68,14 @@ export function locationFromStack(stack: string, onlyFile?: string): { file: str
   return best && { file: best.file, line: best.line, col: best.col };
 }
 
+/** The Python interpreter tells the emulator which line of student code is running. */
+let locationProvider: ((onlyFile?: string) => { file: string; line: number } | undefined) | null = null;
+export function setLocationProvider(p: typeof locationProvider) {
+  locationProvider = p;
+}
+
 /** Location of the student's code that called the current API method. */
-export function callerLocation(onlyFile?: string) {
+export function callerLocation(onlyFile?: string): { file: string; line: number; col?: number } | undefined {
+  if (locationProvider) return locationProvider(onlyFile);
   return locationFromStack(new Error().stack || '', onlyFile);
 }

@@ -1,10 +1,9 @@
 // Playwright-style report: summary, steps, error with code frame, mentor explanation, lint notes.
 import { useState } from 'react';
-import type { ErrorInfo, RunResult, StaticFinding, StepRecord, TestResult } from '../emulator';
+import { SPEC_FILE, type ErrorInfo, type RunResult, type StaticFinding, type StepRecord, type TestResult } from '../emulator';
 import { errorTexts } from '../content';
 import { Bi, BiInline, U, useLang } from '../components/Bi';
 import { Icon } from '../components/Icon';
-import { closestMethod } from '../editor/completions';
 import { applyGender, interpolate } from '../lib/text';
 import type { LiveState } from './useRunner';
 
@@ -16,17 +15,8 @@ export function ErrorExplain({ error }: { error: ErrorInfo }) {
   const { gender } = useLang();
   const entry = errorTexts.errors[error.code] ?? errorTexts.errors.unknown;
   const vars: Record<string, string | number> = { ...error.data, line: error.line ?? error.data.line ?? '?' };
-  let sugEn = '';
-  let sugRu = '';
-  if (error.code === 'not-a-function') {
-    const s = closestMethod(String(error.data.method || ''));
-    if (s && s !== error.data.method) {
-      sugEn = ` Did you mean \`${s}\`?`;
-      sugRu = ` Возможно, \`${s}\`?`;
-    }
-  }
-  const en = interpolate(entry.explain.en, { ...vars, suggestion: sugEn });
-  const ru = interpolate(applyGender(entry.explain.ru, gender), { ...vars, suggestion: sugRu });
+  const en = interpolate(entry.explain.en, vars);
+  const ru = interpolate(applyGender(entry.explain.ru, gender), vars);
   return (
     <div className="err-explain">
       <div className="err-explain-head">
@@ -58,7 +48,7 @@ function StepTree({ steps, onLine, depth = 0 }: { steps: StepRecord[]; onLine?: 
             <span className="step-icon">{s.status === 'passed' ? <Icon name="check" size={14} /> : s.status === 'failed' ? <Icon name="x" size={14} /> : <span className="spinner-dot" />}</span>
             <span className="step-name">{s.title}</span>
             {s.line && (
-              <button type="button" className="step-line" onClick={() => onLine?.(s.line!)} title={s.file || 'example.spec.js'}>
+              <button type="button" className="step-line" onClick={() => onLine?.(s.line!)} title={s.file || SPEC_FILE}>
                 {s.file ? `${s.file.split('/').pop()}:` : ''}{s.line}
               </button>
             )}
@@ -75,22 +65,25 @@ function TestBlock({ t, code, onLine, open: initiallyOpen }: { t: TestResult; co
   const [open, setOpen] = useState(initiallyOpen);
   const ok = t.status === 'passed';
   const icon = ok ? 'check' : t.status === 'skipped' ? 'chevronRight' : 'x';
+  // pytest node id without the file part: TestLogin::test_ok[anna]
+  const name = t.titlePath.slice(1).join('::') || t.title;
   return (
     <div className={`report-test report-${t.status}`}>
       <button type="button" className="report-test-head" onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className="report-status-icon"><Icon name={icon} size={16} strokeWidth={2.4} /></span>
-        <span className="report-test-title">{t.titlePath.join(' › ')}</span>
+        <span className="report-test-title">{name}{t.label && <span className={`report-label report-label-${t.label.toLowerCase().replace(/[^a-z]/g, '')}`}>{t.label}</span>}</span>
         <span className="report-dur">{fmtMs(t.duration)}</span>
         <Icon name="chevronDown" size={16} className={open ? 'rot180' : ''} />
       </button>
       {open && (
         <div className="report-test-body">
+          {t.skipReason && <div className="report-skip">SKIPPED: {t.skipReason}</div>}
           {t.steps.length > 0 && <StepTree steps={t.steps} onLine={onLine} />}
           {t.error && <ErrorBlock error={t.error} code={code} />}
           {t.softErrors.slice(t.error ? 1 : 0).map((e, i) => <ErrorBlock key={i} error={e} code={code} />)}
           {t.logs.length > 0 && (
             <div className="report-console">
-              <div className="report-sub"><Icon name="terminal" size={14} /> <U k="report.console" stack={false} /></div>
+              <div className="report-sub"><Icon name="terminal" size={14} /> Captured stdout</div>
               <pre>{t.logs.join('\n')}</pre>
             </div>
           )}
@@ -100,12 +93,16 @@ function TestBlock({ t, code, onLine, open: initiallyOpen }: { t: TestResult; co
   );
 }
 
+/** pytest-style failure: the code frame with ">" at the failing line, then "E" lines with the error. */
 export function ErrorBlock({ error, code }: { error: ErrorInfo; code: string }) {
+  const inSpec = !!error.line && (!error.file || error.file === SPEC_FILE);
+  const frameLine = inSpec ? error.line : error.specLine;
+  const eLines = error.message.replace(/\n$/, '').split('\n').map((l) => `E   ${l}`).join('\n');
   return (
     <div className="report-error">
-      <pre className="report-error-msg">{error.message}</pre>
-      {error.line && (!error.file || error.file === 'example.spec.js') && <CodeFrame code={code} line={error.line} />}
-      {error.file && error.file !== 'example.spec.js' && <div className="report-file">at {error.file}:{error.line}</div>}
+      {frameLine && <CodeFrame code={code} line={frameLine} />}
+      {error.file && error.file !== SPEC_FILE && <div className="report-file">{error.file}:{error.line}</div>}
+      <pre className="report-error-msg">{eLines}</pre>
       <ErrorExplain error={error} />
     </div>
   );

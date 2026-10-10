@@ -13,31 +13,17 @@
   context: code-review
   chapter: 9
 
-- id: hook
-  en: hook
-  ipa: /hʊk/
-  ru: хук (hook)
+- id: test-class
+  en: test class
+  ipa: /ˈtest klæs/
+  ru: тестовый класс (test class)
   pos: noun
   def:
-    en: "A function that runs automatically before or after tests, such as beforeEach or afterAll."
-    ru: "Функция, которая автоматически выполняется до или после тестов, например beforeEach или afterAll."
+    en: "A class whose name starts with Test, like `class TestCart:`, that groups related tests. Each test is a method with `self` as its first parameter, and the report shows it as `test_cart.py::TestCart::test_apply_promo_code`."
+    ru: "Класс, имя которого начинается с Test, например `class TestCart:`, — он объединяет связанные тесты. Каждый тест — это метод с `self` первым параметром, а в отчёте он выглядит как `test_cart.py::TestCart::test_apply_promo_code`."
   example:
-    en: "Move the login steps into a beforeEach hook — all six tests repeat them."
-    ru: "Вынеси шаги входа в хук beforeEach — все шесть тестов их повторяют."
-  context: code-review
-  chapter: 9
-
-- id: describe-block
-  en: describe block
-  ipa: /dɪˈskraɪb blɑːk/
-  ru: describe-блок (describe block)
-  pos: noun
-  def:
-    en: "A `test.describe` group that collects related tests under one title, like a section in a test suite."
-    ru: "Группа `test.describe`, которая собирает связанные тесты под одним названием, как раздел в наборе тестов."
-  example:
-    en: "Let's put all promo code tests into one describe block called \"Cart promo codes\"."
-    ru: "Давай сложим все тесты промокодов в один describe-блок «Cart promo codes»."
+    en: "Let's put all promo code tests into one test class called TestPromoCodes."
+    ru: "Давай сложим все тесты промокодов в один тестовый класс TestPromoCodes."
   context: code-review
   chapter: 9
 
@@ -47,8 +33,8 @@
   ru: подготовка (setup)
   pos: noun
   def:
-    en: "Steps that prepare what a test needs before it starts: a logged-in user, a filled cart, test data."
-    ru: "Шаги, которые готовят всё нужное до начала теста: пользователя с выполненным входом, заполненную корзину, тестовые данные."
+    en: "Steps that prepare what a test needs before it starts: a logged-in user, a filled cart, test data. In pytest the setup lives in a fixture — the code before `yield`."
+    ru: "Шаги, которые готовят всё нужное до начала теста: пользователя с выполненным входом, заполненную корзину, тестовые данные. В pytest подготовка живёт в фикстуре — это код до `yield`."
   example:
     en: "The setup takes 20 seconds through the UI; let's do it through the API."
     ru: "Подготовка через интерфейс занимает 20 секунд; давай делать её через API."
@@ -61,11 +47,39 @@
   ru: очистка после теста (teardown)
   pos: noun
   def:
-    en: "Steps that clean up after a test, such as deleting the data it created, so the next test starts clean."
-    ru: "Шаги, которые убирают за тестом, например удаляют созданные им данные, чтобы следующий тест начинался с чистого листа."
+    en: "Steps that clean up after a test, such as deleting the data it created, so the next test starts clean. In a pytest fixture the teardown is the code after `yield` — it runs even when the test fails."
+    ru: "Шаги, которые убирают за тестом, например удаляют созданные им данные, чтобы следующий тест начинался с чистого листа. В pytest-фикстуре очистка — это код после `yield`; он выполняется, даже если тест упал."
   example:
     en: "The signup test needs a teardown — otherwise the second run fails with \"This email is already registered.\""
     ru: "Тесту регистрации нужна очистка — иначе второй прогон упадёт с «This email is already registered.»"
+  context: code-review
+  chapter: 9
+
+- id: fixture
+  en: fixture
+  ipa: /ˈfɪkstʃər/
+  ru: фикстура (fixture)
+  pos: noun
+  def:
+    en: "Something pytest prepares for a test and passes into it by name: the built-in `page`, or your own, such as a logged-in page. You write one with `@pytest.fixture`: setup before `yield`, teardown after it."
+    ru: "То, что pytest готовит для теста и передаёт в него по имени: встроенный `page` или твоё собственное — например, страницу с выполненным входом. Пишется через `@pytest.fixture`: подготовка до `yield`, очистка после."
+  example:
+    en: "Use the logged-in page fixture instead of logging in by hand in every test."
+    ru: "Используй фикстуру со страницей после входа вместо ручного логина в каждом тесте."
+  context: code-review
+  chapter: 9
+
+- id: conftest
+  en: conftest.py
+  ipa: /ˈkɑːnftest dɑːt paɪ/
+  ru: conftest.py (общие фикстуры)
+  pos: noun
+  def:
+    en: "A special file where you put fixtures shared by many test files. pytest finds conftest.py automatically: tests just ask for the fixture by name, no import needed."
+    ru: "Особый файл, куда складывают фикстуры, общие для многих файлов с тестами. pytest находит conftest.py сам: тесты просто запрашивают фикстуру по имени, без импорта."
+  example:
+    en: "Move the login fixture to conftest.py — three test files already copy it."
+    ru: "Перенеси фикстуру логина в conftest.py — её уже копируют три файла с тестами."
   context: code-review
   chapter: 9
 
@@ -75,8 +89,8 @@
   ru: Page Object Model (POM, паттерн «объект страницы»)
   pos: noun
   def:
-    en: "A pattern where each page gets a class with its locators and actions, so tests reuse them instead of repeating them."
-    ru: "Паттерн, при котором у каждой страницы есть класс с её локаторами и действиями, и тесты переиспользуют их вместо повторения."
+    en: "A pattern where each page gets a class with its locators and actions, like `LoginPage` in `pages/login_page.py`, so tests reuse them instead of repeating them."
+    ru: "Паттерн, при котором у каждой страницы есть класс с её локаторами и действиями, например `LoginPage` в `pages/login_page.py`, и тесты переиспользуют их вместо повторения."
   example:
     en: "With the Page Object Model, renaming \"Log in\" to \"Sign in\" is a one-line fix in LoginPage."
     ru: "С Page Object Model переименование «Log in» в «Sign in» — исправление в одну строку в LoginPage."
@@ -89,25 +103,11 @@
   ru: класс (class)
   pos: noun
   def:
-    en: "In code, a template that groups related data and methods, like a LoginPage class with a login() method. Not the same as a CSS class."
-    ru: "В коде — шаблон, который объединяет связанные данные и методы, например класс LoginPage с методом login(). Не путать с CSS-классом."
+    en: "In code, a template that groups related data and methods, like a `LoginPage` class with a `log_in()` method. Not the same as a CSS class."
+    ru: "В коде — шаблон, который объединяет связанные данные и методы, например класс `LoginPage` с методом `log_in()`. Не путать с CSS-классом."
   example:
     en: "The agent created a BasePage class with 30 methods we don't use — let's ask for a simpler version."
     ru: "Агент создал класс BasePage с 30 методами, которыми мы не пользуемся, — давай попросим вариант попроще."
-  context: code-review
-  chapter: 9
-
-- id: fixture
-  en: fixture
-  ipa: /ˈfɪkstʃər/
-  ru: фикстура (fixture)
-  pos: noun
-  def:
-    en: "Something Playwright prepares for a test and passes into it, such as page, request or your own logged-in user."
-    ru: "То, что Playwright готовит для теста и передаёт в него: page, request или твой собственный пользователь с выполненным входом."
-  example:
-    en: "Use the loggedInPage fixture instead of logging in by hand in every test."
-    ru: "Используй фикстуру loggedInPage вместо ручного входа в каждом тесте."
   context: code-review
   chapter: 9
 
@@ -117,8 +117,8 @@
   ru: параметризация (parameterization)
   pos: noun
   def:
-    en: "Running the same test body with different input data and expected results."
-    ru: "Запуск одного и того же теста с разными входными данными и ожидаемыми результатами."
+    en: "Running the same test body with different input data and expected results. In pytest it's `@pytest.mark.parametrize`: each data row becomes its own test with its own name in the report."
+    ru: "Запуск одного и того же теста с разными входными данными и ожидаемыми результатами. В pytest это `@pytest.mark.parametrize`: каждая строка данных становится отдельным тестом со своим именем в отчёте."
   example:
     en: "Parameterization fits here: one promo code test, five codes, five expected messages."
     ru: "Здесь подходит параметризация: один тест промокода, пять кодов, пять ожидаемых сообщений."
@@ -131,8 +131,8 @@
   ru: тестирование на основе данных (data-driven testing)
   pos: noun
   def:
-    en: "An approach where test cases are rows of data — inputs and expected results — fed into one test."
-    ru: "Подход, при котором тест-кейсы — это строки данных (входные значения и ожидаемые результаты), которые подаются в один тест."
+    en: "An approach where test cases are rows of data — inputs and expected results — fed into one test, for example from a list or a JSON file."
+    ru: "Подход, при котором тест-кейсы — это строки данных (входные значения и ожидаемые результаты), которые подаются в один тест, например из списка или JSON-файла."
   example:
     en: "Let's make the signup password check data-driven: 7, 8 and 9 characters, each with its own expected result."
     ru: "Давай сделаем проверку пароля при регистрации тестом на основе данных: 7, 8 и 9 символов, у каждого свой ожидаемый результат."

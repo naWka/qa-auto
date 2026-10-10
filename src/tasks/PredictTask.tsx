@@ -4,7 +4,7 @@ import { U } from '../components/Bi';
 import { CodeView } from '../components/CodeView';
 import { Icon } from '../components/Icon';
 import { CodeLab, type LabHandle } from '../lab/CodeLab';
-import type { RunResult } from '../emulator';
+import { SPEC_FILE, type RunResult } from '../emulator';
 import { useProgress } from '../store/progress';
 import { OptionList } from './ChoiceTask';
 import { FilesView } from '../lab/CodeLab';
@@ -47,7 +47,7 @@ export function PredictTask({ task, register, phase }: KindProps<Predict>) {
   return (
     <div className="task-predict">
       {!answered && <FilesView files={task.files} />}
-      {!answered && <CodeView code={task.code} label={task.files ? 'example.spec.js' : undefined} />}
+      {!answered && <CodeView code={task.code} label={task.files ? SPEC_FILE : undefined} />}
       <div className="predict-q">
         <U k="task.predictQuestion" />
         <div className="predict-buttons">

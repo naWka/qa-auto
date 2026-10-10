@@ -5,8 +5,8 @@ title: { en: "Flaky tests and debugging", ru: "Флаки-тесты и отла
 department: { en: "Platform", ru: "Платформа" }
 color: lavender
 summary:
-  en: "Find out why a test is green on Monday and red on Tuesday. You will learn how Playwright waits on its own, why an agent's `waitForTimeout` is a trap, how to read a failure in the trace viewer — and how to tell an honest fix by the healer agent from a test quietly bent to fit a bug. Docs: https://playwright.dev/docs/trace-viewer"
-  ru: "Разберёмся, почему тест зелёный в понедельник и красный во вторник. Ты узнаешь, как Playwright ждёт сам, почему `waitForTimeout` от агента — ловушка, как читать падение в Trace Viewer — и как отличить честное исправление от агента-хилера от теста, который тихо подогнали под баг. Документация: https://playwright.dev/docs/trace-viewer"
+  en: "Find out why a test is green on Monday and red on Tuesday. You will learn how Playwright waits on its own, why an agent's `wait_for_timeout` or `time.sleep` is a trap, how to reproduce a flaky test and read a failure in the trace viewer — and how to tell an honest fix by a healer agent from a test quietly bent to fit a bug. Docs: https://playwright.dev/python/docs/trace-viewer-intro"
+  ru: "Разберёмся, почему тест зелёный в понедельник и красный во вторник. Ты узнаешь, как Playwright ждёт сам, почему `wait_for_timeout` или `time.sleep` от агента — ловушка, как воспроизвести флаки-тест и прочитать падение в Trace Viewer — и как отличить честное исправление от агента-хилера от теста, который тихо подогнали под баг. Документация: https://playwright.dev/python/docs/trace-viewer-intro"
 intro:
   - who: leo
     text:
@@ -14,8 +14,8 @@ intro:
       ru: "Ночной прогон снова упал. Три теста — каждую ночь разные. Команда начала игнорировать красное."
   - who: petal
     text:
-      en: "Easy fix: I added `waitForTimeout(5000)` everywhere. And I relaxed a couple of assertions."
-      ru: "Легко исправить: я добавил везде `waitForTimeout(5000)`. И немного ослабил пару проверок."
+      en: "Easy fix: I added `time.sleep(5)` after every click. And I relaxed a couple of assertions."
+      ru: "Легко исправить: я добавил `time.sleep(5)` после каждого клика. И немного ослабил пару проверок."
   - who: mochi
     text: { en: "Mrrp?!", ru: "Мрр?!" }
   - who: maya
@@ -25,53 +25,53 @@ intro:
 plan:
   - title: { en: "Auto-waiting vs hard waits", ru: "Автоожидание против жёстких пауз" }
     goal:
-      en: "Predict what Playwright waits for before an action, and replace an agent's `waitForTimeout` with a wait for a real signal."
-      ru: "Предсказывать, чего ждёт Playwright перед действием, и заменять `waitForTimeout` от агента ожиданием настоящего сигнала."
+      en: "Predict what Playwright waits for before an action, and replace an agent's `wait_for_timeout` or `time.sleep` with a wait for a real signal."
+      ru: "Предсказывать, чего ждёт Playwright перед действием, и заменять `wait_for_timeout` или `time.sleep` от агента ожиданием настоящего сигнала."
     keyPoints:
       - en: "Before acting, Playwright waits until the element is attached, visible, stable, enabled and can receive clicks."
         ru: "Перед действием Playwright ждёт, пока элемент окажется в DOM, станет видимым, неподвижным, активным и сможет принимать клики."
-      - en: "`waitForTimeout(3000)` is too long on a fast day and too short on a slow one."
-        ru: "`waitForTimeout(3000)` слишком долгий в быстрый день и слишком короткий в медленный."
-      - en: "Wait for what the user waits for — the toast, the heading, the URL, the results count — with a web-first assertion."
-        ru: "Жди того же, чего ждёт пользователь, — тоста, заголовка, URL, количества результатов — с помощью web-first проверки."
+      - en: "`page.wait_for_timeout(3000)` and `time.sleep(3)` are too long on a fast day and too short on a slow one."
+        ru: "`page.wait_for_timeout(3000)` и `time.sleep(3)` слишком долгие в быстрый день и слишком короткие в медленный."
+      - en: "Wait for what the user waits for — the toast, the heading, the URL, the results count — with a web-first assertion: `expect(page.get_by_test_id(\"results-count\")).to_have_text(\"6 products\")`."
+        ru: "Жди того же, чего ждёт пользователь, — тоста, заголовка, URL, количества результатов — с помощью web-first проверки: `expect(page.get_by_test_id(\"results-count\")).to_have_text(\"6 products\")`."
       - en: "Agents add hard waits to turn red into green; ban them in the project rules."
         ru: "Агенты добавляют жёсткие паузы, чтобы превратить красное в зелёное; запрети их в правилах проекта."
   - title: { en: "Why tests flake", ru: "Почему тесты флакают" }
     goal:
-      en: "Diagnose a flaky test by its pattern: a race condition, slow responses, or state shared between tests."
-      ru: "Диагностировать флаки-тест по его поведению: состояние гонки, медленные ответы или общее состояние между тестами."
+      en: "Diagnose a flaky test by its pattern — a race condition, slow responses, shared data or order dependence — and reproduce it by running it many times."
+      ru: "Диагностировать флаки-тест по его поведению — состояние гонки, медленные ответы, общие данные или зависимость от порядка — и воспроизводить его многократным запуском."
     keyPoints:
-      - en: "Race condition: the test reads the result before the app is done — for example, counting products while \"Loading products…\" is on screen."
-        ru: "Состояние гонки: тест читает результат раньше, чем приложение закончило, — например, считает товары, пока на экране «Loading products…»."
-      - en: "Variable latency turns hidden timing assumptions into random failures."
-        ru: "Плавающие задержки превращают скрытые допущения о времени в случайные падения."
-      - en: "Shared state — the same user, the same cart, a fixed test order — makes tests depend on each other."
-        ru: "Общее состояние — один пользователь, одна корзина, жёсткий порядок тестов — делает тесты зависимыми друг от друга."
-      - en: "Rerunning until green hides the cause: a flaky test is a bug in the test or in the app."
-        ru: "Перезапуск до зелёного прячет причину: флаки-тест — это баг в тесте или в приложении."
+      - en: "Race condition: the test reads the result before the app is done — for example, `count()` on the product cards while \"Loading products…\" is still on screen."
+        ru: "Состояние гонки: тест читает результат раньше, чем приложение закончило, — например, вызывает `count()` для карточек товаров, пока на экране ещё «Loading products…»."
+      - en: "Shared data and order dependence — the same user, the same cart, a test that passes only after another one — make tests depend on each other."
+        ru: "Общие данные и зависимость от порядка — один пользователь, одна корзина, тест, который проходит только после другого, — делают тесты зависимыми друг от друга."
+      - en: "Reproduce before you fix: `pytest tests/test_shop.py --count=10` (the pytest-repeat plugin) runs the tests ten times; one red run in ten is a real signal."
+        ru: "Сначала воспроизведи, потом чини: `pytest tests/test_shop.py --count=10` (плагин pytest-repeat) запускает тесты десять раз; один красный прогон из десяти — настоящий сигнал."
+      - en: "Retries (`pytest --reruns 2`, the pytest-rerunfailures plugin) hide flakiness, they don't fix it: a flaky test is a bug in the test or in the app."
+        ru: "Перезапуски (`pytest --reruns 2`, плагин pytest-rerunfailures) прячут нестабильность, а не исправляют её: флаки-тест — это баг в тесте или в приложении."
   - title: { en: "Reading a failure in the trace viewer", ru: "Читаем падение в Trace Viewer" }
     goal:
-      en: "Walk through a failing test step by step and point to the moment it went wrong. Docs: https://playwright.dev/docs/trace-viewer"
-      ru: "Пройти упавший тест шаг за шагом и показать момент, где всё пошло не так. Документация: https://playwright.dev/docs/trace-viewer"
+      en: "Record a trace of a failing test, walk through it step by step and point to the moment it went wrong. Docs: https://playwright.dev/python/docs/trace-viewer-intro"
+      ru: "Записать трейс упавшего теста, пройти его шаг за шагом и показать момент, где всё пошло не так. Документация: https://playwright.dev/python/docs/trace-viewer-intro"
     keyPoints:
-      - en: "A trace records every action with DOM snapshots before and after, plus the console, network calls and the error."
-        ru: "Трейс записывает каждое действие со снимками DOM до и после, а также консоль, сетевые запросы и ошибку."
-      - en: "Read the error message first: expected vs received, which locator, how long it waited."
-        ru: "Сначала читай сообщение об ошибке: что ожидалось и что получено, какой локатор, сколько он ждал."
-      - en: "Then decide: a bug in the app, a bug in the test, or the environment? This is your bug-report instinct at work."
-        ru: "Потом реши: это баг приложения, баг теста или окружение? Здесь работает твоё чутьё на баг-репорты."
+      - en: "`pytest --tracing retain-on-failure` keeps a trace for every failed test; `playwright show-trace test-results/<test>/trace.zip` opens it."
+        ru: "`pytest --tracing retain-on-failure` сохраняет трейс каждого упавшего теста; `playwright show-trace test-results/<test>/trace.zip` открывает его."
+      - en: "The trace lists every action with DOM snapshots before and after, the call log — what Playwright waited for and how long — the console and the error."
+        ru: "В трейсе есть каждое действие со снимками DOM до и после, журнал вызова — чего Playwright ждал и сколько, — консоль и ошибка."
+      - en: "Read the error first — expected vs actual, which locator, how long it waited. Then decide: a bug in the app, a bug in the test, or the environment? This is your bug-report instinct at work."
+        ru: "Сначала читай ошибку — что ожидалось и что получено, какой локатор, сколько он ждал. Потом реши: это баг приложения, баг теста или окружение? Здесь работает твоё чутьё на баг-репорты."
       - en: "Give the agent the error and what you found in the trace, not just \"fix the test\"."
         ru: "Давай агенту ошибку и то, что ты наш{ла|ёл} в трейсе, а не просто «почини тест»."
   - title: { en: "The healer: honest fix or cover-up?", ru: "Хилер: честное исправление или прикрытие?" }
     goal:
-      en: "Review a healer's diff and decide: accept it, ask for a different fix, or mark the test `test.fixme` and file a bug."
-      ru: "Проверять дифф от хилера и решать: принять, попросить другое исправление или пометить тест `test.fixme` и завести баг."
+      en: "Review a healer agent's diff and decide: accept it, ask for a different fix, or mark the test as a known bug with `xfail` and file a bug report."
+      ru: "Проверять дифф от агента-хилера и решать: принять, попросить другое исправление или пометить тест как известный баг через `xfail` и завести баг-репорт."
     keyPoints:
-      - en: "Self-healing is fine when the app changed on purpose: a renamed button, a new step in the flow."
-        ru: "Самовосстановление уместно, когда приложение изменилось намеренно: переименовали кнопку, добавили шаг в сценарий."
+      - en: "Self-healing is fine when the app changed on purpose: a renamed button (\"Log in\" → \"Sign in\"), a new step in the flow."
+        ru: "Самовосстановление уместно, когда приложение изменилось намеренно: переименовали кнопку («Log in» → «Sign in»), добавили шаг в сценарий."
       - en: "Red flag: the healer changes the expected value to match what the app shows now (\"Welcome back, Silva!\")."
         ru: "Тревожный знак: хилер меняет ожидаемое значение под то, что приложение показывает сейчас («Welcome back, Silva!»)."
-      - en: "Other cover-ups: weaker assertions, added waits, deleted steps, `.first()` to silence strict mode."
-        ru: "Другие способы замести следы: ослабленные проверки, добавленные паузы, удалённые шаги, `.first()`, чтобы заглушить строгий режим."
-      - en: "If the feature is broken, the right result is a bug report and `test.fixme`, not a green test."
-        ru: "Если сломана сама функция, правильный итог — баг-репорт и `test.fixme`, а не зелёный тест."
+      - en: "Other cover-ups: weaker assertions, added waits, deleted steps, `.first` to silence strict mode."
+        ru: "Другие способы замести следы: ослабленные проверки, добавленные паузы, удалённые шаги, `.first`, чтобы заглушить строгий режим."
+      - en: "If the feature is broken, the right result is a bug report and `@pytest.mark.xfail(reason=\"BUG-123\", strict=True)` (or `skip`), not a green test. With `strict=True` the test turns red once the bug is fixed — your reminder to remove the mark."
+        ru: "Если сломана сама функция, правильный итог — баг-репорт и `@pytest.mark.xfail(reason=\"BUG-123\", strict=True)` (или `skip`), а не зелёный тест. С `strict=True` тест покраснеет, как только баг починят, — напоминание снять отметку."

@@ -8,8 +8,8 @@ department:
   en: "Onboarding"
   ru: "Онбординг"
 summary:
-  en: "Your first week at Bloomly. See how a test case becomes code: steps become actions, the expected result becomes an assertion, and a red report is a bug report in disguise. Petal writes — you decide what is worth checking."
-  ru: "Первая неделя в Bloomly. Смотрим, как тест-кейс превращается в код: шаги — в действия, ожидаемый результат — в проверку, а красный отчёт — это замаскированный баг-репорт. Пишет Petal, а что стоит проверять — решаешь ты."
+  en: "Your first week at Bloomly. The team's tests are written in Python with pytest: Petal writes them, you review them and decide what is worth checking. See how a test case becomes code: steps become actions, the expected result becomes an assertion, and a red report is a bug report in disguise."
+  ru: "Первая неделя в Bloomly. Тесты в команде пишут на Python с pytest: код пишет Petal, а ты делаешь ревью и решаешь, что стоит проверять. Смотрим, как тест-кейс превращается в код: шаги — в действия, ожидаемый результат — в проверку, а красный отчёт — это замаскированный баг-репорт."
 color: lavender
 intro:
   - who: leo
@@ -22,12 +22,12 @@ intro:
       ru: "Мы хотим автоматизировать её с нашим ИИ-агентом Petal. Но кто-то должен решать, что стоит проверять. Поэтому мы и позвали тебя."
   - who: maya
     text:
-      en: "Hi, I'm Maya, Senior QA. You've written hundreds of test cases and bug reports — that's exactly the skill automation needs. Code is the easy part; we'll learn to read it together."
-      ru: "Привет, я Майя, Senior QA. Ты {написала|написал} сотни тест-кейсов и баг-репортов — именно этот навык и нужен автоматизации. Код — простая часть, читать его научимся вместе."
+      en: "Hi, I'm Maya, Senior QA. You've written hundreds of test cases and bug reports — that's exactly the skill automation needs. Code is the easy part: our tests are in Python, and we'll learn to read them together."
+      ru: "Привет, я Майя, Senior QA. Ты {написала|написал} сотни тест-кейсов и баг-репортов — именно этот навык и нужен автоматизации. Код — простая часть: тесты у нас на Python, и читать их мы научимся вместе."
   - who: petal
     text:
-      en: "Hello! I'm Petal. I can write a Playwright test in ten seconds. Just tell me what to check — I'll handle the rest!"
-      ru: "Привет! Я Petal. Я пишу Playwright-тест за десять секунд. Просто скажи, что проверить, — остальное беру на себя!"
+      en: "Hello! I'm Petal. I can write a test in Python with pytest and Playwright in ten seconds. Just tell me what to check — I'll handle the rest!"
+      ru: "Привет! Я Petal. Тест на Python с pytest и Playwright я пишу за десять секунд. Просто скажи, что проверить, — остальное беру на себя!"
   - who: mochi
     text:
       en: "Mrrp?"
@@ -95,22 +95,22 @@ boss:
           - action: "Click \"Log in\""
             expected: "The account page opens and shows \"Welcome back, Anna!\""
       code: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('registered user can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom1234');
-          await page.getByLabel('Remember me').check();
-          await page.getByRole('button', { name: 'Log in' }).click();
-        });
+
+        def test_registered_user_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom1234")
+            page.get_by_label("Remember me").check()
+            page.get_by_role("button", name="Log in").click()
       issues:
-        - line: 6
+        - line: 7
           type: wrong-data
           note:
             en: "The password in TC-001 is \"bloom123\". \"bloom1234\" would make the login fail."
             ru: "Пароль в TC-001 — «bloom123». С «bloom1234» вход не пройдёт."
-        - line: 7
+        - line: 8
           type: wrong-step
           note:
             en: "TC-001 has no \"Remember me\" step. An extra step changes the scenario: this would test a different case."
@@ -118,16 +118,16 @@ boss:
         - line: 0
           type: no-assertion
           note:
-            en: "The expected result (account page, \"Welcome back, Anna!\") is never checked. The test can't fail — even with a broken login."
-            ru: "Ожидаемый результат (страница аккаунта, «Welcome back, Anna!») нигде не проверяется. Тест не может упасть — даже если вход сломан."
+            en: "The expected result (account page, \"Welcome back, Anna!\") is never checked: `expect` is imported on line 1 but never used. The test can't fail — even with a broken login."
+            ru: "Ожидаемый результат (страница аккаунта, «Welcome back, Anna!») нигде не проверяется: `expect` импортирован в строке 1, но так и не используется. Тест не может упасть — даже если вход сломан."
       types: [wrong-data, wrong-step, no-assertion, hallucination, wrong-assertion]
       hints:
         - en: "Go through the test case step by step and find each step in the code. Then look for the expected result."
           ru: "Пройди по тест-кейсу шаг за шагом и найди каждый шаг в коде. Потом поищи ожидаемый результат."
         - en: "There are three problems: one in the data, one extra step, and one thing missing from the whole test."
           ru: "Проблем три: одна в данных, один лишний шаг и одно, чего не хватает во всём тесте."
-        - en: "Check the password on line 6, the checkbox on line 7, and look for `expect` anywhere."
-          ru: "Проверь пароль в строке 6, чекбокс в строке 7 и поищи `expect` хоть где-нибудь."
+        - en: "Check the password on line 7 and the checkbox on line 8. And `expect` is imported on line 1 — is it used anywhere below?"
+          ru: "Проверь пароль в строке 7 и чекбокс в строке 8. А `expect` импортирован в строке 1 — используется ли он где-нибудь ниже?"
       praise:
         en: "Three out of three — data, steps and the missing check. That's a reviewer Petal will learn from."
         ru: "Три из трёх — данные, шаги и отсутствующая проверка. У такого ревьюера Petal будет учиться."
@@ -157,26 +157,26 @@ boss:
           - action: "Click \"Log in\""
             expected: "The account page opens and shows \"Welcome back, Anna!\""
       starter: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('registered user can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom1234');
-          await page.getByLabel('Remember me').check();
-          await page.getByRole('button', { name: 'Log in' }).click();
-        });
+
+        def test_registered_user_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom1234")
+            page.get_by_label("Remember me").check()
+            page.get_by_role("button", name="Log in").click()
       solution: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('registered user can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page).toHaveURL('/account');
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+
+        def test_registered_user_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page).to_have_url("http://localhost:3000/account")
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       checks:
         expect: pass
         static:
@@ -192,10 +192,10 @@ boss:
       hints:
         - en: "Three edits: the password, the extra line, and the check at the end."
           ru: "Три правки: пароль, лишняя строка и проверка в конце."
-        - en: "The expected result has two parts: the URL `/account` and the heading. `toHaveURL` and `toBeVisible` cover them."
-          ru: "В ожидаемом результате две части: URL `/account` и заголовок. Их покрывают `toHaveURL` и `toBeVisible`."
-        - en: "Add: `await expect(page).toHaveURL('/account');` and `await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();`"
-          ru: "Добавь: `await expect(page).toHaveURL('/account');` и `await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();`"
+        - en: "The expected result has two parts: the URL `/account` and the heading. `to_have_url` and `to_be_visible` cover them."
+          ru: "В ожидаемом результате две части: URL `/account` и заголовок. Их покрывают `to_have_url` и `to_be_visible`."
+        - en: 'Add: `expect(page).to_have_url("http://localhost:3000/account")` and `expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()`'
+          ru: 'Добавь: `expect(page).to_have_url("http://localhost:3000/account")` и `expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()`'
       praise:
         en: "Green for the right reason: correct data, the exact steps, and a check for each part of the expected result."
         ru: "Зелёный по правильной причине: верные данные, точные шаги и проверка на каждую часть ожидаемого результата."
@@ -226,27 +226,27 @@ boss:
           - action: "Click \"Log in\""
             expected: "The account page opens and shows \"Welcome back, Anna!\""
       starter: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('registered user can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page).toHaveURL('/account');
-          await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
-        });
+
+        def test_registered_user_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page).to_have_url("http://localhost:3000/account")
+            expect(page.get_by_role("heading", name="Welcome back")).to_be_visible()
       solution: |
-        import { test, expect } from '@playwright/test';
+        from playwright.sync_api import Page, expect
 
-        test('registered user can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page).toHaveURL('/account');
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+
+        def test_registered_user_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page).to_have_url("http://localhost:3000/account")
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       checks:
         expect: fail
         also:
@@ -257,8 +257,8 @@ boss:
           ru: "Сначала запусти исходный тест. Почему он зелёный, хотя приветствие неправильное?"
         - en: "\"Welcome back\" matches \"Welcome back, Silva!\" too. The check is weaker than the expected result."
           ru: "«Welcome back» совпадает и с «Welcome back, Silva!». Проверка слабее, чем ожидаемый результат."
-        - en: "Use the full text from TC-001 in the heading name: `'Welcome back, Anna!'`."
-          ru: "Используй в имени заголовка полный текст из TC-001: `'Welcome back, Anna!'`."
+        - en: 'Use the full text from TC-001 in the heading name: `name="Welcome back, Anna!"`.'
+          ru: 'Используй в имени заголовка полный текст из TC-001: `name="Welcome back, Anna!"`.'
       praise:
         en: "Your test caught a bug that a green suite was hiding. That's what automation is for."
         ru: "Твой тест поймал баг, который прятал зелёный набор. Вот для этого и нужна автоматизация."

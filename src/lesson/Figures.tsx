@@ -27,7 +27,7 @@ function AgentLoop() {
       <Arrow />
       <Node tone="sky" icon={<Icon name="globe" size={26} />} title={{ en: 'Opens the browser', ru: 'Открывает браузер' }} sub={{ en: 'Playwright MCP / CLI → accessibility snapshot', ru: 'Playwright MCP / CLI → снапшот доступности' }} />
       <Arrow />
-      <Node tone="peach" icon={<Icon name="code" size={26} />} title={{ en: 'Writes & runs the test', ru: 'Пишет и запускает тест' }} sub={{ en: 'npx playwright test', ru: 'npx playwright test' }} />
+      <Node tone="peach" icon={<Icon name="code" size={26} />} title={{ en: 'Writes & runs the test', ru: 'Пишет и запускает тест' }} sub={{ en: 'pytest', ru: 'pytest' }} />
       <Arrow />
       <Node tone="mint" icon={<Icon name="eye" size={26} />} title={{ en: 'You review & verify', ru: 'Ты ревьюишь и проверяешь' }} sub={{ en: 'does it check what matters?', ru: 'проверяет ли он то, что важно?' }} />
     </div>
@@ -35,16 +35,16 @@ function AgentLoop() {
 }
 
 function TestAnatomy() {
-  const code = `import { test, expect } from '@playwright/test';
+  const code = `from playwright.sync_api import Page, expect
 
-test('registered user can log in', async ({ page }) => {
-  await page.goto('/login');
-  await page.getByLabel('Email').fill('anna@bloomly.app');
-  await page.getByLabel('Password').fill('bloom123');
-  await page.getByRole('button', { name: 'Log in' }).click();
-  await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-});`;
-  const cls = (n: number) => (n === 3 ? 'fig-l-title' : n >= 4 && n <= 7 ? 'fig-l-steps' : n === 8 ? 'fig-l-expect' : '');
+
+def test_registered_user_can_log_in(page: Page):
+    page.goto("/login")
+    page.get_by_label("Email").fill("anna@bloomly.app")
+    page.get_by_label("Password").fill("bloom123")
+    page.get_by_role("button", name="Log in").click()
+    expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()`;
+  const cls = (n: number) => (n === 4 ? 'fig-l-title' : n >= 5 && n <= 8 ? 'fig-l-steps' : n === 9 ? 'fig-l-expect' : '');
   return (
     <div className="figure fig-anatomy">
       <CodeView code={code} lineClass={cls} />
@@ -59,10 +59,10 @@ test('registered user can log in', async ({ page }) => {
 
 function ManualVsAuto() {
   const rows: [{ en: string; ru: string }, string][] = [
-    [{ en: 'Open the login page', ru: 'Открыть страницу входа' }, "page.goto('/login')"],
-    [{ en: 'Enter email and password', ru: 'Ввести email и пароль' }, "getByLabel('Email').fill(…)"],
-    [{ en: 'Click “Log in”', ru: 'Нажать «Log in»' }, "getByRole('button', …).click()"],
-    [{ en: 'Expected: greeting is shown', ru: 'Ожидается: приветствие видно' }, 'expect(…).toBeVisible()'],
+    [{ en: 'Open the login page', ru: 'Открыть страницу входа' }, 'page.goto("/login")'],
+    [{ en: 'Enter email and password', ru: 'Ввести email и пароль' }, 'get_by_label("Email").fill(…)'],
+    [{ en: 'Click “Log in”', ru: 'Нажать «Log in»' }, 'get_by_role("button", …).click()'],
+    [{ en: 'Expected: greeting is shown', ru: 'Ожидается: приветствие видно' }, 'expect(…).to_be_visible()'],
   ];
   return (
     <div className="figure fig-mva">
@@ -108,7 +108,7 @@ function ReviewChecklist() {
     { en: 'Does it check the expected result from the test case?', ru: 'Проверяет ли тест ожидаемый результат из тест-кейса?' },
     { en: 'Is there a real assertion (not just “no errors”)?', ru: 'Есть ли настоящая проверка (а не просто «без ошибок»)?' },
     { en: 'Are the locators resilient (role, label, test id)?', ru: 'Устойчивые ли локаторы (роль, подпись, test id)?' },
-    { en: 'No hard waits, no missing awaits?', ru: 'Нет жёстких ожиданий и пропущенных await?' },
+    { en: 'No hard waits, no methods without ()?', ru: 'Нет жёстких ожиданий и методов без ()?' },
     { en: 'Right test data, independent of other tests?', ru: 'Верные данные, тест независим от других?' },
   ];
   return (
@@ -142,10 +142,10 @@ type TT = { en: string; ru: string };
 
 function LocatorPriority() {
   const rows: [string, TT, string][] = [
-    ["getByRole('button', { name: 'Log in' })", { en: 'What everyone sees: role + accessible name', ru: 'То, что видят все: роль + доступное имя' }, 'mint'],
-    ["getByLabel('Email')", { en: 'Form fields by their label', ru: 'Поля формы по подписи' }, 'mint'],
-    ["getByText('Your cart is empty.') · getByPlaceholder(…)", { en: 'Visible text; placeholder only without a label', ru: 'Видимый текст; placeholder — только если нет подписи' }, 'sky'],
-    ["getByTestId('cart-total')", { en: 'A contract with developers: stable, invisible to users', ru: 'Договорённость с разработчиками: стабильно, но не видно пользователю' }, 'butter'],
+    ['get_by_role("button", name="Log in")', { en: 'What everyone sees: role + accessible name', ru: 'То, что видят все: роль + доступное имя' }, 'mint'],
+    ['get_by_label("Email")', { en: 'Form fields by their label', ru: 'Поля формы по подписи' }, 'mint'],
+    ['get_by_text("Your cart is empty.") · get_by_placeholder(…)', { en: 'Visible text; placeholder only without a label', ru: 'Видимый текст; placeholder — только если нет подписи' }, 'sky'],
+    ['get_by_test_id("cart-total")', { en: 'A contract with developers: stable, invisible to users', ru: 'Договорённость с разработчиками: стабильно, но не видно пользователю' }, 'butter'],
     ["locator('#login-form > button.btn')", { en: 'CSS / XPath: last resort, breaks on redesign', ru: 'CSS / XPath: крайний случай, ломается от редизайна' }, 'coral'],
   ];
   return (
@@ -215,9 +215,9 @@ function TestAgents() {
         <Arrow />
         <Node tone="rose" icon={<Icon name="map" size={24} />} title={{ en: 'Planner', ru: 'Планировщик' }} sub={{ en: 'explores the app → specs/plan.md', ru: 'исследует приложение → specs/plan.md' }} />
         <Arrow />
-        <Node tone="sky" icon={<Icon name="code" size={24} />} title={{ en: 'Generator', ru: 'Генератор' }} sub={{ en: 'plan → tests/*.spec.ts, checks locators live', ru: 'план → tests/*.spec.ts, сверяет локаторы вживую' }} />
+        <Node tone="sky" icon={<Icon name="code" size={24} />} title={{ en: 'Generator', ru: 'Генератор' }} sub={{ en: 'plan → tests/test_*.py, checks locators live', ru: 'план → tests/test_*.py, сверяет локаторы вживую' }} />
         <Arrow />
-        <Node tone="peach" icon={<Icon name="wand" size={24} />} title={{ en: 'Healer', ru: 'Хилер' }} sub={{ en: 'failing test → fix or test.fixme()', ru: 'упавший тест → исправление или test.fixme()' }} />
+        <Node tone="peach" icon={<Icon name="wand" size={24} />} title={{ en: 'Healer', ru: 'Хилер' }} sub={{ en: 'failing test → fix or xfail + bug report', ru: 'упавший тест → исправление или xfail + баг-репорт' }} />
       </div>
       <div className="fig-gates">
         <Gate label={{ en: 'Gate 1: you approve the plan', ru: 'Точка 1: ты утверждаешь план' }} />
@@ -233,7 +233,7 @@ function ReviewGates() {
     [{ en: 'Plan', ru: 'План' }, { en: 'Right scenarios? Risks, boundaries, negatives?', ru: 'Те ли сценарии? Риски, границы, негативные случаи?' }],
     [{ en: 'Code', ru: 'Код' }, { en: 'Five review questions for every test', ru: 'Пять вопросов ревью к каждому тесту' }],
     [{ en: 'Proof', ru: 'Доказательство' }, { en: 'Each test goes red when its bug comes back', ru: 'Каждый тест краснеет, когда возвращается его баг' }],
-    [{ en: 'Heals', ru: 'Лечение' }, { en: 'Honest fix — or bug report + test.fixme()', ru: 'Честное исправление — или баг-репорт + test.fixme()' }],
+    [{ en: 'Heals', ru: 'Лечение' }, { en: 'Honest fix — or bug report + @pytest.mark.xfail', ru: 'Честное исправление — или баг-репорт + @pytest.mark.xfail' }],
   ];
   return (
     <div className="figure fig-flow">
@@ -251,15 +251,15 @@ function PageObject() {
   return (
     <div className="figure fig-pom">
       <div className="pom-col">
-        {['login.spec.js', 'cart.spec.js', 'orders.spec.js'].map((f) => (
-          <div key={f} className="pom-file"><Icon name="code" size={14} /> {f}<span className="pom-call">loginPage.login(…)</span></div>
+        {['test_login.py', 'test_cart.py', 'test_orders.py'].map((f) => (
+          <div key={f} className="pom-file"><Icon name="code" size={14} /> {f}<span className="pom-call">login_page.log_in(…)</span></div>
         ))}
       </div>
       <Arrow />
       <div className="pom-class">
         <div className="pom-title"><Icon name="books" size={16} /> LoginPage</div>
         <div className="pom-part"><BiInline t={{ en: 'Locators', ru: 'Локаторы' }} stack={false} /><code>email · password · submit</code></div>
-        <div className="pom-part"><BiInline t={{ en: 'Actions', ru: 'Действия' }} stack={false} /><code>goto() · login(email, password)</code></div>
+        <div className="pom-part"><BiInline t={{ en: 'Actions', ru: 'Действия' }} stack={false} /><code>open() · log_in(email, password)</code></div>
         <div className="pom-note"><BiInline t={{ en: 'The button was renamed? Change one line here.', ru: 'Переименовали кнопку? Меняешь одну строку здесь.' }} /></div>
       </div>
       <Arrow />
@@ -271,11 +271,11 @@ function PageObject() {
 function FixtureLifecycle() {
   return (
     <div className="figure fig-flow">
-      <Node tone="mint" icon={<Icon name="wand" size={22} />} title={{ en: 'Setup', ru: 'Подготовка' }} sub={{ en: 'code before use(): log in, fill the cart', ru: 'код до use(): войти, наполнить корзину' }} />
+      <Node tone="mint" icon={<Icon name="wand" size={22} />} title={{ en: 'Setup', ru: 'Подготовка' }} sub={{ en: 'code before yield: log in, fill the cart', ru: 'код до yield: войти, наполнить корзину' }} />
       <Arrow />
-      <Node tone="lavender" icon={<Icon name="play" size={22} />} title={{ en: 'use(value)', ru: 'use(value)' }} sub={{ en: 'the test runs with the ready value', ru: 'тест выполняется с готовым значением' }} />
+      <Node tone="lavender" icon={<Icon name="play" size={22} />} title={{ en: 'yield value', ru: 'yield value' }} sub={{ en: 'the test runs with the ready value', ru: 'тест выполняется с готовым значением' }} />
       <Arrow />
-      <Node tone="peach" icon={<Icon name="trash" size={22} />} title={{ en: 'Teardown', ru: 'Уборка' }} sub={{ en: 'code after use(): clean up, even if the test failed', ru: 'код после use(): уборка, даже если тест упал' }} />
+      <Node tone="peach" icon={<Icon name="trash" size={22} />} title={{ en: 'Teardown', ru: 'Уборка' }} sub={{ en: 'code after yield: clean up, even if the test failed', ru: 'код после yield: уборка, даже если тест упал' }} />
     </div>
   );
 }
@@ -325,7 +325,7 @@ function CiPipeline() {
     <div className="figure fig-flow">
       <Node tone="lavender" icon={<Icon name="upload" size={22} />} title={{ en: 'Push / pull request', ru: 'Push / pull request' }} sub={{ en: 'git push origin my-branch', ru: 'git push origin my-branch' }} />
       <Arrow />
-      <Node tone="sky" icon={<Icon name="gear" size={22} />} title={{ en: 'GitHub Actions', ru: 'GitHub Actions' }} sub={{ en: 'npm ci → npx playwright install → npx playwright test', ru: 'npm ci → npx playwright install → npx playwright test' }} />
+      <Node tone="sky" icon={<Icon name="gear" size={22} />} title={{ en: 'GitHub Actions', ru: 'GitHub Actions' }} sub={{ en: 'pip install → playwright install → pytest', ru: 'pip install → playwright install → pytest' }} />
       <Arrow />
       <Node tone="peach" icon={<Icon name="download" size={22} />} title={{ en: 'Report artifact', ru: 'Отчёт-артефакт' }} sub={{ en: 'playwright-report/ + traces', ru: 'playwright-report/ + трейсы' }} />
       <Arrow />

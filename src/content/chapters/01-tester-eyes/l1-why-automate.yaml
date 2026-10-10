@@ -98,11 +98,11 @@ steps:
               en: "Speed is exactly what agents are good at."
               ru: "Скорость — как раз сильная сторона агентов."
           - text:
-              en: "Write JavaScript."
-              ru: "Писать на JavaScript."
+              en: "Write Python."
+              ru: "Писать на Python."
             why:
-              en: "Agents write JavaScript well. They are weaker at knowing what the code should check."
-              ru: "На JavaScript агенты пишут хорошо. Слабее у них понимание, что именно код должен проверять."
+              en: "Agents write Python well. They are weaker at knowing what the code should check."
+              ru: "На Python агенты пишут хорошо. Слабее у них понимание, что именно код должен проверять."
         hints:
           - en: "What does an agent not know about Bloomly?"
             ru: "Чего агент не знает о Bloomly?"
@@ -137,18 +137,20 @@ steps:
     body:
       - en: "You already write [[test cases|test-case]]: a title, steps, an expected result. An [[automated test|automated-test]] has exactly the same parts — only written as code."
         ru: "Ты уже пишешь [[тест-кейсы|test-case]]: название, шаги, ожидаемый результат. У [[автотеста|automated-test]] ровно те же части — только записаны они кодом."
-      - en: "A [[test runner|test-runner]] (for us, Playwright) reads this code, opens a browser, does the steps and checks the result. Then it reports: passed or failed."
-        ru: "[[Тест-раннер|test-runner]] (у нас это Playwright) читает этот код, открывает браузер, выполняет шаги и проверяет результат. Потом сообщает: прошёл тест или упал."
-      - en: "Don't try to read every symbol yet. Find the three parts you already know: the title, the steps, the check."
-        ru: "Пока не пытайся разобрать каждый символ. Найди три знакомые части: название, шаги, проверку."
+      - en: "A [[test runner|test-runner]] — for us, pytest — finds every function whose name starts with `test_` and runs it: Playwright opens a browser, does the steps and checks the result. Then pytest reports: passed or failed."
+        ru: "[[Тест-раннер|test-runner]] — у нас это pytest — находит все функции, имя которых начинается с `test_`, и запускает их: Playwright открывает браузер, выполняет шаги и проверяет результат. Потом pytest сообщает: прошёл тест или упал."
+      - en: "Don't try to read every symbol yet — the first line just brings in Playwright's tools. Find the three parts you already know: the title (the function name after `def`), the steps, the check."
+        ru: "Пока не пытайся разобрать каждый символ — первая строка просто подключает инструменты Playwright. Найди три знакомые части: название (имя функции после `def`), шаги, проверку."
     code: |
-      test('registered user can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('bloom123');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page).toHaveURL('/account');
-      });
+      from playwright.sync_api import Page, expect
+
+
+      def test_registered_user_can_log_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page).to_have_url("http://localhost:3000/account")
 
   - type: mapping
     keyPoint: kp-test-is-script
@@ -156,8 +158,8 @@ steps:
       en: "TC-001 and its automated test, side by side"
       ru: "TC-001 и его автотест рядом"
     intro:
-      en: "Every line of the test case has its own line of code. Tap a step to see where it lives."
-      ru: "У каждой строки тест-кейса есть своя строка кода. Нажми на шаг, чтобы увидеть, где он в коде."
+      en: "Every line of the test case has its own line of code, and the title becomes the function name. Tap a step to see where it lives."
+      ru: "У каждой строки тест-кейса есть своя строка кода, а название становится именем функции. Нажми на шаг, чтобы увидеть, где он в коде."
     testCase:
       id: TC-001
       title: Registered user can log in
@@ -171,22 +173,22 @@ steps:
         - action: "Click \"Log in\""
           expected: "The account page opens and shows \"Welcome back, Anna!\""
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('registered user can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('bloom123');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page).toHaveURL('/account');
-        await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-      });
+
+      def test_registered_user_can_log_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page).to_have_url("http://localhost:3000/account")
+          expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
     links:
-      - { from: s1, lines: [4] }
-      - { from: s2, lines: [5] }
-      - { from: s3, lines: [6] }
-      - { from: s4, lines: [7] }
-      - { from: e4, lines: [8, 9] }
+      - { from: s1, lines: [5] }
+      - { from: s2, lines: [6] }
+      - { from: s3, lines: [7] }
+      - { from: s4, lines: [8] }
+      - { from: e4, lines: [9, 10] }
 
   - type: example
     keyPoint: kp-test-is-script
@@ -197,28 +199,28 @@ steps:
       en: "A [[smoke test|smoke-test]] is a quick check that the most important path works. Read the notes, then press Run and watch the runner do the steps."
       ru: "[[Смоук-тест|smoke-test]] — быстрая проверка, что самый важный путь работает. Прочитай пояснения, потом нажми «Run» и посмотри, как раннер выполняет шаги."
     code: |
-      import { test, expect } from '@playwright/test';
+      from playwright.sync_api import Page, expect
 
-      test('home page leads to the shop', async ({ page }) => {
-        await page.goto('/');
-        await page.getByRole('link', { name: 'Shop now' }).click();
-        await expect(page).toHaveURL('/shop');
-        await expect(page.getByRole('heading', { name: 'Shop' })).toBeVisible();
-      });
+
+      def test_home_page_leads_to_the_shop(page: Page):
+          page.goto("/")
+          page.get_by_role("link", name="Shop now").click()
+          expect(page).to_have_url("http://localhost:3000/shop")
+          expect(page.get_by_role("heading", name="Shop")).to_be_visible()
     notes:
       - lines: 1
         text:
-          en: "A standard first line: it brings in `test` and `expect` from Playwright. You'll see it in every test file."
-          ru: "Стандартная первая строка: подключает `test` и `expect` из Playwright. Она будет в каждом файле с тестами."
-      - lines: 3
+          en: "A standard first line: it imports `Page` and `expect` from Playwright. You'll see it at the top of every test file — `tests/test_shop.py`, `tests/test_login.py` and so on."
+          ru: "Стандартная первая строка: импортирует `Page` и `expect` из Playwright. Она стоит в начале каждого файла с тестами — `tests/test_shop.py`, `tests/test_login.py` и так далее."
+      - lines: 4
         text:
-          en: "The test case title, in English. It describes the behaviour."
-          ru: "Название тест-кейса, по-английски. Оно описывает поведение."
-      - lines: [4, 5]
+          en: "The test itself is a function. Its name is the test case title in English, with `_` instead of spaces. The `test_` prefix tells pytest to run it; `page` is the browser tab pytest hands to the test."
+          ru: "Сам тест — это функция. Её имя — название тест-кейса по-английски, с `_` вместо пробелов. Приставка `test_` говорит pytest, что функцию надо запустить; `page` — вкладка браузера, которую pytest передаёт тесту."
+      - lines: [5, 6]
         text:
           en: "Steps: open the home page, click the \"Shop now\" link."
           ru: "Шаги: открыть главную, нажать ссылку «Shop now»."
-      - lines: [6, 7]
+      - lines: [7, 8]
         text:
           en: "Expected result: the shop page opens and its heading \"Shop\" is visible."
           ru: "Ожидаемый результат: открылась страница магазина, виден заголовок «Shop»."
@@ -251,27 +253,27 @@ steps:
         ru: "Сопоставь каждую часть TC-001 со строкой кода."
       pairs:
         - left: { en: "Test case title", ru: "Название тест-кейса" }
-          right: "test('registered user can log in', async ({ page }) => {"
+          right: 'def test_registered_user_can_log_in(page: Page):'
         - left: { en: "Step: open the login page", ru: "Шаг: открыть страницу входа" }
-          right: "await page.goto('/login');"
+          right: 'page.goto("/login")'
         - left: { en: "Step: enter the password bloom123", ru: "Шаг: ввести пароль bloom123" }
-          right: "await page.getByLabel('Password').fill('bloom123');"
+          right: 'page.get_by_label("Password").fill("bloom123")'
         - left: { en: "Expected result: the account page opens", ru: "Ожидаемый результат: открывается страница аккаунта" }
-          right: "await expect(page).toHaveURL('/account');"
+          right: 'expect(page).to_have_url("http://localhost:3000/account")'
       rightCode: true
       hints:
         - en: "Look for familiar words in each line: a title, a page address, a password, an expectation."
           ru: "Ищи знакомые слова в каждой строке: название, адрес страницы, пароль, ожидание."
-        - en: "The line that starts with `test(` holds the title. The line with `expect` is the check."
-          ru: "Строка, которая начинается с `test(`, содержит название. Строка с `expect` — это проверка."
-        - en: "`goto('/login')` opens the login page; `fill('bloom123')` types the password."
-          ru: "`goto('/login')` открывает страницу входа; `fill('bloom123')` вводит пароль."
+        - en: "The line that starts with `def test_` holds the title. The line with `expect` is the check."
+          ru: "Строка, которая начинается с `def test_`, содержит название. Строка с `expect` — это проверка."
+        - en: '`goto("/login")` opens the login page; `fill("bloom123")` types the password.'
+          ru: '`goto("/login")` открывает страницу входа; `fill("bloom123")` вводит пароль.'
       praise:
         en: "You read code through the test case — that's the habit that makes reviews fast."
         ru: "Ты {прочитала|прочитал} код через тест-кейс — именно эта привычка делает ревью быстрым."
       explain:
-        en: "Each part of a test case has a direct twin in code: the title goes into `test('...')`, each step is one `await` line, and the expected result becomes `expect(...)`."
-        ru: "У каждой части тест-кейса есть прямой двойник в коде: название идёт в `test('...')`, каждый шаг — одна строка с `await`, а ожидаемый результат становится `expect(...)`."
+        en: "Each part of a test case has a direct twin in code: the title becomes the function name `test_registered_user_can_log_in`, each step is one line, and the expected result becomes `expect(...)`."
+        ru: "У каждой части тест-кейса есть прямой двойник в коде: название становится именем функции `test_registered_user_can_log_in`, каждый шаг — одна строка, а ожидаемый результат становится `expect(...)`."
 
   - type: task
     task:
@@ -347,13 +349,12 @@ steps:
         en: "Will this test pass or fail?"
         ru: "Этот тест пройдёт или упадёт?"
       code: |
-        test('tom can log in', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('tom@bloomly.app');
-          await page.getByLabel('Password').fill('tulips42');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-        });
+        def test_tom_can_log_in(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("tom@bloomly.app")
+            page.get_by_label("Password").fill("tulips42")
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
       outcome: fail
       reasons:
         - text:
@@ -410,13 +411,12 @@ steps:
           - action: "Click \"Log in\""
             expected: "Error \"Invalid email or password.\" is shown"
       code: |
-        test('wrong password shows an error', async ({ page }) => {
-          await page.goto('/login');
-          await page.getByLabel('Email').fill('anna@bloomly.app');
-          await page.getByLabel('Password').fill('bloom123');
-          await page.getByRole('button', { name: 'Log in' }).click();
-          await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');
-        });
+        def test_wrong_password_shows_an_error(page: Page):
+            page.goto("/login")
+            page.get_by_label("Email").fill("anna@bloomly.app")
+            page.get_by_label("Password").fill("bloom123")
+            page.get_by_role("button", name="Log in").click()
+            expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")
       issues:
         - line: 4
           type: wrong-data
@@ -467,10 +467,10 @@ steps:
           text: "Write a Playwright test for TC-001: a registered user can log in to Bloomly."
           ru: "Напиши Playwright-тест для TC-001: зарегистрированный пользователь может войти в Bloomly."
         - id: steps
-          text: "Steps: open /login, enter anna@bloomly.app and bloom123, click the \"Log in\" button."
+          text: 'Steps: open /login, enter anna@bloomly.app and bloom123, click the "Log in" button.'
           ru: "Шаги: открой /login, введи anna@bloomly.app и bloom123, нажми кнопку «Log in»."
         - id: expected
-          text: "Expected result: the account page shows the heading \"Welcome back, Anna!\"."
+          text: 'Expected result: the account page shows the heading "Welcome back, Anna!".'
           ru: "Ожидаемый результат: на странице аккаунта виден заголовок «Welcome back, Anna!»."
         - id: noise
           text: "You are the best tester in the world. Make no mistakes!"
@@ -482,53 +482,53 @@ steps:
             en: "Here's the test for TC-001. It follows your steps and checks the greeting from the expected result."
             ru: "Вот тест для TC-001. Он идёт по твоим шагам и проверяет приветствие из ожидаемого результата."
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('registered user can log in', async ({ page }) => {
-              await page.goto('/login');
-              await page.getByLabel('Email').fill('anna@bloomly.app');
-              await page.getByLabel('Password').fill('bloom123');
-              await page.getByRole('button', { name: 'Log in' }).click();
-              await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-            });
+
+            def test_registered_user_can_log_in(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("anna@bloomly.app")
+                page.get_by_label("Password").fill("bloom123")
+                page.get_by_role("button", name="Log in").click()
+                expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
         - when: [steps]
           message:
             en: "Done! The test logs in successfully. It's ready to merge."
             ru: "Готово! Тест успешно входит в аккаунт. Можно мержить."
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('registered user can log in', async ({ page }) => {
-              await page.goto('/login');
-              await page.getByLabel('Email').fill('anna@bloomly.app');
-              await page.getByLabel('Password').fill('bloom123');
-              await page.getByRole('button', { name: 'Log in' }).click();
-            });
+
+            def test_registered_user_can_log_in(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("anna@bloomly.app")
+                page.get_by_label("Password").fill("bloom123")
+                page.get_by_role("button", name="Log in").click()
         - when: [expected]
           message:
             en: "I used standard test credentials for the login. The test checks the greeting."
             ru: "Для входа я взял стандартные тестовые данные. Тест проверяет приветствие."
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('registered user can log in', async ({ page }) => {
-              await page.goto('/login');
-              await page.getByLabel('Email').fill('test@example.com');
-              await page.getByLabel('Password').fill('password123');
-              await page.getByRole('button', { name: 'Log in' }).click();
-              await expect(page.getByRole('heading', { name: 'Welcome back, Anna!' })).toBeVisible();
-            });
+
+            def test_registered_user_can_log_in(page: Page):
+                page.goto("/login")
+                page.get_by_label("Email").fill("test@example.com")
+                page.get_by_label("Password").fill("password123")
+                page.get_by_role("button", name="Log in").click()
+                expect(page.get_by_role("heading", name="Welcome back, Anna!")).to_be_visible()
         - when: []
           message:
             en: "You didn't say which flow, so I tested that the home page opens. Looks great!"
             ru: "Ты не {сказала|сказал}, какой сценарий, поэтому я проверил, что открывается главная. Выглядит отлично!"
           code: |
-            import { test, expect } from '@playwright/test';
+            from playwright.sync_api import Page, expect
 
-            test('bloomly works', async ({ page }) => {
-              await page.goto('/');
-              await expect(page).toHaveTitle('Bloomly — Fresh flowers delivered');
-            });
+
+            def test_bloomly_works(page: Page):
+                page.goto("/")
+                expect(page).to_have_title("Bloomly — Fresh flowers delivered")
       missing:
         steps:
           en: "Without the steps and data, the agent guessed — it invented test@example.com, a user that doesn't exist in Bloomly."
@@ -560,21 +560,21 @@ steps:
       en: "Typical mistakes when an agent writes the test"
       ru: "Типичные ошибки, когда тест пишет агент"
     items:
-      - wrong: "await page.getByRole('button', { name: 'Log in' }).click(); // done, test is green"
-        right: "await page.getByRole('button', { name: 'Log in' }).click();\nawait expect(page).toHaveURL('/account');"
+      - wrong: 'page.get_by_role("button", name="Log in").click()  # done, test is green'
+        right: "page.get_by_role(\"button\", name=\"Log in\").click()\nexpect(page).to_have_url(\"http://localhost:3000/account\")"
         why:
           en: "A test that ends after the click checks nothing. It stays green even when login is broken. Ask: what would make this test fail?"
           ru: "Тест, который заканчивается после клика, ничего не проверяет. Он остаётся зелёным, даже когда вход сломан. Спроси себя: что заставит этот тест упасть?"
-      - wrong: "await page.getByLabel('Password').fill('password123');"
-        right: "await page.getByLabel('Password').fill('bloom123');"
+      - wrong: 'page.get_by_label("Password").fill("password123")'
+        right: 'page.get_by_label("Password").fill("bloom123")'
         why:
           en: "Agents invent plausible test data. Take the data from the test case, not from the agent's imagination."
           ru: "Агенты придумывают правдоподобные тестовые данные. Бери данные из тест-кейса, а не из фантазии агента."
-      - wrong: "test('test 1', async ({ page }) => {"
-        right: "test('registered user can log in', async ({ page }) => {"
+      - wrong: "def test_1(page: Page):\n    page.goto(\"/login\")"
+        right: "def test_registered_user_can_log_in(page: Page):\n    page.goto(\"/login\")"
         why:
-          en: "The title is the test case title. In a red report, \"test 1\" tells nobody what broke."
-          ru: "Название — это название тест-кейса. В красном отчёте «test 1» никому не скажет, что сломалось."
+          en: "The test name is the test case title. In a red report, `FAILED tests/test_login.py::test_1` tells nobody what broke."
+          ru: "Имя теста — это название тест-кейса. В красном отчёте `FAILED tests/test_login.py::test_1` никому не скажет, что сломалось."
 
   - type: explain
     keyPoint: kp-qa-role-ai
@@ -686,17 +686,17 @@ checkPool:
       ru: "Сопоставь части TC-002 «Wrong password shows an error» с кодом."
     pairs:
       - left: { en: "Title", ru: "Название" }
-        right: "test('wrong password shows an error', async ({ page }) => {"
+        right: 'def test_wrong_password_shows_an_error(page: Page):'
       - left: { en: "Step: open the login page", ru: "Шаг: открыть страницу входа" }
-        right: "await page.goto('/login');"
+        right: 'page.goto("/login")'
       - left: { en: "Step: enter the password wrong-pass", ru: "Шаг: ввести пароль wrong-pass" }
-        right: "await page.getByLabel('Password').fill('wrong-pass');"
+        right: 'page.get_by_label("Password").fill("wrong-pass")'
       - left: { en: "Expected: the error \"Invalid email or password.\" is shown", ru: "Ожидаемый результат: показана ошибка «Invalid email or password.»" }
-        right: "await expect(page.getByRole('alert')).toHaveText('Invalid email or password.');"
+        right: 'expect(page.get_by_role("alert")).to_have_text("Invalid email or password.")'
     rightCode: true
     hints:
-      - en: "Find the title first: it's inside `test('...')`."
-        ru: "Сначала найди название: оно внутри `test('...')`."
+      - en: "Find the title first: it's the function name after `def`."
+        ru: "Сначала найди название: это имя функции после `def`."
       - en: "The expected result is the line with `expect`."
         ru: "Ожидаемый результат — строка с `expect`."
     explain:
@@ -714,10 +714,9 @@ checkPool:
       en: "The Bloomly home page heading says \"Fresh flowers, delivered with love\"."
       ru: "Заголовок главной страницы Bloomly — «Fresh flowers, delivered with love»."
     code: |
-      test('home page shows the main heading', async ({ page }) => {
-        await page.goto('/');
-        await expect(page.getByRole('heading', { name: 'Fresh flowers, delivered with love' })).toBeVisible();
-      });
+      def test_home_page_shows_the_main_heading(page: Page):
+          page.goto("/")
+          expect(page.get_by_role("heading", name="Fresh flowers, delivered with love")).to_be_visible()
     outcome: pass
     reasons:
       - text:
@@ -753,10 +752,9 @@ checkPool:
         - action: "Open the account page"
           expected: "City shows \"Lisbon\""
     code: |
-      test('account page shows the city', async ({ page }) => {
-        await page.goto('/account');
-        await expect(page.getByTestId('account-city')).toHaveText('Berlin');
-      });
+      def test_account_page_shows_the_city(page: Page):
+          page.goto("/account")
+          expect(page.get_by_test_id("account-city")).to_have_text("Berlin")
     issues:
       - line: 3
         type: wrong-assertion
@@ -767,8 +765,8 @@ checkPool:
     hints:
       - en: "Read the expected result in the test case."
         ru: "Прочитай ожидаемый результат в тест-кейсе."
-      - en: "Compare it with the value inside `toHaveText(...)`."
-        ru: "Сравни его со значением внутри `toHaveText(...)`."
+      - en: "Compare it with the value inside `to_have_text(...)`."
+        ru: "Сравни его со значением внутри `to_have_text(...)`."
     explain:
       en: "The assertion expects the wrong value. The test would fail on a correct app — or, worse, someone would \"fix\" the app to match it. The test case is the source of truth."
       ru: "Проверка ждёт неправильное значение. Тест упадёт на правильном приложении — или, что хуже, кто-то «починит» приложение под него. Источник истины — тест-кейс."
@@ -824,13 +822,12 @@ checkPool:
       en: "Will this test pass or fail on Bloomly?"
       ru: "Этот тест пройдёт или упадёт на Bloomly?"
     code: |
-      test('registered user can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('test@example.com');
-        await page.getByLabel('Password').fill('password123');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page).toHaveURL('/account');
-      });
+      def test_registered_user_can_log_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("test@example.com")
+          page.get_by_label("Password").fill("password123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page).to_have_url("http://localhost:3000/account")
     outcome: fail
     reasons:
       - text:
@@ -856,16 +853,15 @@ checkPool:
     kind: choice
     keyPoint: kp-test-is-script
     prompt:
-      en: "What does the test runner do with a test like this?"
-      ru: "Что тест-раннер делает с таким тестом?"
+      en: "What does the test runner (pytest) do with a test like this?"
+      ru: "Что тест-раннер (pytest) делает с таким тестом?"
     code: |
-      test('registered user can log in', async ({ page }) => {
-        await page.goto('/login');
-        await page.getByLabel('Email').fill('anna@bloomly.app');
-        await page.getByLabel('Password').fill('bloom123');
-        await page.getByRole('button', { name: 'Log in' }).click();
-        await expect(page).toHaveURL('/account');
-      });
+      def test_registered_user_can_log_in(page: Page):
+          page.goto("/login")
+          page.get_by_label("Email").fill("anna@bloomly.app")
+          page.get_by_label("Password").fill("bloom123")
+          page.get_by_role("button", name="Log in").click()
+          expect(page).to_have_url("http://localhost:3000/account")
     options:
       - text:
           en: "Opens a browser, performs the steps one by one, checks the expected result and reports pass or fail."
@@ -898,5 +894,5 @@ checkPool:
       - en: "What happens to each line, and what do you get at the end?"
         ru: "Что происходит с каждой строкой и что получаешь в конце?"
     explain:
-      en: "The test runner (Playwright Test) executes the steps in a real browser, checks the assertions and writes a report: passed or failed, with details."
-      ru: "Тест-раннер (Playwright Test) выполняет шаги в настоящем браузере, проверяет утверждения и пишет отчёт: прошёл или упал, с подробностями."
+      en: "The test runner (pytest, with Playwright driving the browser) runs the steps in a real browser, checks the assertions and prints a report: passed or failed, with details."
+      ru: "Тест-раннер (pytest, а браузером управляет Playwright) выполняет шаги в настоящем браузере, сверяет ожидаемые результаты и выводит отчёт: прошёл тест или упал, с подробностями."
