@@ -268,6 +268,7 @@ button { font: inherit; color: inherit; }
 .cv-line { display: flex; align-items: baseline; min-height: 1.65em; padding-right: 12px; width: 100%; border: 0; background: none; text-align: left; font: inherit; color: inherit; position: relative; }
 button.cv-line { cursor: pointer; }
 button.cv-line:hover { background: var(--code-active); }
+.codeview-plain .cv-line { padding-left: 12px; }
 .cv-num { flex-shrink: 0; width: 2.6em; padding-right: 12px; text-align: right; color: var(--code-gutter); user-select: none; }
 .cv-code { white-space: pre; flex: 1; }
 .cv-extra { margin-left: 8px; flex-shrink: 0; }
@@ -436,14 +437,15 @@ button.cv-line:hover { background: var(--code-active); }
 .tc-data { font-family: var(--font-mono); font-size: .85em; color: var(--ink-2); }
 .mistakes { display: flex; flex-direction: column; gap: 16px; }
 .mistake { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; }
-.mistake-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.mistake-pair .codeview { margin: 4px 0; }
+.mistake-pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-bottom: 8px; }
+.mistake-pair > div { min-width: 0; }
+.mistake-pair .codeview { margin: 4px 0 0; }
+.mistake-pair .cv-code { white-space: pre-wrap; overflow-wrap: anywhere; padding-left: 2ch; text-indent: -2ch; }
 .mistake-wrong .codeview { border-color: color-mix(in srgb, var(--coral) 60%, var(--line)); background: color-mix(in srgb, var(--coral-soft) 50%, var(--code-bg)); }
 .mistake-right .codeview { border-color: color-mix(in srgb, var(--mint) 60%, var(--line)); background: color-mix(in srgb, var(--mint-soft) 50%, var(--code-bg)); }
 .mk-label { display: inline-flex; align-items: center; gap: 4px; font: 800 .74rem var(--font-display); text-transform: uppercase; letter-spacing: .04em; }
 .mistake-wrong .mk-label { color: var(--coral-strong); }
 .mistake-right .mk-label { color: var(--mint-strong); }
-@media (max-width: 640px) { .mistake-pair { grid-template-columns: 1fr; } }
 .model-answer, .explain-box { background: var(--mint-soft); border-radius: var(--r-s); padding: 12px 14px; margin: 12px 0; }
 .explain-box { background: var(--sky-soft); }
 .explain-label { display: flex; align-items: center; gap: 6px; font: 800 .78rem var(--font-display); text-transform: uppercase; letter-spacing: .04em; color: var(--ink-2); margin-bottom: 6px; }

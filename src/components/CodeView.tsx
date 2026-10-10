@@ -112,7 +112,7 @@ export function CodeView({ code, highlight, runLine, errorLine, onLineClick, lin
   const lines = useMemo(() => highlightLines(text), [text]);
   const hl = new Set(highlight || []);
   return (
-    <div className={`codeview ${onLineClick ? 'codeview-clickable' : ''} ${className}`} aria-label={label}>
+    <div className={`codeview ${onLineClick ? 'codeview-clickable' : ''} ${numbers ? '' : 'codeview-plain'} ${className}`} aria-label={label}>
       {label && <div className="codeview-label">{label}</div>}
       <pre>
         {lines.map((toks, i) => {
