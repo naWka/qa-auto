@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Lesson, Step } from '../content/schema';
-import { lessons, chapterById, lessonsOf } from '../content';
+import { loadLesson, loadedLesson, chapterById, lessonsOf } from '../content';
 import { Bi, BiInline, U } from '../components/Bi';
 import { Icon } from '../components/Icon';
 import { Mentor } from '../components/Mentor';
@@ -42,7 +42,18 @@ function PretestStep({ step, onDone }: { step: Extract<Step, { type: 'pretest' }
 }
 
 export function LessonPage({ id, focus, startStep }: { id: string; focus: string[] | null; startStep?: number }) {
-  const lesson = lessons.get(id);
+  const [lesson, setLesson] = useState<Lesson | null | undefined>(() => loadedLesson(id));
+  useEffect(() => {
+    let alive = true;
+    if (!lesson) loadLesson(id).then((l) => alive && setLesson(l ?? null));
+    return () => { alive = false; };
+  }, [id]);
+  if (lesson === undefined) return <div className="page"><div className="center-load"><span className="spinner" /></div></div>;
+  if (lesson === null) return <div className="page"><p>Lesson not found.</p></div>;
+  return <LessonView lesson={lesson} id={id} focus={focus} startStep={startStep} />;
+}
+
+function LessonView({ lesson, id, focus, startStep }: { lesson: Lesson; id: string; focus: string[] | null; startStep?: number }) {
   const p = useProgress();
   const saved = p.lessons[id];
   const items = useMemo(() => (lesson ? buildItems(lesson, focus) : []), [id, focus?.join(',')]);
@@ -58,7 +69,6 @@ export function LessonPage({ id, focus, startStep }: { id: string; focus: string
   useEffect(() => { top.current?.scrollIntoView({ block: 'start' }); window.scrollTo({ top: 0 }); }, [i, finished]);
   useEffect(() => { if (!finished && !focus) p.setLessonStep(id, i); }, [i]);
 
-  if (!lesson) return <div className="page"><p>Lesson not found.</p></div>;
   const chapter = chapterById(lesson.chapter);
 
   if (offerWarmup) {

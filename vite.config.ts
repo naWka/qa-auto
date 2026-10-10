@@ -8,13 +8,22 @@ function yaml(): Plugin {
   return {
     name: 'content-yaml',
     transform(code, id) {
-      if (!/\.ya?ml$/.test(id)) return null;
+      const [path, query] = id.split('?');
+      if (!/\.ya?ml$/.test(path)) return null;
       try {
-        const data = YAML.parse(code, { prettyErrors: true });
+        let data = YAML.parse(code, { prettyErrors: true });
+        // Lessons are split: metadata + check pool load with the app, the steps load when a lesson opens.
+        if (query === 'meta' && data?.steps) {
+          const { steps, ...meta } = data;
+          const stepTasks = (steps as { type: string; task?: { id: string; kind: string; xp?: number } }[])
+            .filter((s) => s.type === 'task' && s.task)
+            .map((s) => ({ id: s.task!.id, kind: s.task!.kind, xp: s.task!.xp }));
+          data = { ...meta, stepTasks };
+        } else if (query === 'steps') data = data?.steps ?? null;
         return { code: `export default ${JSON.stringify(data)};`, map: null };
       } catch (e) {
         // A broken lesson file is skipped (npm run check:content reports it); anything else stops the build.
-        if (!/\/chapters\/[^/]+\/l\d[^/]*\.ya?ml$/.test(id)) throw e;
+        if (!/\/chapters\/[^/]+\/l\d[^/]*\.ya?ml$/.test(path)) throw e;
         this.warn(`skipping ${id}: ${(e as Error).message.split('\n')[0]}`);
         return { code: 'export default null;', map: null };
       }

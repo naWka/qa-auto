@@ -1,6 +1,6 @@
 // Decisions about what to study: next lesson, warm-up queue, checks, placement, weak topics.
-import type { Lesson, Task } from '../content/schema';
-import { chapters, glossary, lessons, lessonsOf } from '../content';
+import type { Task } from '../content/schema';
+import { chapters, glossary, lessons, lessonsOf, type LessonMeta as Lesson } from '../content';
 import { chapterMastered, chapterUnlocked, lessonDone, type ProgressData } from '../store/progress';
 import { isDue } from './srs';
 import { shuffle } from '../tasks/types';

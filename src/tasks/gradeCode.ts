@@ -80,9 +80,16 @@ export async function gradeCode(
       const ok = outcomeMatches(result, extra.expect);
       also.push({ app: extra.app as AppSetup, expect: extra.expect, result, ok });
       if (!ok) {
-        problems.push(extra.expect === 'pass'
-          ? { en: 'On the fixed app the test fails too — so it fails for the wrong reason. A good bug-catching test is green when the bug is gone.', ru: 'На исправленной версии тест тоже падает — значит, падает не из-за бага. Хороший тест, ловящий баг, зеленеет, когда бага нет.' }
-          : { en: 'On the other app version the test should fail, but it passed.', ru: 'На другой версии приложения тест должен упасть, но прошёл.' });
+        const variant = (extra.app as AppSetup).variant;
+        problems.push(extra.expect === 'fail'
+          ? { en: 'On the other app version the test should fail, but it passed.', ru: 'На другой версии приложения тест должен упасть, но прошёл.' }
+          : variant === 'redesign'
+            ? { en: 'After the redesign the test fails: it depends on class names or the page layout. Find elements the way a user does — by role, label, text or test id.', ru: 'После редизайна тест падает: он зависит от имён классов или вёрстки. Ищи элементы так, как их ищет пользователь, — по роли, подписи, тексту или test id.' }
+            : variant === 'sign-in'
+              ? { en: 'On the version with the renamed button the test fails. Is the button\'s name written in more than one place?', ru: 'На версии с переименованной кнопкой тест падает. Имя кнопки записано больше чем в одном месте?' }
+              : (extra.app as AppSetup).bugs?.length
+                ? { en: 'On another app version the test should pass, but it failed.', ru: 'На другой версии приложения тест должен пройти, но упал.' }
+                : { en: 'On the fixed app the test fails too — so it fails for the wrong reason. A good bug-catching test is green when the bug is gone.', ru: 'На исправленной версии тест тоже падает — значит, падает не из-за бага. Хороший тест, ловящий баг, зеленеет, когда бага нет.' });
       }
     }
   }

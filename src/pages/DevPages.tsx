@@ -1,10 +1,10 @@
 // Dev-only helpers: render one task by id, or the lab components on their own.
-import { taskById } from '../content';
+import { loadAllTasks, type TaskRef } from '../content';
 import { TaskShell } from '../tasks/TaskShell';
 import { Inspector } from '../lab/Inspector';
 import { TraceViewer } from '../lab/TraceViewer';
 import { CodeLab } from '../lab/CodeLab';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Figure } from '../lesson/Figures';
 import { Figure as FigureEnum } from '../content/schema';
 
@@ -17,7 +17,9 @@ export function DevFiguresPage() {
 }
 
 export function DevTaskPage({ id }: { id: string }) {
-  const ref = taskById.get(id);
+  const [ref, setRef] = useState<TaskRef | null | undefined>(undefined);
+  useEffect(() => { loadAllTasks().then((all) => setRef(all.find((r) => r.task.id === id) ?? null)); }, [id]);
+  if (ref === undefined) return <div className="page"><span className="spinner" /></div>;
   if (!ref) return <div className="page"><p>No task {id}</p></div>;
   return (
     <div className="page lesson lesson-wide" style={{ paddingBottom: 160 }}>

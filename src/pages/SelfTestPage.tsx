@@ -1,6 +1,6 @@
 // Dev page: runs every reference solution / prediction / best agent response through the emulator.
 import { useEffect, useRef, useState } from 'react';
-import { allTasks, chapters, lessonsOf } from '../content';
+import { chapters, loadAllTasks, loadLesson, lessonsOf } from '../content';
 import type { Checks, Task } from '../content/schema';
 import { RunController, openPreview, runSpec, type AppSetup, type RunResult, type StepRecord } from '../emulator';
 import { AUT_DIR } from '../lab/useRunner';
@@ -42,7 +42,7 @@ export function SelfTestPage() {
     window.__selftest = { done: false, rows: out };
     const push = (r: Row) => { out.push(r); setRows([...out]); };
     const summarize = (r: RunResult) => r.status === 'error' ? `error: ${r.error?.message.split('\n')[0]}` : r.tests.map((t) => `${t.status}${t.error ? ` (${t.error.code}: ${t.error.message.split('\n')[0].slice(0, 120)})` : ''}`).join('; ');
-    const tasks = allTasks.filter((r) => !filter || r.task.id.startsWith(filter));
+    const tasks = (await loadAllTasks()).filter((r) => !filter || r.task.id.startsWith(filter));
     for (const { task } of tasks) {
       const t = task as Task;
       const app = (t as { app?: AppSetup }).app;
@@ -111,7 +111,8 @@ export function SelfTestPage() {
       }
     }
     // runnable examples
-    for (const ch of chapters) for (const l of lessonsOf(ch)) for (const s of l.steps) {
+    for (const ch of chapters) for (const meta of lessonsOf(ch)) for (const s of (await loadLesson(meta.id))?.steps ?? []) {
+      const l = meta;
       if (s.type === 'trace' && (!filter || l.id.startsWith(filter))) {
         const r = await run(s.code, s.app as AppSetup, s.files);
         push({ id: `${l.id} trace`, kind: 'trace-step', status: r.status === 'error' ? 'fail' : 'info', note: summarize(r) });

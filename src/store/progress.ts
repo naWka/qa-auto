@@ -241,7 +241,7 @@ export const useProgress = create<ProgressStore>()(
             xp = LESSON_BONUS;
             if (via !== 'lesson') {
               // Counted by a check: award what the lesson's tasks would have given.
-              for (const s of lesson.steps) if (s.type === 'task' && !p.tasks[s.task.id]?.solved) xp += baseXp(s.task);
+              for (const t of lesson.stepTasks) if (!p.tasks[t.id]?.solved) xp += baseXp(t);
             }
           }
           const t = today();

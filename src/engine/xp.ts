@@ -9,12 +9,12 @@ const BASE: Record<Task['kind'], number> = {
 export const LESSON_BONUS = 15;
 export const BOSS_BONUS = 50;
 
-export function baseXp(task: Task): number {
+export function baseXp(task: Pick<Task, 'kind' | 'xp'>): number {
   return task.xp ?? BASE[task.kind];
 }
 
 /** Reward after hints: each hint −25%, minimum 25%; revealed answer = 0. */
-export function earnedXp(task: Task, hints: number, revealed: boolean): number {
+export function earnedXp(task: Pick<Task, 'kind' | 'xp'>, hints: number, revealed: boolean): number {
   if (revealed) return 0;
   return Math.max(1, Math.round(baseXp(task) * Math.max(0.25, 1 - 0.25 * hints)));
 }

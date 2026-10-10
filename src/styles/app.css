@@ -554,7 +554,9 @@ select.blank { appearance: auto; }
 .parsons-empty, .parsons-drop { color: var(--ink-3); text-align: center; padding: 10px; }
 
 /* match */
-.match-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.match-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.match-item { min-width: 0; overflow-wrap: anywhere; }
+.match-item .code-inline-line { white-space: pre-wrap; word-break: break-word; }
 .match-col { display: flex; flex-direction: column; gap: 8px; }
 .match-item { text-align: left; padding: 10px 12px; border-radius: var(--r-s); border: 1.5px solid var(--line-2); background: var(--surface); cursor: pointer; min-height: 48px; transition: all var(--t-fast); color: var(--ink); font-size: .93rem; }
 .match-item:hover:not(:disabled) { border-color: var(--lavender); }
